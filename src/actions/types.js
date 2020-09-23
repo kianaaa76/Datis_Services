@@ -1,0 +1,21 @@
+export const LOCAL_HOST =
+  'http://deka.datis-elevator.ir:8060/api/ServiceManApplication';
+export const API_KEY =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImRiOTkxYmFhZDIwYjc5MTllZjQ0MjA3MzM1MmVhN2JhZTE4MjU5ZTE2OGMyNWYwODk1ZmMwNDgxZjllNmExNTc3NDJmNzI5MGE0OTFjMjEyIn0.eyJhdWQiOiIxMDk0MSIsImp0aSI6ImRiOTkxYmFhZDIwYjc5MTllZjQ0MjA3MzM1MmVhN2JhZTE4MjU5ZTE2OGMyNWYwODk1ZmMwNDgxZjllNmExNTc3NDJmNzI5MGE0OTFjMjEyIiwiaWF0IjoxNjAwNzczMzg3LCJuYmYiOjE2MDA3NzMzODcsImV4cCI6MTYwMzI3ODk4Nywic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.CFl5nc2Gl1L_1mmS1mcZgJs-HU-b2a70e2530WlKoD0kVv82nGMlCd6eYIOQH8VJ6HGkSAcELGR7yrysZ5olBXbUADuJQ-zXdyKJPOONcxHSYwEjRPSNoRJxqTNcac9YAj9etP6qf69Nj3d5vlRWgyUof8zs_It7IA2luat9i9nB-Yi5_hxH5n-MHZfOG2BxLH0jZ35_bjy0bV82RPZwqq_Uv00GiwgWrt1xGBXfWilrqG7k9urgeo8oW_-DhaCT82UUUToGOn6_ITco6mjK4dAU2q7ZbhO8nhAnVfjaAFSqtptak01A9bjsGn-3N2-B7Oda92qOsthLk5xqUlHOUw';
+
+export const LOGIN_SUCCESS = 'login_success';
+export const LOGIN_FAIL = 'login_fail';
+
+export const LOGIN_VERIFICATION_SUCCESS = 'login_verification_success';
+export const LOGIN_VERIFICATION_FAIL = 'login_verification_fail';
+
+export const GET_MISSION_LIST_SUCCESS = 'get_mission_list_success';
+export const GET_MISSION_LIST_FAIL = 'get_mission_list_fail';
+
+export const START_MISSION_SUCCESS = 'start_mission_success';
+export const START_MISSION_FAIL = 'start_mission_fail';
+
+export const FINISH_MISSION_SUCCESS = 'finish_mission_success';
+export const FINISH_MISSION_FAIL = 'finish_mission_fail';
+
+export const LOGOUT = 'logout';
