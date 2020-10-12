@@ -1,97 +1,62 @@
 import React from 'react';
 import {View, StyleSheet, Dimensions, Text} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import Header from '../../components/common/Header';
-import {toFaDigit} from '../utils/utilities';
+import Header from '../../common/Header';
+import {toFaDigit} from '../../utils/utilities';
+import Icon from "react-native-vector-icons/Foundation";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const MissionDetails = ({navigation}) => {
   const mission = navigation.getParam('mission', {});
-  const startLocation = mission.StartLocation;
+  const StartLocation = mission.StartLocation;
   const EndLocation = mission.EndLocation;
-  const StartLatitude = startLocation.substr(0, startLocation.indexOf(','));
-  const StartLongitude = startLocation.substr(
-    startLocation.indexOf(',') + 1,
-    startLocation.length,
-  );
-  const EndLatitude = EndLocation.substr(0, EndLocation.indexOf(','));
-  const EndLongitude = EndLocation.substr(
-    EndLocation.indexOf(',') + 1,
-    EndLocation.length,
-  );
+  const StartLatitude = StartLocation.length>1 ? StartLocation.substr(0, StartLocation.indexOf(',')):0;
+  const StartLongitude = StartLocation.length>1 ? StartLocation.substr(StartLocation.indexOf(',') + 1, StartLocation.length,):0;
+  const EndLatitude = EndLocation.length>1 ? EndLocation.substr(0, EndLocation.indexOf(',')):0;
+  const EndLongitude = EndLocation.length>1 ? EndLocation.substr(EndLocation.indexOf(',') + 1, EndLocation.length):0;
 
-  const startFeatureCollection = {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        id: mission.ID,
-        properties: {
-          id: mission.ID,
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [parseFloat(StartLongitude)+5, parseFloat(StartLatitude)+5],
-        },
-      },
-    ],
-  };
-
-  const endFeatureCollection = {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        id: -mission.ID,
-        properties: {
-          id: -mission.ID,
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [parseFloat(EndLongitude), parseFloat(EndLatitude)],
-        },
-      },
-    ],
-  };
+  const renderMarker = (latitude,longitude, color, size, id, type) =>{
+    return(
+        <View>
+          <MapboxGL.MarkerView
+              id={id}
+              coordinate={[longitude, latitude]}>
+            <View>
+              <View style={{
+                alignItems: 'center',
+                width: 100,
+                backgroundColor: 'transparent',
+                height: 100,
+              }}>
+                <Icon name="marker" color={color} size={size}/>
+                <Text style={Styles.markerLabelStyle}>{type == "start"? "مبدا" : "مقصد"}</Text>
+              </View>
+            </View>
+          </MapboxGL.MarkerView>
+        </View>
+    )
+  }
 
   return (
     <View style={{flex: 1}}>
       <Header headerText="داتیس سرویس" />
       <View style={Styles.contentContainerStyle}>
         <MapboxGL.MapView style={{width: '100%', height: pageHeight * 0.57}}>
-          <MapboxGL.Camera
-            centerCoordinate={[
-              (parseFloat(StartLongitude) + parseFloat(EndLongitude)) / 2,
-              (parseFloat(StartLatitude) + parseFloat(EndLatitude)) / 2,
-            ]}
-            zoomLevel={10}
-          />
-          <MapboxGL.ShapeSource
-            id="symbolLocationSource"
-            shape={startFeatureCollection}>
-            <MapboxGL.SymbolLayer
-              id="marker"
-              style={{
-                iconImage:
-                  'https://i7.pngguru.com/preview/731/25/158/computer-icons-google-map-maker-marker-pen-cartodb-clip-art-map-marker.jpg',
-                iconSize: 0.3,
-              }}
-            />
-          </MapboxGL.ShapeSource>
-          <MapboxGL.ShapeSource
-            id="symbolLocationSource"
-            shape={endFeatureCollection}>
-            <MapboxGL.SymbolLayer
-              id="marker"
-              style={{
-                iconImage:
-                  'https://i7.pngguru.com/preview/731/25/158/computer-icons-google-map-maker-marker-pen-cartodb-clip-art-map-marker.jpg',
-                iconSize: 0.1,
-              }}
-            />
-          </MapboxGL.ShapeSource>
+          {(!!StartLongitude && !!StartLatitude && !EndLongitude && !EndLatitude) ?
+          (<MapboxGL.Camera
+            centerCoordinate={[parseFloat(StartLongitude), parseFloat(StartLatitude)]}
+          zoomLevel={10}/>)
+              :(!StartLongitude && !StartLatitude && !!EndLongitude && !!EndLatitude) ? (
+                      <MapboxGL.Camera
+                          centerCoordinate={[parseFloat(EndLongitude), parseFloat(EndLatitude),]}
+                          zoomLevel={10}/>
+                  ):null}
+          {!!StartLatitude && !!StartLongitude && (
+            renderMarker(StartLatitude, StartLongitude,"blue", 45, "1",'start'))}
+          {!!EndLatitude && !!EndLongitude && (
+            renderMarker(EndLatitude, EndLongitude, "red", 45, "2", "end"))}
         </MapboxGL.MapView>
         <View style={Styles.detailsContainerStyle}>
           <View style={Styles.singleRowContainerStyle}>
@@ -179,6 +144,15 @@ const Styles = StyleSheet.create({
   itemTextStyle: {
     fontSize: 15,
   },
+  markerLabelStyle:{
+    width:50,
+    height:20,
+    justifyContent:"center",
+    textAlign:"center",
+    borderRadius:10,
+    backgroundColor:"#A8A7A7",
+    color:"#000"
+  }
 });
 
 export default MissionDetails;

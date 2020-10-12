@@ -20,7 +20,7 @@ export default class extends Component {
     return (
       <View style={Styles.headercontainerStyle}>
         <View style={Styles.headerContentStyle}>
-          <View style={{ width: 40 }}>
+          <View style={{ width: 100, justifyContent:'center', height:"100%" }}>
             {!!leftIcon && this.renderHeaderLeft()}
           </View>
           <View style={Styles.headerTextContainerStyle}>
@@ -39,7 +39,7 @@ const Styles = StyleSheet.create({
     height: pageHeight*0.075,
     width: pageWidth,
     paddingHorizontal: 16,
-    paddingVertical: 11,
+    paddingVertical: 5,
     backgroundColor: "#660000",
 
   },
@@ -56,6 +56,6 @@ const Styles = StyleSheet.create({
     color: "#dadfe1"
   },
   headerTextContainerStyle: {
-    flex: 1
+    width:"50%"
   }
 });

@@ -13,10 +13,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {
-  LOGIN_FAIL,
-  LOGIN_SUCCESS,
-  LOGIN_VERIFICATION_SUCCESS,
-  LOGIN_VERIFICATION_FAIL,
+  LOGIN,
+  LOGIN_VERIFICATION,
 } from '../../actions/types';
 import {stackNavigation, NavigationActions} from 'react-navigation';
 import {useSelector, useDispatch} from 'react-redux';
@@ -33,16 +31,16 @@ const inputDeactiveColor = 'gray';
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
   const [hasCode, setHasCode] = useState(false);
-  const [counter, setCounter] = useState(60);
+  const [counter, setCounter] = useState(120);
   const [phoneNumber, setPhoneNumber] = useState();
   const [receiveCodeLoading, setReceiveCodeLoading] = useState(false);
   const [enterSystemLoading, setEnterSystemLoading] = useState(false);
   const [persistLoading, setPersistLoading] = useState(true);
   const [code, setCode] = useState('');
-  const selector = useSelector(state => state);
+  const selector = useSelector((state) => state);
 
   useEffect(() => {
-    if (!!selector.token) {
+    if (selector.token) {
       navigation.navigate('SignedIn');
     } else {
       setPersistLoading(false);
@@ -51,10 +49,10 @@ const Login = ({navigation}) => {
 
   const onReceiveCodePress = () => {
     setReceiveCodeLoading(true);
-    setCounter(60);
-    var iteration = 60;
+    setCounter(120);
+    var iteration = 120;
     setCode('');
-    loginUser(phoneNumber).then(data => {
+    loginUser(phoneNumber).then((data) => {
       if (data.errorCode == 0) {
         setHasCode(true);
         const counterInterval = setInterval(() => {
@@ -65,12 +63,12 @@ const Login = ({navigation}) => {
           return () => clearInterval(counterInterval);
         }, 1000);
         dispatch({
-          type: LOGIN_SUCCESS,
+          type: LOGIN,
           error: '',
         });
       } else {
         dispatch({
-          type: LOGIN_FAIL,
+          type: LOGIN,
           error: data.message,
         });
         ToastAndroid.showWithGravity(
@@ -85,23 +83,31 @@ const Login = ({navigation}) => {
 
   const onEnterSystemPress = () => {
     setEnterSystemLoading(true);
-    loginVerification(phoneNumber, code).then(data => {
-      if (data.errorCode == 0) {
-        dispatch({
-          type: LOGIN_VERIFICATION_SUCCESS,
-          token: data.result.Token,
-          userId: data.result.ID,
-          error: '',
-        });
-        navigation.navigate('SignedIn');
-      } else {
-        dispatch({
-          type: LOGIN_VERIFICATION_FAIL,
-          error: data.message,
-        });
-      }
-      setEnterSystemLoading(false);
-    });
+    if (counter == 0) {
+      ToastAndroid.showWithGravity(
+        'لطفا مجددا درخواست کد فعالسازی دهید.',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    } else {
+      loginVerification(phoneNumber, code).then((data) => {
+        if (data.errorCode == 0) {
+          dispatch({
+            type: LOGIN_VERIFICATION,
+            token: data.result.Token,
+            userId: data.result.ID,
+            error: '',
+          });
+          navigation.navigate('SignedIn');
+        } else {
+          dispatch({
+            type: LOGIN_VERIFICATION,
+            error: data.message,
+          });
+        }
+        setEnterSystemLoading(false);
+      });
+    }
   };
 
   const shadowOpt = {
@@ -133,10 +139,10 @@ const Login = ({navigation}) => {
             <TextInput
               style={[
                 Styles.textInputStyle,
-                {fontWeight: !!phoneNumber ? null : 'bold'},
+                {fontWeight: phoneNumber ? null : 'bold'},
               ]}
               placeholder="شماره تلفن"
-              onChangeText={phoneNumber => {
+              onChangeText={(phoneNumber) => {
                 setPhoneNumber(phoneNumber);
               }}
               keyboardType="numeric"
@@ -164,10 +170,10 @@ const Login = ({navigation}) => {
             <TextInput
               style={[
                 Styles.textInputStyle,
-                {fontWeight: !!code ? null : 'bold'},
+                {fontWeight: code ? null : 'bold'},
               ]}
               placeholder="کد فعالسازی"
-              onChangeText={code => setCode(code)}
+              onChangeText={(code) => setCode(code)}
               keyboardType="numeric"
               placeholderTextColor={hasCode ? '#660000' : 'gray'}
               value={code}

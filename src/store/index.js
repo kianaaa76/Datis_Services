@@ -1,5 +1,5 @@
 import {createStore, applyMiddleware} from 'redux';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {persistStore, persistReducer} from 'redux-persist';
 import {createWhitelistFilter} from 'redux-persist-transform-filter';
 import ReduxThunk from 'redux-thunk';

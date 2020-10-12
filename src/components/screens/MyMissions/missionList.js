@@ -7,45 +7,41 @@ import {
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
-  Text
+  Text,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Octicons from 'react-native-vector-icons/Octicons';
 import {useSelector, useDispatch} from 'react-redux';
-import {getMissionList} from '../../actions/api';
-import {
-  GET_MISSION_LIST_SUCCESS,
-  GET_MISSION_LIST_FAIL,
-} from '../../actions/types';
-import Header from '../common/Header';
-import MissionListItem from '../utils/missionListItem';
+import {getMissionList} from '../../../actions/api';
+import {LOGOUT} from '../../../actions/types';
+import Header from '../../common/Header';
+import MissionListItem from '../../utils/missionListItem';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const MissionList = ({navigation}) => {
   const dispatch = useDispatch();
-  const selector = useSelector(state => state);
+  const selector = useSelector((state) => state);
   const [missionListLoading, setMissionListLoading] = useState(false);
+  const [missionList, setMissionList] = useState([]);
   const getMissions = () => {
     setMissionListLoading(true);
-    getMissionList(selector.userId, selector.token).then(data => {
-      if (data.errorCode == 0) {
-        dispatch({
-          type: GET_MISSION_LIST_SUCCESS,
-          error: '',
-          missionList: data.result,
-        });
+    getMissionList(selector.userId, selector.token).then((data) => {
+      if (data.errorCode === 0) {
+        setMissionList(data.result);
       } else {
-        dispatch({
-          type: GET_MISSION_LIST_FAIL,
-          error: data.message,
-        });
-        ToastAndroid.showWithGravity(
-          data.message,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        if (data.errorCode === 3){
+          dispatch({
+            type:LOGOUT
+          });
+          navigation.navigate("SignedOut");
+        } else {
+          ToastAndroid.showWithGravity(
+              data.message,
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+          );
+        }
       }
       setMissionListLoading(false);
     });
@@ -88,35 +84,14 @@ const MissionList = ({navigation}) => {
         <View style={Styles.contentContianerStyle}>
           <View style={Styles.flatlistContainerStyle}>
             <FlatList
-              data={selector.missionList}
-              renderItem={item => (
+              data={missionList}
+              renderItem={(item) => (
                 <MissionListItem item={item} navigation={navigation} />
               )}
-              keyExtractor={item => item.ID.toString()}
+              keyExtractor={(item) => item.ID.toString()}
               ListEmptyComponent={() => renderEmptyList()}
             />
           </View>
-          <TouchableOpacity
-            style={Styles.newMissionbuttonStyle}
-            onPress={() => {
-              if (!!selector.unfinishedMissionId) {
-                ToastAndroid.showWithGravity(
-                  'به دلیل وجود ماموریت ناتمام امکان ایجاد ماموریت جدید وجود ندارد.',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
-              } else {
-                navigation.navigate('NewMissionStart');
-              }
-            }}>
-            <Octicons
-              name="plus"
-              style={{
-                fontSize: 33,
-                color: '#dadfe1',
-              }}
-            />
-          </TouchableOpacity>
         </View>
       )}
     </View>

@@ -61,11 +61,17 @@ const Home = ({navigation}) => {
       <Header headerText="داتیس سرویس" />
       <View style={Styles.contentStyle}>
         <View style={Styles.SingleRowStyle}>
-          {renderHomeItems('سرویس‌های مانده‌دار', images[0], () => {})}
-          {renderHomeItems('سرویس‌های من', images[1], () => {})}
+          {renderHomeItems('سرویس‌های مانده‌دار', images[0], () => {
+            navigation.navigate("RemainingServices");
+          })}
+          {renderHomeItems('سرویس‌های من', images[1], () => {
+            navigation.navigate('MyServices');
+          })}
         </View>
         <View style={Styles.SingleRowStyle}>
-          {renderHomeItems('سرویس‌های رد‌شده', images[2], () => {})}
+          {renderHomeItems('سرویس‌های رد‌شده', images[2], () => {
+            navigation.navigate('RejectedServices');
+          })}
           {renderHomeItems('آرشیو سرویس‌ها', images[3], () => {})}
         </View>
         <View style={Styles.SingleRowStyle}>
@@ -98,10 +104,11 @@ const Styles = StyleSheet.create({
   },
   contentStyle: {
     flex: 1,
+    height: pageHeight,
   },
   SingleRowStyle: {
     width: pageWidth,
-    height: pageHeight * 0.25,
+    height: pageHeight * 0.23,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

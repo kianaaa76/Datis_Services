@@ -3,10 +3,15 @@ import {createSwitchNavigator, createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Home from '../components/screens/Home';
 import Login from '../components/screens/Login';
-import Missions from '../components/screens/missionList';
-import MissionDetails from '../components/screens/MissionDetails';
-import NewMissionStart from '../components/screens/NewMissionStart';
-import FinishMission from "../components/screens/FinishMission";
+import Missions from '../components/screens/MyMissions/missionList';
+import MissionDetails from '../components/screens/MyMissions/MissionDetails';
+import MyServices from '../components/screens/MyServices/MyServices';
+import MyServiceDetails from "../components/screens/MyServices/MyServiceDetails";
+import NewService from "../components/screens/MyServices/NewService";
+import RejectedServiceList from "../components/screens/RejectedServices/RejectedServiceList";
+import RejectedServiceDetail from "../components/screens/RejectedServices/RejectedServiceDetail";
+import RemainingServiceList from "../components/screens/RemainingServices/RemainingServiceList";
+import RemainingServiceDetail from "../components/screens/RemainingServices/RemainingServiceDetail";
 
 const SignedIn = createStackNavigator(
   {
@@ -19,12 +24,27 @@ const SignedIn = createStackNavigator(
     MissionDetail: {
       screen: MissionDetails,
     },
-    NewMissionStart: {
-      screen: NewMissionStart,
+    MyServices: {
+      screen: MyServices,
     },
-    FinishMission: {
-      screen: FinishMission
-    }
+      MyServiceDetails:{
+        screen: MyServiceDetails
+      },
+      NewService:{
+        screen: NewService
+      },
+      RejectedServices:{
+        screen: RejectedServiceList
+      },
+      RejectedServiceDetail:{
+        screen: RejectedServiceDetail
+      },
+      RemainingServices:{
+        screen: RemainingServiceList
+      },
+      RemainingServiceDetail:{
+        screen: RemainingServiceDetail
+      }
   },
   {
     headerMode: 'none',

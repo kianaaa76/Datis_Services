@@ -33,21 +33,10 @@ const MissionListItem = ({item, navigation}) => {
             width: '100%',
             height: '100%',
           }}
-          onPress={() =>
-            !!Item.EndDate
-              ? navigation.navigate('MissionDetail', {mission: Item})
-              : navigation.navigate('FinishMission', {
-                  startDate: Item.StartDate,
-                  startLatitude: Item.StartLocation.substr(
-                    0,
-                    Item.StartLocation.indexOf(','),
-                  ),
-                  startLongitude: Item.StartLocation.substr(
-                    Item.StartLocation.indexOf(',') + 1,
-                    Item.StartLocation.length,
-                  ),
-                })
-          }>
+          onPress={() => {
+              console.log("ITEM", Item)
+              navigation.navigate('MissionDetail', {mission: Item})
+          }}>
           <View style={{
               width: pageWidth * 0.9,
               height: pageHeight * 0.1,
