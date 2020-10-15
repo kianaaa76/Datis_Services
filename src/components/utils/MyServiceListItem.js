@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -15,7 +15,8 @@ import {RESTORE_SERVICE_DATA} from "../../actions/types";
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectId}) => {
+const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectId, setNetworkModalState}) => {
+    const [isNetworkSaved, setIsNetworkSaved] = useState(false);
   const shadowOpt = {
     width: pageWidth * 0.9,
     height: pageHeight * 0.1,
@@ -28,6 +29,24 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
   };
   const Item = item.item;
     const dispatch = useDispatch();
+    useEffect(async ()=>{
+        await AsyncStorage.getItem("savedServicesList").then(list=> {
+            if(!!list){
+                JSON.parse(list).map(item=>{
+                    if (item.projectId === Item.projectID) {
+                        if (item.saveType == "network"){
+                            setIsNetworkSaved(true);
+                        }
+                    }
+                });
+            }
+        });
+    },[]);
+
+    useEffect(()=>{
+
+    })
+
   return (
     <View style={{flex: 1}}>
       <BoxShadow setting={shadowOpt}>
@@ -42,7 +61,11 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                       let flag = false;
                       JSON.parse(list).map(item=>{
                           if (item.projectId === Item.projectID) {
-                              setModalState(true);
+                              if (item.saveType === "self"){
+                                  setModalState(true);
+                              } else {
+                                  setNetworkModalState(true);
+                              }
                               setSelectedProjectId(Item.projectID);
                               flag = true;
                           }
@@ -66,8 +89,6 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                                   startLongitude: "",
                                   endLatitude: "",
                                   endLongitude: "",
-                                  missionStartDate: "",
-                                  missionEndDate: "",
                                   startCity: "",
                                   endCity: "",
                                   missionDescription: ""
@@ -94,8 +115,6 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                               startLongitude: "",
                               endLatitude: "",
                               endLongitude: "",
-                              missionStartDate: "",
-                              missionEndDate: "",
                               startCity: "",
                               endCity: "",
                               missionDescription: ""
@@ -110,7 +129,7 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
             style={{
               width: pageWidth * 0.9,
               height: pageHeight * 0.1,
-              backgroundColor:  '#fff',
+              backgroundColor: isNetworkSaved? "#287495": "#fff",
               padding: 10,
               marginVertical: 10,
               justifyContent: 'center',
@@ -118,12 +137,22 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
               borderWidth: 1,
               borderColor: 'rgba(158, 150, 150, 0.3)',
             }}>
-            <View style={Styles.firstRowContainerStyle}>
-              <View style={Styles.singleItemStyle}>
-                <Text>{toFaDigit(Item.Name)}</Text>
-                <Text style={{fontWeight: 'bold'}}>نام: </Text>
-              </View>
-            </View>
+              {isNetworkSaved?
+                  (<View style={Styles.secondRowContainerStyle}>
+                      <Text>درحال ارسال</Text>
+                      <View style={Styles.singleItemStyle}>
+                          <Text>{toFaDigit(Item.Name)}</Text>
+                          <Text style={{fontWeight: 'bold'}}>نام: </Text>
+                      </View>
+                  </View>
+              ):(
+                <View style={Styles.firstRowContainerStyle}>
+                  <View style={Styles.singleItemStyle}>
+                      <Text>{toFaDigit(Item.Name)}</Text>
+                      <Text style={{fontWeight: 'bold'}}>نام: </Text>
+                  </View>
+                </View>
+              )}
             <View style={Styles.secondRowContainerStyle}>
                 <View style={Styles.singleItemStyle}>
                     <Text>{toFaDigit(Item.projectID)}</Text>

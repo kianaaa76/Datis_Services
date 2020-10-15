@@ -8,27 +8,54 @@ import {
     ScrollView,
     Text,
     TouchableOpacity,
-    Image
+    Image, TouchableHighlight
 } from "react-native";
 import Header from "../../common/Header";
-import {unsettledServiceDetail} from "../../../actions/api";
+import {companyPayment, personalPayment, unsettledServiceDetail} from "../../../actions/api";
 import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-picker";
 import RNFetchBlob from "rn-fetch-blob";
+import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
+
+const shadowOpt = {
+    width: pageWidth * 0.32,
+    height: pageWidth * 0.16,
+    color: '#000',
+    radius: 7,
+    opacity: 0.2,
+    x: 0,
+    y: 3,
+    style: {justifyContent:"center", alignItems:"center"},
+};
+
+const shadowOpt2 = {
+    width: pageWidth * 0.2,
+    height: pageWidth * 0.13,
+    color: '#000',
+    radius: 7,
+    opacity: 0.2,
+    x: 0,
+    y: 3,
+    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
+}
 
 const RemainingServiceDetail = ({navigation}) => {
     const scrollViewRef = useRef();
     const dispatch = useDispatch();
     const selector = useSelector((state) => state);
     const [detailLoading, setDetailLoading] = useState(true);
-    const [serviceDetail, setServiceDetail] = useState({});
+    const [serviceDetail, setServiceDetail] = useState([]);
     const [factorImage, setFactorImage] = useState("");
+    const [renderConfirmModal, setRenderConfirmModal] = useState(false);
+    const [equalizationType, setEqualizationType] = useState("");
+    const [equalizationLoading, setEqualizationLoading] = useState(false);
+    const [renderToastModal, setRenderToastModal] = useState(false);
     const SERVICE = navigation.getParam("service");
     useEffect(()=>{
         unsettledServiceDetail(SERVICE.projectID, selector.token).then(data=>{
@@ -53,6 +80,65 @@ const RemainingServiceDetail = ({navigation}) => {
         })
 
     },[])
+
+    const personalFullPayment = () =>{
+        setEqualizationLoading(true);
+        setRenderConfirmModal(false);
+        personalPayment(serviceDetail.DoneDetails.projectID, selector.token).then(data=>{
+            if (data.errorCode === 0){
+                setRenderToastModal(true);
+                setEqualizationLoading(false);
+            } else if (data.errorCode === 3){
+                dispatch({
+                    type: LOGOUT
+                });
+                navigation.replace("SignedOut");
+                setEqualizationLoading(false);
+            } else {
+                ToastAndroid.showWithGravity(
+                    data.message,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER
+                );
+                setRenderConfirmModal(false);
+                setEqualizationLoading(false);
+            }
+        })
+    }
+
+    const companyFullPayment = () => {
+        setEqualizationLoading(true);
+        setRenderConfirmModal(false);
+        companyPayment(serviceDetail.DoneDetails.projectID, selector.userId, factorImage, selector.token).then(data=>{
+            if (data.errorCode === 0) {
+                setRenderToastModal(true);
+                setEqualizationLoading(false);
+            } else if (data.errorCode === 3){
+                dispatch({
+                    type: LOGOUT
+                });
+                navigation.replace("SignedOut");
+                setEqualizationLoading(false);
+            } else {
+                ToastAndroid.showWithGravity(
+                    data.message,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER
+                );
+                setRenderConfirmModal(false);
+                setEqualizationLoading(false);
+            }
+        })
+    }
+
+    const onConfirmEqualizationPress = () => {
+        if (equalizationType === "personal"){
+            personalFullPayment();
+        } else {
+            companyFullPayment();
+        }
+    }
+
 
     const getServiceResult = (resultNum) =>{
         switch (resultNum) {
@@ -105,48 +191,73 @@ const RemainingServiceDetail = ({navigation}) => {
     }
 
     return(
+        <View style={{flex:1}}>
         <ScrollView style={{flex:1}} contentContainerstyle={{justifyContent:"center", alignItems:"center"}}
                     ref={scrollViewRef}
                     onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}>
             <Header headerText={"توضیحات"}/>
-            {!!detailLoading ? (
+            {detailLoading ? (
                 <View style={{width:pageWidth, height:pageHeight*0.7, justifyContent:"center", alignItems:"center"}}>
                     <ActivityIndicator size={"large"} color={"#000"}/>
                 </View>
             ) : (<View
                 style={{flex: 1, padding: 10, justifyContent: "center", alignItems: "center"}}>
-                {!!serviceDetail.DoneDetails && ( <View style={Styles.contentContainerStyle}>
-                    <Text style={[{...Styles.itemLabelStyle, marginBottom: 10}]}>
-                        * مرکز خدمات داتیس *
-                    </Text>
-                    {renderSingleItem("شماره پرونده:", "#000", toFaDigit(serviceDetail.DoneDetails.projectID))}
-                    {renderSingleItem("آدرس:", "#000", serviceDetail.DocumentDetails.Address)}
-                    {renderSingleItem("نام و تلفن:", "#000", `${serviceDetail.DocumentDetails.PhoneName} ${toFaDigit(serviceDetail.DocumentDetails.Phone)}`)}
-                    {renderSingleItem("علت خرابی:", "#000", serviceDetail.DocumentDetails.DetectedFailure)}
-                    {renderSingleItem("سریال:", "#000", serviceDetail.DocumentDetails.Serial)}
-                    {renderSingleItem("گارانتی برد:", "#000", serviceDetail.DocumentDetails.WarS)}
-                    {renderSingleItem("تاریخ تولید:", "#000", toFaDigit(serviceDetail.DocumentDetails.DOM))}
-                    {renderSingleItem("زمان اعلام:", "#000", toFaDigit(serviceDetail.DocumentDetails.Date))}
-                    <View style={{width: "100%"}}>
-                        <Text>{toFaDigit(serviceDetail.DocumentDetails.Msg.substr(serviceDetail.DocumentDetails.Msg.length - 12, 12))}</Text>
+                {!!serviceDetail.DoneDetails && !!serviceDetail.DoneDetails.projectID && (
+                    <View style={Styles.contentContainerStyle}>
+                        <Text style={[{...Styles.itemLabelStyle, marginBottom: 10}]}>
+                            * مرکز خدمات داتیس *
+                        </Text>
+                        {renderSingleItem("شماره پرونده:", "#000", toFaDigit(serviceDetail.DoneDetails.projectID))}
+                        {renderSingleItem("آدرس:", "#000", serviceDetail.DocumentDetails.Address)}
+                        {renderSingleItem("نام و تلفن:", "#000", `${serviceDetail.DocumentDetails.PhoneName} ${toFaDigit(serviceDetail.DocumentDetails.Phone)}`)}
+                        {renderSingleItem("علت خرابی:", "#000", serviceDetail.DocumentDetails.DetectedFailure)}
+                        {renderSingleItem("سریال:", "#000", serviceDetail.DocumentDetails.Serial)}
+                        {renderSingleItem("گارانتی برد:", "#000", serviceDetail.DocumentDetails.WarS)}
+                        {renderSingleItem("تاریخ تولید:", "#000", toFaDigit(serviceDetail.DocumentDetails.DOM))}
+                        {renderSingleItem("زمان اعلام:", "#000", toFaDigit(serviceDetail.DocumentDetails.Date))}
+                        <View style={{width: "100%"}}>
+                            <Text>{toFaDigit(serviceDetail.DocumentDetails.Msg.substr(serviceDetail.DocumentDetails.Msg.length - 12, 12))}</Text>
+                        </View>
+                        {renderSingleItem("مبلغ دریافتی:", "#CB3434", toFaDigit(serviceDetail.DoneDetails.RecivedAmount))}
+                        {renderSingleItem("جمع فاکتور:", "#CB3434", toFaDigit(serviceDetail.DoneDetails.InvoiceAmount))}
+                        {renderSingleItem("نوع سرویس:", "#CB3434", getServiceType(serviceDetail.DoneDetails.ServiceType))}
+                        {renderSingleItem("نتیجه سرویس:", "#CB3434", getServiceResult(serviceDetail.DoneDetails.Result))}
+                    </View>)}
+                {equalizationLoading ? (
+                    <View style={{
+                        width:"100%",
+                        justifyContent:"center",
+                        alignItems:"center",
+                        height:pageHeight*0.1
+                    }}>
+                        <ActivityIndicator size={"small"} color={"#660000"}/>
                     </View>
-                    {renderSingleItem("مبلغ دریافتی:", "#CB3434", toFaDigit(serviceDetail.DoneDetails.RecivedAmount))}
-                    {renderSingleItem("جمع فاکتور:", "#CB3434", toFaDigit(serviceDetail.DoneDetails.InvoiceAmount))}
-                    {renderSingleItem("نوع سرویس:", "#CB3434", getServiceType(serviceDetail.DoneDetails.ServiceType))}
-                    {renderSingleItem("نتیجه سرویس:", "#CB3434", getServiceResult(serviceDetail.DoneDetails.Result))}
-                </View>)}
-                <View style={Styles.footerButtonsContainerstyle}>
-                    <TouchableOpacity style={Styles.buttonStyle}>
+                ):(<View style={Styles.footerButtonsContainerstyle}>
+                    <TouchableOpacity style={Styles.buttonStyle} onPress={() => {
+                        if (!!factorImage) {
+                            setEqualizationType("company");
+                            setRenderConfirmModal(true);
+                        } else {
+                            ToastAndroid.showWithGravity(
+                                "لطفا تصویر فاکتور واریزی را بارگذاری نمایید. ",
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER
+                            );
+                        }
+                    }}>
                         <Text style={Styles.buttonTextStyle}>
                             تسویه به حساب شرکت
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={Styles.buttonStyle}>
+                    <TouchableOpacity style={Styles.buttonStyle} onPress={() => {
+                        setEqualizationType("personal");
+                        setRenderConfirmModal(true);
+                    }}>
                         <Text style={Styles.buttonTextStyle}>
                             تسویه به حساب شخصی
                         </Text>
                     </TouchableOpacity>
-                </View>
+                </View>)}
                 <View style={Styles.imageIconContainerStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35, marginHorizontal: 7}} onPress={
                         () => ImagePicker.launchCamera({}, response =>{setFactorImage(response.data)})}/>
@@ -159,7 +270,76 @@ const RemainingServiceDetail = ({navigation}) => {
                         style={{width:pageWidth*0.8, height:pageWidth*0.8, marginTop:15}}/>
                 )}
             </View>)}
+
         </ScrollView>
+            {renderConfirmModal && (
+                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderConfirmModal(false)}>
+                    <View style={Styles.modalContainerStyle}>
+                        <View style={Styles.modalHeaderContainerStyle}>
+                            <Text style={Styles.modalHeaderTextStyle}>
+                                داتیس سرویس
+                            </Text>
+                        </View>
+                        <View style={Styles.modalBodyContainerStyle}>
+                            <Text style={Styles.modalBodyTextStyle}>
+                                برای انجام تسویه حساب گزینه ی تایید را انتخاب نمایید.
+                            </Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=>setRenderConfirmModal(false)}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        بازگشت
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                            <BoxShadow setting={shadowOpt}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=>onConfirmEqualizationPress()}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        تایید
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+            )}
+            {renderToastModal && (
+                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderConfirmModal(false)}>
+                    <View style={Styles.modalContainerStyle}>
+                        <View style={Styles.modalBodyContainerStyle}>
+                            <Text style={{marginBottom:10}}>
+                                با تشکر
+                            </Text>
+                            <Text>
+                                سرویس مورد نظر به طور کامل تسویه گردید.
+                            </Text>
+                            <Text>
+                                {`شماره پیگیری: ${serviceDetail.DoneDetails.projectID}`}
+                            </Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt2}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        setRenderToastModal(false);
+                                        navigation.replace("RemainingServices")
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        OK
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+            )}
+        </View>
     )
 }
 
@@ -216,6 +396,69 @@ const Styles = StyleSheet.create({
         height: pageHeight*0.09,
         justifyContent:"center",
         alignItems:"center"
+    },
+    modalBackgroundStyle:{
+        flex:1,
+        width:pageWidth,
+        height: pageHeight,
+        position: "absolute",
+        backgroundColor:"rgba(0,0,0,0.5)",
+        justifyContent:"center",
+        alignItems:"center",
+        alignSelf:'center'
+    },
+    modalContainerStyle:{
+        position: "absolute",
+        width:pageWidth*0.85,
+        height:pageHeight*0.35,
+        backgroundColor:"#E8E8E8",
+        marginBottom:pageHeight*0.25,
+        borderRadius: 15,
+        overflow:"hidden",
+        justifyContent:"center",
+        alignItems:"center"
+    },
+    modalHeaderContainerStyle:{
+        width:"100%",
+        height:"20%",
+        backgroundColor:"#660000",
+        justifyContent:"center",
+        paddingHorizontal:10
+    },
+    modalHeaderTextStyle:{
+        color:"#fff",
+        fontSize:18
+    },
+    modalBodyContainerStyle:{
+        width:"100%",
+        height:"50%",
+        justifyContent:"center",
+        alignItems:"center",
+        padding: 10
+    },
+    modalBodyTextStyle:{
+        color: "#660000",
+        textAlign:"center",
+        fontSize: 17
+    },
+    modalFooterContainerStyle:{
+        flexDirection:"row",
+        width:"100%",
+        height:"30%",
+        justifyContent:"space-around",
+    },
+    modalButtonStyle:{
+        backgroundColor:"#fff",
+        width:"97%",
+        height:"97%",
+        borderRadius:7,
+        justifyContent:"center",
+        alignItems:"center"
+    },
+    modalButtonTextStyle:{
+        color:"gray",
+        fontSize:16,
+        fontWeight:"bold"
     }
 })
 

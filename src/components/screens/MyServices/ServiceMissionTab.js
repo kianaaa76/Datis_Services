@@ -1,10 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import {View, ScrollView, Dimensions, Text, StyleSheet, TextInput, TouchableOpacity} from "react-native";
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import PersianCalendarPicker from 'react-native-persian-calendar-picker';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import moment from "moment-jalaali";
-import {toFaDigit} from '../../utils/utilities';
 import Icon from "react-native-vector-icons/Foundation";
 import {API_KEY} from "../../../actions/types";
 
@@ -25,12 +21,6 @@ const ServiceMissionTab = ({info, setInfo}) => {
     });
     const [startCity, setStartCity] = useState(info.startCity);
     const [endCity, setEndCity] = useState(info.endCity);
-    const [startDate, setStartDate] = useState(info.missionStartDate);
-    const [endDate, setEndDate] = useState(info.missionEndDate);
-    const [tempDate, setTempDate] = useState("");
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showTimePicker, setShowTimePicker] = useState(false);
-    const [datePickerType, setDatePickerType] = useState("");
 
     const renderMarker = (latitude,longitude, color, size, id, type) =>{
         return(
@@ -101,24 +91,6 @@ const ServiceMissionTab = ({info, setInfo}) => {
         }
     }
 
-    const onSelectTime = (value)=>{
-        let datee = new moment(parseInt(tempDate)).format("jYYYY/jM/jD HH:mm:ss");
-        let timee = datee.split(" ");
-        let timeSplit = timee[1].split(":");
-        let ss = (parseInt(timeSplit[0]*3600) + parseInt(timeSplit[1]*60) + parseInt(timeSplit[2]))*1000;
-        let pureDate = parseInt(tempDate) - ss;
-        let addedTime = (new moment(Date.parse(value)).format("HH:mm:ss")).split(":");
-        let finalTime = pureDate + (parseInt(addedTime[0]*3600) + parseInt(addedTime[1]*60) + parseInt(addedTime[2]))*1000;
-        if (datePickerType === "end"){
-            setEndDate(finalTime);
-            setInfo({...info, missionEndDate: finalTime})
-        } else if (datePickerType === "start") {
-            setStartDate(finalTime);
-            setInfo({...info, missionEndDate:finalTime})
-        }
-        setShowTimePicker(false);
-    }
-
     return(
         <View style={Styles.containerStyle}>
             <MapboxGL.MapView
@@ -166,41 +138,6 @@ const ServiceMissionTab = ({info, setInfo}) => {
                             </View>
                         </View>
                         <View style={Styles.dateContainerstyle}>
-
-                            <View style={Styles.dateItemContainerStyle}>
-                                {!!endDate && (
-                                    <View>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(endDate).format("jYYYY/jM/jD"))}</Text>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(endDate).format("HH:mm"))}</Text>
-                                    </View>
-                                )}
-                                <TouchableOpacity style={Styles.timeButtonStyle} onPress={()=>{
-                                    setDatePickerType("end");
-                                    setShowDatePicker(true);
-                                }}>
-                                    <Text style={Styles.timeButtonTextStyle}>
-                                        زمان پایان
-                                    </Text>
-                                </TouchableOpacity>
-
-                            </View>
-                            <View style={Styles.dateItemContainerStyle}>
-                                {!!startDate && (
-                                    <View>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(startDate).format("jYYYY/jM/jD"))}</Text>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(startDate).format("HH:mm"))}</Text>
-                                    </View>
-                                )}
-                                <TouchableOpacity style={Styles.timeButtonStyle} onPress={()=>{
-                                    setDatePickerType("start");
-                                    setShowDatePicker(true);
-                                }}>
-                                    <Text style={Styles.timeButtonTextStyle}>
-                                        زمان شروع
-                                    </Text>
-                                </TouchableOpacity>
-
-                            </View>
                         </View>
                         <View style={Styles.descriptionContainerStyle}>
                             <Text style={Styles.descriptionTitleTextStyle}>توضیحات: </Text>
@@ -213,36 +150,6 @@ const ServiceMissionTab = ({info, setInfo}) => {
 
                     </View>
                 </View>
-            )}
-            {showDatePicker && (
-                <View style={Styles.datePickerContainerStyle}>
-                    <PersianCalendarPicker
-                        onDateChange={date=>{
-                            setTempDate(Date.parse(date))
-                        }}
-                        width={pageWidth*0.95}
-                        selectedDayColor={"red"}
-                    />
-                    <TouchableOpacity
-                        style={Styles.datePickerConfirmButtonStyle}
-                        onPress={()=> {
-                            setShowTimePicker(true);
-                            setShowDatePicker(false);
-                        }}>
-                        <Text style={Styles.confirmdatePickerTextStyle}>
-                            تایید
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-            {showTimePicker && (
-                <DateTimePickerModal
-                    isVisible={showTimePicker}
-                    mode="time"
-                    onConfirm={value=> onSelectTime(value)}
-                    onCancel={()=>setShowTimePicker(false)}
-                    is24Hour={true}
-                />
             )}
         </View>
     )
@@ -301,7 +208,7 @@ const Styles = StyleSheet.create({
         height:"20%"
     },
     cityDataContainerStyle: {
-        width: pageWidth * 0.8,
+        width: "100%",
         height: pageHeight * 0.06,
         flexDirection: 'row',
         alignItems: 'center',
@@ -320,14 +227,14 @@ const Styles = StyleSheet.create({
     },
     cityDataContentContainerStyle: {
         flexDirection: 'row',
-        width: '40%',
+        width: '50%',
         height: '100%',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
     },
     descriptionContainerStyle: {
         width: "100%",
-        height: "55%",
+        height: "77%",
     },
     descriptionTitleTextStyle: {
         fontSize: 15,
@@ -336,65 +243,12 @@ const Styles = StyleSheet.create({
     },
     descriptionTextInputStyle: {
         width: '100%',
-        height: pageHeight * 0.12,
+        height: pageHeight * 0.18,
         borderWidth: 1,
         borderColor: '#000',
         borderRadius: 10,
         textAlignVertical: 'top',
         padding: 15,
-    },
-    dateContainerstyle:{
-        flexDirection:"row",
-        width: pageWidth * 0.8,
-        height:"25%",
-        alignItems:"center",
-        justifyContent:"space-between",
-        paddingHorizontal:5
-    },
-    dateItemContainerStyle:{
-        flexDirection:'row',
-        width:"46%",
-        height:"100%",
-        alignItems:"center",
-        justifyContent:"flex-end"
-    },
-    timeButtonStyle:{
-        width:"45%",
-        height:"70%",
-        backgroundColor:"#660000",
-        borderRadius:5,
-        justifyContent:"center",
-        alignItems:"center",
-        marginLeft: 5
-    },
-    timeButtonTextStyle:{
-        fontSize:12,
-        color:"#fff",
-        textAlign:"center",
-        fontWeight:"bold"
-    },
-    datePickerContainerStyle:{
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-        position: "absolute",
-        borderWidth: 2,
-        borderColor: "#13A69D",
-        borderRadius:10,
-        overflow:"hidden"
-    },
-    datePickerConfirmButtonStyle:{
-        width:"100%",
-        height:60,
-        justifyContent:"center",
-        alignItems:"center",
-        backgroundColor:"#13A69D"
-    },
-    confirmdatePickerTextStyle:{
-        fontSize:17,
-        fontWeight:"bold"
-    },
-    timeStyle:{
-        fontWeight:"bold"
     },
     markerLabelStyle:{
         width:50,

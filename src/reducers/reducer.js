@@ -31,8 +31,6 @@ const INITIAL_STATE = {
     startLongitude: "",
     endLatitude: "",
     endLongitude: "",
-    missionStartDate: "",
-    missionEndDate: "",
     startCity: "",
     endCity: "",
     missionDescription: ""
@@ -76,8 +74,6 @@ export default (state = INITIAL_STATE, action) => {
           startLongitude: action.savedServiceInfo.startLongitude,
           endLatitude: action.savedServiceInfo.endLatitude,
           endLongitude: action.savedServiceInfo.endLongitude,
-          missionStartDate: action.savedServiceInfo.missionStartDate,
-          missionEndDate: action.savedServiceInfo.missionEndDate,
           startCity: action.savedServiceInfo.startCity,
           endCity: action.savedServiceInfo.endCity,
           missionDescription: action.savedServiceInfo.missionDescription

@@ -43,6 +43,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                 JSON.parse(list).map(item=>{
                                     if (item.projectId === Item.projectID) {
                                         setModalState(true);
+
                                         setSelectedProjectId(Item.projectID);
                                         flag = true;
                                     }

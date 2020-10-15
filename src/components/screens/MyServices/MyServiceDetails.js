@@ -1,5 +1,12 @@
 import React,{useState, useEffect} from "react";
-import {View, Dimensions, StyleSheet, ToastAndroid, ActivityIndicator, PermissionsAndroid} from "react-native";
+import {
+    View,
+    Dimensions,
+    StyleSheet,
+    ToastAndroid,
+    ActivityIndicator,
+    NetInfo, Text, TouchableOpacity, TouchableHighlight
+} from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import {TabView, TabBar} from 'react-native-tab-view';
 import Header from "../../common/Header";
@@ -13,15 +20,41 @@ import ServiceFactorTab from "./ServiceFactorTab";
 import ServiceServicesTab from "./ServiceServicesTab";
 import ServicePartsTab from "./ServicePartsTab";
 import ServiceMissionTab from "./ServiceMissionTab";
+import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
+
+const shadowOpt2 = {
+    width: pageWidth * 0.2,
+    height: 35,
+    color: '#000',
+    radius: 7,
+    opacity: 0.2,
+    x: 0,
+    y: 3,
+    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
+}
+
+const shadowOpt = {
+    width: pageWidth * 0.23,
+    height: 45,
+    color: '#000',
+    radius: 7,
+    opacity: 0.2,
+    x: 0,
+    y: 3,
+    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
+}
 
 const MyServiceDetails = ({navigation}) => {
     let dirs = RNFetchBlob.fs.dirs;
     const dispatch = useDispatch();
     const selector = useSelector((state) => state);
     const [detailsLoading, setDetailsLoading] = useState(false);
+    const [requestLoading, setRequestLoading] = useState(false);
+    const [renderNetworkModal, setRenderNetworkModal] = useState(false);
+    const [renderConfirmModal, setRenderConfirmModal] = useState(false);
     const serviceID = navigation.getParam("serviceID");
     const [factorTabInfo, setFactorTabInfo] = useState({
         factorReceivedPrice:selector.savedServiceInfo.factorReceivedPrice,
@@ -44,8 +77,6 @@ const MyServiceDetails = ({navigation}) => {
         startLongitude: selector.savedServiceInfo.startLongitude,
         endLatitude: selector.savedServiceInfo.endLatitude,
         endLongitude: selector.savedServiceInfo.endLongitude,
-        missionStartDate: selector.savedServiceInfo.missionStartDate,
-        missionEndDate: selector.savedServiceInfo.missionEndDate,
         startCity: selector.savedServiceInfo.startCity,
         endCity: selector.savedServiceInfo.endCity,
         missionDescription: selector.savedServiceInfo.missionDescription
@@ -90,15 +121,13 @@ const MyServiceDetails = ({navigation}) => {
             startLongitude: e.startLongitude,
             endLatitude: e.endLatitude,
             endLongitude: e.endLongitude,
-            missionStartDate: e.missionStartDate,
-            missionEndDate: e.missionEndDate,
             startCity: e.startCity,
             endCity: e.endCity,
             missionDescription: e.missionDescription
         })
     }
 
-    const onSavePress = () => {
+    const onSavePress = (type) => {
         let savedList = [];
         let INDEX = 0;
         let flag = false;
@@ -130,18 +159,24 @@ const MyServiceDetails = ({navigation}) => {
             startLongitude: missionTabInfo.startLongitude,
             endLatitude: missionTabInfo.endLatitude,
             endLongitude: missionTabInfo.endLongitude,
-            missionStartDate: missionTabInfo.missionStartDate,
-            missionEndDate: missionTabInfo.missionEndDate,
             startCity: missionTabInfo.startCity,
             endCity: missionTabInfo.endCity,
-            missionDescription: missionTabInfo.missionDescription
+            missionDescription: missionTabInfo.missionDescription,
+            saveType: type
         });
         AsyncStorage.setItem("savedServicesList", JSON.stringify(savedList))
         navigation.navigate("MyServices");
     }
 
     const onFinishServicePress= () => {
-
+        setRequestLoading(true);
+        NetInfo.isConnected.fetch(isConnected=>{
+            if (isConnected){
+                console.log("send request");
+            } else {
+                setRenderNetworkModal(true);
+            }
+        })
     }
 
     useEffect(()=>{
@@ -204,19 +239,21 @@ const MyServiceDetails = ({navigation}) => {
         <View style={Styles.containerStyle}>
             <Header headerText={"داتیس سرویس"} leftIcon={
                 <View style={{flexDirection:"row", width:pageWidth*0.25, height:"100%", justifyContent: "space-between", alignItems: "center"}}>
-                <Icon
-                    name="check"
-                    style={{
-                        fontSize: 33,
-                         color: '#dadfe1',
-                    }}
-                    onPress={onFinishServicePress}
-                />
+                    {requestLoading? (
+                        <ActivityIndicator size={"small"} color={"#fff"}/>
+                    ) : ( <Icon
+                        name="check"
+                        style={{
+                            fontSize: 33,
+                            color: '#dadfe1',
+                        }}
+                        onPress={()=>setRenderConfirmModal(true)}
+                    />)}
                 <Icon name="save" style={{
                     fontSize: 33,
                     color: '#dadfe1',
                 }}
-                      onPress={onSavePress}/>
+                      onPress={()=>onSavePress("self")}/>
                 </View>
             }/>
             {detailsLoading?(
@@ -238,6 +275,77 @@ const MyServiceDetails = ({navigation}) => {
                     lazy='false'
                 />
             )}
+            {renderConfirmModal && (
+                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderConfirmModal(false)}>
+                    <View style={Styles.modalContainerStyle}>
+                        <View style={Styles.modalBodyContainerStyle2}>
+                            <Text>
+                                آیا از ارسال اطلاعات اطمینان دارید؟
+                            </Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt2}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        setRenderConfirmModal(false)
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        خیر
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                            <BoxShadow setting={shadowOpt2}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        onFinishServicePress()
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        بله
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+            )}
+            {renderNetworkModal && (
+                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderNetworkModal(false)}>
+                    <View style={Styles.modalContainerStyle2}>
+                        <View style={Styles.modalHeaderContainerStyle}>
+                            <Text style={Styles.modalHeaderTextStyle}>
+                                خطا در ارتباط
+                            </Text>
+                        </View>
+                        <View style={Styles.modalBodyContainerStyle}>
+                            <Text style={Styles.modalBodyTextStyle}>
+                                اگر در ارتباط به اینترنت مشکل دارید اطلاعات را برای ارسال در زمان دیگری ذخیره کنید. در غیر این صورت مجددا تلاش کنید.
+                            </Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=>onSavePress("network")}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        ذخیره
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                            <BoxShadow setting={shadowOpt}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=>onFinishServicePress()}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        تلاش مجدد
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+            )}
         </View>
     );
 }
@@ -250,6 +358,84 @@ const Styles = StyleSheet.create({
         flex:1,
         justifyContent:'center',
         alignItems:"center"
+    },
+    modalBackgroundStyle:{
+        flex:1,
+        width:pageWidth,
+        height: pageHeight,
+        position: "absolute",
+        backgroundColor:"rgba(0,0,0,0.5)",
+        justifyContent:"center",
+        alignItems:"center",
+        alignSelf:'center'
+    },
+    modalContainerStyle:{
+        position: "absolute",
+        width:pageWidth*0.7,
+        height:150,
+        backgroundColor:"#E8E8E8",
+        marginBottom:pageHeight*0.25,
+        borderRadius: 15,
+        overflow:"hidden",
+        alignItems:"center"
+    },
+    modalContainerStyle2:{
+        position: "absolute",
+        width:pageWidth*0.8,
+        height:200,
+        backgroundColor:"#E8E8E8",
+        marginBottom:pageHeight*0.25,
+        borderRadius: 15,
+        overflow:"hidden",
+        alignItems:"center",
+    },
+    modalHeaderContainerStyle:{
+        width:"100%",
+        height:"23%",
+        backgroundColor:"#660000",
+        justifyContent:"center",
+        paddingHorizontal:10
+    },
+    modalHeaderTextStyle:{
+        color:"#fff",
+        fontSize:16
+    },
+    modalBodyContainerStyle:{
+        width:"100%",
+        height:"35%",
+        alignItems:"center",
+        padding: 10
+    },
+    modalBodyContainerStyle2:{
+        width:"100%",
+        height:"40%",
+        alignItems:"center",
+        padding: 10,
+        justifyContent:"flex-end"
+    },
+    modalBodyTextStyle:{
+        color: "#660000",
+        textAlign:"center",
+        fontSize: 16
+    },
+    modalFooterContainerStyle:{
+        flexDirection:"row",
+        width:"100%",
+        height:"30%",
+        justifyContent:"space-around",
+    },
+    modalButtonStyle:{
+        backgroundColor:"#fff",
+        width:"97%",
+        height:"97%",
+        borderRadius:7,
+        justifyContent:"center",
+        alignItems:"center"
+    },
+    modalButtonTextStyle:{
+        color:"gray",
+        fontSize:14,
+        fontWeight:"bold"
     }
 })
 

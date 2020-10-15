@@ -183,3 +183,78 @@ export const unsettledServiceDetail = (serviceId, token) => {
   }).then((response) => response.json());
 }
 
+export const personalPayment = (serviceId, token) => {
+  return fetch(`${LOCAL_HOST}/FullPayment?id=${serviceId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+
+export const companyPayment = (serviceId, servicemanId, image, token) => {
+  // console.log("company", serviceId, servicemanId, token);
+  const msg = JSON.stringify({
+    ID:serviceId,
+    ServiceManId: servicemanId,
+    PaymentImage: image
+  });
+  return fetch(`${LOCAL_HOST}/FullPaymentCompany`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body: msg
+  }).then((response) => response.json());
+}
+
+export const serviceArchiveListWithSerial = (servicemanId, token, serial)=>{
+  const msg = JSON.stringify({
+    ServiceManId: servicemanId,
+    Serial: serial
+  });
+  return fetch(`${LOCAL_HOST}/GetDoneService`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body: msg
+  }).then((response) => response.json());
+}
+
+export const serviceArchiveListWithoutSerial = (servicemanId, token)=>{
+  const msg = JSON.stringify({
+    ServiceManId: servicemanId,
+  });
+  return fetch(`${LOCAL_HOST}/GetDoneService`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body: msg
+  }).then((response) => response.json());
+}
+
+export const updateService = (serviceId, servicemanId, token, address, description, factorImage, image)=>{
+  const msg = JSON.stringify({
+    ServiceManId: servicemanId,
+    projectID: serviceId,
+    Image: image,
+    FactorImage: factorImage,
+    Location: address,
+    Details:"a"
+  });
+  return fetch(`${LOCAL_HOST}/UpdateServiceDocument`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body: msg
+  }).then((response) => response.json());
+}
+

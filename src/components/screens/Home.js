@@ -72,7 +72,9 @@ const Home = ({navigation}) => {
           {renderHomeItems('سرویس‌های رد‌شده', images[2], () => {
             navigation.navigate('RejectedServices');
           })}
-          {renderHomeItems('آرشیو سرویس‌ها', images[3], () => {})}
+          {renderHomeItems('آرشیو سرویس‌ها', images[3], () => {
+            navigation.navigate("ServiceArchiveList");
+          })}
         </View>
         <View style={Styles.SingleRowStyle}>
           {renderHomeItems('انبارداری', images[4], () => {})}

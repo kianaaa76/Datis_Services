@@ -55,7 +55,7 @@ const RemainingServiceListItem = ({item, navigation}) => {
                         </View>
                         <View style={Styles.secondRowContainerStyle}>
                             <View style={Styles.singleItemStyle}>
-                                <Text style={{color:"#CB3434"}}>{` ${toFaDigit(Item.remaind)}-  ریال`}</Text>
+                                <Text style={{color:"#CB3434"}}>{Item.remaind == 0 ? `${toFaDigit(0)} ریال`:` ${toFaDigit(Item.remaind)}-  ریال`}</Text>
                                 <Text style={{fontWeight: 'bold', fontSize:14, color:"#CB3434"}}>مانده: </Text>
                             </View>
                         </View>

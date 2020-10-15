@@ -45,6 +45,7 @@ const MyService = ({navigation}) => {
   const [serviceListLoading, setServiceListLoading] = useState(false);
   const [renderRestoreModal, setRenderRestoreModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [renderSendDataModal, setRenderSendDataModal] = useState(false);
 
   const renderEmptyList = () => {
     return (
@@ -92,8 +93,6 @@ const MyService = ({navigation}) => {
               startLongitude: "",
               endLatitude: "",
               endLongitude: "",
-              missionStartDate: "",
-              missionEndDate: "",
               startCity: "",
               endCity: "",
               missionDescription: ""
@@ -128,8 +127,6 @@ const MyService = ({navigation}) => {
                   startLongitude: currentList[Index].startLongitude,
                   endLatitude: currentList[Index].endLatitude,
                   endLongitude: currentList[Index].endLongitude,
-                  missionStartDate: currentList[Index].missionStartDate,
-                  missionEndDate: currentList[Index].missionEndDate,
                   startCity: currentList[Index].startCity,
                   endCity: currentList[Index].endCity,
                   missionDescription: currentList[Index].missionDescription
@@ -196,6 +193,7 @@ const MyService = ({navigation}) => {
                     item={item}
                     navigation={navigation}
                     setModalState={setRenderRestoreModal}
+                    setNetworkModalState={setRenderSendDataModal}
                     setSelectedProjectId={setSelectedProjectId}
                 />
               )}
@@ -245,6 +243,44 @@ const MyService = ({navigation}) => {
                                     onPress={()=>onConfirmDataPress(selectedProjectId)}>
                                     <Text style={Styles.modalButtonTextStyle}>
                                         تایید
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+            )}
+            {renderSendDataModal && (
+                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderSendDataModal(false)}>
+                    <View style={Styles.modalContainerStyle}>
+                        <View style={Styles.modalHeaderContainerStyle}>
+                            <Text style={Styles.modalHeaderTextStyle}>
+                                داتیس سرویس
+                            </Text>
+                        </View>
+                        <View style={Styles.modalBodyContainerStyle}>
+                            <Text style={Styles.modalBodyTextStyle}>
+                                برای تغییر اطلاعات ارسال گزینه ویرایش را انتخاب نمایید. در غیر این صورت اطلاعات هنگام برقراری ارتباط با اینترنت ارسال میشوند.
+                            </Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=>setRenderSendDataModal(false)}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        بازگشت
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                            <BoxShadow setting={shadowOpt}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        onConfirmDataPress(selectedProjectId)
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        ویرایش
                                     </Text>
                                 </TouchableOpacity>
                             </BoxShadow>

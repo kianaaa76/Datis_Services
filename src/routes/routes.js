@@ -12,6 +12,8 @@ import RejectedServiceList from "../components/screens/RejectedServices/Rejected
 import RejectedServiceDetail from "../components/screens/RejectedServices/RejectedServiceDetail";
 import RemainingServiceList from "../components/screens/RemainingServices/RemainingServiceList";
 import RemainingServiceDetail from "../components/screens/RemainingServices/RemainingServiceDetail";
+import ServiceArchiveList from "../components/screens/ServiceArchive/ServiceArchiveList";
+import ServiceArchiveDetail from "../components/screens/ServiceArchive/ArchiveListServiceDetail";
 
 const SignedIn = createStackNavigator(
   {
@@ -44,6 +46,12 @@ const SignedIn = createStackNavigator(
       },
       RemainingServiceDetail:{
         screen: RemainingServiceDetail
+      },
+      ServiceArchiveList: {
+          screen: ServiceArchiveList
+      },
+      ServiceArchiveDetail:{
+        screen: ServiceArchiveDetail
       }
   },
   {
