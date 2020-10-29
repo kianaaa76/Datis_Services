@@ -93,7 +93,7 @@ const ServiceArchiveList = ({navigation}) => {
 
     const renderEmptyList = () => {
         return (
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{height:pageHeight*0.8, width:pageWidth, justifyContent: 'center', alignItems: 'center'}}>
                 <Text style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
                     سرویس مورد نظر یافت نشد.
                 </Text>
@@ -133,6 +133,7 @@ const ServiceArchiveList = ({navigation}) => {
                                 <ServiceArchiveListItem item={item} navigation={navigation} />
                             )}
                             keyExtractor={(item) => item.projectID.toString()}
+                            ListEmptyComponent={()=>renderEmptyList()}
                         />
                     </View>
                 </View>
@@ -204,7 +205,6 @@ const Styles = StyleSheet.create({
     flatlistContainerStyle: {
         width: pageWidth * 0.95,
         height: pageHeight * 0.95,
-        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
     },

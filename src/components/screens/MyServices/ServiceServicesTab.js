@@ -7,46 +7,47 @@ import {
     Dimensions,
     ScrollView,
     Image,
-    TouchableOpacity,
+    TouchableOpacity, TouchableHighlight,
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
-import RNFetchBlob from 'rn-fetch-blob';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Foundation from "react-native-vector-icons/Foundation";
 import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
-import ImagePicker from "react-native-image-picker";
+import ImagePicker from "react-native-image-crop-picker";
 import PersianCalendarPicker from 'react-native-persian-calendar-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment-jalaali";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import {API_KEY} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
+import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
+const shadowOpt2 = {
+    width: pageWidth * 0.2,
+    height: 35,
+    color: '#000',
+    radius: 7,
+    opacity: 0.2,
+    x: 0,
+    y: 3,
+    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
+}
 
-const ServiceServicesTab = ({setInfo, info, projectId}) => {
-    let dirs = RNFetchBlob.fs.dirs;
+let cameraRef={};
+
+const ServiceServicesTab = ({setInfo, info}) => {
     const [showDatePicker, setShowDatePicke] = useState(false);
     const [screenMode, setScreenMode] = useState("tab");
     const [selectedLatitude, setSelectedLatitude] = useState(null);
     const [selectedLongitude, setSelectedLongitude] = useState(null);
-    const [userLatitude, setUserLatitude] = useState(null);
-    const [userLongitude, setUserLongitude] = useState(null);
     const [renderTimePicker, setRenderTimePicker] = useState(false);
     const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
-    const [image, setImage] = useState("");
+    const [dateIsSelected, setDateIsSelected] = useState(false);
+    const [deletingImage, setDeletingImage] = useState(0);
 
-
-    useEffect(()=>{
-        RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${projectId}/3.png`, 'base64').then(data=>{
-            setImage(data);
-        })
-    },[])
-
-
-    const renderCheckbox = (title, checkboxPurpose, name) => {
+    const renderCheckbox = (title, checkboxPurpose) => {
         return (
             <View style={Styles.checkboxContainerStyle}>
                 <Text style={Styles.checkboxTextStyle}>
@@ -54,49 +55,40 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 </Text>
                 <CheckBox
                     onValueChange={()=>{
-                        if (checkboxPurpose == "result"){
+                        if (checkboxPurpose === "result"){
                             setInfo({
-                                description:info.description,
-                                address:info.address,
-                                finalDate:info.finalDate,
-                                serviceResult:name,
-                                serviceType:info.serviceType
+                                ...info,
+                                serviceResult:title,
                             })
                         } else {
                             setInfo({
-                                description:info.description,
-                                address:info.address,
-                                finalDate:info.finalDate,
-                                serviceResult:info.serviceResult,
-                                serviceType:name
+                                ...info,
+                                serviceType:title
                             })
                         }
                     }}
-                    value={checkboxPurpose == "result"?
-                        (info.serviceResult == name ? true : false) :
-                        (info.serviceType == name ? true : false)}
+                    value={checkboxPurpose === "result"?
+                        (info.serviceResult == title ? true : false) :
+                        (info.serviceType == title ? true : false)}
                     tintColors={{ true: '#660000', false: 'black' }}
                 />
             </View>
         )
     }
 
-    return  screenMode == "tab" ? (
+    return  screenMode === "tab" ? (
+        <>
         <ScrollView style={Styles.containerStyle} contentContainerStyle={{justifyContent:"center", alignItems:"center"}}>
             <View style={Styles.descriptionRowStyle}>
                 <View style={{width: 70, marginBottom:10}}>
                     <Icon name={"star"} style={{color:"red"}}/>
-                    <Text style={Styles.descriptionLabelStyle}>توضیحات:</Text>
+                    <Text>توضیحات:</Text>
                 </View>
                 <TextInput
                     style={Styles.descriptionInputStyle}
                     onChangeText={text=>{
-                        setInfo({
+                        setInfo({...info,
                             description:text,
-                            address:info.address,
-                            finalDate:info.finalDate,
-                            serviceResult:info.serviceResult,
-                            serviceType:info.serviceType
                         })
                     }}
                     value={info.description}
@@ -111,12 +103,8 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 <TextInput
                     style={Styles.textInputStyle}
                     onChangeText={text=>{
-                        setInfo({
-                            description:info.description,
-                            address:text,
-                            finalDate:info.finalDate,
-                            serviceResult:info.serviceResult,
-                            serviceType:info.serviceType
+                        setInfo({...info,
+                            address:text
                         })
                     }}
                     value={info.address}
@@ -127,29 +115,46 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 <View style={Styles.getImageContainerViewStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                         () => {
-                            ImagePicker.launchCamera({}, response =>{
-                                setImage(response.data);
-                                RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/3.png`,response.data, 'base64' )
+                            ImagePicker.openCamera({
+                                width:pageWidth-20,
+                                height: pageHeight*0.4,
+                                includeBase64:true,
+                                compressImageQuality:1
+                            }).then( response =>{
+                                setInfo({...info, image: response.data})
                             })
                         }}
                     />
                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
-                        ()=>ImagePicker.launchImageLibrary({},response=>{
-                            setImage(response.data);
-                            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/3.png`,response.data, 'base64' )
+                        ()=>ImagePicker.openPicker({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:1
+                        }).then(response=>{
+                            setInfo({...info, image: response.data})
                         })}/>
                 </View>
                 <View style={{width: 70}}>
                     <Text style={Styles.labelStyle}>عکس:</Text>
                 </View>
             </View>
-            {!!image && (
-                <Image
-                    source={{uri: `data:image/gif;base64,${image}`}}
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
+            {!!info.image && (
+                <TouchableOpacity
+                    style={{width:"100%", height:pageHeight*0.4, marginBottom:30}}
+                    onPress={()=> {
+                        setDeletingImage(3)
+                    }}>
+                    <Image
+                        source={{uri: `data:image/jpeg;base64,${info.image}`}}
+                        style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
+                </TouchableOpacity>
             )}
             <View style={Styles.datePickerRowStyle}>
-                <FontAwesomeIcon name={"calendar"} style={{color:"#000", fontSize:30}} onPress={()=>setShowDatePicke(true)}/>
+                <FontAwesomeIcon name={"calendar"} style={{color:"#000", fontSize:30}} onPress={()=> {
+                    setDateIsSelected(false);
+                    setShowDatePicke(true)
+                }}/>
                 <View style={{width: pageWidth*0.5, flexDirection:"row", alignItems:"center", justifyContent:"flex-end"}}>
                     {!!info.finalDate && (
                         <Text style={{fontSize:15, marginRight:10}}>
@@ -165,28 +170,29 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                         <Icon name={"star"} style={{color:"red"}}/>
                         <Text style={Styles.serviceTypeTextStyle}>نوع سرویس:</Text>
                     </View>
-                    {renderCheckbox("خرابی یا تعویض قطعه", "type", "breakdown")}
-                    {renderCheckbox("ایراد نصب و تنظیم روتین", "type", "routinFail")}
-                    {renderCheckbox("تنظیم و عیب غیرروتین", "type", "nonRoutinFail")}
+                    {renderCheckbox("خرابی یا تعویض قطعه", "type")}
+                    {renderCheckbox("ایراد نصب و تنظیم روتین", "type")}
+                    {renderCheckbox("تنظیم و عیب غیرروتین", "type")}
                 </View>
                 <View style={Styles.servicetypeContainerStyle}>
                     <View style={{width: "100%", flexDirection:'row', justifyContent:"flex-end"}}>
                         <Icon name={"star"} style={{color:"red"}}/>
                         <Text style={Styles.serviceTypeTextStyle}>نتیجه سرویس:</Text>
                     </View>
-                    {renderCheckbox("موفق", "result", "success")}
-                    {renderCheckbox("موفق مشکوک", "result", "success-suspicious")}
-                    {renderCheckbox("سرویس جدید- کسری قطعات", "result", "new-shortage")}
-                    {renderCheckbox("سرویس جدید- آماده نبودن پروژه", "result", "new-notReady")}
-                    {renderCheckbox("سرویس جدید- عدم تسلط", "result", "new-notMaster")}
-                    {renderCheckbox("لغو موفق", "result", "fail")}
+                    {renderCheckbox("موفق", "result")}
+                    {renderCheckbox("موفق مشکوک", "result")}
+                    {renderCheckbox("سرویس جدید- کسری قطعات", "result")}
+                    {renderCheckbox("سرویس جدید- آماده نبودن پروژه", "result")}
+                    {renderCheckbox("سرویس جدید- عدم تسلط", "result")}
+                    {renderCheckbox("لغو موفق", "result")}
                 </View>
             </View>
             {showDatePicker && (
                     <View style={Styles.datePickerContainerStyle}>
                         <PersianCalendarPicker
                             onDateChange={date=>{
-                             setDate(Date.parse(date));
+                                setDate(Date.parse(date));
+                                setDateIsSelected(true);
                             }}
                             width={pageWidth*0.95}
                             selectedDayColor={"red"}
@@ -194,6 +200,9 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                         <TouchableOpacity
                             style={Styles.datePickerConfirmButtonStyle}
                               onPress={()=> {
+                                  if(!dateIsSelected){
+                                      setDate(Date.parse(new Date()));
+                                  }
                                   setRenderTimePicker(true);
                                   setShowDatePicke(false);
                               }}>
@@ -208,7 +217,6 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                     isVisible={renderTimePicker}
                     mode="time"
                     onConfirm={value=> {
-                        setTime(Date.parse(value))
                         let datee = new moment(date).format("jYYYY/jM/jD HH:mm:ss");
                         let timee = datee.split(" ");
                         let timeSplit = timee[1].split(":");
@@ -217,11 +225,8 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                         let addedTime = (new moment(Date.parse(value)).format("HH:mm:ss")).split(":");
                         let finalTime = pureDate + (parseInt(addedTime[0]*3600) + parseInt(addedTime[1]*60) + parseInt(addedTime[2]))*1000;
                         setInfo({
-                            description:info.description,
-                            address:info.address,
-                            finalDate:finalTime,
-                            serviceResult:info.serviceResult,
-                            serviceType:info.serviceType
+                            ...info,
+                            finalDate:finalTime
                         })
                         setRenderTimePicker(false);
                     }}
@@ -230,6 +235,47 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 />
             )}
         </ScrollView>
+        {!!deletingImage && (
+        <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setDeletingImage(0)}>
+            <View style={Styles.modalContainerStyle}>
+                <View style={Styles.modalBodyContainerStyle2}>
+                    <Text>
+                        آیا از پاک کردن عکس اطمینان دارید؟
+                    </Text>
+                </View>
+                <View style={Styles.modalFooterContainerStyle}>
+                    <BoxShadow setting={shadowOpt2}>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={()=> {
+                                setDeletingImage(0);
+                            }}>
+                            <Text style={Styles.modalButtonTextStyle}>
+                                خیر
+                            </Text>
+                        </TouchableOpacity>
+                    </BoxShadow>
+                    <BoxShadow setting={shadowOpt2}>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={()=> {
+                                if (deletingImage === 3){
+                                    setInfo({
+                                        ...info, image: ""
+                                    });
+                                }
+                                setDeletingImage(0);
+                            }}>
+                            <Text style={Styles.modalButtonTextStyle}>
+                                بله
+                            </Text>
+                        </TouchableOpacity>
+                    </BoxShadow>
+                </View>
+            </View>
+        </TouchableHighlight>
+    )}
+    </>
     ):(
         <View style={{flex:1}}>
             <MapboxGL.MapView style={{flex:1}} onPress={feature=>{
@@ -238,15 +284,13 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
             }}>
                 <MapboxGL.UserLocation
                     onUpdate={location => {
-                        setUserLatitude(location.coords.latitude);
-                        setUserLongitude(location.coords.longitude);
+                        cameraRef.moveTo([location.coords.longitude, location.coords.latitude], 500);
+                        cameraRef.zoomTo(11, 500)
                     }}
                 />
-                {!!userLatitude && !!userLongitude && (
                     <MapboxGL.Camera
-                        centerCoordinate={[userLongitude, userLatitude]}
+                        ref={ref=>cameraRef=ref}
                     />
-                )}
                 {!!selectedLatitude && !!selectedLongitude && (
                     <View>
                         <MapboxGL.MarkerView
@@ -278,12 +322,8 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                         })
                             .then(response => response.json())
                             .then(data => {
-                                setInfo({
-                                    description:info.description,
-                                    address:data.address,
-                                    finalDate:info.finalDate,
-                                    serviceResult:info.serviceResult,
-                                    serviceType:info.serviceType
+                                setInfo({...info,
+                                    address:data.address
                                 })
                             });
                         setScreenMode("tab")
@@ -457,7 +497,65 @@ const Styles = StyleSheet.create({
     checkboxTextStyle:{
         fontSize:12,
         width:"75%"
-    }
+    },
+    modalBackgroundStyle:{
+        flex:1,
+        width:pageWidth,
+        height: pageHeight,
+        position: "absolute",
+        backgroundColor:"rgba(0,0,0,0.5)",
+        justifyContent:"center",
+        alignItems:"center",
+        alignSelf:'center'
+    },
+    modalContainerStyle:{
+        position: "absolute",
+        bottom:pageHeight*0.3,
+        width:pageWidth*0.7,
+        height:150,
+        backgroundColor:"#E8E8E8",
+        marginBottom:pageHeight*0.25,
+        borderRadius: 15,
+        overflow:"hidden",
+        alignItems:"center"
+    },
+    modalBodyContainerStyle:{
+        width:"100%",
+        height:"35%",
+        alignItems:"center",
+        padding: 10
+    },
+    modalBodyContainerStyle2:{
+        width:"100%",
+        height:"40%",
+        alignItems:"center",
+        padding: 10,
+        justifyContent:"flex-end"
+    },
+    modalBodyTextStyle:{
+        color: "#660000",
+        textAlign:"center",
+        fontSize: 16
+    },
+    modalFooterContainerStyle:{
+        flexDirection:"row",
+        width:"100%",
+        height:"30%",
+        justifyContent:"space-around",
+    },
+    modalButtonStyle:{
+        backgroundColor:"#fff",
+        width:"97%",
+        height:"97%",
+        borderRadius:7,
+        justifyContent:"center",
+        alignItems:"center"
+    },
+    modalButtonTextStyle:{
+        color:"gray",
+        fontSize:14,
+        fontWeight:"bold"
+    },
 })
 
 export default ServiceServicesTab;

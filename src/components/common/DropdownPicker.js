@@ -1,12 +1,14 @@
 import React,{useState} from "react";
-import {View, TextInput, StyleSheet, Dimensions, Text, TouchableOpacity, ScrollView} from "react-native";
+import {View, TextInput, StyleSheet, Dimensions, Text, TouchableOpacity, ScrollView, FlatList} from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 
 const pageWidth = Dimensions.get("screen").width;
 const pageHeight = Dimensions.get("screen").height;
 
-const DropdownPicker = ({placeholder, list, onSelect}) => {
+const DropdownPicker = ({placeholder, list, onSelect, listHeight}) => {
+
+
 
     const [listIsShown, setListIsShown] = useState(false);
     const [showingList, setShowingList] = useState(list);
@@ -14,18 +16,31 @@ const DropdownPicker = ({placeholder, list, onSelect}) => {
     const [selectedItemName, setSelecedItemName] = useState("");
 
     const renderListItem = (item) => {
-        return(
+        return(!!item.item.Key?(
             <TouchableOpacity
                 style={Styles.listItemsContainerStyle}
                 onPress={()=> {
-                    setSelecedItemName(item.label);
-                    onSelect(item);
+                    setSelecedItemName(item.item.Value);
+                    onSelect(item.item);
                     setListIsShown(false);
                     setShowingList(list);
                 }}
             >
-                <Text>{item.label}</Text>
+                <Text>{item.item.Value}</Text>
             </TouchableOpacity>
+            ):(
+            <TouchableOpacity
+                style={Styles.listItemsContainerStyle}
+                onPress={()=> {
+                    setSelecedItemName(item.item.label);
+                    onSelect(item.item);
+                    setListIsShown(false);
+                    setShowingList(list);
+                }}
+            >
+                <Text>{item.item.label}</Text>
+            </TouchableOpacity>
+        )
         )
     }
 
@@ -42,7 +57,9 @@ const DropdownPicker = ({placeholder, list, onSelect}) => {
     return(
         <View style={{width:pageWidth*0.7}}>
             <TouchableOpacity style={Styles.containerStyle}
-            onPress={()=>setListIsShown(!listIsShown)}>
+            onPress={()=> {
+                setListIsShown(!listIsShown)
+            }}>
                 <Text style={{color: !!selectedItemName ? "#000" : "gray"}}>
                     {!!selectedItemName ? selectedItemName: placeholder}
                 </Text>
@@ -53,11 +70,11 @@ const DropdownPicker = ({placeholder, list, onSelect}) => {
                         setListIsShown(false);
                     }}/>
                 ):(
-                    <FontAwesome name={"chevron-down"} style={Styles.upDownIconStyle} onPress={()=>setListIsShown(true)}/>
+                    <FontAwesome name={"chevron-down"} style={Styles.upDownIconStyle}/>
                 )}
             </TouchableOpacity>
             {listIsShown && (
-                <View style={Styles.listContainerStyle}>
+                <View style={[Styles.listContainerStyle, {height: listHeight}]}>
                     <View style={Styles.searchbarContainerStyle}>
                         <TextInput
                             value={searchText}
@@ -70,11 +87,15 @@ const DropdownPicker = ({placeholder, list, onSelect}) => {
                         <FontAwesome name={"search"} style={Styles.searchIconStyle}/>
                     </View>
                     <ScrollView nestedScrollEnabled={true} scrollEnabled={!!showingList.length}>
-                    {showingList.length>0 ? showingList.map(item=>renderListItem(item)) : (
-                        <View style={{justifyContent:"center", alignItems:"center", height:"100%"}}>
-                            <Text>موردی یافت نشد.</Text>
-                        </View>
-                    )}
+                        <FlatList
+                            data={showingList}
+                            renderItem={(item)=>renderListItem(item)}
+                            ListEmptyComponent={()=>(
+                                <View style={{justifyContent:"center", alignItems:"center", height:"100%"}}>
+                                    <Text>موردی یافت نشد.</Text>
+                                </View>
+                            )}
+                        />
                     </ScrollView>
                 </View>
             )}
@@ -124,7 +145,6 @@ const Styles= StyleSheet.create({
     },
     listContainerStyle:{
         width:"100%",
-        height:150,
         backgroundColor:"#fff",
         borderWidth:1,
         borderColor: "#000",

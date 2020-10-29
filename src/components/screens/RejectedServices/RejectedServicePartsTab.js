@@ -19,7 +19,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import DropdownPicker from "../../common/DropdownPicker";
 import {useSelector} from 'react-redux';
-import {getObjects, getObjBySerial} from "../../../actions/api";
+import {getObjBySerial} from "../../../actions/api";
 import {RNCamera} from "react-native-camera";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -33,20 +33,42 @@ const ServicePartsTab = ({setInfo, info}) => {
         serial:"",
         partTypeSelected:{},
         partVersionSelected:{},
-        newObjectPrice:"",
+        Price:"",
         failureDescription:"",
         hasGarantee:null,
-        prePrice:""
     })
     const [newHasStarted, setNewHasStarted] = useState(Boolean);
     const [isNewPartFormExpanded,setIsNewPartFormExpanded] = useState(false);
-    const [partsListName, setPartsListName] = useState([]);
+    const [partsListName, setPartsListName] = useState(selector.objectsList);
     const [selectedPartVersionsList, setSelectedPartVersionsList] = useState([]);
     const [screenMode, setScreenMode] = useState(false);
     const [searchBarcodeLoading, setSearchBarcodeLoading] = useState(false);
     const [objectsList, setObjectsList] = useState(info);
     const [refresh, setRefresh] = useState(false);
     const [selectedItemList, setSelectedItemList] = useState({});
+
+    useEffect(()=>{
+        let temp = []
+        info.map((item, index)=>{
+            let object = partsListName.filter(part=>part.label === item.Name);
+            let ver = object[0].value.Versions.filter(v=>v.Key === item.VersionId);
+            temp.push({
+                "index": index,
+                "Id": item.Id,
+                "isExpanded": false,
+                "failureDescription": item.Description,
+                "hasGarantee":"",
+                "objectType":item.Direction == 0 ? "new" : "failed",
+                "availableVersions": object[0].value.Versions,
+                "partType":object[0],
+                "Price": item.Price,
+                "serial" : item.Serial,
+                "version": ver[0]
+            });
+        })
+        setInfo(temp);
+        setObjectsList(temp);
+    },[partsListName])
 
     const onSuccess = async (code) => {
         await setScreenMode(false);
@@ -63,12 +85,12 @@ const ServicePartsTab = ({setInfo, info}) => {
                     let selectedVersion =
                         selectedObject[0].value.Versions.filter(item=>item.Key == data.result.VersionId);
                     if (!!selectedItemList.id){
-                        refactorObjectListItems("partType",selectedObject[0],selectedItemList.id)
-                        refactorObjectListItems("version",selectedVersion[0],selectedItemList.id)
+                        refactorObjectListItems("partType",selectedObject[0],selectedItemList.index)
+                        refactorObjectListItems("version",selectedVersion[0],selectedItemList.index)
                         refactorObjectListItems(
                             "serial",
                             `${selectedObject[0].value.SerialFormat.substr(0,serialHeaderIndex)}${leftOfCode}`,
-                            selectedItemList.id)
+                            selectedItemList.index)
                         setSelectedItemList({});
                     } else {
                         setFieldsObject({...fieldsObject,
@@ -108,8 +130,8 @@ const ServicePartsTab = ({setInfo, info}) => {
                 if (data.errorCode == 0) {
                     let selectedVersion = object.value.Versions.filter(item=>item.Key == data.result.VersionId);
                     if(!!selectedItemList.id){
-                        refactorObjectListItems("partType", object, selectedItemList.id);
-                        refactorObjectListItems("version", selectedVersion[0], selectedItemList.id);
+                        refactorObjectListItems("partType", object, selectedItemList.index);
+                        refactorObjectListItems("version", selectedVersion[0], selectedItemList.index);
                         setSelectedItemList({});
                     } else {
                         setFieldsObject({...fieldsObject,
@@ -136,28 +158,12 @@ const ServicePartsTab = ({setInfo, info}) => {
         }
     }
 
-    const getPartsObject = (token) => {
-        getObjects(token).then(data=>{
-            if (data.errorCode == 0){
-                const partsList = [];
-                data.result.map(item=>partsList.push({label:item.Name, value:item}));
-                setPartsListName(partsList);
-            } else {
-                ToastAndroid.showWithGravity(
-                    data.message,
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER
-                );
-            }
-        })
-    }
-
-    const refactorObjectListItems = (refactorFeild, newValue, objectId)=>{
+    const refactorObjectListItems = (refactorFeild, newValue, objectIndex)=>{
         let currentList = !!info.length ? info : [];
         let selectedObject = {};
         let Index = 0;
         currentList.map((item, index)=>{
-            if (item.id == objectId){
+            if (item.index === objectIndex){
                 selectedObject = item;
                 switch (refactorFeild) {
                     case "isExpanded":
@@ -176,7 +182,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                         selectedObject = {...selectedObject, "partType": newValue};
                         break;
                     case "price":
-                        selectedObject = {...selectedObject, "price": newValue};
+                        selectedObject = {...selectedObject, "Price": newValue};
                         break;
                     case "serial":
                         selectedObject = {...selectedObject, "serial": newValue};
@@ -195,34 +201,33 @@ const ServicePartsTab = ({setInfo, info}) => {
     }
 
     const renderServicePartItem = (item)=>{
-        let Item = item.item;
+        let Item = item;
+        console.log("ITEM", Item);
         return(
-            <View style={Styles.formContainerStyle}>
-                <TouchableHighlight style={Styles.formHeaderStyle} onPress={()=>refactorObjectListItems("isExpanded", !Item.isExpanded, Item.id)}>
-                    <View style={Styles.formHeaderStyle}>
-                        <View style={Styles.ItemFromHeaderStyle}>
-                            <TouchableOpacity
-                                style={{width: 37, height: 37, justifyContent:"center", alignItems:"center", backgroundColor: "#660000", borderRadius:5}}
-                                onPress={()=>refactorObjectListItems("isExpanded", !Item.isExpanded, Item.id)}>
-                                {Item.isExpanded?(
-                                    <Feather name={"minus"} style={{color:"#fff", fontSize:17}}/>
-                                ):(
-                                    <Feather name={"plus"} style={{color:"#fff", fontSize:17}}/>
-                                )}
-                            </TouchableOpacity>
-                            <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
-                                {Item.serial}
-                            </Text>
-                            <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
-                                {!!Item.partType.label? Item.partType.label : "نام"}
-                            </Text>
-                        </View>
+            <View style={[Styles.newformContainerStyle,{marginBottom: 10}]}>
+                <TouchableHighlight style={Styles.formHeaderStyle} onPress={()=>refactorObjectListItems("isExpanded", !Item.isExpanded, Item.index)}>
+                    <>
+                        <TouchableOpacity
+                            style={{width: 37, height: 37, justifyContent:"center", alignItems:"center", backgroundColor: "#660000", borderRadius:5}}
+                            onPress={()=>refactorObjectListItems("isExpanded", !Item.isExpanded, Item.index)}>
+                            {Item.isExpanded?(
+                                <Feather name={"minus"} style={{color:"#fff", fontSize:17}}/>
+                            ):(
+                                <Feather name={"plus"} style={{color:"#fff", fontSize:17}}/>
+                            )}
+                        </TouchableOpacity>
+                        <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                            {!!Item.serial? Item.serial : "سریال"}
+                        </Text>
+                        <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                            {!!Item.partType? Item.partType.label : "نام"}
+                        </Text>
                         {Item.objectType == "new" ? (
                             <FontAwesome5 name={"arrow-right"} style={{color:"green", fontSize:20}}/>
                         ):(
                             <FontAwesome5 name={"arrow-left"} style={{color:"red", fontSize:20}}/>
                         )}
-                    </View>
+                    </>
                 </TouchableHighlight>
                 {Item.isExpanded && (
                     <View style={Styles.bothOptionsContainerStyle}>
@@ -230,14 +235,16 @@ const ServicePartsTab = ({setInfo, info}) => {
                             <DropdownPicker
                                 list={partsListName}
                                 onSelect={value=> {
-                                    refactorObjectListItems("partType", value.label, Item.id);
+                                    refactorObjectListItems("partType", value, Item.index);
                                     let versions=[];
                                     value.value.Versions.map(item=>versions.push({label:item.Value, value:item}))
-                                    refactorObjectListItems("availableVersions", versions, Item.id);
+                                    refactorObjectListItems("availableVersions", versions, Item.index);
+                                    refactorObjectListItems("version", "", Item.index)
                                 }}
-                                placeholder={!!Item.partType.label
+                                placeholder={!!Item.partType
                                     ? Item.partType.label
-                                    :"قطعه مورد نظر خود را انتخاب کنید."}/>
+                                    :"قطعه مورد نظر خود را انتخاب کنید."}
+                                listHeight={150}/>
                             <Text style={{width:"20%"}}>نوع قطعه:</Text>
                         </View>
                         <View style={Styles.serialContainerStyle}>
@@ -251,14 +258,14 @@ const ServicePartsTab = ({setInfo, info}) => {
                             />
                             <Icon
                                 name={"qr-code-2"}
-                                style={{color:"#000", fontSize:30}}
+                                style={{color:"#000", fontSize:30, marginHorizontal:5}}
                                 onPress={()=> {
                                     setSelectedItemList(Item);
-                                    setScreenMode(true);
+                                    setScreenMode(true)
                                 }}/>
                             <TextInput
                                 style={Styles.serialInputStyle}
-                                onChangeText={text=>refactorObjectListItems("serial", text, Item.id)}
+                                onChangeText={text=>refactorObjectListItems("serial", text, Item.index)}
                                 value={Item.serial}
                             />
                             <View style={{flexDirection:"row"}}>
@@ -269,10 +276,11 @@ const ServicePartsTab = ({setInfo, info}) => {
                         <View style={Styles.partTypeContainerStyle}>
                             <DropdownPicker
                                 list={Item.availableVersions}
-                                placeholder={!!Item.version.Key
+                                placeholder={!!Item.version
                                     ? Item.version.Value
                                     :"نسخه مورد نظر خود را انتخاب کنید."}
-                                onSelect={item=>refactorObjectListItems("version", item.Value, Item.id)}
+                                onSelect={item=>refactorObjectListItems("version", item.Value, Item.index)}
+                                listHeight={150}
                             />
                             <Text style={{width:65}}>نسخه:  </Text>
                         </View>
@@ -285,22 +293,22 @@ const ServicePartsTab = ({setInfo, info}) => {
                         </Text>
                         <TextInput
                             style={Styles.priceInputStyle}
-                            onChangeText={text=>refactorObjectListItems("price", text, Item.id)}
-                            value={Item.price}
+                            onChangeText={text=>refactorObjectListItems("price", text, Item.index)}
+                            value={Item.Price}
                             keyboardType="numeric"
                         />
                         <Text>
                             قیمت:
                         </Text>
                     </View>
-                ) : Item.isExpanded && Item.objectType === "failed" ? (
+                ) :Item.isExpanded && Item.objectType === "failed" ? (
                     <View style={{marginTop:15, width:"100%"}}>
                         <Text>شرح نوع خرابی و علت احتمالی آن: </Text>
                         <View style={Styles.failureDescriptionContainerStyle}>
                             <Text style={{marginBottom:5}}>توضیحات: </Text>
                             <TextInput
                                 style={Styles.descriptionInputStyle}
-                                onChangeText={text=>refactorObjectListItems("failureDescription", text, Item.id)}
+                                onChangeText={text=>refactorObjectListItems("failureDescription", text, Item.index)}
                                 value={Item.failureDescription}
                             />
                         </View>
@@ -316,8 +324,8 @@ const ServicePartsTab = ({setInfo, info}) => {
                             </Text>
                             <TextInput
                                 style={Styles.prePriceInputStyle}
-                                onChangeText={text=>refactorObjectListItems("price", text, Item.id)}
-                                value={Item.price}
+                                onChangeText={text=>refactorObjectListItems("price", text, Item.index)}
+                                value={Item.Price}
                                 keyboardType="numeric"
                             />
                             <Text>
@@ -332,7 +340,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                             let currentList = objectsList.length>0 ? objectsList : [];
                             let selectedIndex = 0;
                             currentList.map((item, index)=>{
-                                if (item.id == Item.id){
+                                if (item.index == Item.index){
                                     selectedIndex = index;
                                 }
                             });
@@ -343,7 +351,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                             <Octicons name={"trashcan"} style={{fontSize:17, color:"#fff"}}/>
                         </TouchableOpacity>
                         <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=>{
-                            refactorObjectListItems("isExpanded", false, Item.id);
+                            refactorObjectListItems("isExpanded", false, Item.index);
                         }}>
                             <Octicons name={"check"} style={{fontSize:17, color:"#fff"}}/>
                         </TouchableOpacity>
@@ -353,21 +361,14 @@ const ServicePartsTab = ({setInfo, info}) => {
         );
     }
 
-    useEffect(()=>{
-        getPartsObject(selector.token);
-    },[fieldsObject.objectType, newHasStarted]);
     return !screenMode ? (
         <>
             <ScrollView style={{flex: 0.8, padding: 15}}>
                 {!!objectsList && objectsList.length > 0 && (
-                    <View style={{flex:1, marginBottom:newHasStarted?0:30}}>
-                        <FlatList
-                            style={{width:"100%"}}
-                            data={objectsList}
-                            renderItem={item =>renderServicePartItem(item)}
-                            keyExtractor={(item,index) => index.toString()}
-                            extraData={refresh}
-                        />
+                    <View style={{flex: 1}}>
+                        {objectsList.map(item=>(
+                            renderServicePartItem(item)
+                        ))}
                     </View>
                 )}
                 {newHasStarted && (
@@ -435,7 +436,8 @@ const ServicePartsTab = ({setInfo, info}) => {
                                         }}
                                         placeholder={!!fieldsObject.partTypeSelected.label
                                             ? fieldsObject.partTypeSelected.label
-                                            :"قطعه مورد نظر خود را انتخاب کنید."}/>
+                                            :"قطعه مورد نظر خود را انتخاب کنید."}
+                                        listHeight={150}/>
                                     <Text style={{width:"20%"}}>نوع قطعه:</Text>
                                 </View>
                                 <View style={Styles.serialContainerStyle}>
@@ -468,6 +470,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                                             ? fieldsObject.partVersionSelected.Value
                                             :"نسخه مورد نظر خود را انتخاب کنید."}
                                         onSelect={item=>setFieldsObject({...fieldsObject, partVersionSelected: item})}
+                                        listHeight={150}
                                     />
                                     <Text style={{width:65}}>نسخه:  </Text>
                                 </View>
@@ -480,8 +483,8 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 </Text>
                                 <TextInput
                                     style={Styles.priceInputStyle}
-                                    onChangeText={text=>setFieldsObject({...fieldsObject, newObjectPrice: text})}
-                                    value={fieldsObject.newObjectPrice}
+                                    onChangeText={text=>setFieldsObject({...fieldsObject, Price: text})}
+                                    value={fieldsObject.Price}
                                     keyboardType="numeric"
                                 />
                                 <Text>
@@ -511,8 +514,8 @@ const ServicePartsTab = ({setInfo, info}) => {
                                     </Text>
                                     <TextInput
                                         style={Styles.prePriceInputStyle}
-                                        onChangeText={text=>setFieldsObject({...fieldsObject, prePrice: text})}
-                                        value={fieldsObject.prePrice}
+                                        onChangeText={text=>setFieldsObject({...fieldsObject, Price: text})}
+                                        value={fieldsObject.Price}
                                         keyboardType="numeric"
                                     />
                                     <Text>
@@ -531,26 +534,25 @@ const ServicePartsTab = ({setInfo, info}) => {
                                     serial: "",
                                     partTypeSelected: {},
                                     partVersionSelected: {},
-                                    newObjectPrice: "",
                                     failureDescription: "",
                                     hasGarantee: null,
-                                    prePrice: ""});
+                                    Price: ""});
                             }}>
                                 <Octicons name={"trashcan"} style={{fontSize:17, color:"#fff"}}/>
                             </TouchableOpacity>
                             <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=>{
                                 let INFO = !!objectsList ? objectsList : [];
                                 INFO.push({
-                                    id: INFO.length + 1,
-                                    serial: fieldsObject.serial,
-                                    isExpanded: false,
-                                    failureDescription: fieldsObject.failureDescription,
-                                    hasGarantee:fieldsObject.hasGarantee,
-                                    price: fieldsObject.objectType == "new" ? fieldsObject.newObjectPrice : fieldsObject.prePrice,
-                                    objectType:fieldsObject.objectType,
-                                    partType: fieldsObject.partTypeSelected,
-                                    availableVersions:[],
-                                    version: fieldsObject.partVersionSelected
+                                    "index": INFO.length + 1,
+                                    "serial": fieldsObject.serial,
+                                    "isExpanded": false,
+                                    "failureDescription": fieldsObject.failureDescription,
+                                    "hasGarantee":fieldsObject.hasGarantee,
+                                    "Price":fieldsObject.Price,
+                                    "objectType":fieldsObject.objectType,
+                                    "partType": fieldsObject.partTypeSelected,
+                                    "availableVersions":[],
+                                    "version": fieldsObject.partVersionSelected
                                 });
                                 setNewHasStarted(false);
                                 setFieldsObject({
@@ -559,10 +561,9 @@ const ServicePartsTab = ({setInfo, info}) => {
                                     serial: "",
                                     partTypeSelected: {},
                                     partVersionSelected: {},
-                                    newObjectPrice: "",
+                                    Price: "",
                                     failureDescription: "",
-                                    hasGarantee: null,
-                                    prePrice: ""});
+                                    hasGarantee: null});
                                 setObjectsList(INFO);
                                 setInfo(INFO);
                             }}>

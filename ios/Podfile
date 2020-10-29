@@ -8,6 +8,8 @@ target 'Datis_Services' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'RNImageCropPicker', :path => '../node_modules/react-native-image-crop-picker'
+
   target 'Datis_ServicesTests' do
     inherit! :complete
     # Pods for testing

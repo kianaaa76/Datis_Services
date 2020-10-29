@@ -1,25 +1,25 @@
-import React,{useState, useEffect} from "react";
+import React from "react";
 import {View, StyleSheet, Text, TextInput, Dimensions, ScrollView, Image} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import ImagePicker from 'react-native-image-picker';
-import RNFetchBlob from 'rn-fetch-blob';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServiceFactorTab = ({setInfo, info, projectId}) => {
-    let dirs = RNFetchBlob.fs.dirs;
-
+const ServiceFactorTab = ({setInfo, info}) => {
     return (
         <ScrollView style={Styles.containerStyle} contentContainerStyle={{justifyContent:"center", alignItems:"center"}}>
             <View style={Styles.rowDataStyle}>
                 <Text style={Styles.rialTextStyle}>ریال</Text>
-                <TextInput style={Styles.textInputStyle} onChangeText={text=> {
-                    setInfo({
-                        factorReceivedPrice:text,
-                        factorTotalPrice: info.factorTotalPrice,
-                    })
-                }} value={info.factorReceivedPrice}  keyboardType="numeric"/>
+                <TextInput
+                    style={Styles.textInputStyle}
+                    onChangeText={text=> {
+                        setInfo({...info,
+                            factorReceivedPrice:text
+                        })
+                    }}
+                    value={info.factorReceivedPrice.toString()}
+                    keyboardType="numeric"/>
                 <View style={{width: 70}}>
                     <Icon name={"star"} style={{color:"red", fontSize:10}}/>
                     <Text style={Styles.labelStyle}>مبلغ دریافتی:</Text>
@@ -30,11 +30,11 @@ const ServiceFactorTab = ({setInfo, info, projectId}) => {
                 <TextInput style={Styles.textInputStyle}
                            onChangeText={text=> {
                                setInfo({
-                                   factorReceivedPrice: info.factorReceivedPrice,
+                                   ...info,
                                    factorTotalPrice: text,
                                })
                            }}
-                           value={info.factorTotalPrice}
+                           value={info.factorTotalPrice.toString()}
                            keyboardType="numeric"/>
                 <View style={{width: 70}}>
                     <Icon name={"star"} style={{color:"red"}}/>
@@ -45,27 +45,31 @@ const ServiceFactorTab = ({setInfo, info, projectId}) => {
                 <View style={Styles.getImageContainerViewStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                         () => {
-                            ImagePicker.launchCamera({}, response => {
+                            ImagePicker.openCamera({
+                                width:pageWidth-20,
+                                height: pageHeight*0.4,
+                                includeBase64:true,
+                                compressImageQuality:1
+                            }).then( response => {
                                 setInfo({
-                                    factorReceivedPrice:info.factorReceivedPrice,
-                                    factorTotalPrice:info.factorTotalPrice,
-                                    factorImage: response.data,
-                                    billImage:info.billImage
+                                    ...info,
+                                    factorImage: response.data
                                 });
-                                RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/1.png`, response.data, 'base64' )
                             })
                         }}
                     />
                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
                         ()=>{
-                            ImagePicker.launchImageLibrary({},response=>{
+                            ImagePicker.openPicker({
+                                width:pageWidth-20,
+                                height: pageHeight*0.4,
+                                includeBase64:true,
+                                compressImageQuality:1
+                            }).then(response=>{
                                 setInfo({
-                                    factorReceivedPrice:info.factorReceivedPrice,
-                                    factorTotalPrice:info.factorTotalPrice,
-                                    factorImage: response.data,
-                                    billImage:info.billImage
+                                    ...info,
+                                    factorImage: response.data
                                 });
-                                RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/1.png`,response.data, 'base64' )
                             })
                         }}/>
                 </View>
@@ -74,35 +78,39 @@ const ServiceFactorTab = ({setInfo, info, projectId}) => {
                     <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
                 </View>
             </View>
-            {!!info.factorImage && (
+            {!!info.factorImage&& (
                 <Image
-                    source={{uri: `data:image/gif;base64,${info.factorImage}`}}
+                    source={{uri: `data:image/jpeg;base64,${info.factorImage}`}}
                     style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
             )}
             <View style={Styles.imageRowStyle}>
                 <View style={Styles.getImageContainerViewStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                         () => {
-                            ImagePicker.launchCamera({}, response => {
+                            ImagePicker.openCamera({
+                                width:pageWidth-20,
+                                height: pageHeight*0.4,
+                                includeBase64:true,
+                                compressImageQuality:1
+                            }).then( response => {
                                 setInfo({
-                                    factorReceivedPrice:info.factorReceivedPrice,
-                                    factorTotalPrice:info.factorTotalPrice,
-                                    factorImage: info.factorImage,
+                                    ...info,
                                     billImage:response.data
                                 });
-                                RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${serviceID}/2.png`,response.data, 'base64' )
                             })
                         }}
                     />
                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
-                        ()=>ImagePicker.launchImageLibrary({},response=>{
+                        ()=>ImagePicker.openPicker({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:1
+                        }).then(response=>{
                             setInfo({
-                                factorReceivedPrice:info.factorReceivedPrice,
-                                factorTotalPrice:info.factorTotalPrice,
-                                factorImage: info.factorImage,
+                                ...info,
                                 billImage:response.data
                             });
-                            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${serviceID}/2.png`,response.data, 'base64' )
                         })}/>
                 </View>
                 <View style={{width: 100}}>
@@ -111,7 +119,7 @@ const ServiceFactorTab = ({setInfo, info, projectId}) => {
             </View>
             {!!info.billImage && (
                 <Image
-                    source={{uri: `data:image/gif;base64,${info.billImage}`}}
+                    source={{uri: `data:image/jpeg;base64,${info.billImage}`}}
                     style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
             )}
         </ScrollView>

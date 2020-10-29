@@ -1,16 +1,35 @@
 import React,{useState, useEffect} from "react";
-import {View, StyleSheet, Text, TextInput, Dimensions, ScrollView, Image} from "react-native";
+import {
+    View,
+    StyleSheet,
+    Text,
+    TextInput,
+    Dimensions,
+    ScrollView,
+    Image,
+    TouchableOpacity,
+    TouchableHighlight
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import ImagePicker from 'react-native-image-picker';
-import RNFetchBlob from 'rn-fetch-blob';
+import ImagePicker from 'react-native-image-crop-picker';
+import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-
-const ServiceFactorTab = ({setInfo, info, projectId}) => {
-    let dirs = RNFetchBlob.fs.dirs;
-
+const shadowOpt2 = {
+    width: pageWidth * 0.2,
+    height: 35,
+    color: '#000',
+    radius: 7,
+    opacity: 0.2,
+    x: 0,
+    y: 3,
+    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
+}
+const ServiceFactorTab = ({setInfo, info}) => {
+    const [deletingImage, setDeletingImage] = useState(0);
     return (
+        <>
         <ScrollView style={Styles.containerStyle} contentContainerStyle={{justifyContent:"center", alignItems:"center"}}>
             <View style={Styles.rowDataStyle}>
                 <Text style={Styles.rialTextStyle}>ریال</Text>
@@ -45,27 +64,27 @@ const ServiceFactorTab = ({setInfo, info, projectId}) => {
                 <View style={Styles.getImageContainerViewStyle}>
                 <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                     () => {
-                        ImagePicker.launchCamera({}, response => {
-                            setInfo({
-                                factorReceivedPrice:info.factorReceivedPrice,
-                                factorTotalPrice:info.factorTotalPrice,
-                                factorImage: response.data,
-                                billImage:info.billImage
-                            });
-                            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/1.png`, response.data, 'base64' )
+                        ImagePicker.openCamera({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:0.7
+                        }).then( response => {
+                            console.log("response", response);
+                            setInfo({...info, factorImage:response.data});
                         })
                     }}
                 />
                 <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
                     ()=>{
-                        ImagePicker.launchImageLibrary({},response=>{
-                            setInfo({
-                                factorReceivedPrice:info.factorReceivedPrice,
-                                factorTotalPrice:info.factorTotalPrice,
-                                factorImage: response.data,
-                                billImage:info.billImage
-                            });
-                            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/1.png`,response.data, 'base64' )
+                        ImagePicker.openPicker({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:0.7
+                        }).then(response=>{
+                            console.log("response",response);
+                            setInfo({...info, factorImage:response.data});
                         })
                     }}/>
                 </View>
@@ -75,34 +94,38 @@ const ServiceFactorTab = ({setInfo, info, projectId}) => {
                 </View>
             </View>
             {!!info.factorImage && (
-                <Image
-                    source={{uri: `data:image/gif;base64,${info.factorImage}`}}
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
+                <TouchableOpacity
+                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
+                    onPress={()=> {
+                        setDeletingImage(1)
+                    }}>
+                    <Image
+                        source={{uri: `data:image/jpeg;base64,${info.factorImage}`}}
+                        style={{width:"100%", height:"100%"}}/>
+                </TouchableOpacity>
             )}
             <View style={Styles.imageRowStyle}>
                 <View style={Styles.getImageContainerViewStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                         () => {
-                            ImagePicker.launchCamera({}, response => {
-                                setInfo({
-                                    factorReceivedPrice:info.factorReceivedPrice,
-                                    factorTotalPrice:info.factorTotalPrice,
-                                    factorImage: info.factorImage,
-                                    billImage:response.data
-                                });
-                                RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${serviceID}/2.png`,response.data, 'base64' )
+                            ImagePicker.openCamera({
+                                width:pageWidth-20,
+                                height: pageHeight*0.4,
+                                includeBase64:true,
+                                compressImageQuality:0.7
+                            }).then( response => {
+                                setInfo({...info, billImage:response.data});
                             })
                         }}
                     />
                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
-                        ()=>ImagePicker.launchImageLibrary({},response=>{
-                            setInfo({
-                                factorReceivedPrice:info.factorReceivedPrice,
-                                factorTotalPrice:info.factorTotalPrice,
-                                factorImage: info.factorImage,
-                                billImage:response.data
-                            });
-                            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${serviceID}/2.png`,response.data, 'base64' )
+                        ()=>ImagePicker.openPicker({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:0.7
+                        }).then(response=>{
+                            setInfo({...info, billImage:response.data});
                         })}/>
                 </View>
                 <View style={{width: 100}}>
@@ -110,11 +133,62 @@ const ServiceFactorTab = ({setInfo, info, projectId}) => {
                 </View>
             </View>
             {!!info.billImage && (
-                <Image
-                    source={{uri: `data:image/gif;base64,${info.billImage}`}}
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
+                <TouchableOpacity
+                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
+                    onPress={()=> {
+                        setDeletingImage(2)
+                    }}>
+                        <Image
+                            source={{uri: `data:image/jpeg;base64,${info.billImage}`}}
+                            style={{width:"100%", height:"100%"}}/>
+                </TouchableOpacity>
             )}
         </ScrollView>
+    {!!deletingImage && (
+        <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setDeletingImage(0)}>
+            <View style={Styles.modalContainerStyle}>
+                <View style={Styles.modalBodyContainerStyle2}>
+                    <Text>
+                        آیا از پاک کردن عکس اطمینان دارید؟
+                    </Text>
+                </View>
+                <View style={Styles.modalFooterContainerStyle}>
+                    <BoxShadow setting={shadowOpt2}>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={()=> {
+                                setDeletingImage(0);
+                            }}>
+                            <Text style={Styles.modalButtonTextStyle}>
+                                خیر
+                            </Text>
+                        </TouchableOpacity>
+                    </BoxShadow>
+                    <BoxShadow setting={shadowOpt2}>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={()=> {
+                                if (deletingImage === 1){
+                                    setInfo({
+                                        ...info, factorImage: ""
+                                    });
+                                } else if (deletingImage === 2){
+                                    setInfo({
+                                        ...info, billImage: ""
+                                    });
+                                }
+                                setDeletingImage(0);
+                            }}>
+                            <Text style={Styles.modalButtonTextStyle}>
+                                بله
+                            </Text>
+                        </TouchableOpacity>
+                    </BoxShadow>
+                </View>
+            </View>
+        </TouchableHighlight>
+    )}
+    </>
     );
 }
 
@@ -158,6 +232,64 @@ const Styles = StyleSheet.create({
     },
     labelStyle: {
         width:"100%",
+    },
+    modalBackgroundStyle:{
+        flex:1,
+        width:pageWidth,
+        height: pageHeight,
+        position: "absolute",
+        backgroundColor:"rgba(0,0,0,0.5)",
+        justifyContent:"center",
+        alignItems:"center",
+        alignSelf:'center'
+    },
+    modalContainerStyle:{
+        position: "absolute",
+        bottom:pageHeight*0.3,
+        width:pageWidth*0.7,
+        height:150,
+        backgroundColor:"#E8E8E8",
+        marginBottom:pageHeight*0.25,
+        borderRadius: 15,
+        overflow:"hidden",
+        alignItems:"center"
+    },
+    modalBodyContainerStyle:{
+        width:"100%",
+        height:"35%",
+        alignItems:"center",
+        padding: 10
+    },
+    modalBodyContainerStyle2:{
+        width:"100%",
+        height:"40%",
+        alignItems:"center",
+        padding: 10,
+        justifyContent:"flex-end"
+    },
+    modalBodyTextStyle:{
+        color: "#660000",
+        textAlign:"center",
+        fontSize: 16
+    },
+    modalFooterContainerStyle:{
+        flexDirection:"row",
+        width:"100%",
+        height:"30%",
+        justifyContent:"space-around",
+    },
+    modalButtonStyle:{
+        backgroundColor:"#fff",
+        width:"97%",
+        height:"97%",
+        borderRadius:7,
+        justifyContent:"center",
+        alignItems:"center"
+    },
+    modalButtonTextStyle:{
+        color:"gray",
+        fontSize:14,
+        fontWeight:"bold"
     },
 })
 

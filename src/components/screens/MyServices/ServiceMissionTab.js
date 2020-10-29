@@ -1,16 +1,14 @@
 import React,{useState,useEffect} from 'react';
-import {View, ScrollView, Dimensions, Text, StyleSheet, TextInput, TouchableOpacity} from "react-native";
+import {View, Switch, Dimensions, Text, StyleSheet, TextInput, BackHandler} from "react-native";
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from "react-native-vector-icons/Foundation";
-import {API_KEY} from "../../../actions/types";
+import {API_KEY, MAPBOX_API_KEY} from "../../../actions/types";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-
-
-const ServiceMissionTab = ({info, setInfo}) => {
-    const [cameraLatitude, setCameraLatitude] = useState("");
-    const [cameraLongitude, setCameraLongitude] = useState("");
+let EndObject={};
+let cameraRef={};
+const ServiceMissionTab = ({info, setInfo, navigation}) => {
     const [startLocation, setStartLocation] = useState({
         startLatitude: info.startLatitude,
         startLongitude: info.startLongitude
@@ -21,6 +19,35 @@ const ServiceMissionTab = ({info, setInfo}) => {
     });
     const [startCity, setStartCity] = useState(info.startCity);
     const [endCity, setEndCity] = useState(info.endCity);
+    const [travel, setTravel] = useState(info.travel);
+
+    useEffect(() => {
+        const backAction = () => {
+            if(!!endLocation.endLongitude){
+                setEndLocation({endLongitude: "", endLatitude: ""});
+                setEndCity("");
+                setInfo({...info,
+                    endLatitude: "",
+                    endLongitude: "",
+                    endCity: ""
+                })
+            } else if (!!startLocation.startLatitude){
+                setStartLocation({startLatitude: "", startLongitude: ""});
+                setStartCity("");
+                setInfo({...info,
+                    startLatitude: "",
+                    startLongitude: "",
+                    startCity: ""
+                })
+            } else {
+                navigation.goBack();
+            }
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+        return () => backHandler.remove();
+    });
+
 
     const renderMarker = (latitude,longitude, color, size, id, type) =>{
         return(
@@ -38,7 +65,6 @@ const ServiceMissionTab = ({info, setInfo}) => {
                             <Icon name="marker" color={color} size={size}/>
                             <Text style={Styles.markerLabelStyle}>{type == "start"? "مبدا" : "مقصد"}</Text>
                         </View>
-
                     </View>
                 </MapboxGL.MarkerView>
             </View>
@@ -47,6 +73,15 @@ const ServiceMissionTab = ({info, setInfo}) => {
 
     const mapOnLongPress = (feature) => {
         if (!startLocation.startLatitude){
+            setStartLocation({
+                startLatitude: feature.geometry.coordinates[1],
+                startLongitude: feature.geometry.coordinates[0]
+            })
+            setInfo({
+                ...info,
+                startLatitude: feature.geometry.coordinates[1],
+                startLongitude: feature.geometry.coordinates[0],
+            });
             fetch(`https://map.ir/fast-reverse?lat=${feature.geometry.coordinates[1]}&lon=${feature.geometry.coordinates[0]}`, {
                 method: 'GET',
                 headers: {
@@ -57,18 +92,23 @@ const ServiceMissionTab = ({info, setInfo}) => {
                 .then(response => response.json())
                 .then(data => {
                     setStartCity(data.city);
-                    setInfo({...info, startCity: data.city});
-                    setStartLocation({
-                        startLatitude: feature.geometry.coordinates[1],
-                        startLongitude: feature.geometry.coordinates[0]
-                    })
                     setInfo({...info,
+                        startCity: data.city,
                         startLatitude: feature.geometry.coordinates[1],
                         startLongitude: feature.geometry.coordinates[0],
                     })
-                });
+                })
         } else if (!endLocation.endLatitude) {
-            fetch(`https://map.ir/reverse?lat=${feature.geometry.coordinates[1]}&lon=${feature.geometry.coordinates[0]}`, {
+            setEndLocation({
+                endLatitude: feature.geometry.coordinates[1],
+                endLongitude: feature.geometry.coordinates[0]
+            });
+            setInfo({
+                ...info,
+                endLatitude: feature.geometry.coordinates[1],
+                endLongitude: feature.geometry.coordinates[0],
+            })
+            fetch(`https://map.ir/fast-reverse?lat=${feature.geometry.coordinates[1]}&lon=${feature.geometry.coordinates[0]}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,37 +117,44 @@ const ServiceMissionTab = ({info, setInfo}) => {
             })
                 .then(response => response.json())
                 .then(data => {
+                    EndObject= data.city
                     setEndCity(data.city);
-                    setInfo({...info, endCity: data.city});
-                    setEndLocation({
-                        endLatitude: feature.geometry.coordinates[1],
-                        endLongitude: feature.geometry.coordinates[0]
-                    });
-                    setInfo({...info,
-                        endLatitude: feature.geometry.coordinates[1],
-                        endLongitude: feature.geometry.coordinates[0],
-                    })
-                });
+                })
+            fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${startLocation.startLongitude},${startLocation.startLatitude};${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}?access_token=${MAPBOX_API_KEY}`,{
+                method: 'GET'
+            }).then(response=> response.json()).then(data=>{
+                setInfo({
+                    ...info,
+                    distance: data.routes[0].legs[0].distance,
+                    endCity: EndObject,
+                    endLatitude: feature.geometry.coordinates[1],
+                    endLongitude: feature.geometry.coordinates[0],
+                })
+            })
+            setInfo({
+                ...info,
+                startLatitude: startLocation.startLatitude,
+                startLongitude: startLocation.startLongitude
+            })
+            cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],100,100);
         }
     }
-
     return(
         <View style={Styles.containerStyle}>
             <MapboxGL.MapView
                 style={{width:pageWidth, height:pageHeight}}
                 onLongPress={feature => mapOnLongPress(feature)}>
+                <MapboxGL.Camera
+                    ref={ref=>cameraRef=ref}
+                />
                 <MapboxGL.UserLocation
                     onUpdate={location => {
-                        setCameraLatitude(location.coords.latitude);
-                        setCameraLongitude(location.coords.longitude);
+                        if (!startLocation.startLatitude && !endLocation.endLongitude) {
+                            cameraRef.moveTo([location.coords.longitude, location.coords.latitude], 500);
+                            cameraRef.zoomTo(11, 500)
+                        }
                     }}
                 />
-                {!!cameraLongitude && !!cameraLatitude && (
-                    <MapboxGL.Camera
-                        centerCoordinate={[cameraLongitude, cameraLatitude]}
-                        zoomLevel={12}
-                    />
-                )}
                 {!!startLocation.startLongitude && !!startLocation.startLatitude && (
                     renderMarker(startLocation.startLatitude, startLocation.startLongitude, "blue", 45, 1, "start")
                 )}
@@ -129,15 +176,43 @@ const ServiceMissionTab = ({info, setInfo}) => {
                     <View style={Styles.cardContentContainerStyle}>
                         <View style={Styles.cityDataContainerStyle}>
                             <View style={Styles.cityDataContentContainerStyle}>
-                                <Text style={Styles.cityDataTextStyle}>{endCity}</Text>
+                                    <TextInput style={Styles.cityDataTextStyle} onChangeText={text=> {
+                                        setInfo({
+                                            ...info, endCity: text
+                                        })
+                                        setEndCity(text)
+                                    }}
+                                       value={endCity}
+                                    />
                                 <Text style={Styles.cityDataTitleStyle}>شهر مقصد: </Text>
                             </View>
                             <View style={Styles.cityDataContentContainerStyle}>
-                                <Text style={Styles.cityDataTextStyle}>{startCity}</Text>
+                                    <TextInput style={Styles.cityDataTextStyle} onChangeText={text=> {
+                                        setInfo({
+                                            ...info, start: text
+                                        })
+                                        setStartCity(text)}}
+                                       value={startCity}
+                                    />
                                 <Text style={Styles.cityDataTitleStyle}>شهر مبدا: </Text>
                             </View>
                         </View>
-                        <View style={Styles.dateContainerstyle}>
+                        <View style={Styles.switchContainerStyle}>
+                            <Switch
+                                trackColor={{ false: "gray", true: "#660000" }}
+                                thumbColor={travel ? "#990000" : "#C0C0C0"}
+                                onValueChange={()=>{
+                                    setTravel(!travel);
+                                    setInfo({
+                                        ...info,
+                                        travel: !info.travel
+                                    });
+                                }}
+                                value={travel}
+                            />
+                            <Text style={Styles.switchLabelStyle}>
+                                بازگشت به مبدا:
+                            </Text>
                         </View>
                         <View style={Styles.descriptionContainerStyle}>
                             <Text style={Styles.descriptionTitleTextStyle}>توضیحات: </Text>
@@ -219,6 +294,8 @@ const Styles = StyleSheet.create({
         borderBottomColor: '#000',
         fontSize: 15,
         marginLeft: 10,
+        width:"35%",
+        textAlign:"center"
     },
     cityDataTitleStyle: {
         fontSize: 15,
@@ -234,7 +311,8 @@ const Styles = StyleSheet.create({
     },
     descriptionContainerStyle: {
         width: "100%",
-        height: "77%",
+        height: "60%",
+        justifyContent:"flex-end",
     },
     descriptionTitleTextStyle: {
         fontSize: 15,
@@ -243,7 +321,7 @@ const Styles = StyleSheet.create({
     },
     descriptionTextInputStyle: {
         width: '100%',
-        height: pageHeight * 0.18,
+        height: pageHeight * 0.14,
         borderWidth: 1,
         borderColor: '#000',
         borderRadius: 10,
@@ -258,6 +336,18 @@ const Styles = StyleSheet.create({
         borderRadius:10,
         backgroundColor:"#A8A7A7",
         color:"#000"
+    },
+    switchContainerStyle:{
+        flexDirection:"row",
+        width:"100%",
+        alignItems:"center",
+        justifyContent:"flex-end",
+        marginTop:8
+    },
+    switchLabelStyle:{
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginBottom: 10,
     }
 })
 

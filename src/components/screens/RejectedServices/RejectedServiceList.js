@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     ToastAndroid,
     Text,
-    TouchableHighlight,
+    TouchableHighlight, Alert,
 } from 'react-native';
 import AsyncStorage from "@react-native-community/async-storage";
 import RNFetchBlob from 'rn-fetch-blob';
@@ -17,15 +17,17 @@ import {useSelector, useDispatch} from 'react-redux';
 import Header from '../../common/Header';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RejectedServiceListItem from '../../utils/RejectedServiceListItem';
-import Octicons from 'react-native-vector-icons/Octicons';
-import {rejectedServiceList} from '../../../actions/api';
+import {rejectedServiceDetail, rejectedServiceList} from '../../../actions/api';
 import {
-    LOGOUT, RESTORE_SERVICE_DATA,
+    LOGOUT, RESTORE_SERVICE_DATA, SET_EDITING_SERVICE,
 } from '../../../actions/types';
+
+let FACTOR_IMAGE="";
+let BILL_IMAGE="";
+let IMAGE="";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-
 const shadowOpt = {
     width: pageWidth * 0.32,
     height: pageWidth * 0.16,
@@ -37,21 +39,56 @@ const shadowOpt = {
     style: {justifyContent:"center", alignItems:"center"},
 };
 
+let serviceList = [];
 const MyService = ({navigation}) => {
     let dirs = RNFetchBlob.fs.dirs;
     const dispatch = useDispatch();
     const selector = useSelector((state) => state);
-    const [serviceList, setServiceList] = useState([]);
     const [serviceListLoading, setServiceListLoading] = useState(false);
     const [renderRestoreModal, setRenderRestoreModal] = useState(false);
+    const [renderSendDataModal, setRenderSendDataModal] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState("");
+    const [selectItemLoading, setSelectItemLoading] = useState(false);
+    const [modalLoading, setModalLoading] = useState(false);
+
+    const getServiceResult = (resultNum) =>{
+        switch (resultNum) {
+            case 1:
+                return "موفق";
+            case 2:
+                return "موفق مشکوک";
+            case 3:
+                return "سرویس جدید - کسری قطعات";
+            case 4:
+                return "سرویس جدید - آماده نبودن پروژه";
+            case 5:
+                return "سرویس جدید - عدم تسلط";
+            case 6:
+                return "لغو موفق";
+            default:
+                return "";
+        }
+    }
+
+    const getServiceType = (typeNum) => {
+        switch (typeNum) {
+            case 1:
+                return "خرابی یا تعویض موقت";
+            case 2:
+                return "ایراد نصب و تنظیم روتین";
+            case 3:
+                return "تنظیم و عیب غیر روتین";
+            default:
+                return "";
+        }
+    }
 
     const renderEmptyList = () => {
         return (
             <View
                 style={{
                     width: pageWidth,
-                    height: pageHeight,
+                    height: pageHeight*0.8,
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
@@ -63,47 +100,103 @@ const MyService = ({navigation}) => {
     };
 
     const onNewDataPress = (projectId) => {
-        let LIST = [];
+        setModalLoading(true);
+        setRenderRestoreModal(false);
         AsyncStorage.getItem("savedServicesList").then(list=>{
-            let currentList = JSON.parse(list);
-            let Index = 0;
-            currentList.map((item,index)=>{
-                if (item.projectId == projectId){
-                    Index = index;
-                }
-            });
-            delete currentList[Index];
-            LIST = currentList;
+            let tempList = !!list ? JSON.parse(list).filter(service=>service.projectId !== projectId): [];
+            AsyncStorage.setItem("savedServicesList", JSON.stringify(tempList));
+            RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${projectId}`);
         });
-        AsyncStorage.setItem("savedServicesList", JSON.stringify(LIST));
-        dispatch({
-            type:RESTORE_SERVICE_DATA,
-            savedServiceInfo:{
-                projectId:projectId,
-                factorReceivedPrice:"",
-                factorTotalPrice:"",
-                serviceDescription:"",
-                address:"",
-                finalDate: "",
-                serviceResult:"",
-                serviceType:"",
-                objectList:[],
-                startLatitude: "",
-                startLongitude: "",
-                endLatitude: "",
-                endLongitude: "",
-                missionStartDate: "",
-                missionEndDate: "",
-                startCity: "",
-                endCity: "",
-                missionDescription: ""
+        rejectedServiceDetail(projectId, selector.token).then(data=>{
+            if (data.errorCode === 0){
+                dispatch({
+                    type:RESTORE_SERVICE_DATA,
+                    savedServiceInfo:{
+                        projectId:projectId,
+                        factorReceivedPrice:data.result.RecivedAmount,
+                        factorTotalPrice:data.result.InvoiceAmount,
+                        serviceDescription:data.result.Details,
+                        address:data.result.Location,
+                        finalDate: data.result.DoneTime,
+                        serviceResult:getServiceResult(data.result.Result),
+                        serviceType:getServiceType(data.result.ServiceType),
+                        objectList:data.result.ObjectList,
+                        startLatitude: "",
+                        startLongitude: "",
+                        endLatitude: "",
+                        endLongitude: "",
+                        startCity: "",
+                        endCity: "",
+                        missionDescription: "",
+                        distance:"",
+                        saveType:"",
+                        travel:false
+                    }
+                });
+                navigation.navigate("RejectedServiceDetail", {serviceID: projectId, service: {
+                        "projectID":data.result.projectID,
+                        "DocText":{
+                            "PhoneName": data.result.DocText.PhoneName,
+                            "Phone":data.result.DocText.Phone,
+                            "Serial": data.result.DocText.Serial,
+                            "WarS": data.result.DocText.WarS,
+                            "DOM": data.result.DocText.DOM,
+                            "Address": data.result.DocText.Address,
+                            "DetectedFailure": data.result.DocText.DetectedFailure,
+                            "parts": data.result.DocText.parts,
+                            "Date": data.result.DocText.Date
+                        },
+                        "factorImage":data.result.FactorImage,
+                        "image":data.result.Image,
+                        "billImage":data.result.BillImage
+                    }});
+                setModalLoading(false);
+            } else if (data.errorCode === 3){
+                dispatch({
+                    type: LOGOUT
+                });
+                navigation.navigate("SignedOut");
+                setModalLoading(false);
+                setRenderRestoreModal(false);
+            } else {
+                setModalLoading(false);
+                setRenderRestoreModal(false);
+                ToastAndroid.showWithGravity(
+                    data.message,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER
+                );
             }
-        });
-        RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${projectId}`);
-        navigation.navigate("MyServiceDetails", {serviceID: projectId});
+        }).catch(()=>{
+            setSelectItemLoading(false);
+            Alert.alert(
+                'اخطار',
+                'به دلیل عدم دسترسی به اینترنت امکان باز کردن این سرویس وجود ندارد.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        })
     }
 
-    const onConfirmDataPress = async (projectId)=>{
+    const onConfirmDataPress = (projectId)=>{
+        setRenderRestoreModal(false);
+        RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${projectId}/1.png`, 'base64').then(data=>{
+            if (!!data){
+                FACTOR_IMAGE = data;
+            }
+        });
+        RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${projectId}/2.png`, 'base64').then(data=>{
+            if(!!data){
+                BILL_IMAGE=data;
+            }
+        });
+        RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${projectId}/3.png`, 'base64').then(data=>{
+            if(!!data){
+                IMAGE=data;
+            }
+        });
+        setModalLoading(true);
         AsyncStorage.getItem("savedServicesList").then(list=>{
             let currentList = JSON.parse(list);
             let Index = 0;
@@ -128,15 +221,62 @@ const MyService = ({navigation}) => {
                     startLongitude: currentList[Index].startLongitude,
                     endLatitude: currentList[Index].endLatitude,
                     endLongitude: currentList[Index].endLongitude,
-                    missionStartDate: currentList[Index].missionStartDate,
-                    missionEndDate: currentList[Index].missionEndDate,
                     startCity: currentList[Index].startCity,
                     endCity: currentList[Index].endCity,
-                    missionDescription: currentList[Index].missionDescription
+                    missionDescription: currentList[Index].missionDescription,
+                    distance: currentList[Index].distance,
+                    saveType: currentList[Index].saveType,
+                    travel: currentList[Index].travel
                 }
             });
-            setRenderRestoreModal(false);
-            navigation.replace("MyServiceDetails", {serviceID: projectId});
+            rejectedServiceDetail(projectId, selector.token).then(data=>{
+                if (data.errorCode === 0){
+                    navigation.replace("RejectedServiceDetail", {serviceID: projectId, service:{
+                        "projectID":projectId,
+                        "DocText":{
+                            "PhoneName": data.result.DocText.PhoneName,
+                            "Phone":data.result.DocText.Phone,
+                            "Serial": data.result.DocText.Serial,
+                            "WarS": data.result.DocText.WarS,
+                            "DOM": data.result.DocText.DOM,
+                            "Address": data.result.DocText.Address,
+                            "DetectedFailure": data.result.DocText.DetectedFailure,
+                            "parts": data.result.DocText.parts,
+                            "Date": data.result.DocText.Date
+                        },
+                        "factorImage":FACTOR_IMAGE,
+                        "image":IMAGE,
+                        "billImage":BILL_IMAGE
+                    }});
+                    setRenderRestoreModal(false);
+                    setModalLoading(false);
+                } else if (data.errorCode === 3){
+                    dispatch({
+                        type: LOGOUT
+                    });
+                    setRenderRestoreModal(false);
+                    setModalLoading(false);
+                    navigation.navigate("SignedOut");
+                } else {
+                    setRenderRestoreModal(false);
+                    setModalLoading(false);
+                    ToastAndroid.showWithGravity(
+                        data.message,
+                        ToastAndroid.SHORT,
+                        ToastAndroid.CENTER
+                    );
+                }
+            }).catch(()=>{
+                setRenderRestoreModal(false);
+                setSelectItemLoading(false);
+                Alert.alert(
+                    'اخطار',
+                    'به دلیل عدم دسترسی به اینترنت امکان باز کردن این سرویس وجود ندارد.',
+                    [
+                        { text: 'OK', onPress: () => {} }
+                    ],
+                );
+            })
         });
     }
 
@@ -144,7 +284,7 @@ const MyService = ({navigation}) => {
         setServiceListLoading(true);
         rejectedServiceList(id, token).then((data) => {
             if (data.errorCode == 0) {
-                setServiceList(data.result)
+                serviceList = data.result;
             } else {
                 if (data.errorCode === 3){
                     dispatch({
@@ -152,7 +292,6 @@ const MyService = ({navigation}) => {
                     });
                     navigation.navigate("SignedOut");
                 } else {
-                    setServiceList([]);
                     ToastAndroid.showWithGravity(
                         data.message,
                         ToastAndroid.SHORT,
@@ -161,8 +300,17 @@ const MyService = ({navigation}) => {
                 }
             };
             setServiceListLoading(false);
-        });
+        }).catch(()=>setServiceListLoading(false));
     };
+
+    const renderOnScreenLoading=()=>{
+        return(
+            <View style={Styles.onScreenLoadingContainerStyle}>
+                <ActivityIndicator size={"large"} color={"#660000"}/>
+            </View>
+        )
+    }
+
     useEffect(() => {
         getRejectedServices(selector.userId, selector.token);
     }, []);
@@ -197,6 +345,7 @@ const MyService = ({navigation}) => {
                                     navigation={navigation}
                                     setModalState={setRenderRestoreModal}
                                     setSelectedProjectId={setSelectedProjectId}
+                                    renderLoading={setSelectItemLoading}
                                 />
                             )}
                             keyExtractor={(item) => item.projectID.toString()}
@@ -216,11 +365,15 @@ const MyService = ({navigation}) => {
                                         این پرونده اطلاعات ذخیره شده دارد. آیا مایلید با همان اطلاعات ادامه دهید؟
                                     </Text>
                                 </View>
-                                <View style={Styles.modalFooterContainerStyle}>
+                                {modalLoading?(
+                                    <View style={Styles.modalFooterContainerStyle}>
+                                        <ActivityIndicator size={"small"} color={"#660000"}/>
+                                    </View>
+                                ):(<View style={Styles.modalFooterContainerStyle}>
                                     <BoxShadow setting={shadowOpt}>
                                         <TouchableOpacity
                                             style={Styles.modalButtonStyle}
-                                            onPress={()=>onNewDataPress(selectedProjectId)}>
+                                            onPress={() => onNewDataPress(selectedProjectId)}>
                                             <Text style={Styles.modalButtonTextStyle}>
                                                 اطلاعات جدید
                                             </Text>
@@ -229,9 +382,64 @@ const MyService = ({navigation}) => {
                                     <BoxShadow setting={shadowOpt}>
                                         <TouchableOpacity
                                             style={Styles.modalButtonStyle}
-                                            onPress={()=>onConfirmDataPress(selectedProjectId)}>
+                                            onPress={() => onConfirmDataPress(selectedProjectId)}>
                                             <Text style={Styles.modalButtonTextStyle}>
                                                 تایید
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </BoxShadow>
+                                </View>)}
+                            </View>
+                        </TouchableHighlight>
+                    )}
+                    {renderSendDataModal && (
+                        <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderSendDataModal(false)}>
+                            <View style={Styles.modalContainerStyle}>
+                                <View style={Styles.modalHeaderContainerStyle}>
+                                    <Text style={Styles.modalHeaderTextStyle}>
+                                        داتیس سرویس
+                                    </Text>
+                                </View>
+                                <View style={Styles.modalBodyContainerStyle}>
+                                    <Text style={Styles.modalBodyTextStyle}>
+                                        برای تغییر اطلاعات ارسال گزینه ویرایش را انتخاب نمایید. در غیر این صورت اطلاعات هنگام برقراری ارتباط با اینترنت ارسال میشوند.
+                                    </Text>
+                                </View>
+                                <View style={Styles.modalFooterContainerStyle}>
+                                    <BoxShadow setting={shadowOpt}>
+                                        <TouchableOpacity
+                                            style={Styles.modalButtonStyle}
+                                            onPress={()=>setRenderSendDataModal(false)}>
+                                            <Text style={Styles.modalButtonTextStyle}>
+                                                بازگشت
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </BoxShadow>
+                                    <BoxShadow setting={shadowOpt}>
+                                        <TouchableOpacity
+                                            style={Styles.modalButtonStyle}
+                                            onPress={()=> {
+                                                AsyncStorage.getItem("savedServicesList").then(list=>{
+                                                    let temp = list.filter(item=>item.projectId === selectedProjectId);
+                                                    if (temp.length > 0){
+                                                        dispatch({
+                                                            type: SET_EDITING_SERVICE,
+                                                            editingService: selectedProjectId
+                                                        });
+                                                        onConfirmDataPress(selectedProjectId)
+                                                    } else{
+                                                        Alert.alert(
+                                                            "",
+                                                            "سرویس فعلی بسته شده است. لطفا لیست سرویس ها را به روزرسانی کنید.",
+                                                            [
+                                                                { text: 'OK', onPress: () => {} }
+                                                            ],
+                                                        )
+                                                    }
+                                                })
+                                            }}>
+                                            <Text style={Styles.modalButtonTextStyle}>
+                                                ویرایش
                                             </Text>
                                         </TouchableOpacity>
                                     </BoxShadow>
@@ -239,6 +447,7 @@ const MyService = ({navigation}) => {
                             </View>
                         </TouchableHighlight>
                     )}
+                    {selectItemLoading && renderOnScreenLoading()}
                 </View>
             )}
         </View>
@@ -257,7 +466,6 @@ const Styles = StyleSheet.create({
     },
     flatlistContainerStyle: {
         width: pageWidth * 0.95,
-        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -329,6 +537,14 @@ const Styles = StyleSheet.create({
         color:"gray",
         fontSize:16,
         fontWeight:"bold"
+    },
+    onScreenLoadingContainerStyle:{
+        width:pageWidth,
+        height:pageHeight,
+        justifyContent:"center",
+        alignItems:"center",
+        backgroundColor:"rgba(00,00,00,0.5)",
+        position:"absolute"
     }
 });
 export default MyService;

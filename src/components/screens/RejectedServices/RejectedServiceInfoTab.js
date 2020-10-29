@@ -1,24 +1,35 @@
 import React from "react";
-import {View, StyleSheet, Text, ScrollView} from "react-native";
+import {View, StyleSheet, Text, ScrollView, Linking, Dimensions} from "react-native";
 import {toFaDigit} from "../../utils/utilities";
+import Icon from "react-native-vector-icons/FontAwesome";
+
+const pageWidth = Dimensions.get('screen').width;
+const pageHeight = Dimensions.get('screen').height;
 
 const ServiceInfoTab = ({serviceData}) => {
     const data = serviceData;
     const renderSingleRow = (title, text) => {
         return (
             <View style={Styles.singleRowStyle}>
-                {!!text ? (
-                    <Text style={Styles.textStyle}>
-                        {text}
+                <View>
+                    {title === "شماره تماس" ? (
+                        <Icon name={"phone-square"} style={{fontSize:30, color:"gray", marginLeft:10}} onPress={()=>Linking.openURL(`tel:${text}`)}/>
+                    ):null}
+                </View>
+                <View style={Styles.rightSideContainerStyle}>
+                    {!!text ? (
+                        <Text style={Styles.textStyle}>
+                            {text}
+                        </Text>
+                    ) : (
+                        <Text style={Styles.textStyle}>
+                            -
+                        </Text>
+                    )}
+                    <Text style={Styles.titleTextStyle}>
+                        {`${title}:   `}
                     </Text>
-                ) : (
-                    <Text style={Styles.textStyle}>
-                        -
-                    </Text>
-                )}
-                <Text style={Styles.titleTextStyle}>
-                    {`${title}:   `}
-                </Text>
+                </View>
             </View>
         )
     }
@@ -45,10 +56,10 @@ const Styles = StyleSheet.create({
     },
     singleRowStyle: {
         flexDirection:"row",
-        justifyContent:"flex-end",
+        justifyContent:"space-between",
         width: "100%",
-        height: 20,
-        marginBottom:15
+        height: 35,
+        marginBottom:15,
     },
     titleTextStyle: {
         fontSize:15,
@@ -57,7 +68,16 @@ const Styles = StyleSheet.create({
     },
     textStyle: {
         fontSize: 15,
-        textAlign:"center",
+        textAlign:"right",
+        width: pageWidth-160,
+        height:38,
+    },
+    rightSideContainerStyle:{
+        flexDirection:"row",
+        justifyContent:"flex-end",
+        width: "88%",
+        height: "100%",
+        marginBottom:15,
     }
 })
 

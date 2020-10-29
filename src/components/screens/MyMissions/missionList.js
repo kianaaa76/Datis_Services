@@ -53,7 +53,7 @@ const MissionList = ({navigation}) => {
 
   const renderEmptyList = () => {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{width:pageWidth,height:pageHeight*0.8, justifyContent: 'center', alignItems: 'center'}}>
         <Text style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
           ماموریتی وجود ندارد.
         </Text>
@@ -110,8 +110,6 @@ const Styles = StyleSheet.create({
   },
   flatlistContainerStyle: {
     width: pageWidth * 0.95,
-    height: pageHeight * 0.95,
-    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -1,29 +1,30 @@
 import {
   LOGIN,
-  LOGIN_VERIFICATION,
   LOGOUT,
-  GET_MY_SERVICES_LIST,
   GET_SERVICE_DETAIL,
   RESTORE_SERVICE_DATA,
+    SET_EDITING_SERVICE,
+    GET_OBJECTS_LIST
 } from '../actions/types';
 
 const INITIAL_STATE = {
   token: '',
-  authError: '',
   userId: '',
+  constantUserId:'',
   unfinishedMissionId: null,
   selectedService:null,
-  selectServiceError:"",
+    objectsList:[],
   savedServiceInfo:{
     projectId:"",
-    factorReceivedPrice: 0 ,
-    factorTotalPrice:"",
+    factorReceivedPrice: 0,
+    factorTotalPrice:0,
     factorImage:0,
     billImage:"",
+    image:"",
     serviceDescription:"",
     address:"",
     serviceImage:"",
-    date:"",
+    finalDate:"",
     serviceResult:"",
     serviceType:"",
     objectList:[],
@@ -33,32 +34,28 @@ const INITIAL_STATE = {
     endLongitude: "",
     startCity: "",
     endCity: "",
-    missionDescription: ""
-  }
+    missionDescription: "",
+    missionId: "",
+    distance:"",
+    saveType:"",
+    travel:false
+  },
+    editingService:""
 };
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case LOGIN:
-      return {...state, authError: action.error };
-    case LOGIN_VERIFICATION:
       return {
         ...state,
-        error: action.error,
         token: action.token,
         userId: action.userId,
-        MissionsError: action.error,
-      };
-    case GET_MY_SERVICES_LIST:
-      return {
-        ...state,
-        myServiceList: action.myServiceList,
-        getMyServicesError: action.error,
+        constantUserId: action.constantUserId
       };
     case GET_SERVICE_DETAIL:
-      return {...state, selectedService: action.selectedService, selectServiceError: action.selectServiceError};
+      return {...state, selectedService: action.selectedService};
     case LOGOUT:
-      return {...state, token:'', userId: ''}
+      return {...state, token:'', userId: '', constantUserId: ''}
     case RESTORE_SERVICE_DATA:
       return {...state, savedServiceInfo: {
           projectId: action.savedServiceInfo.projectId,
@@ -76,8 +73,16 @@ export default (state = INITIAL_STATE, action) => {
           endLongitude: action.savedServiceInfo.endLongitude,
           startCity: action.savedServiceInfo.startCity,
           endCity: action.savedServiceInfo.endCity,
-          missionDescription: action.savedServiceInfo.missionDescription
+          missionDescription: action.savedServiceInfo.missionDescription,
+          missionId: action.savedServiceInfo.missionId,
+          distance: action.savedServiceInfo.distance,
+          saveType: action.savedServiceInfo.saveType,
+          travel: action.savedServiceInfo.travel
         }}
+      case SET_EDITING_SERVICE:
+          return {...state, editingService: action.editingService}
+      case GET_OBJECTS_LIST:
+          return {...state, objectsList: action.objectsList}
     default:
       return state;
   }

@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React,{useState, useEffect, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -29,12 +29,12 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
   };
   const Item = item.item;
     const dispatch = useDispatch();
-    useEffect(async ()=>{
-        await AsyncStorage.getItem("savedServicesList").then(list=> {
+    useEffect( ()=>{
+         AsyncStorage.getItem("savedServicesList").then(list=> {
             if(!!list){
                 JSON.parse(list).map(item=>{
                     if (item.projectId === Item.projectID) {
-                        if (item.saveType == "network"){
+                        if (item.saveType === "network"){
                             setIsNetworkSaved(true);
                         }
                     }
@@ -42,18 +42,13 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
             }
         });
     },[]);
-
-    useEffect(()=>{
-
-    })
-
   return (
     <View style={{flex: 1}}>
       <BoxShadow setting={shadowOpt}>
         <TouchableWithoutFeedback
           style={{
             width: '100%',
-            height: '100%',
+            height: '100%'
           }}
           onPress={async () =>{
              await AsyncStorage.getItem("savedServicesList").then(list=> {
@@ -79,8 +74,6 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                                   factorTotalPrice:"",
                                   serviceDescription:"",
                                   address:"",
-                                  time:"",
-                                  date:"",
                                   finalDate: "",
                                   serviceResult:"",
                                   serviceType:"",
@@ -91,7 +84,10 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                                   endLongitude: "",
                                   startCity: "",
                                   endCity: "",
-                                  missionDescription: ""
+                                  missionDescription: "",
+                                  distance:"",
+                                  saveType:"",
+                                  travel:false
                               }
                           });
                           navigation.navigate('MyServiceDetails', {serviceID: Item.projectID})
@@ -105,8 +101,6 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                               factorTotalPrice:"",
                               serviceDescription:"",
                               address:"",
-                              time:"",
-                              date:"",
                               finalDate: "",
                               serviceResult:"",
                               serviceType:"",
@@ -117,7 +111,10 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                               endLongitude: "",
                               startCity: "",
                               endCity: "",
-                              missionDescription: ""
+                              missionDescription: "",
+                              distance:"",
+                              saveType:"",
+                              travel:false
                           }
                       });
                       navigation.navigate('MyServiceDetails', {serviceID: Item.projectID})
@@ -125,11 +122,12 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
               });
 
           }}>
+
           <View
             style={{
               width: pageWidth * 0.9,
               height: pageHeight * 0.1,
-              backgroundColor: isNetworkSaved? "#287495": "#fff",
+              backgroundColor: isNetworkSaved? "#3399FF": "#fff",
               padding: 10,
               marginVertical: 10,
               justifyContent: 'center',
@@ -137,6 +135,7 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
               borderWidth: 1,
               borderColor: 'rgba(158, 150, 150, 0.3)',
             }}>
+
               {isNetworkSaved?
                   (<View style={Styles.secondRowContainerStyle}>
                       <Text>درحال ارسال</Text>

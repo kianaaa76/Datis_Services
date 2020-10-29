@@ -13,15 +13,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {
-  LOGIN,
-  LOGIN_VERIFICATION,
+  LOGIN, LOGOUT,
 } from '../../actions/types';
-import {stackNavigation, NavigationActions} from 'react-navigation';
 import {useSelector, useDispatch} from 'react-redux';
 import {BoxShadow} from 'react-native-shadow';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit} from '../utils/utilities';
-import {loginUser, loginVerification} from '../../actions/api';
+import {loginUser, loginVerification, getUsers} from '../../actions/api';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -41,7 +39,16 @@ const Login = ({navigation}) => {
 
   useEffect(() => {
     if (selector.token) {
-      navigation.navigate('SignedIn');
+      getUsers().then(data=>{
+        if (data.errorCode === 0){
+          navigation.navigate('Home',{users:data.result});
+        } else{
+          dispatch({
+            type:LOGOUT
+          });
+          setPersistLoading(false);
+        }
+      })
     } else {
       setPersistLoading(false);
     }
@@ -62,15 +69,7 @@ const Login = ({navigation}) => {
           }
           return () => clearInterval(counterInterval);
         }, 1000);
-        dispatch({
-          type: LOGIN,
-          error: '',
-        });
       } else {
-        dispatch({
-          type: LOGIN,
-          error: data.message,
-        });
         ToastAndroid.showWithGravity(
           data.message,
           ToastAndroid.SHORT,
@@ -93,17 +92,18 @@ const Login = ({navigation}) => {
       loginVerification(phoneNumber, code).then((data) => {
         if (data.errorCode == 0) {
           dispatch({
-            type: LOGIN_VERIFICATION,
+            type: LOGIN,
             token: data.result.Token,
             userId: data.result.ID,
-            error: '',
+            constantUserId: data.result.ID,
           });
-          navigation.navigate('SignedIn');
+          navigation.navigate('Home',{users:data.result});
         } else {
-          dispatch({
-            type: LOGIN_VERIFICATION,
-            error: data.message,
-          });
+          ToastAndroid.showWithGravity(
+              data.message,
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+          );
         }
         setEnterSystemLoading(false);
       });
@@ -127,7 +127,8 @@ const Login = ({navigation}) => {
     </View>
   ) : (
     <ScrollView
-      style={{height: pageHeight}}
+      style={{flex:1}}
+      scrollEnabled={false}
       keyboardShouldPersistTaps="handled">
       <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
         <View style={{marginTop: '30%', alignItems: 'center'}}>

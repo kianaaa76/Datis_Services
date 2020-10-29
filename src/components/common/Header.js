@@ -20,7 +20,7 @@ export default class extends Component {
     return (
       <View style={Styles.headercontainerStyle}>
         <View style={Styles.headerContentStyle}>
-          <View style={{ width: 100, justifyContent:'center', height:"100%" }}>
+          <View style={{ justifyContent:'center', height:"100%" }}>
             {!!leftIcon && this.renderHeaderLeft()}
           </View>
           <View style={Styles.headerTextContainerStyle}>

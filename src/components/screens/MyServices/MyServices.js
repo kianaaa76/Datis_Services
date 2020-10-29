@@ -9,6 +9,7 @@ import {
   ToastAndroid,
   Text,
   TouchableHighlight,
+    Alert
 } from 'react-native';
 import AsyncStorage from "@react-native-community/async-storage";
 import RNFetchBlob from 'rn-fetch-blob';
@@ -20,7 +21,7 @@ import ServiceListItem from '../../utils/MyServiceListItem';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {getMyServicesList} from '../../../actions/api';
 import {
-     LOGOUT, RESTORE_SERVICE_DATA,
+    LOGOUT, RESTORE_SERVICE_DATA, SET_EDITING_SERVICE,
 } from '../../../actions/types';
 
 const pageWidth = Dimensions.get('screen').width;
@@ -36,23 +37,21 @@ const shadowOpt = {
     y: 3,
     style: {justifyContent:"center", alignItems:"center"},
 };
-
+let serviceList = [];
 const MyService = ({navigation}) => {
     let dirs = RNFetchBlob.fs.dirs;
   const dispatch = useDispatch();
   const selector = useSelector((state) => state);
-  const [serviceList, setServiceList] = useState([]);
   const [serviceListLoading, setServiceListLoading] = useState(false);
   const [renderRestoreModal, setRenderRestoreModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [renderSendDataModal, setRenderSendDataModal] = useState(false);
-
   const renderEmptyList = () => {
     return (
       <View
         style={{
           width: pageWidth,
-          height: pageHeight*0.7,
+          height: pageHeight*0.8,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
@@ -64,6 +63,7 @@ const MyService = ({navigation}) => {
   };
 
   const onNewDataPress = (projectId) => {
+      setRenderRestoreModal(false);
       let LIST = [];
       AsyncStorage.getItem("savedServicesList").then(list=>{
           let currentList = JSON.parse(list);
@@ -95,7 +95,9 @@ const MyService = ({navigation}) => {
               endLongitude: "",
               startCity: "",
               endCity: "",
-              missionDescription: ""
+              missionDescription: "",
+              distance: "",
+              type:""
           }
       });
       RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${projectId}`);
@@ -129,11 +131,14 @@ const MyService = ({navigation}) => {
                   endLongitude: currentList[Index].endLongitude,
                   startCity: currentList[Index].startCity,
                   endCity: currentList[Index].endCity,
-                  missionDescription: currentList[Index].missionDescription
+                  missionDescription: currentList[Index].missionDescription,
+                  distance: currentList[Index].distance,
+                  type: currentList[Index].type
               }
           });
           setRenderRestoreModal(false);
-          navigation.replace("MyServiceDetails", {serviceID: projectId});
+          setRenderSendDataModal(false);
+          navigation.navigate("MyServiceDetails", {serviceID: projectId});
       });
   }
 
@@ -141,7 +146,7 @@ const MyService = ({navigation}) => {
     setServiceListLoading(true);
     getMyServicesList(id, token).then((data) => {
       if (data.errorCode == 0) {
-          setServiceList(data.result)
+          serviceList = data.result;
       } else {
           if (data.errorCode === 3){
               dispatch({
@@ -149,7 +154,6 @@ const MyService = ({navigation}) => {
               });
               navigation.navigate("SignedOut");
           } else {
-              setServiceList([]);
               ToastAndroid.showWithGravity(
                   data.message,
                   ToastAndroid.SHORT,
@@ -158,8 +162,9 @@ const MyService = ({navigation}) => {
           }
       };
       setServiceListLoading(false);
-    });
+    }).catch(()=>  setServiceListLoading(false))
   };
+
   useEffect(() => {
     getMyServices(selector.userId, selector.token);
   }, []);
@@ -277,7 +282,24 @@ const MyService = ({navigation}) => {
                                 <TouchableOpacity
                                     style={Styles.modalButtonStyle}
                                     onPress={()=> {
-                                        onConfirmDataPress(selectedProjectId)
+                                        AsyncStorage.getItem("savedServicesList").then(list=>{
+                                            let temp = list.filter(item=>item.projectId === selectedProjectId);
+                                            if (temp.length > 0){
+                                                dispatch({
+                                                    type: SET_EDITING_SERVICE,
+                                                    editingService: selectedProjectId
+                                                });
+                                                onConfirmDataPress(selectedProjectId)
+                                            } else{
+                                                Alert.alert(
+                                                    "",
+                                                    "سرویس فعلی بسته شده است. لطفا لیست سرویس ها را به روزرسانی کنید.",
+                                                    [
+                                                        { text: 'OK', onPress: () => {} }
+                                                    ],
+                                                )
+                                            }
+                                        })
                                     }}>
                                     <Text style={Styles.modalButtonTextStyle}>
                                         ویرایش
@@ -305,7 +327,6 @@ const Styles = StyleSheet.create({
   },
   flatlistContainerStyle: {
     width: pageWidth * 0.95,
-    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },

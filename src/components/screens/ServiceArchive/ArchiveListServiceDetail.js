@@ -17,7 +17,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {API_KEY, LOGOUT} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import ImagePicker from "react-native-image-picker";
+import ImagePicker from "react-native-image-crop-picker";
 import {BoxShadow} from "react-native-shadow";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import Foundation from "react-native-vector-icons/Foundation";
@@ -311,12 +311,26 @@ const ServiceArchiveDetail = ({navigation}) => {
                                                 <View style={Styles.getImageContainerViewStyle}>
                                                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                                                         () => {
-                                                            ImagePicker.launchCamera({}, response =>setFactorImage(response.data))
+                                                            ImagePicker.openCamera({
+                                                                width:pageWidth-20,
+                                                                height: pageHeight*0.4,
+                                                                includeBase64:true,
+                                                                compressImageQuality:1
+                                                            }).then( response => {
+                                                                setFactorImage(response.data)
+                                                            })
                                                         }}
                                                     />
                                                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
                                                         ()=>{
-                                                            ImagePicker.launchImageLibrary({},response=>setFactorImage(response.data))
+                                                            ImagePicker.openPicker({
+                                                                width:pageWidth-20,
+                                                                height: pageHeight*0.4,
+                                                                includeBase64:true,
+                                                                compressImageQuality:1
+                                                            }).then(response=> {
+                                                                setFactorImage(response.data)
+                                                            })
                                                         }}/>
                                                 </View>
                                                 <View style={{width: 70}}>
@@ -325,18 +339,32 @@ const ServiceArchiveDetail = ({navigation}) => {
                                             </View>
                                             {!!factorImage && (
                                                 <Image
-                                                    source={{uri: `data:image/gif;base64,${factorImage}`}}
+                                                    source={{uri: `data:image/jpeg;base64,${factorImage}`}}
                                                     style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
                                             )}
                                             <View style={Styles.imageRowStyle}>
                                                 <View style={Styles.getImageContainerViewStyle}>
                                                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                                                         () => {
-                                                            ImagePicker.launchCamera({}, response => setImage(response.data))
+                                                            ImagePicker.openCamera({
+                                                                width:pageWidth-20,
+                                                                height: pageHeight*0.4,
+                                                                includeBase64:true,
+                                                                compressImageQuality:1
+                                                            }).then( response => {
+                                                                setImage(response.data)
+                                                            })
                                                         }}
                                                     />
                                                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
-                                                        ()=>ImagePicker.launchImageLibrary({},response=>setImage(response.data))}/>
+                                                        ()=>ImagePicker.openPicker({
+                                                            width:pageWidth-20,
+                                                            height: pageHeight*0.4,
+                                                            includeBase64:true,
+                                                            compressImageQuality:1
+                                                        }).then(response=> {
+                                                            setImage(response.data)
+                                                        })}/>
                                                 </View>
                                                 <View style={{width: 100}}>
                                                     <Text style={Styles.labelStyle}>عکس:</Text>
@@ -344,7 +372,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                                             </View>
                                             {!!image && (
                                                 <Image
-                                                    source={{uri: `data:image/gif;base64,${image}`}}
+                                                    source={{uri: `data:image/jpeg;base64,${image}`}}
                                                     style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
                                             )}
                                         </View>

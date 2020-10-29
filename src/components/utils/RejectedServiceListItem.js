@@ -1,21 +1,24 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import {
     View,
     StyleSheet,
     TouchableWithoutFeedback,
     Text,
-    Dimensions,
+    Dimensions, ToastAndroid, Alert,
 } from 'react-native';
 import {BoxShadow} from 'react-native-shadow';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {toFaDigit} from './utilities';
 import AsyncStorage from "@react-native-community/async-storage";
-import {RESTORE_SERVICE_DATA} from "../../actions/types";
+import {LOGOUT, RESTORE_SERVICE_DATA} from "../../actions/types";
+import {rejectedServiceDetail} from "../../actions/api";
+import RNFetchBlob from "rn-fetch-blob";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedProjectId}) => {
+const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedProjectId, renderLoading}) => {
+    let dirs = RNFetchBlob.fs.dirs;
     const shadowOpt = {
         width: pageWidth * 0.9,
         height: pageHeight * 0.11,
@@ -28,6 +31,56 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
     };
     const Item = item.item;
     const dispatch = useDispatch();
+    const selector = useSelector((state) => state);
+    const [isNetworkSaved, setIsNetworkSaved] = useState(false);
+
+    useEffect( ()=>{
+        AsyncStorage.getItem("savedServicesList").then(list=> {
+            if(!!list){
+                JSON.parse(list).map(item=>{
+                    if (item.projectId === Item.projectID) {
+                        if (item.saveType === "network"){
+                            setIsNetworkSaved(true);
+                        }
+                    }
+                });
+            }
+        });
+    },[]);
+
+    const getServiceResult = (resultNum) =>{
+        switch (resultNum) {
+            case 1:
+                return "موفق";
+            case 2:
+                return "موفق مشکوک";
+            case 3:
+                return "سرویس جدید - کسری قطعات";
+            case 4:
+                return "سرویس جدید - آماده نبودن پروژه";
+            case 5:
+                return "سرویس جدید - عدم تسلط";
+            case 6:
+                return "لغو موفق";
+            default:
+                return "";
+        }
+    }
+
+    const getServiceType = (typeNum) => {
+        switch (typeNum) {
+            case 1:
+                return "خرابی یا تعویض موقت";
+            case 2:
+                return "ایراد نصب و تنظیم روتین";
+            case 3:
+                return "تنظیم و عیب غیر روتین";
+            default:
+                return "";
+        }
+    }
+
+
     return (
         <View style={{flex: 1}}>
             <BoxShadow setting={shadowOpt}>
@@ -37,81 +90,172 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                         height: '100%',
                     }}
                     onPress={async () =>{
-                        await AsyncStorage.getItem("savedRejectedServiceList").then(list=> {
+                        await AsyncStorage.getItem("savedServicesList").then(list=> {
                             if(!!list){
                                 let flag = false;
                                 JSON.parse(list).map(item=>{
                                     if (item.projectId === Item.projectID) {
                                         setModalState(true);
-
                                         setSelectedProjectId(Item.projectID);
                                         flag = true;
                                     }
                                 });
                                 if (!flag){
-                                    dispatch({
-                                        type:RESTORE_SERVICE_DATA,
-                                        savedServiceInfo:{
-                                            projectId:"",
-                                            factorReceivedPrice:"",
-                                            factorTotalPrice:"",
-                                            serviceDescription:"",
-                                            address:"",
-                                            time:"",
-                                            date:"",
-                                            finalDate: "",
-                                            serviceResult:"",
-                                            serviceType:"",
-                                            objectList:[],
-                                            startLatitude: "",
-                                            startLongitude: "",
-                                            endLatitude: "",
-                                            endLongitude: "",
-                                            missionStartDate: "",
-                                            missionEndDate: "",
-                                            startCity: "",
-                                            endCity: "",
-                                            missionDescription: ""
+                                    renderLoading(true);
+                                    rejectedServiceDetail(Item.projectID, selector.token).then(data=>{
+                                        if (data.errorCode === 0){
+                                            dispatch({
+                                                type:RESTORE_SERVICE_DATA,
+                                                savedServiceInfo:{
+                                                    projectId:Item.projectID,
+                                                    factorReceivedPrice:data.result.RecivedAmount,
+                                                    factorTotalPrice:data.result.InvoiceAmount,
+                                                    serviceDescription:data.result.Details,
+                                                    address:data.result.Location,
+                                                    finalDate: data.result.DoneTime,
+                                                    serviceResult:getServiceResult(data.result.Result),
+                                                    serviceType:getServiceType(data.result.ServiceType),
+                                                    objectList:data.result.ObjectList,
+                                                    startLatitude: !!data.result.Mission ? data.result.Mission.StartLocation.substr(0,data.result.Mission.StartLocation.indexOf(',')) : "",
+                                                    startLongitude: !!data.result.Mission ?
+                                                        data.result.Mission.StartLocation.substr(data.result.Mission.StartLocation.indexOf(',')+1,data.result.Mission.StartLocation.length) :"",
+                                                    endLatitude: !!data.result.Mission ? data.result.Mission.EndLocation.substr(0,data.result.Mission.EndLocation.indexOf(',')):"",
+                                                    endLongitude: !!data.result.Mission ?
+                                                        data.result.Mission.EndLocation.substr(data.result.Mission.EndLocation.indexOf(',')+1,data.result.Mission.EndLocation.length):"",
+                                                    startCity: !!data.result.Mission ? data.result.Mission.StartCity : "",
+                                                    endCity: !!data.result.Mission ? data.result.Mission.EndCity : "",
+                                                    missionDescription: !!data.result.Mission ? data.result.Mission.Description : "",
+                                                    missionId: !!data.result.Mission ? data.result.Mission.ID : "",
+                                                    distance: !!data.result.Mission ? data.result.Mission.Distance : "",
+                                                    savedType:"",
+                                                    travel: !!data.result.Mission ? data.result.Mission.Travel : false
+                                                }
+                                            });
+                                            renderLoading(false);
+                                            navigation.navigate('RejectedServiceDetail', {serviceID: Item.projectID, service:{
+                                                    "projectID":data.result.projectID,
+                                                    "DocText":{
+                                                        "PhoneName": data.result.DocText.PhoneName,
+                                                        "Phone":data.result.DocText.Phone,
+                                                        "Serial": data.result.DocText.Serial,
+                                                        "WarS": data.result.DocText.WarS,
+                                                        "DOM": data.result.DocText.DOM,
+                                                        "Address": data.result.DocText.Address,
+                                                        "DetectedFailure": data.result.DocText.DetectedFailure,
+                                                        "parts": data.result.DocText.parts,
+                                                        "Date": data.result.DocText.Date
+                                                    },
+                                                    "factorImage":data.result.FactorImage,
+                                                    "image":data.result.Image,
+                                                    "billImage":data.result.BillImage
+                                                }});
+                                        } else if (data.errorCode === 3){
+                                            renderLoading(false);
+                                            dispatch({
+                                                type:LOGOUT
+                                            });
+                                            navigation.navigate("SignedOut");
+                                        } else {
+                                            renderLoading(false);
+                                            ToastAndroid.showWithGravity(
+                                                data.message,
+                                                ToastAndroid.SHORT,
+                                                ToastAndroid.CENTER,
+                                            );
                                         }
+                                    }).catch(()=>{
+                                        renderLoading(false);
+                                        setModalState(false);
+                                        Alert.alert(
+                                            'اخطار',
+                                            'به دلیل عدم دسترسی به اینترنت امکان باز کردن این سرویس وجود ندارد.',
+                                            [
+                                                { text: 'OK', onPress: () => {} }
+                                            ],
+                                        );
                                     });
-                                    navigation.navigate('RejectedServiceDetail', {serviceID: Item.projectID})
                                 }
                             } else {
-                                dispatch({
-                                    type:RESTORE_SERVICE_DATA,
-                                    savedServiceInfo:{
-                                        projectId:"",
-                                        factorReceivedPrice:"",
-                                        factorTotalPrice:"",
-                                        serviceDescription:"",
-                                        address:"",
-                                        time:"",
-                                        date:"",
-                                        finalDate: "",
-                                        serviceResult:"",
-                                        serviceType:"",
-                                        objectList:[],
-                                        startLatitude: "",
-                                        startLongitude: "",
-                                        endLatitude: "",
-                                        endLongitude: "",
-                                        missionStartDate: "",
-                                        missionEndDate: "",
-                                        startCity: "",
-                                        endCity: "",
-                                        missionDescription: ""
+                                renderLoading(true);
+                                rejectedServiceDetail(Item.projectID, selector.token).then(data=>{
+                                    if (data.errorCode === 0){
+                                        dispatch({
+                                            type:RESTORE_SERVICE_DATA,
+                                            savedServiceInfo:{
+                                                projectId:Item.projectID,
+                                                factorReceivedPrice:data.result.RecivedAmount,
+                                                factorTotalPrice: data.result.InvoiceAmount,
+                                                serviceDescription:data.result.Details,
+                                                address:data.result.Location,
+                                                finalDate: data.result.DoneTime,
+                                                serviceResult:getServiceResult(data.result.Result),
+                                                serviceType:getServiceType(data.result.ServiceType),
+                                                objectList:data.result.ObjectList,
+                                                startLatitude: !!data.result.Mission ? parseInt(data.result.Mission.StartLocation.substr(0,data.result.Mission.StartLocation.indexOf(','))) : "",
+                                                startLongitude: !!data.result.Mission ?
+                                                    parseInt(data.result.Mission.StartLocation.substr(data.result.Mission.StartLocation.indexOf(',')+1,data.result.Mission.StartLocation.length)) :"",
+                                                endLatitude: !!data.result.Mission ? parseInt(data.result.Mission.EndLocation.substr(0,data.result.Mission.EndLocation.indexOf(','))):"",
+                                                endLongitude: !!data.result.Mission ?
+                                                    parseInt(data.result.Mission.EndLocation.substr(data.result.Mission.EndLocation.indexOf(',')+1,data.result.Mission.EndLocation.length)):"",
+                                                startCity: !!data.result.Mission ? data.result.Mission.StartCity : "",
+                                                endCity: !!data.result.Mission ? data.result.Mission.EndCity : "",
+                                                missionDescription: !!data.result.Mission ? data.result.Mission.Description : "",
+                                                missionId: !!data.result.Mission ? data.result.Mission.ID : "",
+                                                distance: !!data.result.Mission ? data.result.Mission.Distance : "",
+                                                savedType:"",
+                                                travel: !!data.result.Mission ? data.result.Mission.Travel : false
+                                            }
+                                        });
+                                        renderLoading(false);
+                                        navigation.navigate('RejectedServiceDetail', {serviceID: Item.projectID, service:{
+                                                "projectID":data.result.projectID,
+                                                "DocText":{
+                                                    "PhoneName": data.result.DocText.PhoneName,
+                                                    "Phone":data.result.DocText.Phone,
+                                                    "Serial": data.result.DocText.Serial,
+                                                    "WarS": data.result.DocText.WarS,
+                                                    "DOM": data.result.DocText.DOM,
+                                                    "Address": data.result.DocText.Address,
+                                                    "DetectedFailure": data.result.DocText.DetectedFailure,
+                                                    "parts": data.result.DocText.parts,
+                                                    "Date": data.result.DocText.Date
+                                                },
+                                                "factorImage":data.result.FactorImage,
+                                                "image":data.result.Image,
+                                                "billImage":data.result.BillImage
+                                            }})
+                                    } else if (data.errorCode === 3){
+                                        dispatch({
+                                            type:LOGOUT
+                                        });
+                                        navigation.navigate("SignedOut");
+                                    } else {
+                                        renderLoading(false);
+                                        ToastAndroid.showWithGravity(
+                                            data.message,
+                                            ToastAndroid.SHORT,
+                                            ToastAndroid.CENTER,
+                                        );
                                     }
-                                });
-                                navigation.navigate('RejectedServiceDetail', {serviceID: Item.projectID})
+                                }).catch(()=>{
+                                    setModalState(false);
+                                    renderLoading(false);
+                                    Alert.alert(
+                                        'اخطار',
+                                        'به دلیل عدم دسترسی به اینترنت امکان باز کردن این سرویس وجود ندارد.',
+                                        [
+                                            { text: 'OK', onPress: () => {} }
+                                        ],
+                                    );
+                                })
                             }
                         });
-
                     }}>
                     <View
                         style={{
                             width: pageWidth * 0.9,
                             height: pageHeight * 0.11,
-                            backgroundColor:  '#fff',
+                            backgroundColor: isNetworkSaved? "#3399FF": "#fff",
                             padding: 10,
                             marginVertical: 10,
                             justifyContent: 'center',

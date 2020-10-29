@@ -1,5 +1,14 @@
 package com.datis_services;
-
+import android.os.Bundle;
+import com.facebook.react.ReactInstanceManager;
+import android.os.Handler;
+import android.content.Intent;
+import android.content.Context;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.CatalystInstance;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.ReactActivity;
 
 public class MainActivity extends ReactActivity {

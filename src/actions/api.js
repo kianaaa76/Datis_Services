@@ -258,3 +258,67 @@ export const updateService = (serviceId, servicemanId, token, address, descripti
   }).then((response) => response.json());
 }
 
+export const sendServiceData = (
+    token,
+    serviceId,
+    serviceResult,
+    serviceType,
+    receivedAmount,
+    invoiceAmount,
+    location,
+    serviceDetail,
+    image,
+    factorImage,
+    objectList,
+    doneTime,
+    reconfirm,
+    mission,
+    serviceManId,
+    billImage,
+)=>{
+  const msg = JSON.stringify({
+    ServiceManId: serviceManId,
+    projectID: serviceId,
+    Image: image,
+    FactorImage: factorImage,
+    Location: location,
+    ReceivedAmount: receivedAmount,
+    InvoiceAmount: invoiceAmount,
+    ObjectList: objectList,
+    DoneTime: doneTime,
+    Reconfirm: reconfirm,
+    Details: serviceDetail,
+    Result: serviceResult,
+    ServiceType: serviceType,
+    BillImage: billImage,
+    Mission: mission
+  });
+  return fetch(`${LOCAL_HOST}/ServiceDocumentResult`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body: msg
+  }).then((response) => response.json());
+}
+
+export const getUsers = ()=>{
+  return fetch(`${LOCAL_HOST}/GetAllUser`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((response) => response.json());
+}
+
+export const call = (token)=>{
+  return fetch(`${LOCAL_HOST}/CallWithMe`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+

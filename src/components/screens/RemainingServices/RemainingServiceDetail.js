@@ -16,8 +16,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import ImagePicker from "react-native-image-picker";
-import RNFetchBlob from "rn-fetch-blob";
+import ImagePicker from "react-native-image-crop-picker";
 import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -260,13 +259,27 @@ const RemainingServiceDetail = ({navigation}) => {
                 </View>)}
                 <View style={Styles.imageIconContainerStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35, marginHorizontal: 7}} onPress={
-                        () => ImagePicker.launchCamera({}, response =>{setFactorImage(response.data)})}/>
+                        () => ImagePicker.openCamera({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:1
+                        }).then( response =>{
+                            setFactorImage(response.data)
+                        })}/>
                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35, marginHorizontal:7}} onPress={
-                        ()=>ImagePicker.launchImageLibrary({},response=>{setFactorImage(response.data)})}/>
+                        ()=>ImagePicker.openPicker({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:1
+                        }).then(response=>{
+                            setFactorImage(response.data)
+                        })}/>
                 </View>
                 {!!factorImage && (
                     <Image
-                        source={{uri: `data:image/gif;base64,${factorImage}`}}
+                        source={{uri: `data:image/jpeg;base64,${factorImage}`}}
                         style={{width:pageWidth*0.8, height:pageWidth*0.8, marginTop:15}}/>
                 )}
             </View>)}

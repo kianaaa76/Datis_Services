@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from "react";
+import React,{useState} from "react";
 import {
     View,
     StyleSheet,
@@ -10,11 +10,10 @@ import {
     TouchableOpacity,
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
-import RNFetchBlob from 'rn-fetch-blob';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Foundation from "react-native-vector-icons/Foundation";
 import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
-import ImagePicker from "react-native-image-picker";
+import ImagePicker from "react-native-image-crop-picker";
 import PersianCalendarPicker from 'react-native-persian-calendar-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment-jalaali";
@@ -25,8 +24,9 @@ import {toFaDigit} from "../../utils/utilities";
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServiceServicesTab = ({setInfo, info, projectId}) => {
-    let dirs = RNFetchBlob.fs.dirs;
+let cameraRef={};
+
+const ServiceServicesTab = ({setInfo, info}) => {
     const [showDatePicker, setShowDatePicke] = useState(false);
     const [screenMode, setScreenMode] = useState("tab");
     const [selectedLatitude, setSelectedLatitude] = useState(null);
@@ -35,18 +35,9 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
     const [userLongitude, setUserLongitude] = useState(null);
     const [renderTimePicker, setRenderTimePicker] = useState(false);
     const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
-    const [image, setImage] = useState("");
+    const [dateIsSelected, setDateIsSelected] = useState(false);
 
-
-    useEffect(()=>{
-        RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${projectId}/3.png`, 'base64').then(data=>{
-            setImage(data);
-        })
-    },[])
-
-
-    const renderCheckbox = (title, checkboxPurpose, name) => {
+    const renderCheckbox = (title, checkboxPurpose) => {
         return (
             <View style={Styles.checkboxContainerStyle}>
                 <Text style={Styles.checkboxTextStyle}>
@@ -54,34 +45,28 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 </Text>
                 <CheckBox
                     onValueChange={()=>{
-                        if (checkboxPurpose == "result"){
+                        if (checkboxPurpose === "result"){
                             setInfo({
-                                description:info.description,
-                                address:info.address,
-                                finalDate:info.finalDate,
-                                serviceResult:name,
-                                serviceType:info.serviceType
+                                ...info,
+                                serviceResult:title
                             })
                         } else {
                             setInfo({
-                                description:info.description,
-                                address:info.address,
-                                finalDate:info.finalDate,
-                                serviceResult:info.serviceResult,
-                                serviceType:name
+                                ...info,
+                                serviceType:title
                             })
                         }
                     }}
-                    value={checkboxPurpose == "result"?
-                        (info.serviceResult == name ? true : false) :
-                        (info.serviceType == name ? true : false)}
+                    value={checkboxPurpose === "result"?
+                        (info.serviceResult == title ? true : false) :
+                        (info.serviceType == title ? true : false)}
                     tintColors={{ true: '#660000', false: 'black' }}
                 />
             </View>
         )
     }
 
-    return  screenMode == "tab" ? (
+    return  screenMode === "tab" ? (
         <ScrollView style={Styles.containerStyle} contentContainerStyle={{justifyContent:"center", alignItems:"center"}}>
             <View style={Styles.descriptionRowStyle}>
                 <View style={{width: 70, marginBottom:10}}>
@@ -91,12 +76,8 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 <TextInput
                     style={Styles.descriptionInputStyle}
                     onChangeText={text=>{
-                        setInfo({
-                            description:text,
-                            address:info.address,
-                            finalDate:info.finalDate,
-                            serviceResult:info.serviceResult,
-                            serviceType:info.serviceType
+                        setInfo({...info,
+                            description:text
                         })
                     }}
                     value={info.description}
@@ -111,12 +92,8 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 <TextInput
                     style={Styles.textInputStyle}
                     onChangeText={text=>{
-                        setInfo({
-                            description:info.description,
-                            address:text,
-                            finalDate:info.finalDate,
-                            serviceResult:info.serviceResult,
-                            serviceType:info.serviceType
+                        setInfo({...info,
+                            address:text
                         })
                     }}
                     value={info.address}
@@ -127,33 +104,44 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                 <View style={Styles.getImageContainerViewStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:35}} onPress={
                         () => {
-                            ImagePicker.launchCamera({}, response =>{
-                                setImage(response.data);
-                                RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/3.png`,response.data, 'base64' )
+                            ImagePicker.openCamera({
+                                width:pageWidth-20,
+                                height: pageHeight*0.4,
+                                includeBase64:true,
+                                compressImageQuality:1
+                            }).then( response =>{
+                                setInfo({...info, image: response.data});
                             })
                         }}
                     />
                     <Icon name={"file-upload"} style={{color:"#000", fontSize:35}} onPress={
-                        ()=>ImagePicker.launchImageLibrary({},response=>{
-                            setImage(response.data);
-                            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${projectId}/3.png`,response.data, 'base64' )
+                        ()=>ImagePicker.openPicker({
+                            width:pageWidth-20,
+                            height: pageHeight*0.4,
+                            includeBase64:true,
+                            compressImageQuality:1
+                        }).then(response=>{
+                            setInfo({...info, image:response.data})
                         })}/>
                 </View>
                 <View style={{width: 70}}>
                     <Text style={Styles.labelStyle}>عکس:</Text>
                 </View>
             </View>
-            {!!image && (
+            {!!info.image && (
                 <Image
-                    source={{uri: `data:image/gif;base64,${image}`}}
+                    source={{uri: `data:image/jpeg;base64,${info.image}`}}
                     style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
             )}
             <View style={Styles.datePickerRowStyle}>
-                <FontAwesomeIcon name={"calendar"} style={{color:"#000", fontSize:30}} onPress={()=>setShowDatePicke(true)}/>
+                <FontAwesomeIcon name={"calendar"} style={{color:"#000", fontSize:30}} onPress={()=> {
+                    setDateIsSelected(false);
+                    setShowDatePicke(true);
+                }}/>
                 <View style={{width: pageWidth*0.5, flexDirection:"row", alignItems:"center", justifyContent:"flex-end"}}>
                     {!!info.finalDate && (
                         <Text style={{fontSize:15, marginRight:10}}>
-                            {`${toFaDigit(new moment(info.finalDate).format("jYYYY/jM/jD  HH:mm"))}`}
+                            {`${toFaDigit(info.finalDate)}`}
                         </Text>)}
                     <Icon name={"star"} style={{color:"red", fontSize:10}}/>
                     <Text style={Styles.labelStyle}>تاریخ انجام پروژه:</Text>
@@ -165,21 +153,21 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                         <Icon name={"star"} style={{color:"red"}}/>
                         <Text style={Styles.serviceTypeTextStyle}>نوع سرویس:</Text>
                     </View>
-                    {renderCheckbox("خرابی یا تعویض قطعه", "type", "breakdown")}
-                    {renderCheckbox("ایراد نصب و تنظیم روتین", "type", "routinFail")}
-                    {renderCheckbox("تنظیم و عیب غیرروتین", "type", "nonRoutinFail")}
+                    {renderCheckbox("خرابی یا تعویض قطعه", "type")}
+                    {renderCheckbox("ایراد نصب و تنظیم روتین", "type")}
+                    {renderCheckbox("تنظیم و عیب غیرروتین", "type")}
                 </View>
                 <View style={Styles.servicetypeContainerStyle}>
                     <View style={{width: "100%", flexDirection:'row', justifyContent:"flex-end"}}>
                         <Icon name={"star"} style={{color:"red"}}/>
                         <Text style={Styles.serviceTypeTextStyle}>نتیجه سرویس:</Text>
                     </View>
-                    {renderCheckbox("موفق", "result", "success")}
-                    {renderCheckbox("موفق مشکوک", "result", "success-suspicious")}
-                    {renderCheckbox("سرویس جدید- کسری قطعات", "result", "new-shortage")}
-                    {renderCheckbox("سرویس جدید- آماده نبودن پروژه", "result", "new-notReady")}
-                    {renderCheckbox("سرویس جدید- عدم تسلط", "result", "new-notMaster")}
-                    {renderCheckbox("لغو موفق", "result", "fail")}
+                    {renderCheckbox("موفق", "result")}
+                    {renderCheckbox("موفق مشکوک", "result")}
+                    {renderCheckbox("سرویس جدید- کسری قطعات", "result")}
+                    {renderCheckbox("سرویس جدید- آماده نبودن پروژه", "result")}
+                    {renderCheckbox("سرویس جدید- عدم تسلط", "result")}
+                    {renderCheckbox("لغو موفق", "result")}
                 </View>
             </View>
             {showDatePicker && (
@@ -194,6 +182,9 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                     <TouchableOpacity
                         style={Styles.datePickerConfirmButtonStyle}
                         onPress={()=> {
+                            if (!dateIsSelected){
+                                setDate(Date.parse(new Date()));
+                            }
                             setRenderTimePicker(true);
                             setShowDatePicke(false);
                         }}>
@@ -208,7 +199,6 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                     isVisible={renderTimePicker}
                     mode="time"
                     onConfirm={value=> {
-                        setTime(Date.parse(value))
                         let datee = new moment(date).format("jYYYY/jM/jD HH:mm:ss");
                         let timee = datee.split(" ");
                         let timeSplit = timee[1].split(":");
@@ -216,12 +206,8 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                         let pureDate = parseInt(date) - ss;
                         let addedTime = (new moment(Date.parse(value)).format("HH:mm:ss")).split(":");
                         let finalTime = pureDate + (parseInt(addedTime[0]*3600) + parseInt(addedTime[1]*60) + parseInt(addedTime[2]))*1000;
-                        setInfo({
-                            description:info.description,
-                            address:info.address,
-                            finalDate:finalTime,
-                            serviceResult:info.serviceResult,
-                            serviceType:info.serviceType
+                        setInfo({...info,
+                            finalDate:new moment(finalTime).format("jYYYY/jM/jD HH:mm")
                         })
                         setRenderTimePicker(false);
                     }}
@@ -238,15 +224,13 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
             }}>
                 <MapboxGL.UserLocation
                     onUpdate={location => {
-                        setUserLatitude(location.coords.latitude);
-                        setUserLongitude(location.coords.longitude);
+                        cameraRef.moveTo([location.coords.longitude, location.coords.latitude], 500);
+                        cameraRef.zoomTo(11, 500)
                     }}
                 />
-                {!!userLatitude && !!userLongitude && (
                     <MapboxGL.Camera
-                        centerCoordinate={[userLongitude, userLatitude]}
+                        ref={ref=>cameraRef=ref}
                     />
-                )}
                 {!!selectedLatitude && !!selectedLongitude && (
                     <View>
                         <MapboxGL.MarkerView
@@ -278,12 +262,8 @@ const ServiceServicesTab = ({setInfo, info, projectId}) => {
                         })
                             .then(response => response.json())
                             .then(data => {
-                                setInfo({
-                                    description:info.description,
-                                    address:data.address,
-                                    finalDate:info.finalDate,
-                                    serviceResult:info.serviceResult,
-                                    serviceType:info.serviceType
+                                setInfo({...info,
+                                    address:data.address
                                 })
                             });
                         setScreenMode("tab")

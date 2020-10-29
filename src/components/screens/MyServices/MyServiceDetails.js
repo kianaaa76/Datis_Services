@@ -5,16 +5,20 @@ import {
     StyleSheet,
     ToastAndroid,
     ActivityIndicator,
-    NetInfo, Text, TouchableOpacity, TouchableHighlight
+    Text,
+    TouchableOpacity,
+    TouchableHighlight,
+    Alert
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import {TabView, TabBar} from 'react-native-tab-view';
+import ImageResizer from 'react-native-image-resizer';
 import Header from "../../common/Header";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import RNFetchBlob from 'rn-fetch-blob';
 import {useSelector, useDispatch} from 'react-redux';
-import {getServiceDetails} from "../../../actions/api";
-import {GET_SERVICE_DETAIL, LOGOUT} from "../../../actions/types";
+import {getServiceDetails, sendServiceData} from "../../../actions/api";
+import {GET_SERVICE_DETAIL, LOGOUT, SET_EDITING_SERVICE} from "../../../actions/types";
 import ServiceInfoTab from "./ServiceInfoTab";
 import ServiceFactorTab from "./ServiceFactorTab";
 import ServiceServicesTab from "./ServiceServicesTab";
@@ -47,6 +51,8 @@ const shadowOpt = {
     style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
 }
 
+let requestObjectList=[];
+
 const MyServiceDetails = ({navigation}) => {
     let dirs = RNFetchBlob.fs.dirs;
     const dispatch = useDispatch();
@@ -71,7 +77,6 @@ const MyServiceDetails = ({navigation}) => {
         image:""
     });
     const [partsTabInfo, setPartsTabInfo] = useState(selector.savedServiceInfo.objectList);
-
     const [missionTabInfo, setMissionTabInfo] = useState({
         startLatitude: selector.savedServiceInfo.startLatitude,
         startLongitude: selector.savedServiceInfo.startLongitude,
@@ -79,20 +84,69 @@ const MyServiceDetails = ({navigation}) => {
         endLongitude: selector.savedServiceInfo.endLongitude,
         startCity: selector.savedServiceInfo.startCity,
         endCity: selector.savedServiceInfo.endCity,
-        missionDescription: selector.savedServiceInfo.missionDescription
+        missionDescription: selector.savedServiceInfo.missionDescription,
+        distance: selector.savedServiceInfo.distance,
+        travel: selector.savedServiceInfo.travel
     })
 
     useEffect(()=>{
         RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${serviceID}/1.png`, 'base64').then(data=>{
-            setFactorTabInfo({...factorTabInfo, factorImage: data});
-        })
+            if (!!data){
+                setFactorTabInfo({
+                    ...factorTabInfo, factorImage: data
+                })
+            }
+        });
         RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${serviceID}/2.png`, 'base64').then(data=>{
-            setFactorTabInfo({...factorTabInfo, billImage: data});
-        })
+            if(!!data){
+                setFactorTabInfo({
+                    ...factorTabInfo, billImage: data
+                })
+            }
+        });
         RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${serviceID}/3.png`, 'base64').then(data=>{
-            setServiceTabInfo({...serviceTabInfo, image: data});
-        })
+            if(!!data){
+                setFactorTabInfo({
+                    ...serviceTabInfo, image: data
+                })
+            }
+        });
     },[])
+
+    useEffect(()=>{
+        // let tempList = [];
+        // console.log("partsTabInfo",partsTabInfo);
+        // partsTabInfo.map(item=>{
+        //     tempList.push({
+        //         ServiceId: serviceID,
+        //         Object_Id: item.partType.value.Id,
+        //         Direction: item.objectType=="new" ? "0" : "1",
+        //         Description: item.failureDescription,
+        //         Price: !item.Price ? parseInt(item.Price) : 0,
+        //         Serial: item.serial,
+        //         VersionId: item.version.Key
+        //     });
+        //     setRequestObjectList(tempList);
+        // });
+        // if (!!factorTabInfo.factorImage) {
+        //     ImageResizer.createResizedImage(`data:image/imagetype${factorTabInfo.factorImage}`, pageWidth - 20, pageHeight * 0.4, "PNG", 80, 0, null)
+        //         .then(response => {
+        //             console.log("responseUri", response.uri);
+        //             setFactorTabInfo({
+        //                 ...factorTabInfo, factorImage: response.uri
+        //             });
+        //             // response.uri is the URI of the new image that can now be displayed, uploaded...
+        //             // response.path is the path of the new image
+        //             // response.name is the name of the new image with the extension
+        //             // response.size is the size of the new image
+        //         })
+        //         .catch(err => {
+        //             console.log("errUri", err);
+        //             // Oops, something went wrong. Check that the filename is correct and
+        //             // inspect err to get more details.
+        //         });
+        // }
+    },[partsTabInfo])
 
     const setFactorInfo = (e) => {
         setFactorTabInfo(
@@ -123,60 +177,303 @@ const MyServiceDetails = ({navigation}) => {
             endLongitude: e.endLongitude,
             startCity: e.startCity,
             endCity: e.endCity,
-            missionDescription: e.missionDescription
+            missionDescription: e.missionDescription,
+            distance: e.distance,
+            travel: e.travel
         })
+    }
+
+    const convertResultTitleToNum=(title)=>{
+        switch (title) {
+            case "موفق":
+                return 1;
+            case "موفق مشکوک":
+                return 2;
+            case "سرویس جدید - کسری قطعات":
+                return 3;
+            case "سرویس جدید - آماده نبودن پروژه":
+                return 4;
+            case "سرویس جدید - عدم تسلط":
+                return 5;
+            case "لغو موفق":
+                return 6;
+            default:
+                return 0;
+        }
+    }
+
+    const convertTypeTitleToNum = (title)=>{
+        switch (title) {
+            case "خرابی یا تعویض موقت":
+                return 1;
+            case "ایراد نصب و تنظیم روتین":
+                return 2;
+            case "تنظیم و عیب غیر روتین":
+                return 3;
+            default:
+                return 0;
+        }
     }
 
     const onSavePress = (type) => {
-        let savedList = [];
-        let INDEX = 0;
-        let flag = false;
         AsyncStorage.getItem("savedServicesList").then(list=>{
-            savedList = !!list ? JSON.parse(list) : [];
-        });
-        if (savedList.length>0){
-            savedList.map((item, index) => {
-                if (!!item.projectId && item.projectId === serviceID){
-                    flag = true;
-                    INDEX = index;
-                }
+            let savedList = !!list ? JSON.parse(list).filter(item=>item.projectId != serviceID) : [];
+            savedList.push({
+                projectId: serviceID,
+                factorReceivedPrice:factorTabInfo.factorReceivedPrice,
+                factorTotalPrice:factorTabInfo.factorTotalPrice,
+                serviceDescription:serviceTabInfo.description,
+                address:serviceTabInfo.address,
+                finalDate:serviceTabInfo.finalDate,
+                serviceResult:serviceTabInfo.serviceResult,
+                serviceType:serviceTabInfo.serviceType,
+                objectList:partsTabInfo,
+                startLatitude: missionTabInfo.startLatitude,
+                startLongitude: missionTabInfo.startLongitude,
+                endLatitude: missionTabInfo.endLatitude,
+                endLongitude: missionTabInfo.endLongitude,
+                startCity: missionTabInfo.startCity,
+                endCity: missionTabInfo.endCity,
+                missionDescription: missionTabInfo.missionDescription,
+                distance:missionTabInfo.distance,
+                saveType: type,
+                isRejectedService: false,
+                travel:missionTabInfo.travel
             });
-            if (flag){
-                delete savedList[INDEX];
-            }
-        }
-        savedList.push({
-            projectId: serviceID,
-            factorReceivedPrice:factorTabInfo.factorReceivedPrice,
-            factorTotalPrice:factorTabInfo.factorTotalPrice,
-            serviceDescription:serviceTabInfo.description,
-            address:serviceTabInfo.address,
-            finalDate:serviceTabInfo.finalDate,
-            serviceResult:serviceTabInfo.serviceResult,
-            serviceType:serviceTabInfo.serviceType,
-            objectList:partsTabInfo,
-            startLatitude: missionTabInfo.startLatitude,
-            startLongitude: missionTabInfo.startLongitude,
-            endLatitude: missionTabInfo.endLatitude,
-            endLongitude: missionTabInfo.endLongitude,
-            startCity: missionTabInfo.startCity,
-            endCity: missionTabInfo.endCity,
-            missionDescription: missionTabInfo.missionDescription,
-            saveType: type
+            AsyncStorage.setItem("savedServicesList", JSON.stringify(savedList))
         });
-        AsyncStorage.setItem("savedServicesList", JSON.stringify(savedList))
-        navigation.navigate("MyServices");
+        RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${serviceID}/1.png`, factorTabInfo.factorImage, 'base64' )
+        if(!!factorTabInfo.billImage){
+            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${serviceID}/2.png`, factorTabInfo.billImage, 'base64' )
+        }
+        if (!!serviceTabInfo.image){
+            RNFetchBlob.fs.writeFile(`${dirs.DownloadDir}/${serviceID}/3.png`, serviceTabInfo.image, 'base64' )
+        }
+        dispatch({
+            type:SET_EDITING_SERVICE,
+            editingService: ""
+        });
+        navigation.replace("MyServices");
     }
 
     const onFinishServicePress= () => {
+        requestObjectList = [];
         setRequestLoading(true);
-        NetInfo.isConnected.fetch(isConnected=>{
-            if (isConnected){
-                console.log("send request");
-            } else {
-                setRenderNetworkModal(true);
-            }
-        })
+        setRenderConfirmModal(false);
+        setRenderNetworkModal(false);
+        if(!factorTabInfo.factorImage){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا عکس فاکتور را بارگذاری کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        } else if (!factorTabInfo.factorReceivedPrice){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا مبلغ دریافتی فاکتور را مشخص کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        } else if (!factorTabInfo.factorTotalPrice){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا جمع فاکتور را مشخص کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        } else if (!serviceTabInfo.description){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا قسمت توضیحات خدمات را پر کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        } else if (!serviceTabInfo.finalDate){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا تاریخ انجام پروژه را مشخص کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        } else if (!serviceTabInfo.serviceResult){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا نتیجه سرویس را مشخص کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        } else if (!serviceTabInfo.serviceType){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا نوع سرویس را مشخص کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        }
+        else if (!!missionTabInfo.startLongitude && !missionTabInfo.endLongitude){
+            setRequestLoading(false);
+            Alert.alert(
+                'اخطار',
+                'لطفا مبدا ماموریت را مشخص کنید.',
+                [
+                    { text: 'OK', onPress: () => {} }
+                ],
+            );
+        }
+        else if (!!missionTabInfo.startLongitude && !!missionTabInfo.endLongitude){
+            partsTabInfo.map(item=>{
+                requestObjectList.push({
+                    ServiceId: serviceID,
+                    Object_Id: item.partType.value.Id,
+                    Direction: item.objectType=="new" ? "0" : "1",
+                    Description: item.failureDescription,
+                    Price: !item.Price ? parseInt(item.Price) : 0,
+                    Serial: item.serial,
+                    VersionId: item.version.Key
+                });
+            });
+                        sendServiceData(
+                            selector.token,
+                            serviceID,
+                            convertResultTitleToNum(serviceTabInfo.serviceResult),
+                            convertTypeTitleToNum(serviceTabInfo.serviceType),
+                            factorTabInfo.factorReceivedPrice,
+                            factorTabInfo.factorTotalPrice,
+                            serviceTabInfo.address,
+                            serviceTabInfo.description,
+                            serviceTabInfo.image,
+                            factorTabInfo.factorImage,
+                            requestObjectList,
+                            serviceTabInfo.finalDate,
+                            false,
+                            {
+                                ServiceManId: selector.userId,
+                                StartCity: missionTabInfo.startCity,
+                                StartLocation:`${missionTabInfo.startLatitude},${missionTabInfo.startLongitude}`,
+                                EndCity: missionTabInfo.endCity,
+                                EndLocation: `${missionTabInfo.endLatitude},${missionTabInfo.endLongitude}`,
+                                Distance: missionTabInfo.distance,
+                                Description: missionTabInfo.missionDescription,
+                                Travel:missionTabInfo.travel
+                            },
+                            selector.userId,
+                            factorTabInfo.billImage
+                    ).then(data=>{
+                        if (data.errorCode === 0){
+                            AsyncStorage.getItem("savedServicesList").then(list=>{
+                                let tempList = !!list ? JSON.parse(list).filter(service=>service.projectId !== serviceID) : [];
+                                AsyncStorage.setItem("savedServicesList", JSON.stringify(tempList));
+                            });
+                            RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`)
+                            setRequestLoading(false);
+                            dispatch({
+                                type: SET_EDITING_SERVICE,
+                                editingService: ""
+                            })
+                            navigation.replace("MyServices");
+                        } else if (data.errorCode === 3){
+                            setRequestLoading(false);
+                            dispatch({
+                                type: LOGOUT
+                            });
+                            dispatch({
+                                type: SET_EDITING_SERVICE,
+                                editingService: ""
+                            })
+                            navigation.navigate("SignedOut");
+                        } else {
+                            setRequestLoading(false);
+                            ToastAndroid.showWithGravity(
+                                data.message,
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER
+                            );
+                        }
+                    }).catch(err=>{
+                        setRequestLoading(false);
+                        setRenderNetworkModal(true);
+                    })
+        } else if (!missionTabInfo.startLongitude && !missionTabInfo.endLongitude) {
+            partsTabInfo.map(item=>{
+                requestObjectList.push({
+                    ServiceId: serviceID,
+                    Object_Id: item.partType.value.Id,
+                    Direction: item.objectType=="new" ? "0" : "1",
+                    Description: item.failureDescription,
+                    Price: !item.Price ? parseInt(item.Price) : 0,
+                    Serial: item.serial,
+                    VersionId: item.version.Key
+                });
+            });
+                    sendServiceData(
+                        selector.token,
+                        serviceID,
+                        convertResultTitleToNum(serviceTabInfo.serviceResult),
+                        convertTypeTitleToNum(serviceTabInfo.serviceType),
+                        factorTabInfo.factorReceivedPrice,
+                        factorTabInfo.factorTotalPrice,
+                        serviceTabInfo.address,
+                        serviceTabInfo.description,
+                        serviceTabInfo.image,
+                        factorTabInfo.factorImage,
+                        requestObjectList,
+                        serviceTabInfo.finalDate,
+                        false,
+                        {},
+                        selector.userId,
+                        factorTabInfo.billImage
+                    ).then(data=>{
+                        console.log("dataaaaa", data);
+                        if (data.errorCode === 0){
+                            AsyncStorage.getItem("savedServicesList").then(list=>{
+                                let tempList = !!list ? JSON.parse(list).filter(service=>service.projectId !== serviceID) : [];
+                                AsyncStorage.setItem("savedServicesList", JSON.stringify(tempList));
+                            });
+                            RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`)
+                            setRequestLoading(false);
+                            dispatch({
+                                type: SET_EDITING_SERVICE,
+                                editingService: ""
+                            })
+                            navigation.replace("MyServices");
+                        } else if (data.errorCode === 3){
+                            setRequestLoading(false);
+                            dispatch({
+                                type: LOGOUT
+                            });
+                            dispatch({
+                                type: SET_EDITING_SERVICE,
+                                editingService: ""
+                            })
+                            navigation.navigate("SignedOut");
+                        } else {
+                            setRequestLoading(false);
+                            ToastAndroid.showWithGravity(
+                                data.message,
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER
+                            );
+                        }
+                    }).catch(err=>{
+                        setRequestLoading(false);
+                        setRenderNetworkModal(true);
+                    })
+        }
     }
 
     useEffect(()=>{
@@ -193,6 +490,10 @@ const MyServiceDetails = ({navigation}) => {
                     dispatch({
                         type: LOGOUT
                     });
+                    dispatch({
+                        type: SET_EDITING_SERVICE,
+                        editingService: ""
+                    })
                     navigation.navigate("SignedOut");
                 } else {
                     dispatch({
@@ -224,11 +525,11 @@ const MyServiceDetails = ({navigation}) => {
             case 'services':
                 return <ServiceServicesTab setInfo={(e)=>setServiceInfo(e)} info={serviceTabInfo} projectId={serviceID}/>;
             case 'factor':
-                return <ServiceFactorTab setInfo={(e)=>setFactorInfo(e)} info={factorTabInfo} projectId={serviceID}/>;
+                return <ServiceFactorTab setInfo={(e)=>setFactorInfo(e)} info={factorTabInfo} />;
             case 'parts':
-                return <ServicePartsTab setInfo={setPartsTabInfo} info={partsTabInfo}/>;
+                return <ServicePartsTab setInfo={(e)=> setPartsTabInfo(e)} info={partsTabInfo}/>;
             case 'mission':
-                return <ServiceMissionTab setInfo={(e)=>setMissionInfo(e)} info={missionTabInfo}/>;
+                return <ServiceMissionTab setInfo={(e)=>setMissionInfo(e)} info={missionTabInfo} navigation={navigation}/>;
             case 'info':
                 return <ServiceInfoTab serviceData={selector.selectedService}/>;
             default:
@@ -239,16 +540,14 @@ const MyServiceDetails = ({navigation}) => {
         <View style={Styles.containerStyle}>
             <Header headerText={"داتیس سرویس"} leftIcon={
                 <View style={{flexDirection:"row", width:pageWidth*0.25, height:"100%", justifyContent: "space-between", alignItems: "center"}}>
-                    {requestLoading? (
-                        <ActivityIndicator size={"small"} color={"#fff"}/>
-                    ) : ( <Icon
-                        name="check"
-                        style={{
-                            fontSize: 33,
-                            color: '#dadfe1',
-                        }}
-                        onPress={()=>setRenderConfirmModal(true)}
-                    />)}
+                 <Icon
+                    name="check"
+                    style={{
+                        fontSize: 33,
+                        color: '#dadfe1',
+                    }}
+                    onPress={()=>setRenderConfirmModal(true)}
+                />
                 <Icon name="save" style={{
                     fontSize: 33,
                     color: '#dadfe1',
@@ -261,6 +560,7 @@ const MyServiceDetails = ({navigation}) => {
                     <ActivityIndicator size="large" color={"#000"}/>
                 </View>
             ):(
+
                 <TabView
                     renderTabBar={props => (
                         <TabBar
@@ -345,6 +645,11 @@ const MyServiceDetails = ({navigation}) => {
                         </View>
                     </View>
                 </TouchableHighlight>
+            )}
+            {requestLoading && (
+                <View style={Styles.onScreenLoadingContainerStyle}>
+                    <ActivityIndicator size={"large"} color={"#660000"}/>
+                </View>
             )}
         </View>
     );
@@ -436,6 +741,14 @@ const Styles = StyleSheet.create({
         color:"gray",
         fontSize:14,
         fontWeight:"bold"
+    },
+    onScreenLoadingContainerStyle:{
+        width: pageWidth,
+        height: pageHeight,
+        justifyContent:"center",
+        alignItems:"center",
+        backgroundColor:"rgba(00,00,00,0.5)",
+        position:"absolute"
     }
 })
 

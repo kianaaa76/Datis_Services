@@ -1,20 +1,14 @@
 import React,{useState,useEffect} from 'react';
-import {View, ScrollView, Dimensions, Text, StyleSheet, TextInput, TouchableOpacity} from "react-native";
+import {View, Dimensions, Text, StyleSheet, TextInput, Switch} from "react-native";
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import PersianCalendarPicker from 'react-native-persian-calendar-picker';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import moment from "moment-jalaali";
-import {toFaDigit} from '../../utils/utilities';
 import Icon from "react-native-vector-icons/Foundation";
-import {API_KEY} from "../../../actions/types";
+import {API_KEY, MAPBOX_API_KEY} from "../../../actions/types";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-
-
+let cameraRef={};
+let EndObject="";
 const ServiceMissionTab = ({info, setInfo}) => {
-    const [cameraLatitude, setCameraLatitude] = useState("");
-    const [cameraLongitude, setCameraLongitude] = useState("");
     const [startLocation, setStartLocation] = useState({
         startLatitude: info.startLatitude,
         startLongitude: info.startLongitude
@@ -25,12 +19,7 @@ const ServiceMissionTab = ({info, setInfo}) => {
     });
     const [startCity, setStartCity] = useState(info.startCity);
     const [endCity, setEndCity] = useState(info.endCity);
-    const [startDate, setStartDate] = useState(info.missionStartDate);
-    const [endDate, setEndDate] = useState(info.missionEndDate);
-    const [tempDate, setTempDate] = useState("");
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showTimePicker, setShowTimePicker] = useState(false);
-    const [datePickerType, setDatePickerType] = useState("");
+    const [travel, setTravel] = useState(info.travel);
 
     const renderMarker = (latitude,longitude, color, size, id, type) =>{
         return(
@@ -46,9 +35,8 @@ const ServiceMissionTab = ({info, setInfo}) => {
                             height: 100,
                         }}>
                             <Icon name="marker" color={color} size={size}/>
-                            <Text style={Styles.markerLabelStyle}>{type == "start"? "مبدا" : "مقصد"}</Text>
+                            <Text style={Styles.markerLabelStyle}>{type === "start"? "مبدا" : "مقصد"}</Text>
                         </View>
-
                     </View>
                 </MapboxGL.MarkerView>
             </View>
@@ -57,6 +45,15 @@ const ServiceMissionTab = ({info, setInfo}) => {
 
     const mapOnLongPress = (feature) => {
         if (!startLocation.startLatitude){
+            setStartLocation({
+                startLatitude: feature.geometry.coordinates[1],
+                startLongitude: feature.geometry.coordinates[0]
+            })
+            setInfo({
+                ...info,
+                startLatitude: feature.geometry.coordinates[1],
+                startLongitude: feature.geometry.coordinates[0],
+            })
             fetch(`https://map.ir/fast-reverse?lat=${feature.geometry.coordinates[1]}&lon=${feature.geometry.coordinates[0]}`, {
                 method: 'GET',
                 headers: {
@@ -67,17 +64,22 @@ const ServiceMissionTab = ({info, setInfo}) => {
                 .then(response => response.json())
                 .then(data => {
                     setStartCity(data.city);
-                    setInfo({...info, startCity: data.city});
-                    setStartLocation({
-                        startLatitude: feature.geometry.coordinates[1],
-                        startLongitude: feature.geometry.coordinates[0]
-                    })
                     setInfo({...info,
                         startLatitude: feature.geometry.coordinates[1],
                         startLongitude: feature.geometry.coordinates[0],
+                        startCity: data.city
                     })
                 });
         } else if (!endLocation.endLatitude) {
+            setEndLocation({
+                endLatitude: feature.geometry.coordinates[1],
+                endLongitude: feature.geometry.coordinates[0]
+            });
+            setInfo({
+                ...info,
+                endLatitude: feature.geometry.coordinates[1],
+                endLongitude: feature.geometry.coordinates[0]
+            })
             fetch(`https://map.ir/reverse?lat=${feature.geometry.coordinates[1]}&lon=${feature.geometry.coordinates[0]}`, {
                 method: 'GET',
                 headers: {
@@ -88,35 +90,24 @@ const ServiceMissionTab = ({info, setInfo}) => {
                 .then(response => response.json())
                 .then(data => {
                     setEndCity(data.city);
-                    setInfo({...info, endCity: data.city});
-                    setEndLocation({
-                        endLatitude: feature.geometry.coordinates[1],
-                        endLongitude: feature.geometry.coordinates[0]
-                    });
-                    setInfo({...info,
-                        endLatitude: feature.geometry.coordinates[1],
-                        endLongitude: feature.geometry.coordinates[0],
-                    })
+                    EndObject = data.city;
                 });
+            fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${startLocation.startLongitude},${startLocation.startLatitude};${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}?access_token=${MAPBOX_API_KEY}`,{
+                method: 'GET'
+            }).then(response=> response.json()).then(data=>{
+                setInfo({
+                    ...info,
+                    distance: data.routes[0].legs[0].distance,
+                    endLatitude: feature.geometry.coordinates[1],
+                    endLongitude: feature.geometry.coordinates[0],
+                    startCity:startCity,
+                    startLatitude:startLocation.startLatitude,
+                    startLongitude: startLocation.startLongitude,
+                    endCity: EndObject
+                })
+            })
+            cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],100,100);
         }
-    }
-
-    const onSelectTime = (value)=>{
-        let datee = new moment(parseInt(tempDate)).format("jYYYY/jM/jD HH:mm:ss");
-        let timee = datee.split(" ");
-        let timeSplit = timee[1].split(":");
-        let ss = (parseInt(timeSplit[0]*3600) + parseInt(timeSplit[1]*60) + parseInt(timeSplit[2]))*1000;
-        let pureDate = parseInt(tempDate) - ss;
-        let addedTime = (new moment(Date.parse(value)).format("HH:mm:ss")).split(":");
-        let finalTime = pureDate + (parseInt(addedTime[0]*3600) + parseInt(addedTime[1]*60) + parseInt(addedTime[2]))*1000;
-        if (datePickerType === "end"){
-            setEndDate(finalTime);
-            setInfo({...info, missionEndDate: finalTime})
-        } else if (datePickerType === "start") {
-            setStartDate(finalTime);
-            setInfo({...info, missionEndDate:finalTime})
-        }
-        setShowTimePicker(false);
     }
 
     return(
@@ -126,16 +117,17 @@ const ServiceMissionTab = ({info, setInfo}) => {
                 onLongPress={feature => mapOnLongPress(feature)}>
                 <MapboxGL.UserLocation
                     onUpdate={location => {
-                        setCameraLatitude(location.coords.latitude);
-                        setCameraLongitude(location.coords.longitude);
+                        if (!startLocation.startLatitude && !endLocation.endLongitude) {
+                            cameraRef.moveTo([location.coords.longitude, location.coords.latitude]);
+                            cameraRef.zoomTo(11)
+                        } else {
+                        cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[endLocation.endLongitude, endLocation.endLatitude],100,100);
+                        }
                     }}
                 />
-                {!!cameraLongitude && !!cameraLatitude && (
-                    <MapboxGL.Camera
-                        centerCoordinate={[cameraLongitude, cameraLatitude]}
-                        zoomLevel={12}
-                    />
-                )}
+                <MapboxGL.Camera
+                    ref={ref=>cameraRef=ref}
+                />
                 {!!startLocation.startLongitude && !!startLocation.startLatitude && (
                     renderMarker(startLocation.startLatitude, startLocation.startLongitude, "blue", 45, 1, "start")
                 )}
@@ -165,42 +157,22 @@ const ServiceMissionTab = ({info, setInfo}) => {
                                 <Text style={Styles.cityDataTitleStyle}>شهر مبدا: </Text>
                             </View>
                         </View>
-                        <View style={Styles.dateContainerstyle}>
-
-                            <View style={Styles.dateItemContainerStyle}>
-                                {!!endDate && (
-                                    <View>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(endDate).format("jYYYY/jM/jD"))}</Text>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(endDate).format("HH:mm"))}</Text>
-                                    </View>
-                                )}
-                                <TouchableOpacity style={Styles.timeButtonStyle} onPress={()=>{
-                                    setDatePickerType("end");
-                                    setShowDatePicker(true);
-                                }}>
-                                    <Text style={Styles.timeButtonTextStyle}>
-                                        زمان پایان
-                                    </Text>
-                                </TouchableOpacity>
-
-                            </View>
-                            <View style={Styles.dateItemContainerStyle}>
-                                {!!startDate && (
-                                    <View>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(startDate).format("jYYYY/jM/jD"))}</Text>
-                                        <Text style={Styles.timeStyle}>{toFaDigit(new moment(startDate).format("HH:mm"))}</Text>
-                                    </View>
-                                )}
-                                <TouchableOpacity style={Styles.timeButtonStyle} onPress={()=>{
-                                    setDatePickerType("start");
-                                    setShowDatePicker(true);
-                                }}>
-                                    <Text style={Styles.timeButtonTextStyle}>
-                                        زمان شروع
-                                    </Text>
-                                </TouchableOpacity>
-
-                            </View>
+                        <View style={Styles.switchContainerStyle}>
+                            <Switch
+                                trackColor={{ false: "gray", true: "#660000" }}
+                                thumbColor={travel ? "#990000" : "#C0C0C0"}
+                                onValueChange={()=>{
+                                    setTravel(!travel);
+                                    setInfo({
+                                        ...info,
+                                        travel: !info.travel
+                                    });
+                                }}
+                                value={travel}
+                            />
+                            <Text style={Styles.switchLabelStyle}>
+                                بازگشت به مبدا:
+                            </Text>
                         </View>
                         <View style={Styles.descriptionContainerStyle}>
                             <Text style={Styles.descriptionTitleTextStyle}>توضیحات: </Text>
@@ -210,39 +182,8 @@ const ServiceMissionTab = ({info, setInfo}) => {
                                 multiline
                                 onChangeText={description => setInfo({...info, missionDescription: description})}/>
                         </View>
-
                     </View>
                 </View>
-            )}
-            {showDatePicker && (
-                <View style={Styles.datePickerContainerStyle}>
-                    <PersianCalendarPicker
-                        onDateChange={date=>{
-                            setTempDate(Date.parse(date))
-                        }}
-                        width={pageWidth*0.95}
-                        selectedDayColor={"red"}
-                    />
-                    <TouchableOpacity
-                        style={Styles.datePickerConfirmButtonStyle}
-                        onPress={()=> {
-                            setShowTimePicker(true);
-                            setShowDatePicker(false);
-                        }}>
-                        <Text style={Styles.confirmdatePickerTextStyle}>
-                            تایید
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-            {showTimePicker && (
-                <DateTimePickerModal
-                    isVisible={showTimePicker}
-                    mode="time"
-                    onConfirm={value=> onSelectTime(value)}
-                    onCancel={()=>setShowTimePicker(false)}
-                    is24Hour={true}
-                />
             )}
         </View>
     )
@@ -301,7 +242,7 @@ const Styles = StyleSheet.create({
         height:"20%"
     },
     cityDataContainerStyle: {
-        width: pageWidth * 0.8,
+        width: "100%",
         height: pageHeight * 0.06,
         flexDirection: 'row',
         alignItems: 'center',
@@ -320,14 +261,14 @@ const Styles = StyleSheet.create({
     },
     cityDataContentContainerStyle: {
         flexDirection: 'row',
-        width: '40%',
+        width: '50%',
         height: '100%',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
     },
     descriptionContainerStyle: {
         width: "100%",
-        height: "55%",
+        height: "60%",
     },
     descriptionTitleTextStyle: {
         fontSize: 15,
@@ -336,65 +277,12 @@ const Styles = StyleSheet.create({
     },
     descriptionTextInputStyle: {
         width: '100%',
-        height: pageHeight * 0.12,
+        height: pageHeight * 0.14,
         borderWidth: 1,
         borderColor: '#000',
         borderRadius: 10,
         textAlignVertical: 'top',
         padding: 15,
-    },
-    dateContainerstyle:{
-        flexDirection:"row",
-        width: pageWidth * 0.8,
-        height:"25%",
-        alignItems:"center",
-        justifyContent:"space-between",
-        paddingHorizontal:5
-    },
-    dateItemContainerStyle:{
-        flexDirection:'row',
-        width:"46%",
-        height:"100%",
-        alignItems:"center",
-        justifyContent:"flex-end"
-    },
-    timeButtonStyle:{
-        width:"45%",
-        height:"70%",
-        backgroundColor:"#660000",
-        borderRadius:5,
-        justifyContent:"center",
-        alignItems:"center",
-        marginLeft: 5
-    },
-    timeButtonTextStyle:{
-        fontSize:12,
-        color:"#fff",
-        textAlign:"center",
-        fontWeight:"bold"
-    },
-    datePickerContainerStyle:{
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-        position: "absolute",
-        borderWidth: 2,
-        borderColor: "#13A69D",
-        borderRadius:10,
-        overflow:"hidden"
-    },
-    datePickerConfirmButtonStyle:{
-        width:"100%",
-        height:60,
-        justifyContent:"center",
-        alignItems:"center",
-        backgroundColor:"#13A69D"
-    },
-    confirmdatePickerTextStyle:{
-        fontSize:17,
-        fontWeight:"bold"
-    },
-    timeStyle:{
-        fontWeight:"bold"
     },
     markerLabelStyle:{
         width:50,
@@ -404,6 +292,18 @@ const Styles = StyleSheet.create({
         borderRadius:10,
         backgroundColor:"#A8A7A7",
         color:"#000"
+    },
+    switchContainerStyle:{
+        flexDirection:"row",
+        width:"100%",
+        alignItems:"center",
+        justifyContent:"flex-end",
+        marginTop:8
+    },
+    switchLabelStyle:{
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginBottom: 10,
     }
 })
 

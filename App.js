@@ -1,27 +1,18 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {
   PermissionsAndroid,
-  Platform,
-  ActivityIndicator,
-  View,
+  Platform
 } from 'react-native';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {RootNav} from './src/routes/routes';
 import {getStore, getPersistor} from './src/store/index';
+import SendData from "./src/components/screens/SendData";
 
 
 const App = () => {
   const myStore = getStore();
   const myPersistor = getPersistor();
-
-  const renderLoading = () => {
-    return (
-      <View style={{flex:1, justifyContent:"center", alignItems:"center"}}>
-        <ActivityIndicator size={'large'} />
-      </View>
-    );
-  };
 
   useEffect(() => {
     if (Platform.OS == 'android') {
@@ -40,8 +31,9 @@ const App = () => {
   }, []);
   return (
     <Provider store={myStore}>
+        <SendData/>
       <PersistGate loading={null} persistor={myPersistor}>
-        <RootNav />
+        <RootNav/>
       </PersistGate>
     </Provider>
   );
