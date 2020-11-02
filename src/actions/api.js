@@ -276,13 +276,14 @@ export const sendServiceData = (
     serviceManId,
     billImage,
 )=>{
+  console.log("missionnnnnnn", mission);
   const msg = JSON.stringify({
     ServiceManId: serviceManId,
     projectID: serviceId,
     Image: image,
     FactorImage: factorImage,
     Location: location,
-    ReceivedAmount: receivedAmount,
+    RecivedAmount: receivedAmount,
     InvoiceAmount: invoiceAmount,
     ObjectList: objectList,
     DoneTime: doneTime,
@@ -314,6 +315,16 @@ export const getUsers = ()=>{
 
 export const call = (token)=>{
   return fetch(`${LOCAL_HOST}/CallWithMe`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+
+export const checkUpdate = (version, token) => {
+  return fetch(`${LOCAL_HOST}/GetVersion?versionName=${version}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

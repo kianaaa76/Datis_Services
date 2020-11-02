@@ -3,6 +3,7 @@ import {View, Switch, Dimensions, Text, StyleSheet, TextInput, BackHandler} from
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from "react-native-vector-icons/Foundation";
 import {API_KEY, MAPBOX_API_KEY} from "../../../actions/types";
+import {toFaDigit} from "../../utils/utilities";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -20,16 +21,20 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
     const [startCity, setStartCity] = useState(info.startCity);
     const [endCity, setEndCity] = useState(info.endCity);
     const [travel, setTravel] = useState(info.travel);
+    const [distance, setDistance] = useState(info.distance);
+
 
     useEffect(() => {
         const backAction = () => {
             if(!!endLocation.endLongitude){
                 setEndLocation({endLongitude: "", endLatitude: ""});
                 setEndCity("");
+                setDistance("0");
                 setInfo({...info,
                     endLatitude: "",
                     endLongitude: "",
-                    endCity: ""
+                    endCity: "",
+                    distance:""
                 })
             } else if (!!startLocation.startLatitude){
                 setStartLocation({startLatitude: "", startLongitude: ""});
@@ -123,13 +128,14 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
             fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${startLocation.startLongitude},${startLocation.startLatitude};${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}?access_token=${MAPBOX_API_KEY}`,{
                 method: 'GET'
             }).then(response=> response.json()).then(data=>{
+                setDistance(parseFloat(data.routes[0].legs[0].distance)/1000);
                 setInfo({
                     ...info,
                     distance: data.routes[0].legs[0].distance,
                     endCity: EndObject,
                     endLatitude: feature.geometry.coordinates[1],
                     endLongitude: feature.geometry.coordinates[0],
-                })
+                });
             })
             setInfo({
                 ...info,
@@ -184,7 +190,7 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
                                     }}
                                        value={endCity}
                                     />
-                                <Text style={Styles.cityDataTitleStyle}>شهر مقصد: </Text>
+                                <Text style={Styles.titleStyle}>شهر مقصد: </Text>
                             </View>
                             <View style={Styles.cityDataContentContainerStyle}>
                                     <TextInput style={Styles.cityDataTextStyle} onChangeText={text=> {
@@ -194,25 +200,32 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
                                         setStartCity(text)}}
                                        value={startCity}
                                     />
-                                <Text style={Styles.cityDataTitleStyle}>شهر مبدا: </Text>
+                                <Text style={Styles.titleStyle}>شهر مبدا: </Text>
                             </View>
                         </View>
-                        <View style={Styles.switchContainerStyle}>
-                            <Switch
-                                trackColor={{ false: "gray", true: "#660000" }}
-                                thumbColor={travel ? "#990000" : "#C0C0C0"}
-                                onValueChange={()=>{
-                                    setTravel(!travel);
-                                    setInfo({
-                                        ...info,
-                                        travel: !info.travel
-                                    });
-                                }}
-                                value={travel}
-                            />
-                            <Text style={Styles.switchLabelStyle}>
-                                بازگشت به مبدا:
-                            </Text>
+                        <View style={Styles.distanceRowStyle}>
+                            <View style={Styles.distanceContainerStyle}>
+                                <Text>کیلومتر</Text>
+                                <Text style={{marginHorizontal:5}}>{toFaDigit(distance).substr(0,15)}</Text>
+                                <Text style={Styles.titleStyle}>فاصله: </Text>
+                            </View>
+                            <View style={Styles.switchContainerStyle}>
+                                <Switch
+                                    trackColor={{ false: "gray", true: "#660000" }}
+                                    thumbColor={travel ? "#990000" : "#C0C0C0"}
+                                    onValueChange={()=>{
+                                        setTravel(!travel);
+                                        setInfo({
+                                            ...info,
+                                            travel: !info.travel
+                                        });
+                                    }}
+                                    value={travel}
+                                />
+                                <Text style={Styles.titleStyle}>
+                                    بازگشت به مبدا:
+                                </Text>
+                            </View>
                         </View>
                         <View style={Styles.descriptionContainerStyle}>
                             <Text style={Styles.descriptionTitleTextStyle}>توضیحات: </Text>
@@ -297,11 +310,6 @@ const Styles = StyleSheet.create({
         width:"35%",
         textAlign:"center"
     },
-    cityDataTitleStyle: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
     cityDataContentContainerStyle: {
         flexDirection: 'row',
         width: '50%',
@@ -339,15 +347,30 @@ const Styles = StyleSheet.create({
     },
     switchContainerStyle:{
         flexDirection:"row",
-        width:"100%",
+        width:"50%",
         alignItems:"center",
         justifyContent:"flex-end",
+        // marginTop:8
+    },
+    distanceRowStyle:{
+        flexDirection:"row",
+        width:"100%",
+        alignItems:"center",
+        justifyContent:"space-between",
         marginTop:8
     },
-    switchLabelStyle:{
+    titleStyle:{
         fontSize: 15,
         fontWeight: 'bold',
-        marginBottom: 10,
+        textAlign:'center'
+        // marginBottom: 10,
+    },
+    distanceContainerStyle:{
+        flexDirection:"row",
+        width:"50%",
+        alignItems:"center",
+        justifyContent:"flex-end"
+
     }
 })
 

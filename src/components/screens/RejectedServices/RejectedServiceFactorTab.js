@@ -49,7 +49,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
                                 width:pageWidth-20,
                                 height: pageHeight*0.4,
                                 includeBase64:true,
-                                compressImageQuality:1
+                                compressImageQuality:0.7
                             }).then( response => {
                                 setInfo({
                                     ...info,
@@ -64,7 +64,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
                                 width:pageWidth-20,
                                 height: pageHeight*0.4,
                                 includeBase64:true,
-                                compressImageQuality:1
+                                compressImageQuality:0.7
                             }).then(response=>{
                                 setInfo({
                                     ...info,
@@ -91,7 +91,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
                                 width:pageWidth-20,
                                 height: pageHeight*0.4,
                                 includeBase64:true,
-                                compressImageQuality:1
+                                compressImageQuality:0.7
                             }).then( response => {
                                 setInfo({
                                     ...info,
@@ -105,7 +105,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
                             width:pageWidth-20,
                             height: pageHeight*0.4,
                             includeBase64:true,
-                            compressImageQuality:1
+                            compressImageQuality:0.7
                         }).then(response=>{
                             setInfo({
                                 ...info,

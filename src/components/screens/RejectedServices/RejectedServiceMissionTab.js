@@ -1,14 +1,15 @@
 import React,{useState,useEffect} from 'react';
-import {View, Dimensions, Text, StyleSheet, TextInput, Switch} from "react-native";
+import {View, Dimensions, Text, StyleSheet, TextInput, Switch, BackHandler} from "react-native";
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from "react-native-vector-icons/Foundation";
 import {API_KEY, MAPBOX_API_KEY} from "../../../actions/types";
+import {toFaDigit} from "../../utils/utilities";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 let cameraRef={};
 let EndObject="";
-const ServiceMissionTab = ({info, setInfo}) => {
+const ServiceMissionTab = ({info, setInfo, navigation}) => {
     const [startLocation, setStartLocation] = useState({
         startLatitude: info.startLatitude,
         startLongitude: info.startLongitude
@@ -20,6 +21,36 @@ const ServiceMissionTab = ({info, setInfo}) => {
     const [startCity, setStartCity] = useState(info.startCity);
     const [endCity, setEndCity] = useState(info.endCity);
     const [travel, setTravel] = useState(info.travel);
+    const [distance, setDistance] = useState(parseFloat(info.distance)/1000);
+
+    useEffect(() => {
+        const backAction = () => {
+            if(!!endLocation.endLongitude){
+                setEndLocation({endLongitude: "", endLatitude: ""});
+                setEndCity("");
+                setDistance("0");
+                setInfo({...info,
+                    endLatitude: "",
+                    endLongitude: "",
+                    endCity: "",
+                    distance:"0"
+                })
+            } else if (!!startLocation.startLatitude){
+                setStartLocation({startLatitude: "", startLongitude: ""});
+                setStartCity("");
+                setInfo({...info,
+                    startLatitude: "",
+                    startLongitude: "",
+                    startCity: ""
+                })
+            } else {
+                navigation.goBack();
+            }
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+        return () => backHandler.remove();
+    });
 
     const renderMarker = (latitude,longitude, color, size, id, type) =>{
         return(
@@ -95,6 +126,7 @@ const ServiceMissionTab = ({info, setInfo}) => {
             fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${startLocation.startLongitude},${startLocation.startLatitude};${feature.geometry.coordinates[0]},${feature.geometry.coordinates[1]}?access_token=${MAPBOX_API_KEY}`,{
                 method: 'GET'
             }).then(response=> response.json()).then(data=>{
+                setDistance(parseFloat(data.routes[0].legs[0].distance)/1000);
                 setInfo({
                     ...info,
                     distance: data.routes[0].legs[0].distance,
@@ -120,8 +152,14 @@ const ServiceMissionTab = ({info, setInfo}) => {
                         if (!startLocation.startLatitude && !endLocation.endLongitude) {
                             cameraRef.moveTo([location.coords.longitude, location.coords.latitude]);
                             cameraRef.zoomTo(11)
-                        } else {
+                        } else if (!startLocation.startLatitude && !endLocation.endLongitude){
                         cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[endLocation.endLongitude, endLocation.endLatitude],100,100);
+                        } else if (!startLocation.startLatitude && !!endLocation.endLatitude){
+                            cameraRef.moveTo([endLocation.endLongitude, endLocation.endLatitude]);
+                            cameraRef.zoomTo(11)
+                        } else {
+                            cameraRef.moveTo([startLocation.startLongitude, startLocation.startLatitude]);
+                            cameraRef.zoomTo(11)
                         }
                     }}
                 />
@@ -150,29 +188,36 @@ const ServiceMissionTab = ({info, setInfo}) => {
                         <View style={Styles.cityDataContainerStyle}>
                             <View style={Styles.cityDataContentContainerStyle}>
                                 <Text style={Styles.cityDataTextStyle}>{endCity}</Text>
-                                <Text style={Styles.cityDataTitleStyle}>شهر مقصد: </Text>
+                                <Text style={Styles.titleStyle}>شهر مقصد: </Text>
                             </View>
                             <View style={Styles.cityDataContentContainerStyle}>
                                 <Text style={Styles.cityDataTextStyle}>{startCity}</Text>
-                                <Text style={Styles.cityDataTitleStyle}>شهر مبدا: </Text>
+                                <Text style={Styles.titleStyle}>شهر مبدا: </Text>
                             </View>
                         </View>
-                        <View style={Styles.switchContainerStyle}>
-                            <Switch
-                                trackColor={{ false: "gray", true: "#660000" }}
-                                thumbColor={travel ? "#990000" : "#C0C0C0"}
-                                onValueChange={()=>{
-                                    setTravel(!travel);
-                                    setInfo({
-                                        ...info,
-                                        travel: !info.travel
-                                    });
-                                }}
-                                value={travel}
-                            />
-                            <Text style={Styles.switchLabelStyle}>
-                                بازگشت به مبدا:
-                            </Text>
+                        <View style={Styles.distanceRowStyle}>
+                            <View style={Styles.distanceContainerStyle}>
+                                <Text>کیلومتر</Text>
+                                <Text style={{marginHorizontal:5}}>{toFaDigit(distance).substr(0,15)}</Text>
+                                <Text style={Styles.titleStyle}>فاصله: </Text>
+                            </View>
+                            <View style={Styles.switchContainerStyle}>
+                                <Switch
+                                    trackColor={{ false: "gray", true: "#660000" }}
+                                    thumbColor={travel ? "#990000" : "#C0C0C0"}
+                                    onValueChange={()=>{
+                                        setTravel(!travel);
+                                        setInfo({
+                                            ...info,
+                                            travel: !info.travel
+                                        });
+                                    }}
+                                    value={travel}
+                                />
+                                <Text style={Styles.titleStyle}>
+                                    بازگشت به مبدا:
+                                </Text>
+                            </View>
                         </View>
                         <View style={Styles.descriptionContainerStyle}>
                             <Text style={Styles.descriptionTitleTextStyle}>توضیحات: </Text>
@@ -254,11 +299,6 @@ const Styles = StyleSheet.create({
         fontSize: 15,
         marginLeft: 10,
     },
-    cityDataTitleStyle: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
     cityDataContentContainerStyle: {
         flexDirection: 'row',
         width: '50%',
@@ -295,15 +335,29 @@ const Styles = StyleSheet.create({
     },
     switchContainerStyle:{
         flexDirection:"row",
-        width:"100%",
+        width:"50%",
         alignItems:"center",
         justifyContent:"flex-end",
         marginTop:8
     },
-    switchLabelStyle:{
+    distanceRowStyle:{
+        flexDirection:"row",
+        width:"100%",
+        alignItems:"center",
+        justifyContent:"space-between",
+        marginTop:8
+    },
+    titleStyle:{
         fontSize: 15,
         fontWeight: 'bold',
-        marginBottom: 10,
+        textAlign:'center'
+    },
+    distanceContainerStyle:{
+        flexDirection:"row",
+        width:"50%",
+        alignItems:"center",
+        justifyContent:"flex-end"
+
     }
 })
 

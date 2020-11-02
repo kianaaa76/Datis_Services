@@ -116,23 +116,23 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                                     serviceResult:getServiceResult(data.result.Result),
                                                     serviceType:getServiceType(data.result.ServiceType),
                                                     objectList:data.result.ObjectList,
-                                                    startLatitude: !!data.result.Mission ? data.result.Mission.StartLocation.substr(0,data.result.Mission.StartLocation.indexOf(',')) : "",
+                                                    startLatitude: !!data.result.Mission ? parseFloat(data.result.Mission.StartLocation.substr(0,data.result.Mission.StartLocation.indexOf(','))) : "",
                                                     startLongitude: !!data.result.Mission ?
-                                                        data.result.Mission.StartLocation.substr(data.result.Mission.StartLocation.indexOf(',')+1,data.result.Mission.StartLocation.length) :"",
-                                                    endLatitude: !!data.result.Mission ? data.result.Mission.EndLocation.substr(0,data.result.Mission.EndLocation.indexOf(',')):"",
+                                                        parseFloat(data.result.Mission.StartLocation.substr(data.result.Mission.StartLocation.indexOf(',')+1,data.result.Mission.StartLocation.length)) :"",
+                                                    endLatitude: !!data.result.Mission ? parseFloat(data.result.Mission.EndLocation.substr(0,data.result.Mission.EndLocation.indexOf(','))):"",
                                                     endLongitude: !!data.result.Mission ?
-                                                        data.result.Mission.EndLocation.substr(data.result.Mission.EndLocation.indexOf(',')+1,data.result.Mission.EndLocation.length):"",
+                                                        parseFloat(data.result.Mission.EndLocation.substr(data.result.Mission.EndLocation.indexOf(',')+1,data.result.Mission.EndLocation.length)):"",
                                                     startCity: !!data.result.Mission ? data.result.Mission.StartCity : "",
                                                     endCity: !!data.result.Mission ? data.result.Mission.EndCity : "",
                                                     missionDescription: !!data.result.Mission ? data.result.Mission.Description : "",
-                                                    missionId: !!data.result.Mission ? data.result.Mission.ID : "",
-                                                    distance: !!data.result.Mission ? data.result.Mission.Distance : "",
+                                                    missionId: !!data.result.Mission ? data.result.Mission.Id : 0,
+                                                    distance: !!data.result.Mission ? data.result.Mission.Distance : "0",
                                                     savedType:"",
                                                     travel: !!data.result.Mission ? data.result.Mission.Travel : false
                                                 }
                                             });
                                             renderLoading(false);
-                                            navigation.navigate('RejectedServiceDetail', {serviceID: Item.projectID, service:{
+                                            navigation.replace('RejectedServiceDetail', {serviceID: Item.projectID, service:{
                                                     "projectID":data.result.projectID,
                                                     "DocText":{
                                                         "PhoneName": data.result.DocText.PhoneName,
@@ -154,7 +154,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                             dispatch({
                                                 type:LOGOUT
                                             });
-                                            navigation.navigate("SignedOut");
+                                            navigation.replace("SignedOut");
                                         } else {
                                             renderLoading(false);
                                             ToastAndroid.showWithGravity(
@@ -191,23 +191,23 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                                 serviceResult:getServiceResult(data.result.Result),
                                                 serviceType:getServiceType(data.result.ServiceType),
                                                 objectList:data.result.ObjectList,
-                                                startLatitude: !!data.result.Mission ? parseInt(data.result.Mission.StartLocation.substr(0,data.result.Mission.StartLocation.indexOf(','))) : "",
+                                                startLatitude: !!data.result.Mission ? parseFloat(data.result.Mission.StartLocation.substr(0,data.result.Mission.StartLocation.indexOf(','))) : "",
                                                 startLongitude: !!data.result.Mission ?
-                                                    parseInt(data.result.Mission.StartLocation.substr(data.result.Mission.StartLocation.indexOf(',')+1,data.result.Mission.StartLocation.length)) :"",
-                                                endLatitude: !!data.result.Mission ? parseInt(data.result.Mission.EndLocation.substr(0,data.result.Mission.EndLocation.indexOf(','))):"",
+                                                    parseFloat(data.result.Mission.StartLocation.substr(data.result.Mission.StartLocation.indexOf(',')+1,data.result.Mission.StartLocation.length)) :"",
+                                                endLatitude: !!data.result.Mission ? parseFloat(data.result.Mission.EndLocation.substr(0,data.result.Mission.EndLocation.indexOf(','))):"",
                                                 endLongitude: !!data.result.Mission ?
-                                                    parseInt(data.result.Mission.EndLocation.substr(data.result.Mission.EndLocation.indexOf(',')+1,data.result.Mission.EndLocation.length)):"",
+                                                    parseFloat(data.result.Mission.EndLocation.substr(data.result.Mission.EndLocation.indexOf(',')+1,data.result.Mission.EndLocation.length)):"",
                                                 startCity: !!data.result.Mission ? data.result.Mission.StartCity : "",
                                                 endCity: !!data.result.Mission ? data.result.Mission.EndCity : "",
                                                 missionDescription: !!data.result.Mission ? data.result.Mission.Description : "",
-                                                missionId: !!data.result.Mission ? data.result.Mission.ID : "",
+                                                missionId: !!data.result.Mission ? data.result.Mission.ID : 0,
                                                 distance: !!data.result.Mission ? data.result.Mission.Distance : "",
                                                 savedType:"",
                                                 travel: !!data.result.Mission ? data.result.Mission.Travel : false
                                             }
                                         });
                                         renderLoading(false);
-                                        navigation.navigate('RejectedServiceDetail', {serviceID: Item.projectID, service:{
+                                        navigation.replace('RejectedServiceDetail', {serviceID: Item.projectID, service:{
                                                 "projectID":data.result.projectID,
                                                 "DocText":{
                                                     "PhoneName": data.result.DocText.PhoneName,
@@ -228,7 +228,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                         dispatch({
                                             type:LOGOUT
                                         });
-                                        navigation.navigate("SignedOut");
+                                        navigation.replace("SignedOut");
                                     } else {
                                         renderLoading(false);
                                         ToastAndroid.showWithGravity(

@@ -34,9 +34,8 @@ const ServiceFactorTab = ({setInfo, info}) => {
             <View style={Styles.rowDataStyle}>
                 <Text style={Styles.rialTextStyle}>ریال</Text>
                 <TextInput style={Styles.textInputStyle} onChangeText={text=> {
-                    setInfo({
+                    setInfo({...info,
                         factorReceivedPrice:text,
-                        factorTotalPrice: info.factorTotalPrice,
                     })
                 }} value={info.factorReceivedPrice}  keyboardType="numeric"/>
                 <View style={{width: 70}}>
@@ -49,7 +48,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
                 <TextInput style={Styles.textInputStyle}
                            onChangeText={text=> {
                                setInfo({
-                                   factorReceivedPrice: info.factorReceivedPrice,
+                                   ...info,
                                    factorTotalPrice: text,
                                })
                            }}
@@ -95,7 +94,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
             </View>
             {!!info.factorImage && (
                 <TouchableOpacity
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
+                    style={{width:"100%", height:pageHeight*0.4, marginVertical:10}}
                     onPress={()=> {
                         setDeletingImage(1)
                     }}>
@@ -134,7 +133,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
             </View>
             {!!info.billImage && (
                 <TouchableOpacity
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
+                    style={{width:"100%", height:pageHeight*0.4, marginVertical:10}}
                     onPress={()=> {
                         setDeletingImage(2)
                     }}>
@@ -219,6 +218,7 @@ const Styles = StyleSheet.create({
         height:65,
         alignItems:"center",
         justifyContent:"space-between",
+        marginBottom:10
     },
     getImageContainerViewStyle:{
         justifyContent:"space-between",

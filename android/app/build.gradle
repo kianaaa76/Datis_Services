@@ -134,8 +134,8 @@ android {
         applicationId "com.datis_services"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "3.3.2"
         multiDexEnabled true
         missingDimensionStrategy 'react-native-camera', 'general'
     }
@@ -148,6 +148,12 @@ android {
         }
     }
     signingConfigs {
+        release {
+              storeFile file('your_key_name.keystore')
+              storePassword 'android'
+              keyAlias 'your_key_alias'
+              keyPassword 'android'
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'

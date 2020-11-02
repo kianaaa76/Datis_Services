@@ -263,7 +263,7 @@ const RemainingServiceDetail = ({navigation}) => {
                             width:pageWidth-20,
                             height: pageHeight*0.4,
                             includeBase64:true,
-                            compressImageQuality:1
+                            compressImageQuality:0.7
                         }).then( response =>{
                             setFactorImage(response.data)
                         })}/>
@@ -272,7 +272,7 @@ const RemainingServiceDetail = ({navigation}) => {
                             width:pageWidth-20,
                             height: pageHeight*0.4,
                             includeBase64:true,
-                            compressImageQuality:1
+                            compressImageQuality:0.7
                         }).then(response=>{
                             setFactorImage(response.data)
                         })}/>

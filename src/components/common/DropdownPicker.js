@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState, forwardRef, useImperativeHandle} from "react";
 import {View, TextInput, StyleSheet, Dimensions, Text, TouchableOpacity, ScrollView, FlatList} from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
@@ -6,14 +6,18 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 const pageWidth = Dimensions.get("screen").width;
 const pageHeight = Dimensions.get("screen").height;
 
-const DropdownPicker = ({placeholder, list, onSelect, listHeight}) => {
-
-
+const DropdownPicker = forwardRef(({placeholder, list, onSelect, listHeight},ref) => {
 
     const [listIsShown, setListIsShown] = useState(false);
     const [showingList, setShowingList] = useState(list);
     const [searchText, setSearchText] = useState("");
     const [selectedItemName, setSelecedItemName] = useState("");
+
+    useImperativeHandle(ref, () => ({
+        setList(LIST) {
+            setShowingList(LIST);
+        }
+    }));
 
     const renderListItem = (item) => {
         return(!!item.item.Key?(
@@ -101,7 +105,7 @@ const DropdownPicker = ({placeholder, list, onSelect, listHeight}) => {
             )}
         </View>
     );
-}
+})
 
 const Styles= StyleSheet.create({
     searchbarContainerStyle:{

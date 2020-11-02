@@ -58,9 +58,9 @@ const ServiceArchiveDetail = ({navigation}) => {
     const shadowOpt2 = {
         width: pageWidth * 0.9,
         height: (!!image && !!factorImage)
-            ?  pageHeight*1.34
+            ?  pageHeight*1.6
             : ((!!image && !factorImage) || (!image && !!factorImage))
-                ? pageHeight*1.12 : pageHeight*0.54,
+                ? pageHeight*1.12 : pageHeight*0.67,
         color: '#000',
         radius: 1,
         opacity: 0.1,
@@ -315,7 +315,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                                                                 width:pageWidth-20,
                                                                 height: pageHeight*0.4,
                                                                 includeBase64:true,
-                                                                compressImageQuality:1
+                                                                compressImageQuality:0.7
                                                             }).then( response => {
                                                                 setFactorImage(response.data)
                                                             })
@@ -327,7 +327,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                                                                 width:pageWidth-20,
                                                                 height: pageHeight*0.4,
                                                                 includeBase64:true,
-                                                                compressImageQuality:1
+                                                                compressImageQuality:0.7
                                                             }).then(response=> {
                                                                 setFactorImage(response.data)
                                                             })
@@ -350,7 +350,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                                                                 width:pageWidth-20,
                                                                 height: pageHeight*0.4,
                                                                 includeBase64:true,
-                                                                compressImageQuality:1
+                                                                compressImageQuality:0.7
                                                             }).then( response => {
                                                                 setImage(response.data)
                                                             })
@@ -361,7 +361,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                                                             width:pageWidth-20,
                                                             height: pageHeight*0.4,
                                                             includeBase64:true,
-                                                            compressImageQuality:1
+                                                            compressImageQuality:0.7
                                                         }).then(response=> {
                                                             setImage(response.data)
                                                         })}/>

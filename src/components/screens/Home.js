@@ -104,9 +104,9 @@ const Home = ({navigation}) => {
   },[])
 
   const images = [
-    require('../../../assets/images/icon_settlement.png'),
-    require('../../../assets/images/icon_my_services.png'),
     require('../../../assets/images/icon_rejected.png'),
+    require('../../../assets/images/icon_my_services.png'),
+    require('../../../assets/images/icon_settlement.png'),
     require('../../../assets/images/icon_archive.png'),
     require('../../../assets/images/icon_inventory.png'),
     require('../../../assets/images/icon_mission.png'),
@@ -215,16 +215,16 @@ const Home = ({navigation}) => {
 
         <View style={Styles.contentStyle}>
           <View style={Styles.SingleRowStyle}>
-            {renderHomeItems('سرویس‌های مانده‌دار', images[0], () => {
-              navigation.navigate("RemainingServices");
+            {renderHomeItems('سرویس‌های رد‌شده', images[0], () => {
+              navigation.navigate('RejectedServices');
             })}
             {renderHomeItems('سرویس‌های من', images[1], () => {
               navigation.navigate('MyServices');
             })}
           </View>
           <View style={Styles.SingleRowStyle}>
-            {renderHomeItems('سرویس‌های رد‌شده', images[2], () => {
-              navigation.navigate('RejectedServices');
+            {renderHomeItems('سرویس‌های مانده‌دار', images[2], () => {
+              navigation.navigate("RemainingServices");
             })}
             {renderHomeItems('آرشیو سرویس‌ها', images[3], () => {
               navigation.navigate("ServiceArchiveList");
@@ -292,7 +292,7 @@ const Home = ({navigation}) => {
 };
 
 const Styles = StyleSheet.create({
-  containerStyle: {
+  containerStyle : {
     flex: 1,
     width:pageWidth,
     justifyContent: 'center',

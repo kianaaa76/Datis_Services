@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   PermissionsAndroid,
-  Platform
+  Platform,
 } from 'react-native';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -13,7 +13,6 @@ import SendData from "./src/components/screens/SendData";
 const App = () => {
   const myStore = getStore();
   const myPersistor = getPersistor();
-
   useEffect(() => {
     if (Platform.OS == 'android') {
       const granted = PermissionsAndroid.requestMultiple([
@@ -29,6 +28,9 @@ const App = () => {
       }
     }
   }, []);
+
+
+
   return (
     <Provider store={myStore}>
         <SendData/>
@@ -38,4 +40,7 @@ const App = () => {
     </Provider>
   );
 };
+
+
+
 export default App;

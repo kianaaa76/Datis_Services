@@ -86,8 +86,34 @@ const MyServiceDetails = ({navigation}) => {
         travel: selector.savedServiceInfo.travel
     });
         const [requestLoading,setRequestLoading] = useState(false);
-        const [renderConfirmModal,setRenderConfirmModal] = useState(false);
+    const [partsListName, setPartsListName] = useState(selector.objectsList);
+    const [renderConfirmModal,setRenderConfirmModal] = useState(false);
         const [renderNetworkModal,setRenderNetworkModal] = useState(false);
+
+        useEffect(()=>{
+            if (partsTabInfo.length>0 && !partsTabInfo[0].availableVersions){
+                let temp = []
+                partsTabInfo.map((item, index)=>{
+                    let object = partsListName.filter(part=>part.label === item.Name);
+                    let ver = !!object[0]  ? object[0].value.Versions.filter(v=>v.Key === item.VersionId):[];
+                    temp.push({
+                        "index": index,
+                        "Id": item.Id,
+                        "isExpanded": false,
+                        "failureDescription": item.Description,
+                        "hasGarantee":"",
+                        "objectType":item.Direction == 0 ? "new" : "failed",
+                        "availableVersions": !!object.length ? object[0].value.Versions : [],
+                        "partType":!!object.length ? object[0] : {},
+                        "Price": item.Price,
+                        "serial" : item.Serial,
+                        "version": !!ver.length ? ver[0] : {}
+                    });
+                })
+                setPartsTabInfo(temp);
+            }
+        },[])
+
     const setFactorInfo = (e) => {
         setFactorTabInfo(
             {
@@ -163,7 +189,7 @@ const MyServiceDetails = ({navigation}) => {
             type:SET_EDITING_SERVICE,
             editingService: ""
         })
-        navigation.navigate("RejectedServices");
+        navigation.replace("RejectedServices");
     }
 
     const convertResultTitleToNum=(title)=>{
@@ -277,16 +303,17 @@ const MyServiceDetails = ({navigation}) => {
             );
         }
         else if (!!missionTabInfo.startLongitude && !!missionTabInfo.endLongitude){
-            console.log("missionTabInfo",missionTabInfo);
+            requestObjectList = [];
             partsTabInfo.map(item=>{
                 requestObjectList.push({
+                    Id: !!item.Id ? item.Id : 0,
                     ServiceId: serviceID,
-                    Object_Id: item.partType.value.Id,
-                    Directon: item.serviceType=="new" ? "0" : "1",
+                    Object_Id: !!item.partType ? item.partType.value.Id : "",
+                    Direction: item.objectType==="new" ? "0" : "1",
                     Description: item.failureDescription,
                     Price: item.Price,
                     Serial: item.serial,
-                    VersionId: item.version.Key
+                    VersionId: !!item.version ? item.version.Key : ""
                 });
             })
             sendServiceData(
@@ -294,8 +321,8 @@ const MyServiceDetails = ({navigation}) => {
                 serviceID,
                 convertResultTitleToNum(serviceTabInfo.serviceResult),
                 convertTypeTitleToNum(serviceTabInfo.serviceType),
-                factorTabInfo.factorReceivedPrice,
-                factorTabInfo.factorTotalPrice,
+                parseInt(factorTabInfo.factorReceivedPrice),
+                parseInt(factorTabInfo.factorTotalPrice),
                 serviceTabInfo.address,
                 serviceTabInfo.description,
                 serviceTabInfo.image,
@@ -304,7 +331,7 @@ const MyServiceDetails = ({navigation}) => {
                 serviceTabInfo.finalDate,
                 true,
                 {
-                    ID:selector.missionId,
+                    Id:missionTabInfo.missionId,
                     ServiceManId: selector.userId,
                     StartCity: missionTabInfo.startCity,
                     StartLocation:`${missionTabInfo.startLatitude},${missionTabInfo.startLongitude}`,
@@ -338,7 +365,7 @@ const MyServiceDetails = ({navigation}) => {
                         type:SET_EDITING_SERVICE,
                         editingService: ""
                     })
-                    navigation.navigate("SignedOut");
+                    navigation.replace("SignedOut");
                 } else {
                     setRequestLoading(false);
                     ToastAndroid.showWithGravity(
@@ -352,15 +379,18 @@ const MyServiceDetails = ({navigation}) => {
                 setRenderNetworkModal(true);
             })
         } else if (!missionTabInfo.startLongitude && !missionTabInfo.endLongitude) {
-            partsTabInfo.map(item=>{
+            console.log("mamad");
+            requestObjectList = [];
+           partsTabInfo.map(item=>{
                 requestObjectList.push({
+                    Id: !!item.Id ? item.Id : 0,
                     ServiceId: serviceID,
-                    Object_Id: item.partType.value.Id,
-                    Directon: item.serviceType=="new" ? "0" : "1",
+                    Object_Id: !!item.partType ? item.partType.value.Id : "",
+                    Direction: item.objectType==="new" ? "0" : "1",
                     Description: item.failureDescription,
                     Price: item.Price,
                     Serial: item.serial,
-                    VersionId: item.version.Key
+                    VersionId: !!item.version ? item.version.Key : ""
                 });
             })
             sendServiceData(
@@ -368,8 +398,8 @@ const MyServiceDetails = ({navigation}) => {
                 serviceID,
                 convertResultTitleToNum(serviceTabInfo.serviceResult),
                 convertTypeTitleToNum(serviceTabInfo.serviceType),
-                factorTabInfo.factorReceivedPrice,
-                factorTabInfo.factorTotalPrice,
+                parseInt(factorTabInfo.factorReceivedPrice),
+                parseInt(factorTabInfo.factorTotalPrice),
                 serviceTabInfo.address,
                 serviceTabInfo.description,
                 serviceTabInfo.image,
@@ -377,7 +407,7 @@ const MyServiceDetails = ({navigation}) => {
                 requestObjectList,
                 serviceTabInfo.finalDate,
                 true,
-                {},
+                null,
                 selector.userId,
                 factorTabInfo.billImage
             ).then(data=>{
@@ -402,7 +432,7 @@ const MyServiceDetails = ({navigation}) => {
                         type:SET_EDITING_SERVICE,
                         editingService: ""
                     })
-                    navigation.navigate("SignedOut");
+                    navigation.replace("SignedOut");
                 } else {
                     setRequestLoading(false);
                     ToastAndroid.showWithGravity(
@@ -436,7 +466,7 @@ const MyServiceDetails = ({navigation}) => {
             case 'parts':
                 return <ServicePartsTab setInfo={setPartsTabInfo} info={partsTabInfo}/>;
             case 'mission':
-                return <ServiceMissionTab setInfo={(e)=>setMissionInfo(e)} info={missionTabInfo}/>;
+                return <ServiceMissionTab setInfo={(e)=>setMissionInfo(e)} info={missionTabInfo} navigation={navigation}/>;
             case 'info':
                 return <ServiceInfoTab serviceData={service}/>;
             default:

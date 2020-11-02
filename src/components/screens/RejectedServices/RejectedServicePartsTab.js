@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {
     View,
     StyleSheet,
@@ -7,10 +7,11 @@ import {
     Dimensions,
     TouchableOpacity,
     ToastAndroid,
-    FlatList,
     TextInput,
     ActivityIndicator,
-    TouchableHighlight
+    TouchableHighlight,
+    Alert,
+    Keyboard
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -21,7 +22,6 @@ import DropdownPicker from "../../common/DropdownPicker";
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from "../../../actions/api";
 import {RNCamera} from "react-native-camera";
-
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
@@ -33,11 +33,13 @@ const ServicePartsTab = ({setInfo, info}) => {
         serial:"",
         partTypeSelected:{},
         partVersionSelected:{},
-        Price:"",
+        Price:"0",
         failureDescription:"",
         hasGarantee:null,
     })
+    const dropRef = useRef();
     const [newHasStarted, setNewHasStarted] = useState(Boolean);
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
     const [isNewPartFormExpanded,setIsNewPartFormExpanded] = useState(false);
     const [partsListName, setPartsListName] = useState(selector.objectsList);
     const [selectedPartVersionsList, setSelectedPartVersionsList] = useState([]);
@@ -47,28 +49,25 @@ const ServicePartsTab = ({setInfo, info}) => {
     const [refresh, setRefresh] = useState(false);
     const [selectedItemList, setSelectedItemList] = useState({});
 
-    useEffect(()=>{
-        let temp = []
-        info.map((item, index)=>{
-            let object = partsListName.filter(part=>part.label === item.Name);
-            let ver = object[0].value.Versions.filter(v=>v.Key === item.VersionId);
-            temp.push({
-                "index": index,
-                "Id": item.Id,
-                "isExpanded": false,
-                "failureDescription": item.Description,
-                "hasGarantee":"",
-                "objectType":item.Direction == 0 ? "new" : "failed",
-                "availableVersions": object[0].value.Versions,
-                "partType":object[0],
-                "Price": item.Price,
-                "serial" : item.Serial,
-                "version": ver[0]
-            });
-        })
-        setInfo(temp);
-        setObjectsList(temp);
-    },[partsListName])
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => {
+                setKeyboardVisible(true);
+            }
+        );
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                setKeyboardVisible(false);
+            }
+        );
+
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+        };
+    }, []);
 
     const onSuccess = async (code) => {
         await setScreenMode(false);
@@ -84,7 +83,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                 if (data.errorCode == 0){
                     let selectedVersion =
                         selectedObject[0].value.Versions.filter(item=>item.Key == data.result.VersionId);
-                    if (!!selectedItemList.id){
+                    if (!!selectedItemList.Id){
                         refactorObjectListItems("partType",selectedObject[0],selectedItemList.index)
                         refactorObjectListItems("version",selectedVersion[0],selectedItemList.index)
                         refactorObjectListItems(
@@ -116,8 +115,10 @@ const ServicePartsTab = ({setInfo, info}) => {
     }
 
     const searchBarcode = ()=>{
+        setSearchBarcodeLoading(true);
         let object = {};
         const sserial = !!selectedItemList.id ? selectedItemList.serial : fieldsObject.serial;
+        console.log("sserial", sserial);
         partsListName.map(item=>{
             let serialFormatHeader = item.value.SerialFormat.substr(0,item.value.SerialFormat.indexOf('#'));
             if(!!serialFormatHeader && serialFormatHeader == sserial.substr(0,item.value.SerialFormat.indexOf('#'))){
@@ -125,7 +126,6 @@ const ServicePartsTab = ({setInfo, info}) => {
             }
         });
         if (!!object.label){
-            setSearchBarcodeLoading(true);
             getObjBySerial(selector.token, sserial, object.value.Id).then(data=>{
                 if (data.errorCode == 0) {
                     let selectedVersion = object.value.Versions.filter(item=>item.Key == data.result.VersionId);
@@ -155,6 +155,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                 ToastAndroid.SHORT,
                 ToastAndroid.CENTER
             )
+            setSearchBarcodeLoading(false);
         }
     }
 
@@ -200,9 +201,8 @@ const ServicePartsTab = ({setInfo, info}) => {
         setRefresh(!refresh);
     }
 
-    const renderServicePartItem = (item)=>{
+    const renderServicePartItem = (item , index)=>{
         let Item = item;
-        console.log("ITEM", Item);
         return(
             <View style={[Styles.newformContainerStyle,{marginBottom: 10}]}>
                 <TouchableHighlight style={Styles.formHeaderStyle} onPress={()=>refactorObjectListItems("isExpanded", !Item.isExpanded, Item.index)}>
@@ -236,26 +236,30 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 list={partsListName}
                                 onSelect={value=> {
                                     refactorObjectListItems("partType", value, Item.index);
-                                    let versions=[];
-                                    value.value.Versions.map(item=>versions.push({label:item.Value, value:item}))
-                                    refactorObjectListItems("availableVersions", versions, Item.index);
-                                    refactorObjectListItems("version", "", Item.index)
+                                    refactorObjectListItems("serial", "", Item.index);
+                                    refactorObjectListItems("version", {}, Item.index);
+                                    refactorObjectListItems("availableVersions", value.value.Versions, Item.index);
+                                    dropRef.current.setList(value.value.Versions);
                                 }}
                                 placeholder={!!Item.partType
                                     ? Item.partType.label
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
-                                listHeight={150}/>
+                                listHeight={150}
+                            />
                             <Text style={{width:"20%"}}>نوع قطعه:</Text>
                         </View>
                         <View style={Styles.serialContainerStyle}>
-                            <Icon
-                                name={"search"}
-                                style={{color: "#000", fontSize: 30}}
-                                onPress={()=>{
-                                    setSelectedItemList(Item);
-                                    searchBarcode();
-                                }}
-                            />
+                            {searchBarcodeLoading ? (
+                                <ActivityIndicator size={"small"} color={"#000"}/>
+                            ) : (
+                                <Icon
+                                    name={"search"}
+                                    style={{color: "#000", fontSize: 30}}
+                                    onPress={()=>{
+                                        setSelectedItemList(Item);
+                                        searchBarcode();
+                                    }}
+                                />)}
                             <Icon
                                 name={"qr-code-2"}
                                 style={{color:"#000", fontSize:30, marginHorizontal:5}}
@@ -265,24 +269,28 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 }}/>
                             <TextInput
                                 style={Styles.serialInputStyle}
-                                onChangeText={text=>refactorObjectListItems("serial", text, Item.index)}
+                                onChangeText={text=> {
+                                    refactorObjectListItems("serial", text, Item.index);
+                                }}
                                 value={Item.serial}
                             />
                             <View style={{flexDirection:"row"}}>
-                                <Icon name={"star"} style={{color:"red"}}/>
+                                {!!Item.partType.label && Item.partType.value.SerialFormat.length > 0
+                                    ? (<Icon name={"star"} style={{color:"red"}}/>) : null}
                                 <Text style={Styles.labelStyle}>سریال:</Text>
                             </View>
                         </View>
                         <View style={Styles.partTypeContainerStyle}>
                             <DropdownPicker
+                                ref={dropRef}
                                 list={Item.availableVersions}
                                 placeholder={!!Item.version
                                     ? Item.version.Value
                                     :"نسخه مورد نظر خود را انتخاب کنید."}
-                                onSelect={item=>refactorObjectListItems("version", item.Value, Item.index)}
+                                onSelect={item=>refactorObjectListItems("version", item, Item.index)}
                                 listHeight={150}
                             />
-                            <Text style={{width:65}}>نسخه:  </Text>
+                            <Text style={{width:65}}>   نسخه:  </Text>
                         </View>
                     </View>
                 )}
@@ -336,22 +344,41 @@ const ServicePartsTab = ({setInfo, info}) => {
                 ):null}
                 {Item.isExpanded && (
                     <View style={Styles.formFooterContainerstyle}>
-                        <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=> {
-                            let currentList = objectsList.length>0 ? objectsList : [];
-                            let selectedIndex = 0;
-                            currentList.map((item, index)=>{
-                                if (item.index == Item.index){
-                                    selectedIndex = index;
-                                }
-                            });
-                            delete currentList[selectedIndex];
-                            setInfo(currentList);
-                            setObjectsList(currentList);
+                        <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={async ()=> {
+                            await setInfo(c=>c.filter((_, i) => i !== index));
+                            await setObjectsList(c=>c.filter((_, i) => i !== index));
                         }}>
                             <Octicons name={"trashcan"} style={{fontSize:17, color:"#fff"}}/>
                         </TouchableOpacity>
                         <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=>{
-                            refactorObjectListItems("isExpanded", false, Item.index);
+                            if(!Item.partType.label){
+                                Alert.alert(
+                                    "",
+                                    "لطفا نوع قطعه را مشخص کنید.",
+                                    [
+                                        { text: 'OK', onPress: () => {} }
+                                    ]
+                                )
+                            } else if (!Item.version.Key){
+                                Alert.alert(
+                                    "",
+                                    "لطفا نسخه قطعه را مشخص کنید.",
+                                    [
+                                        { text: 'OK', onPress: () => {} }
+                                    ]
+                                )
+                            } else if (!!Item.partType.value.SerialFormat && Item.serial===""){
+                                Alert.alert(
+                                    "",
+                                    "لطفا سریال را مشخص کنید.",
+                                    [
+                                        { text: 'OK', onPress: () => {} }
+                                    ]
+                                )
+                            }
+                            else {
+                                refactorObjectListItems("isExpanded", false, Item.index);
+                            }
                         }}>
                             <Octicons name={"check"} style={{fontSize:17, color:"#fff"}}/>
                         </TouchableOpacity>
@@ -360,14 +387,13 @@ const ServicePartsTab = ({setInfo, info}) => {
             </View>
         );
     }
-
     return !screenMode ? (
         <>
             <ScrollView style={{flex: 0.8, padding: 15}}>
                 {!!objectsList && objectsList.length > 0 && (
-                    <View style={{flex: 1}}>
-                        {objectsList.map(item=>(
-                            renderServicePartItem(item)
+                    <View style={{flex: 1, marginBottom:10}}>
+                        {objectsList.map((item, index)=>(
+                            renderServicePartItem(item, index)
                         ))}
                     </View>
                 )}
@@ -429,10 +455,9 @@ const ServicePartsTab = ({setInfo, info}) => {
                                     <DropdownPicker
                                         list={partsListName}
                                         onSelect={value=> {
-                                            setFieldsObject({...fieldsObject, partTypeSelected: value})
-                                            let versions=[];
-                                            value.value.Versions.map(item=>versions.push({label:item.Value, value:item}))
-                                            setSelectedPartVersionsList(versions);
+                                            setFieldsObject({...fieldsObject, partTypeSelected: value, serial:"", partVersionSelected: {}})
+                                            setSelectedPartVersionsList(value.value.Versions);
+                                            dropRef.current.setList(value.value.Versions) ;
                                         }}
                                         placeholder={!!fieldsObject.partTypeSelected.label
                                             ? fieldsObject.partTypeSelected.label
@@ -455,16 +480,27 @@ const ServicePartsTab = ({setInfo, info}) => {
                                         onPress={()=>setScreenMode(true)}/>
                                     <TextInput
                                         style={Styles.serialInputStyle}
-                                        onChangeText={text=>setFieldsObject({...fieldsObject, serial: text})}
+                                        onChangeText={text=> {
+                                            setFieldsObject({
+                                                ...fieldsObject,
+                                                serial: text,
+                                                partTypeSelected: {},
+                                                partVersionSelected: ""
+                                            });
+                                            setSelectedPartVersionsList([]);
+                                        }}
                                         value={fieldsObject.serial}
                                     />
                                     <View style={{flexDirection:"row"}}>
-                                        <Icon name={"star"} style={{color:"red"}}/>
+                                        {!!fieldsObject.partTypeSelected.label && !!fieldsObject.partTypeSelected.value.SerialFormat ?
+                                            <Icon name={"star"} style={{color: "red"}}/>
+                                            : null}
                                         <Text style={Styles.labelStyle}>سریال:</Text>
                                     </View>
                                 </View>
                                 <View style={Styles.partTypeContainerStyle}>
                                     <DropdownPicker
+                                        ref={dropRef}
                                         list={selectedPartVersionsList}
                                         placeholder={!!fieldsObject.partVersionSelected.Key
                                             ? fieldsObject.partVersionSelected.Value
@@ -541,31 +577,58 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 <Octicons name={"trashcan"} style={{fontSize:17, color:"#fff"}}/>
                             </TouchableOpacity>
                             <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=>{
-                                let INFO = !!objectsList ? objectsList : [];
-                                INFO.push({
-                                    "index": INFO.length + 1,
-                                    "serial": fieldsObject.serial,
-                                    "isExpanded": false,
-                                    "failureDescription": fieldsObject.failureDescription,
-                                    "hasGarantee":fieldsObject.hasGarantee,
-                                    "Price":fieldsObject.Price,
-                                    "objectType":fieldsObject.objectType,
-                                    "partType": fieldsObject.partTypeSelected,
-                                    "availableVersions":[],
-                                    "version": fieldsObject.partVersionSelected
-                                });
-                                setNewHasStarted(false);
-                                setFieldsObject({
-                                    ...fieldsObject,
-                                    objectType: "",
-                                    serial: "",
-                                    partTypeSelected: {},
-                                    partVersionSelected: {},
-                                    Price: "",
-                                    failureDescription: "",
-                                    hasGarantee: null});
-                                setObjectsList(INFO);
-                                setInfo(INFO);
+                                if(!fieldsObject.partTypeSelected.label){
+                                    Alert.alert(
+                                        "",
+                                        "لطفا نوع قطعه را مشخص کنید.",
+                                        [
+                                            { text: 'OK', onPress: () => {} }
+                                        ]
+                                    )
+                                } else if (!fieldsObject.partVersionSelected.Key){
+                                    Alert.alert(
+                                        "",
+                                        "لطفا نسخه قطعه را مشخص کنید.",
+                                        [
+                                            { text: 'OK', onPress: () => {} }
+                                        ]
+                                    )
+                                } else if (!!fieldsObject.partTypeSelected.value.SerialFormat && fieldsObject.serial===""){
+                                    Alert.alert(
+                                        "",
+                                        "لطفا سریال را مشخص کنید.",
+                                        [
+                                            { text: 'OK', onPress: () => {} }
+                                        ]
+                                    )
+                                }
+                                else {
+                                    let INFO = !!objectsList ? objectsList : [];
+                                    INFO.push({
+                                        "index": INFO.length + 1,
+                                        "serial": fieldsObject.serial,
+                                        "isExpanded": false,
+                                        "failureDescription": fieldsObject.failureDescription,
+                                        "hasGarantee":fieldsObject.hasGarantee,
+                                        "Price":fieldsObject.Price,
+                                        "objectType":fieldsObject.objectType,
+                                        "partType": fieldsObject.partTypeSelected,
+                                        "availableVersions":[],
+                                        "version": fieldsObject.partVersionSelected
+                                    });
+                                    setNewHasStarted(false);
+                                    setFieldsObject({
+                                        ...fieldsObject,
+                                        objectType: "",
+                                        serial: "",
+                                        partTypeSelected: {},
+                                        partVersionSelected: {},
+                                        Price: "",
+                                        failureDescription: "",
+                                        hasGarantee: null});
+                                    setObjectsList(INFO);
+                                    setInfo(INFO);
+                                }
                             }}>
                                 <Octicons name={"check"} style={{fontSize:17, color:"#fff"}}/>
                             </TouchableOpacity>
@@ -573,7 +636,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                     </View>
                 )}
             </ScrollView>
-            <View style={{flex:0.2, paddingHorizontal: 10}}>
+            {!isKeyboardVisible && (<View style={{flex: 0.2, paddingHorizontal: 10}}>
                 <TouchableOpacity
                     style={Styles.newPartbuttonStyle}
                     onPress={() => {
@@ -595,7 +658,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                         }}
                     />
                 </TouchableOpacity>
-            </View>
+            </View>)}
         </>
     ) : (
         <RNCamera
@@ -679,6 +742,7 @@ const Styles = StyleSheet.create({
     footerIconContainerStyle: {
         width:35,
         height:35,
+        borderRadius:5,
         justifyContent:"center",
         alignItems:"center",
         backgroundColor: "#660000",

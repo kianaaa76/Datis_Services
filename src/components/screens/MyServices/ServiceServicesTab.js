@@ -119,7 +119,7 @@ const ServiceServicesTab = ({setInfo, info}) => {
                                 width:pageWidth-20,
                                 height: pageHeight*0.4,
                                 includeBase64:true,
-                                compressImageQuality:1
+                                compressImageQuality:0.7
                             }).then( response =>{
                                 setInfo({...info, image: response.data})
                             })
@@ -130,7 +130,7 @@ const ServiceServicesTab = ({setInfo, info}) => {
                             width:pageWidth-20,
                             height: pageHeight*0.4,
                             includeBase64:true,
-                            compressImageQuality:1
+                            compressImageQuality:0.7
                         }).then(response=>{
                             setInfo({...info, image: response.data})
                         })}/>
@@ -447,9 +447,9 @@ const Styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFFFFF',
         position: "absolute",
-        bottom: pageWidth*0.6,
+        top: "20%",
         borderWidth: 2,
-        borderColor: "#13A69D",
+        borderColor: "#660000",
         borderRadius:10,
         overflow:"hidden"
     },
@@ -458,11 +458,12 @@ const Styles = StyleSheet.create({
         height:60,
         justifyContent:"center",
         alignItems:"center",
-        backgroundColor:"#13A69D"
+        backgroundColor:"#660000"
     },
     confirmdatePickerTextStyle:{
         fontSize:17,
-        fontWeight:"bold"
+        fontWeight:"bold",
+        color:"#fff"
     },
     serviceResultContainerStyle:{
         flexDirection:"row",

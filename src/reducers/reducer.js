@@ -4,7 +4,7 @@ import {
   GET_SERVICE_DETAIL,
   RESTORE_SERVICE_DATA,
     SET_EDITING_SERVICE,
-    GET_OBJECTS_LIST
+    GET_OBJECTS_LIST,
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -40,7 +40,8 @@ const INITIAL_STATE = {
     saveType:"",
     travel:false
   },
-    editingService:""
+    editingService:"",
+    forceUpdate: false
 };
 
 export default (state = INITIAL_STATE, action) => {

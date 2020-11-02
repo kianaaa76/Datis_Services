@@ -14,6 +14,7 @@ import RemainingServiceList from "../components/screens/RemainingServices/Remain
 import RemainingServiceDetail from "../components/screens/RemainingServices/RemainingServiceDetail";
 import ServiceArchiveList from "../components/screens/ServiceArchive/ServiceArchiveList";
 import ServiceArchiveDetail from "../components/screens/ServiceArchive/ArchiveListServiceDetail";
+import Splash from "../components/screens/SplashScreen";
 
 const SignedIn = createStackNavigator(
   {
@@ -64,6 +65,9 @@ const SignedIn = createStackNavigator(
 
 export const switcher = createSwitchNavigator(
   {
+      Splash:{
+          screen:Splash
+      },
     SignedIn: {
       screen: SignedIn,
     },
@@ -72,7 +76,7 @@ export const switcher = createSwitchNavigator(
     },
   },
   {
-    initialRouteName: 'SignedOut',
+    initialRouteName: 'Splash',
   },
 );
 

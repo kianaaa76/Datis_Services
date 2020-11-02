@@ -113,41 +113,6 @@ const MyServiceDetails = ({navigation}) => {
         });
     },[])
 
-    useEffect(()=>{
-        // let tempList = [];
-        // console.log("partsTabInfo",partsTabInfo);
-        // partsTabInfo.map(item=>{
-        //     tempList.push({
-        //         ServiceId: serviceID,
-        //         Object_Id: item.partType.value.Id,
-        //         Direction: item.objectType=="new" ? "0" : "1",
-        //         Description: item.failureDescription,
-        //         Price: !item.Price ? parseInt(item.Price) : 0,
-        //         Serial: item.serial,
-        //         VersionId: item.version.Key
-        //     });
-        //     setRequestObjectList(tempList);
-        // });
-        // if (!!factorTabInfo.factorImage) {
-        //     ImageResizer.createResizedImage(`data:image/imagetype${factorTabInfo.factorImage}`, pageWidth - 20, pageHeight * 0.4, "PNG", 80, 0, null)
-        //         .then(response => {
-        //             console.log("responseUri", response.uri);
-        //             setFactorTabInfo({
-        //                 ...factorTabInfo, factorImage: response.uri
-        //             });
-        //             // response.uri is the URI of the new image that can now be displayed, uploaded...
-        //             // response.path is the path of the new image
-        //             // response.name is the name of the new image with the extension
-        //             // response.size is the size of the new image
-        //         })
-        //         .catch(err => {
-        //             console.log("errUri", err);
-        //             // Oops, something went wrong. Check that the filename is correct and
-        //             // inspect err to get more details.
-        //         });
-        // }
-    },[partsTabInfo])
-
     const setFactorInfo = (e) => {
         setFactorTabInfo(
         {
@@ -340,7 +305,7 @@ const MyServiceDetails = ({navigation}) => {
                 requestObjectList.push({
                     ServiceId: serviceID,
                     Object_Id: item.partType.value.Id,
-                    Direction: item.objectType=="new" ? "0" : "1",
+                    Direction: item.objectType==="new" ? "0" : "1",
                     Description: item.failureDescription,
                     Price: !item.Price ? parseInt(item.Price) : 0,
                     Serial: item.serial,
@@ -395,7 +360,7 @@ const MyServiceDetails = ({navigation}) => {
                                 type: SET_EDITING_SERVICE,
                                 editingService: ""
                             })
-                            navigation.navigate("SignedOut");
+                            navigation.replace("SignedOut");
                         } else {
                             setRequestLoading(false);
                             ToastAndroid.showWithGravity(
@@ -413,7 +378,7 @@ const MyServiceDetails = ({navigation}) => {
                 requestObjectList.push({
                     ServiceId: serviceID,
                     Object_Id: item.partType.value.Id,
-                    Direction: item.objectType=="new" ? "0" : "1",
+                    Direction: item.objectType==="new" ? "0" : "1",
                     Description: item.failureDescription,
                     Price: !item.Price ? parseInt(item.Price) : 0,
                     Serial: item.serial,
@@ -438,7 +403,6 @@ const MyServiceDetails = ({navigation}) => {
                         selector.userId,
                         factorTabInfo.billImage
                     ).then(data=>{
-                        console.log("dataaaaa", data);
                         if (data.errorCode === 0){
                             AsyncStorage.getItem("savedServicesList").then(list=>{
                                 let tempList = !!list ? JSON.parse(list).filter(service=>service.projectId !== serviceID) : [];
@@ -460,7 +424,7 @@ const MyServiceDetails = ({navigation}) => {
                                 type: SET_EDITING_SERVICE,
                                 editingService: ""
                             })
-                            navigation.navigate("SignedOut");
+                            navigation.replace("SignedOut");
                         } else {
                             setRequestLoading(false);
                             ToastAndroid.showWithGravity(
@@ -494,7 +458,7 @@ const MyServiceDetails = ({navigation}) => {
                         type: SET_EDITING_SERVICE,
                         editingService: ""
                     })
-                    navigation.navigate("SignedOut");
+                    navigation.replace("SignedOut");
                 } else {
                     dispatch({
                         type: GET_SERVICE_DETAIL,

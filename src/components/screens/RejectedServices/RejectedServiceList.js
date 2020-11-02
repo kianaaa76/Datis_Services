@@ -133,7 +133,7 @@ const MyService = ({navigation}) => {
                         travel:false
                     }
                 });
-                navigation.navigate("RejectedServiceDetail", {serviceID: projectId, service: {
+                navigation.replace("RejectedServiceDetail", {serviceID: projectId, service: {
                         "projectID":data.result.projectID,
                         "DocText":{
                             "PhoneName": data.result.DocText.PhoneName,
@@ -155,7 +155,7 @@ const MyService = ({navigation}) => {
                 dispatch({
                     type: LOGOUT
                 });
-                navigation.navigate("SignedOut");
+                navigation.replace("SignedOut");
                 setModalLoading(false);
                 setRenderRestoreModal(false);
             } else {
@@ -205,6 +205,7 @@ const MyService = ({navigation}) => {
                     Index = index;
                 }
             });
+            console.log("(((((((((((()))))))))))",currentList[Index].objectList);
             dispatch({
                 type:RESTORE_SERVICE_DATA,
                 savedServiceInfo:{
@@ -256,7 +257,7 @@ const MyService = ({navigation}) => {
                     });
                     setRenderRestoreModal(false);
                     setModalLoading(false);
-                    navigation.navigate("SignedOut");
+                    navigation.replace("SignedOut");
                 } else {
                     setRenderRestoreModal(false);
                     setModalLoading(false);
@@ -290,7 +291,7 @@ const MyService = ({navigation}) => {
                     dispatch({
                         type: LOGOUT
                     });
-                    navigation.navigate("SignedOut");
+                    navigation.replace("SignedOut");
                 } else {
                     ToastAndroid.showWithGravity(
                         data.message,

@@ -101,7 +101,7 @@ const MyService = ({navigation}) => {
           }
       });
       RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${projectId}`);
-      navigation.navigate("MyServiceDetails", {serviceID: projectId});
+      navigation.replace("MyServiceDetails", {serviceID: projectId});
   }
 
   const onConfirmDataPress = async (projectId)=>{
@@ -138,7 +138,7 @@ const MyService = ({navigation}) => {
           });
           setRenderRestoreModal(false);
           setRenderSendDataModal(false);
-          navigation.navigate("MyServiceDetails", {serviceID: projectId});
+          navigation.replace("MyServiceDetails", {serviceID: projectId});
       });
   }
 
@@ -152,7 +152,7 @@ const MyService = ({navigation}) => {
               dispatch({
                   type: LOGOUT
               });
-              navigation.navigate("SignedOut");
+              navigation.replace("SignedOut");
           } else {
               ToastAndroid.showWithGravity(
                   data.message,
