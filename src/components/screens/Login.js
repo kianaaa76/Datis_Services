@@ -25,7 +25,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 const inputActiveColor = '#660000';
 const inputDeactiveColor = 'gray';
-
+let userList = [];
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
   const [hasCode, setHasCode] = useState(false);
@@ -38,15 +38,14 @@ const Login = ({navigation}) => {
   const selector = useSelector((state) => state);
 
   useEffect(() => {
-    if (selector.token) {
+    if(!!selector.token){
       getUsers().then(data=>{
         if (data.errorCode === 0){
-          navigation.navigate('Home',{users:data.result});
-        } else{
+            navigation.navigate('Home',{users:data.result});
+          } else{
           dispatch({
             type:LOGOUT
           });
-          setPersistLoading(false);
         }
       })
     } else {
@@ -83,30 +82,42 @@ const Login = ({navigation}) => {
   const onEnterSystemPress = () => {
     setEnterSystemLoading(true);
     if (counter == 0) {
+      setEnterSystemLoading(false);
       ToastAndroid.showWithGravity(
         'لطفا مجددا درخواست کد فعالسازی دهید.',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
     } else {
-      loginVerification(phoneNumber, code).then((data) => {
-        if (data.errorCode == 0) {
-          dispatch({
-            type: LOGIN,
-            token: data.result.Token,
-            userId: data.result.ID,
-            constantUserId: data.result.ID,
-          });
-          navigation.navigate('Home',{users:data.result});
+      getUsers().then(data=>{
+        if(data.errorCode===0){
+          userList = data.result;
+          loginVerification(phoneNumber, code).then((data) => {
+            if (data.errorCode === 0){
+              dispatch({
+                type: LOGIN,
+                token: data.result.Token,
+                userId: data.result.ID,
+                constantUserId: data.result.ID,
+              });
+              setEnterSystemLoading(false);
+              navigation.navigate('Home',{users:userList});
+            } else {
+              dispatch({
+                type:LOGOUT
+              });
+              setPersistLoading(false);
+            }
+          })
         } else {
+          setEnterSystemLoading(false);
           ToastAndroid.showWithGravity(
-              data.message,
+              "مشکلی پیش آمد. لطفا دوباره تلاش کنید.",
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
           );
         }
-        setEnterSystemLoading(false);
-      });
+      })
     }
   };
 

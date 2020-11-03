@@ -28,6 +28,7 @@ const Home = ({navigation}) => {
   const dispatch = useDispatch();
   const selector = useSelector((state) => state);
   const userList = JSON.stringify(navigation.getParam("users"));
+  console.log("userList", userList);
   const [user, setUser] = useState("");
   const [showUserList, setShowUserList] = useState(false);
   const [ShowinUserList, setShowingUserList] = useState(JSON.parse(userList));
