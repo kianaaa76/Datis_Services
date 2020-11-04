@@ -97,7 +97,7 @@ const Login = ({navigation}) => {
               constantUserId: data.result.ID,
             });
             setEnterSystemLoading(false);
-            navigation.replace('Home',{users:usersList});
+            navigation.navigate('Home',{users:usersList});
             setPersistLoading(false);
           } else {
             dispatch({

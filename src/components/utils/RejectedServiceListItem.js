@@ -18,6 +18,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedProjectId, renderLoading}) => {
+    console.log("itemmmm1233333", item);
     let dirs = RNFetchBlob.fs.dirs;
     const shadowOpt = {
         width: pageWidth * 0.9,
@@ -256,8 +257,8 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                             width: pageWidth * 0.9,
                             height: pageHeight * 0.11,
                             backgroundColor: isNetworkSaved? "#3399FF": "#fff",
-                            padding: 10,
-                            marginVertical: 10,
+                            paddingHorizontal:6,
+                            paddingVertical: 2,
                             justifyContent: 'center',
                             alignItems: 'center',
                             borderWidth: 1,
@@ -273,7 +274,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                 <Text style={{fontWeight: 'bold', fontSize:14}}>نام: </Text>
                             </View>
                         </View>
-                        <View style={Styles.firstRowContainerStyle}>
+                        <View style={[Styles.firstRowContainerStyle,{marginBottom:2}]}>
                             <View style={Styles.singleItemStyle}>
                                 <Text>{toFaDigit(Item.cell)}</Text>
                                 <Text style={{fontSize: 14, fontWeight: 'bold'}}>همراه: </Text>

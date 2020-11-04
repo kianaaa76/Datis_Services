@@ -48,23 +48,25 @@ const Splash = ({navigation}) => {
     })
 
     useEffect(()=>{
-        let version = VersionInfo.appVersion;
-        checkUpdate(version).then(data=>{
-            if (data.errorCode === 5) {
-                setShowUpdateModal(true);
-            } else {
-                if (!!selector.token){
-                    navigation.navigate("Home", {users:usersList})
+        if (usersList.length>0){
+            let version = VersionInfo.appVersion;
+            checkUpdate(version).then(data=>{
+                if (data.errorCode === 5) {
+                    setShowUpdateModal(true);
                 } else {
-                    navigation.navigate("SignedOut");
+                    if (!!selector.token){
+                        navigation.navigate("Home", {users:usersList})
+                    } else {
+                        navigation.navigate("SignedOut");
+                    }
                 }
-            }
-        });
-    },[usersList]);
+            });
+        }
+    });
 
     return (
         <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
-            <Image source={splashImage} style={{width:pageWidth*0.3, height: pageWidth*0.22}}/>
+            <Image source={splashImage} style={{width:pageWidth*0.55, height: pageWidth*0.22}}/>
             {showUpdateModal && (<View style={Styles.modalBackgroundStyle}>
                 <View style={Styles.modalContainerStyle}>
                     <View style={Styles.modalHeaderContainerStyle}>
