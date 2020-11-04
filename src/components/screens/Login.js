@@ -25,12 +25,12 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 const inputActiveColor = '#660000';
 const inputDeactiveColor = 'gray';
-let userList = [];
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
   const [hasCode, setHasCode] = useState(false);
   const [counter, setCounter] = useState(120);
   const [phoneNumber, setPhoneNumber] = useState();
+  const [usersList, setUsersList] = useState([]);
   const [receiveCodeLoading, setReceiveCodeLoading] = useState(false);
   const [enterSystemLoading, setEnterSystemLoading] = useState(false);
   const [persistLoading, setPersistLoading] = useState(true);
@@ -38,20 +38,23 @@ const Login = ({navigation}) => {
   const selector = useSelector((state) => state);
 
   useEffect(() => {
-    if(!!selector.token){
+    if (usersList.length === 0){
       getUsers().then(data=>{
         if (data.errorCode === 0){
-            navigation.navigate('Home',{users:data.result});
+            if(!!selector.token){
+              navigation.navigate('Home',{users:data.result});
+            } else{
+              setUsersList(data.result)
+            }
           } else{
           dispatch({
             type:LOGOUT
           });
         }
       })
-    } else {
       setPersistLoading(false);
     }
-  }, []);
+  });
 
   const onReceiveCodePress = () => {
     setReceiveCodeLoading(true);
@@ -89,37 +92,26 @@ const Login = ({navigation}) => {
         ToastAndroid.CENTER,
       );
     } else {
-      getUsers().then(data=>{
-        if(data.errorCode===0){
-          userList = data.result;
-          loginVerification(phoneNumber, code).then((data) => {
-            if (data.errorCode === 0){
-              dispatch({
-                type: LOGIN,
-                token: data.result.Token,
-                userId: data.result.ID,
-                constantUserId: data.result.ID,
-              });
-              setEnterSystemLoading(false);
-              navigation.navigate('Home',{users:userList});
-            } else {
-              dispatch({
-                type:LOGOUT
-              });
-              setPersistLoading(false);
-            }
-          })
-        } else {
-          setEnterSystemLoading(false);
-          ToastAndroid.showWithGravity(
-              "مشکلی پیش آمد. لطفا دوباره تلاش کنید.",
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-          );
-        }
-      })
+        loginVerification(phoneNumber, code).then((data) => {
+          if (data.errorCode === 0){
+            dispatch({
+              type: LOGIN,
+              token: data.result.Token,
+              userId: data.result.ID,
+              constantUserId: data.result.ID,
+            });
+            setEnterSystemLoading(false);
+            navigation.navigate('Home',{users:usersList});
+            setPersistLoading(false);
+          } else {
+            dispatch({
+              type:LOGOUT
+            });
+            setPersistLoading(false);
+          }
+        })
+      }
     }
-  };
 
   const shadowOpt = {
     width: pageWidth * 0.45,
