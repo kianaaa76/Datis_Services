@@ -1,6 +1,7 @@
 import React, {useState,useEffect} from 'react';
 import {
     View,
+    Image,
     ImageBackground,
     Dimensions,
     StyleSheet,
@@ -16,7 +17,6 @@ import VersionInfo from 'react-native-version-info';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
 import splashImage from '../../../assets/images/image_splash_screen.png';
 import {checkUpdate, getUsers} from "../../actions/api";
-import {Image} from "react-native-svg";
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -54,9 +54,9 @@ const Splash = ({navigation}) => {
                 setShowUpdateModal(true);
             } else {
                 if (!!selector.token){
-                    navigation.replace("Home", {users:usersList})
+                    navigation.navigate("Home", {users:usersList})
                 } else {
-                    navigation.replace("SignedOut");
+                    navigation.navigate("SignedOut");
                 }
             }
         });

@@ -65,9 +65,9 @@ const SignedIn = createStackNavigator(
 
 export const switcher = createSwitchNavigator(
   {
-      Splash:{
-          screen:Splash
-      },
+    Splash:{
+        screen:Splash
+    },
     SignedIn: {
       screen: SignedIn,
     },
