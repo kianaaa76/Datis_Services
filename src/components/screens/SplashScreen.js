@@ -14,7 +14,9 @@ import {BoxShadow} from 'react-native-shadow';
 import {useSelector} from 'react-redux';
 import VersionInfo from 'react-native-version-info';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
-import {checkUpdate} from "../../actions/api";
+import splashImage from '../../../assets/images/image_splash_screen.png';
+import {checkUpdate, getUsers} from "../../actions/api";
+import {Image} from "react-native-svg";
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -33,20 +35,36 @@ const shadowOpt = {
 const Splash = ({navigation}) => {
     const selector = useSelector((state) => state);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [usersList, setUsersList] = useState([]);
+
+    useEffect(()=>{
+        if (usersList.length === 0){
+            getUsers().then(data=>{
+                if (data.errorCode === 0) {
+                    setUsersList(data.result);
+                }
+            })
+        }
+    })
 
     useEffect(()=>{
         let version = VersionInfo.appVersion;
-        checkUpdate(version,selector.token).then(data=>{
+        checkUpdate(version).then(data=>{
             if (data.errorCode === 5) {
                 setShowUpdateModal(true);
             } else {
-                navigation.navigate("SignedOut");
+                if (!!selector.token){
+                    navigation.replace("Home", {users:usersList})
+                } else {
+                    navigation.replace("SignedOut");
+                }
             }
         });
-    },[]);
+    },[usersList]);
 
     return (
         <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
+            <Image source={splashImage} style={{width:pageWidth*0.3, height: pageWidth*0.22}}/>
             {showUpdateModal && (<View style={Styles.modalBackgroundStyle}>
                 <View style={Styles.modalContainerStyle}>
                     <View style={Styles.modalHeaderContainerStyle}>

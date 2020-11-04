@@ -41,11 +41,7 @@ const Login = ({navigation}) => {
     if (usersList.length === 0){
       getUsers().then(data=>{
         if (data.errorCode === 0){
-            if(!!selector.token){
-              navigation.navigate('Home',{users:data.result});
-            } else{
-              setUsersList(data.result)
-            }
+            setUsersList(data.result)
           } else{
           dispatch({
             type:LOGOUT
@@ -101,7 +97,7 @@ const Login = ({navigation}) => {
               constantUserId: data.result.ID,
             });
             setEnterSystemLoading(false);
-            navigation.navigate('Home',{users:usersList});
+            navigation.replace('Home',{users:usersList});
             setPersistLoading(false);
           } else {
             dispatch({

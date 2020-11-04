@@ -323,12 +323,11 @@ export const call = (token)=>{
   }).then((response) => response.json());
 }
 
-export const checkUpdate = (version, token) => {
+export const checkUpdate = (version) => {
   return fetch(`${LOCAL_HOST}/GetVersion?versionName=${version}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `bearer ${token}`,
     },
   }).then((response) => response.json());
 }
