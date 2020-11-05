@@ -9,6 +9,12 @@ import {RootNav} from './src/routes/routes';
 import {getStore, getPersistor} from './src/store/index';
 import SendData from "./src/components/screens/SendData";
 
+const ReactNative = require('react-native');
+try {
+  ReactNative.I18nManager.allowRTL(false);
+} catch (e) {
+  console.log(e);
+}
 
 const App = () => {
   const myStore = getStore();

@@ -22,7 +22,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
     let dirs = RNFetchBlob.fs.dirs;
     const shadowOpt = {
         width: pageWidth * 0.9,
-        height: pageHeight * 0.11,
+        height: pageHeight * 0.13,
         color: '#000',
         radius: 5,
         opacity: 0.1,
@@ -255,7 +255,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                     <View
                         style={{
                             width: pageWidth * 0.9,
-                            height: pageHeight * 0.11,
+                            height: pageHeight * 0.13,
                             backgroundColor: isNetworkSaved? "#3399FF": "#fff",
                             paddingHorizontal:6,
                             paddingVertical: 2,
@@ -282,7 +282,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                         </View>
                         <View style={Styles.firstRowContainerStyle}>
                             <View style={Styles.singleItemStyle}>
-                                <Text>{Item.Resone}</Text>
+                                <Text>{Item.Resone.length>20?`${Item.Resone.substr(0,20)}...`:Item.Resone}</Text>
                                 <Text style={{fontSize: 14, fontWeight: 'bold'}}>دلیل ردشدن پروژه: </Text>
                             </View>
                         </View>

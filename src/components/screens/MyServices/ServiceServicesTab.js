@@ -142,7 +142,7 @@ const ServiceServicesTab = ({setInfo, info}) => {
             {!!info.image && (
                 <TouchableOpacity
                     style={{width:"100%", height:pageHeight*0.4, marginBottom:30}}
-                    onPress={()=> {
+                    onLongPress={()=> {
                         setDeletingImage(3)
                     }}>
                     <Image

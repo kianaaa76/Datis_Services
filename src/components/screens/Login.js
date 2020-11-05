@@ -15,7 +15,7 @@ import {
 import {
   LOGIN, LOGOUT,
 } from '../../actions/types';
-import {useSelector, useDispatch} from 'react-redux';
+import { useDispatch} from 'react-redux';
 import {BoxShadow} from 'react-native-shadow';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit} from '../utils/utilities';
@@ -35,7 +35,6 @@ const Login = ({navigation}) => {
   const [enterSystemLoading, setEnterSystemLoading] = useState(false);
   const [persistLoading, setPersistLoading] = useState(true);
   const [code, setCode] = useState('');
-  const selector = useSelector((state) => state);
 
   useEffect(() => {
     if (usersList.length === 0){
@@ -88,24 +87,33 @@ const Login = ({navigation}) => {
         ToastAndroid.CENTER,
       );
     } else {
-        loginVerification(phoneNumber, code).then((data) => {
-          if (data.errorCode === 0){
-            dispatch({
-              type: LOGIN,
-              token: data.result.Token,
-              userId: data.result.ID,
-              constantUserId: data.result.ID,
-            });
-            setEnterSystemLoading(false);
-            navigation.navigate('Home',{users:usersList});
-            setPersistLoading(false);
-          } else {
-            dispatch({
-              type:LOGOUT
-            });
-            setPersistLoading(false);
-          }
-        })
+      if (code.length !== 4) {
+        setEnterSystemLoading(false);
+        ToastAndroid.showWithGravity(
+            'کد فعالسازی نادرست است.',
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+        );
+      } else {
+          loginVerification(phoneNumber, code).then((data) => {
+            if (data.errorCode === 0) {
+              dispatch({
+                type: LOGIN,
+                token: data.result.Token,
+                userId: data.result.ID,
+                constantUserId: data.result.ID,
+              });
+              setEnterSystemLoading(false);
+              navigation.navigate('Home', {users: usersList});
+              setPersistLoading(false);
+            } else {
+              dispatch({
+                type: LOGOUT
+              });
+              setPersistLoading(false);
+            }
+          })
+        }
       }
     }
 

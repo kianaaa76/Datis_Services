@@ -51,6 +51,7 @@ const RemainingServiceDetail = ({navigation}) => {
     const [detailLoading, setDetailLoading] = useState(true);
     const [serviceDetail, setServiceDetail] = useState([]);
     const [factorImage, setFactorImage] = useState("");
+    const [deletingImage, setDeletingImage] = useState(0);
     const [renderConfirmModal, setRenderConfirmModal] = useState(false);
     const [equalizationType, setEqualizationType] = useState("");
     const [equalizationLoading, setEqualizationLoading] = useState(false);
@@ -278,12 +279,15 @@ const RemainingServiceDetail = ({navigation}) => {
                         })}/>
                 </View>
                 {!!factorImage && (
-                    <Image
-                        source={{uri: `data:image/jpeg;base64,${factorImage}`}}
-                        style={{width:pageWidth*0.8, height:pageWidth*0.8, marginTop:15}}/>
+                    <TouchableOpacity
+                        style={{width:pageWidth*0.8, height:pageWidth*0.8, marginTop:15}}
+                        onLongPress={()=>setDeletingImage(1)}>
+                        <Image
+                            source={{uri: `data:image/jpeg;base64,${factorImage}`}}
+                            style={{width:"100%", height:"100%"}}/>
+                    </TouchableOpacity>
                 )}
             </View>)}
-
         </ScrollView>
             {renderConfirmModal && (
                 <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderConfirmModal(false)}>
@@ -345,6 +349,44 @@ const RemainingServiceDetail = ({navigation}) => {
                                     }}>
                                     <Text style={Styles.modalButtonTextStyle}>
                                         OK
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+            )}
+            {!!deletingImage && (
+                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setDeletingImage(0)}>
+                    <View style={[Styles.modalContainerStyle,{height:pageHeight*0.28}]}>
+                        <View style={Styles.modalBodyContainerStyle2}>
+                            <Text style={{fontSize:15, fontWeight:"bold"}}>
+                                آیا از پاک کردن عکس اطمینان دارید؟
+                            </Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt2}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        setDeletingImage(0);
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        خیر
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                            <BoxShadow setting={shadowOpt2}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        if (deletingImage === 1){
+                                            setFactorImage("");
+                                        }
+                                        setDeletingImage(0);
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        بله
                                     </Text>
                                 </TouchableOpacity>
                             </BoxShadow>
@@ -430,6 +472,13 @@ const Styles = StyleSheet.create({
         overflow:"hidden",
         justifyContent:"center",
         alignItems:"center"
+    },
+    modalBodyContainerStyle2:{
+        width:"100%",
+        height:"30%",
+        alignItems:"center",
+        padding: 10,
+        justifyContent:"flex-end"
     },
     modalHeaderContainerStyle:{
         width:"100%",

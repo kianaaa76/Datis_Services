@@ -28,7 +28,6 @@ const Home = ({navigation}) => {
   const dispatch = useDispatch();
   const selector = useSelector((state) => state);
   const userList = JSON.stringify(navigation.getParam("users"));
-  console.log("userList", userList);
   const [user, setUser] = useState("");
   const [showUserList, setShowUserList] = useState(false);
   const [ShowinUserList, setShowingUserList] = useState(JSON.parse(userList));
@@ -232,7 +231,13 @@ const Home = ({navigation}) => {
             })}
           </View>
           <View style={Styles.SingleRowStyle}>
-            {renderHomeItems('انبارداری', images[4], () => {})}
+            {renderHomeItems('انبارداری', images[4], () => {
+              ToastAndroid.showWithGravity(
+                  "این قسمت بعدا اضافه خواهد شد.",
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER
+              );
+            })}
             {renderHomeItems('ماموریت‌های من', images[5], () => {
               navigation.navigate('Mission');
             })}

@@ -7,7 +7,7 @@ import {
     Dimensions,
     ScrollView,
     Image,
-    TouchableOpacity,
+    TouchableOpacity, TouchableHighlight,
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -20,9 +20,21 @@ import moment from "moment-jalaali";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import {API_KEY} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
+import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
+
+const shadowOpt2 = {
+    width: pageWidth * 0.2,
+    height: 35,
+    color: '#000',
+    radius: 7,
+    opacity: 0.2,
+    x: 0,
+    y: 3,
+    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
+}
 
 let cameraRef={};
 
@@ -31,8 +43,7 @@ const ServiceServicesTab = ({setInfo, info}) => {
     const [screenMode, setScreenMode] = useState("tab");
     const [selectedLatitude, setSelectedLatitude] = useState(null);
     const [selectedLongitude, setSelectedLongitude] = useState(null);
-    const [userLatitude, setUserLatitude] = useState(null);
-    const [userLongitude, setUserLongitude] = useState(null);
+    const [deletingImage, setDeletingImage] = useState(0);
     const [renderTimePicker, setRenderTimePicker] = useState(false);
     const [date, setDate] = useState("");
     const [dateIsSelected, setDateIsSelected] = useState(false);
@@ -67,6 +78,7 @@ const ServiceServicesTab = ({setInfo, info}) => {
     }
 
     return  screenMode === "tab" ? (
+        <>
         <ScrollView style={Styles.containerStyle} contentContainerStyle={{justifyContent:"center", alignItems:"center"}}>
             <View style={Styles.descriptionRowStyle}>
                 <View style={{width: 70, marginBottom:10}}>
@@ -129,9 +141,13 @@ const ServiceServicesTab = ({setInfo, info}) => {
                 </View>
             </View>
             {!!info.image && (
-                <Image
-                    source={{uri: `data:image/jpeg;base64,${info.image}`}}
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
+                <TouchableOpacity
+                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
+                    onLongPress={()=>setDeletingImage(3)}>
+                    <Image
+                        source={{uri: `data:image/jpeg;base64,${info.image}`}}
+                        style={{width:"100%", height:"100%"}}/>
+                </TouchableOpacity>
             )}
             <View style={Styles.datePickerRowStyle}>
                 <FontAwesomeIcon name={"calendar"} style={{color:"#000", fontSize:30}} onPress={()=> {
@@ -216,6 +232,47 @@ const ServiceServicesTab = ({setInfo, info}) => {
                 />
             )}
         </ScrollView>
+        {!!deletingImage && (
+        <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setDeletingImage(0)}>
+            <View style={Styles.modalContainerStyle}>
+                <View style={Styles.modalBodyContainerStyle2}>
+                    <Text>
+                        آیا از پاک کردن عکس اطمینان دارید؟
+                    </Text>
+                </View>
+                <View style={Styles.modalFooterContainerStyle}>
+                    <BoxShadow setting={shadowOpt2}>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={()=> {
+                                setDeletingImage(0);
+                            }}>
+                            <Text style={Styles.modalButtonTextStyle}>
+                                خیر
+                            </Text>
+                        </TouchableOpacity>
+                    </BoxShadow>
+                    <BoxShadow setting={shadowOpt2}>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={()=> {
+                                if (deletingImage === 3){
+                                    setInfo({
+                                        ...info, image: ""
+                                    });
+                                }
+                                setDeletingImage(0);
+                            }}>
+                            <Text style={Styles.modalButtonTextStyle}>
+                                بله
+                            </Text>
+                        </TouchableOpacity>
+                    </BoxShadow>
+                </View>
+            </View>
+        </TouchableHighlight>
+    )}
+    </>
     ):(
         <View style={{flex:1}}>
             <MapboxGL.MapView style={{flex:1}} onPress={feature=>{
@@ -438,7 +495,65 @@ const Styles = StyleSheet.create({
     checkboxTextStyle:{
         fontSize:12,
         width:"75%"
-    }
+    },
+    modalBackgroundStyle:{
+        flex:1,
+        width:pageWidth,
+        height: pageHeight,
+        position: "absolute",
+        backgroundColor:"rgba(0,0,0,0.5)",
+        justifyContent:"center",
+        alignItems:"center",
+        alignSelf:'center'
+    },
+    modalContainerStyle:{
+        position: "absolute",
+        bottom:pageHeight*0.3,
+        width:pageWidth*0.7,
+        height:150,
+        backgroundColor:"#E8E8E8",
+        marginBottom:pageHeight*0.25,
+        borderRadius: 15,
+        overflow:"hidden",
+        alignItems:"center"
+    },
+    modalBodyContainerStyle:{
+        width:"100%",
+        height:"35%",
+        alignItems:"center",
+        padding: 10
+    },
+    modalBodyContainerStyle2:{
+        width:"100%",
+        height:"40%",
+        alignItems:"center",
+        padding: 10,
+        justifyContent:"flex-end"
+    },
+    modalBodyTextStyle:{
+        color: "#660000",
+        textAlign:"center",
+        fontSize: 16
+    },
+    modalFooterContainerStyle:{
+        flexDirection:"row",
+        width:"100%",
+        height:"30%",
+        justifyContent:"space-around",
+    },
+    modalButtonStyle:{
+        backgroundColor:"#fff",
+        width:"97%",
+        height:"97%",
+        borderRadius:7,
+        justifyContent:"center",
+        alignItems:"center"
+    },
+    modalButtonTextStyle:{
+        color:"gray",
+        fontSize:14,
+        fontWeight:"bold"
+    },
 })
 
 export default ServiceServicesTab;

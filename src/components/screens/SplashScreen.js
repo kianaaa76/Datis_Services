@@ -66,7 +66,7 @@ const Splash = ({navigation}) => {
 
     return (
         <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
-            <Image source={splashImage} style={{width:pageWidth*0.55, height: pageWidth*0.22}}/>
+            <Image source={splashImage} style={{width:pageWidth*0.55, height: pageWidth*0.23}}/>
             {showUpdateModal && (<View style={Styles.modalBackgroundStyle}>
                 <View style={Styles.modalContainerStyle}>
                     <View style={Styles.modalHeaderContainerStyle}>

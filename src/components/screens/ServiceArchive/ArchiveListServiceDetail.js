@@ -9,7 +9,7 @@ import {
     Text,
     TouchableOpacity,
     Image,
-    TextInput
+    TextInput, TouchableHighlight
 } from "react-native";
 import Header from "../../common/Header";
 import {updateService, unsettledServiceDetail} from "../../../actions/api";
@@ -33,6 +33,7 @@ const ServiceArchiveDetail = ({navigation}) => {
     const [serviceDetail, setServiceDetail] = useState([]);
     const [factorImage, setFactorImage] = useState("");
     const [image, setImage] = useState("");
+    const [deletingImage, setDeletingImage] = useState(0);
     const [description, setDescription] = useState("");
     const [address, setAddress] = useState("");
     const [isMapModeOn, setIsMapModeOn] = useState(false);
@@ -69,6 +70,17 @@ const ServiceArchiveDetail = ({navigation}) => {
         style: {justifyContent:"center", alignItems:"center", marginBottom:10},
     };
 
+    const shadowOpt3 = {
+        width: pageWidth * 0.2,
+        height: 35,
+        color: '#000',
+        radius: 7,
+        opacity: 0.2,
+        x: 0,
+        y: 3,
+        style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
+    }
+
     const getServiceResult = (resultNum) =>{
         switch (resultNum) {
             case 1:
@@ -104,7 +116,6 @@ const ServiceArchiveDetail = ({navigation}) => {
     const updateServiceDetail = ()=>{
         setConfrimRequestLoading(true);
         updateService(SERVICE.projectID, selector.userId, selector.token, address, description, factorImage, image).then(data=>{
-            console.log("kiana", data);
             if (data.errorCode === 0){
                 navigation.navigate("ServiceArchiveList");
                 ToastAndroid.showWithGravity(
@@ -338,9 +349,15 @@ const ServiceArchiveDetail = ({navigation}) => {
                                                 </View>
                                             </View>
                                             {!!factorImage && (
-                                                <Image
-                                                    source={{uri: `data:image/jpeg;base64,${factorImage}`}}
-                                                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
+                                                <TouchableOpacity
+                                                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
+                                                    onLongPress={()=> {
+                                                        setDeletingImage(1)
+                                                    }}>
+                                                    <Image
+                                                        source={{uri: `data:image/jpeg;base64,${factorImage}`}}
+                                                        style={{width:"100%", height:"100%"}}/>
+                                                </TouchableOpacity>
                                             )}
                                             <View style={Styles.imageRowStyle}>
                                                 <View style={Styles.getImageContainerViewStyle}>
@@ -371,9 +388,13 @@ const ServiceArchiveDetail = ({navigation}) => {
                                                 </View>
                                             </View>
                                             {!!image && (
-                                                <Image
-                                                    source={{uri: `data:image/jpeg;base64,${image}`}}
-                                                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}/>
+                                                <TouchableOpacity
+                                                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
+                                                    onLongPress={()=>setDeletingImage(2)}>
+                                                    <Image
+                                                        source={{uri: `data:image/jpeg;base64,${image}`}}
+                                                        style={{width:"100%", height:"100%"}}/>
+                                                </TouchableOpacity>
                                             )}
                                         </View>
                                     </BoxShadow>
@@ -410,6 +431,46 @@ const ServiceArchiveDetail = ({navigation}) => {
                         </TouchableOpacity>
                     </View>)}
                 </View>
+            )}
+            {!!deletingImage && (
+                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setDeletingImage(0)}>
+                    <View style={Styles.modalContainerStyle}>
+                        <View style={Styles.modalBodyContainerStyle2}>
+                            <Text style={{fontSize:15, fontWeight:"bold"}}>
+                                آیا از پاک کردن عکس اطمینان دارید؟
+                            </Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt3}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        setDeletingImage(0);
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        خیر
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                            <BoxShadow setting={shadowOpt3}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={()=> {
+                                        if (deletingImage === 1){
+                                            setFactorImage("");
+                                        } else if (deletingImage === 2) {
+                                            setImage("");
+                                        }
+                                        setDeletingImage(0);
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>
+                                        بله
+                                    </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
             )}
         </View>
     )
@@ -483,7 +544,7 @@ const Styles = StyleSheet.create({
     modalContainerStyle:{
         position: "absolute",
         width:pageWidth*0.85,
-        height:pageHeight*0.35,
+        height:pageHeight*0.3,
         backgroundColor:"#E8E8E8",
         marginBottom:pageHeight*0.25,
         borderRadius: 15,
@@ -491,16 +552,12 @@ const Styles = StyleSheet.create({
         justifyContent:"center",
         alignItems:"center"
     },
-    modalHeaderContainerStyle:{
+    modalBodyContainerStyle2:{
         width:"100%",
-        height:"20%",
-        backgroundColor:"#660000",
-        justifyContent:"center",
-        paddingHorizontal:10
-    },
-    modalHeaderTextStyle:{
-        color:"#fff",
-        fontSize:18
+        height:"30%",
+        alignItems:"center",
+        padding: 10,
+        justifyContent:"flex-end",
     },
     modalBodyContainerStyle:{
         width:"100%",

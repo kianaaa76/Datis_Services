@@ -10,6 +10,7 @@ import {
     TouchableOpacity,
     TouchableHighlight
 } from "react-native";
+import ImageViewer from 'react-native-image-zoom-viewer';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from 'react-native-image-crop-picker';
 import {BoxShadow} from "react-native-shadow";
@@ -95,7 +96,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
             {!!info.factorImage && (
                 <TouchableOpacity
                     style={{width:"100%", height:pageHeight*0.4, marginVertical:10}}
-                    onPress={()=> {
+                    onLongPress={()=> {
                         setDeletingImage(1)
                     }}>
                     <Image
@@ -134,11 +135,19 @@ const ServiceFactorTab = ({setInfo, info}) => {
             {!!info.billImage && (
                 <TouchableOpacity
                     style={{width:"100%", height:pageHeight*0.4, marginVertical:10}}
-                    onPress={()=> {
+                    onLongPress={()=> {
                         setDeletingImage(2)
                     }}>
-                        <Image
-                            source={{uri: `data:image/jpeg;base64,${info.billImage}`}}
+                        <ImageViewer
+                            // source={{uri: `data:image/jpeg;base64,${info.billImage}`}}
+                            imageUrls={[{
+                                url:'',
+                                props:{
+                                    source: {uri:`data:image/jpeg;base64,${info.billImage}`},
+                                    width: "100%",
+                                    height:"100%"
+                                }
+                            }]}
                             style={{width:"100%", height:"100%"}}/>
                 </TouchableOpacity>
             )}
