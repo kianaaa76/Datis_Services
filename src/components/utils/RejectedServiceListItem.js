@@ -154,7 +154,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                             dispatch({
                                                 type:LOGOUT
                                             });
-                                            navigation.replace("SignedOut");
+                                            navigation.navigate("SignedOut");
                                         } else {
                                             renderLoading(false);
                                             ToastAndroid.showWithGravity(
@@ -228,7 +228,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                                         dispatch({
                                             type:LOGOUT
                                         });
-                                        navigation.replace("SignedOut");
+                                        navigation.navigate("SignedOut");
                                     } else {
                                         renderLoading(false);
                                         ToastAndroid.showWithGravity(

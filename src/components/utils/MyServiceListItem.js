@@ -90,7 +90,7 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                                   travel:false
                               }
                           });
-                          navigation.navigate('MyServiceDetails', {serviceID: Item.projectID})
+                          navigation.replace('MyServiceDetails', {serviceID: Item.projectID})
                       }
                   } else {
                       dispatch({
@@ -117,7 +117,7 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
                               travel:false
                           }
                       });
-                      navigation.navigate('MyServiceDetails', {serviceID: Item.projectID})
+                      navigation.replace('MyServiceDetails', {serviceID: Item.projectID})
                   }
               });
 

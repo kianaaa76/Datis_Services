@@ -130,46 +130,97 @@ const ServicePartsTab = ({setInfo, info}) => {
     }
 
     const searchBarcode = ()=>{
-        let object = {};
-        const sserial = !!selectedItemList.id ? selectedItemList.serial : fieldsObject.serial;
-        partsListName.map(item=>{
-            let serialFormatHeader = item.value.SerialFormat.substr(0,item.value.SerialFormat.indexOf('#'));
-            if(!!serialFormatHeader && serialFormatHeader === sserial.substr(0,item.value.SerialFormat.indexOf('#'))){
-                object = item;
-            }
-        });
-        if (!!object.label){
-            setSearchBarcodeLoading(true);
-            getObjBySerial(selector.token, sserial, object.value.Id).then(data=>{
-                if (data.errorCode == 0) {
-                    let selectedVersion = object.value.Versions.filter(item=>item.Key == data.result.VersionId);
-                    if(!!selectedItemList.id){
-                        refactorObjectListItems("partType", object, selectedItemList.index);
-                        refactorObjectListItems("version", selectedVersion[0], selectedItemList.index);
-                        setSelectedItemList({});
-                    } else {
-                        setFieldsObject({...fieldsObject,
-                            partTypeSelected: object,
-                            partVersionSelected: selectedVersion[0]
-                        });
+        setSearchBarcodeLoading(true);
+        const object = !!selectedItemList.id ? !!selectedItemList.partType ? selectedItemList.partType : null : !!fieldsObject.partTypeSelected ? fieldsObject.partTypeSelected: null;
+        const sserial = !!selectedItemList.id ? selectedItemList.serial.toUpperCase() : fieldsObject.serial.toUpperCase();
+        if (!!object){
+            if (!!object.value.SerialFormat.length > 0){
+                let serialFormatHeader = object.value.SerialFormat.substr(0,object.value.SerialFormat.indexOf('#'));
+                let serialLengthWithoutHeader = object.value.SerialFormat.length - serialFormatHeader.length;
+                let leftOfSerialFormat = object.value.SerialFormat.substr(object.value.SerialFormat.indexOf('#'),object.value.SerialFormat.length)
+                if (sserial.length === object.value.SerialFormat.length){
+                    if (serialFormatHeader === sserial.substr(0,serialFormatHeader.length)) {
+                        getObjBySerial(selector.token, sserial, object.value.Id).then(data => {
+                            if (data.errorCode == 0) {
+                                let selectedVersion = object.value.Versions.filter(item => item.Key == data.result.VersionId);
+                                if (!!selectedItemList.id) {
+                                    refactorObjectListItems("partType", object, selectedItemList.index);
+                                    refactorObjectListItems("version", selectedVersion[0], selectedItemList.index);
+                                    setSelectedItemList({});
+                                } else {
+                                    setFieldsObject({
+                                        ...fieldsObject,
+                                        partTypeSelected: object,
+                                        partVersionSelected: selectedVersion[0]
+                                    });
+                                }
+                                setSearchBarcodeLoading(false);
+                            } else {
+                                setSearchBarcodeLoading(false);
+                                ToastAndroid.showWithGravity(
+                                    data.errorCode,
+                                    ToastAndroid.SHORT,
+                                    ToastAndroid.CENTER
+                                )
+                            }
+                        })
+                    } else  {
+                        setSearchBarcodeLoading(false);
+                        ToastAndroid.showWithGravity(
+                            `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+                            ToastAndroid.SHORT,
+                            ToastAndroid.CENTER
+                        )
                     }
-                    setSearchBarcodeLoading(false);
+                } else if (sserial.length === serialLengthWithoutHeader){
+                    getObjBySerial(selector.token, `${serialFormatHeader}${sserial}`, object.value.Id).then(data => {
+                        if (data.errorCode == 0) {
+                            let selectedVersion = object.value.Versions.filter(item => item.Key == data.result.VersionId);
+                            if (!!selectedItemList.id) {
+                                refactorObjectListItems("partType", object, selectedItemList.index);
+                                refactorObjectListItems("version", selectedVersion[0], selectedItemList.index);
+                                setSelectedItemList({});
+                            } else {
+                                setFieldsObject({
+                                    ...fieldsObject,
+                                    partTypeSelected: object,
+                                    partVersionSelected: selectedVersion[0]
+                                });
+                            }
+                            setSearchBarcodeLoading(false);
+                        } else {
+                            setSearchBarcodeLoading(false);
+                            ToastAndroid.showWithGravity(
+                                data.errorCode,
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER
+                            )
+                        }
+                    })
                 } else {
                     setSearchBarcodeLoading(false);
                     ToastAndroid.showWithGravity(
-                        data.errorCode,
+                        `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
                         ToastAndroid.SHORT,
                         ToastAndroid.CENTER
                     )
                 }
-            })
+            } else {
+                setSearchBarcodeLoading(false);
+                ToastAndroid.showWithGravity(
+                    "برای این قطعه باید نسخه را به صورت دستی وارد کنید.",
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER
+                )
+            }
+
         } else {
+            setSearchBarcodeLoading(false);
             ToastAndroid.showWithGravity(
-                "فرمت سریال وارد شده صحیح نیست.",
+                "لطفا نوع قطعه را مشخص کنید.",
                 ToastAndroid.SHORT,
                 ToastAndroid.CENTER
             )
-            setSearchBarcodeLoading(false);
         }
     }
 
@@ -194,7 +245,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                         selectedObject = {...selectedObject, "hasGarantee": newValue};
                         break;
                     case "partType":
-                        selectedObject = {...selectedObject, "partType": newValue, "serial":"", "version":{}, "availableVersions": newValue.value.Versions};
+                        selectedObject = {...selectedObject, "partType": newValue};
                         break;
                     case "Price":
                         selectedObject = {...selectedObject, "Price": newValue};
@@ -210,7 +261,6 @@ const ServicePartsTab = ({setInfo, info}) => {
             }
         });
         currentList.splice(Index,1,selectedObject);
-        console.log("currentList", currentList);
         setInfo(currentList);
         setObjectsList(currentList);
         setRefresh(!refresh);
@@ -497,7 +547,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 value={fieldsObject.serial}
                             />
                             <View style={{flexDirection:"row"}}>
-                                {!!fieldsObject.partTypeSelected && fieldsObject.partTypeSelected.value.SerialFormat.length>0 ? <Icon name={"star"} style={{color:"red"}}/> : null}
+                                {(!!fieldsObject.partTypeSelected && fieldsObject.partTypeSelected.value.SerialFormat.length>0) || !fieldsObject.partTypeSelected ? <Icon name={"star"} style={{color:"red"}}/> : null}
                                 <Text style={Styles.labelStyle}>سریال:</Text>
                             </View>
                         </View>

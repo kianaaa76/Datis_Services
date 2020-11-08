@@ -93,7 +93,7 @@ const RemainingServiceDetail = ({navigation}) => {
                 dispatch({
                     type: LOGOUT
                 });
-                navigation.replace("SignedOut");
+                navigation.navigate("SignedOut");
                 setEqualizationLoading(false);
             } else {
                 ToastAndroid.showWithGravity(
@@ -118,7 +118,7 @@ const RemainingServiceDetail = ({navigation}) => {
                 dispatch({
                     type: LOGOUT
                 });
-                navigation.replace("SignedOut");
+                navigation.navigate("SignedOut");
                 setEqualizationLoading(false);
             } else {
                 ToastAndroid.showWithGravity(

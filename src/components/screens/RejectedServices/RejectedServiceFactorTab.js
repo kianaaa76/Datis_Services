@@ -6,7 +6,6 @@ import {
     TextInput,
     Dimensions,
     ScrollView,
-    Image,
     TouchableOpacity,
     TouchableHighlight
 } from "react-native";
@@ -29,7 +28,7 @@ const shadowOpt2 = {
     style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
 }
 
-const ServiceFactorTab = ({setInfo, info}) => {
+const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
     const [deletingImage, setDeletingImage] = useState(0);
     return (
         <>
@@ -46,7 +45,10 @@ const ServiceFactorTab = ({setInfo, info}) => {
                     value={info.factorReceivedPrice.toString()}
                     keyboardType="numeric"/>
                 <View style={{width: 70}}>
-                    <Icon name={"star"} style={{color:"red", fontSize:10}}/>
+                    {serviceInfo.serviceResult !== 'لغو موفق' &&
+                    serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                        <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                    )}
                     <Text style={Styles.labelStyle}>مبلغ دریافتی:</Text>
                 </View>
             </View>
@@ -62,6 +64,10 @@ const ServiceFactorTab = ({setInfo, info}) => {
                            value={info.factorTotalPrice.toString()}
                            keyboardType="numeric"/>
                 <View style={{width: 70}}>
+                    {serviceInfo.serviceResult !== 'لغو موفق' &&
+                    serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                        <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                    )}
                     <Text style={Styles.labelStyle}>جمع فاکتور:</Text>
                 </View>
             </View>
@@ -96,10 +102,12 @@ const ServiceFactorTab = ({setInfo, info}) => {
                                 });
                             })
                         }}/>
-                    )}
                 </View>
                 <View style={{width: 70}}>
-                    <Icon name={"star"} style={{color:"red", fontSize:10}}/>
+                    {serviceInfo.serviceResult !== 'لغو موفق' &&
+                    serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                        <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                    )}
                     <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
                 </View>
             </View>

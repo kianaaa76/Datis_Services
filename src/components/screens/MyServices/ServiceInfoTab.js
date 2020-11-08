@@ -8,7 +8,6 @@ const pageHeight = Dimensions.get('screen').height;
 
 const ServiceInfoTab = (serviceData) => {
     const data = serviceData.serviceData;
-
     const renderSingleRow = (title, text) => {
         return (
             <View style={Styles.singleRowStyle}>
@@ -43,8 +42,8 @@ const ServiceInfoTab = (serviceData) => {
             {renderSingleRow("گارانتی برد", data.WarS)}
             {renderSingleRow("تاریخ تولید", toFaDigit(data.DOM))}
             {renderSingleRow("آدرس", data.Address)}
-            {renderSingleRow("علت خرابی", data.Details)}
-            {renderSingleRow("قطعات مورد نیاز", data.Parts)}
+            {renderSingleRow("علت خرابی", data.DetectedFailure)}
+            {renderSingleRow("قطعات مورد نیاز", data.parts)}
             {renderSingleRow("زمان اعلام", toFaDigit(data.Date))}
         </ScrollView>
     ):(

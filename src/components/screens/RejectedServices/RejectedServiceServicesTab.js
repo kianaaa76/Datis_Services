@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState, useEffect} from "react";
 import {
     View,
     StyleSheet,
@@ -6,8 +6,7 @@ import {
     Text,
     Dimensions,
     ScrollView,
-    Image,
-    TouchableOpacity, 
+    TouchableOpacity,
     TouchableHighlight,
     BackHandler
 } from "react-native";
@@ -178,7 +177,10 @@ const ServiceServicesTab = ({setInfo, info}) => {
                         <Text style={{fontSize:15, marginRight:10}}>
                             {`${toFaDigit(info.finalDate)}`}
                         </Text>)}
-                    <Icon name={"star"} style={{color:"red", fontSize:10}}/>
+                    {info.serviceResult !== 'لغو موفق' &&
+                    info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                        <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                    )}
                     <Text style={Styles.labelStyle}>تاریخ انجام پروژه:</Text>
                 </View>
             </View>

@@ -85,10 +85,10 @@ const MyServiceDetails = ({navigation}) => {
         distance: selector.savedServiceInfo.distance,
         travel: selector.savedServiceInfo.travel
     });
-        const [requestLoading,setRequestLoading] = useState(false);
+    const [requestLoading,setRequestLoading] = useState(false);
     const [partsListName, setPartsListName] = useState(selector.objectsList);
     const [renderConfirmModal,setRenderConfirmModal] = useState(false);
-        const [renderNetworkModal,setRenderNetworkModal] = useState(false);
+    const [renderNetworkModal,setRenderNetworkModal] = useState(false);
 
         useEffect(()=>{
             if (partsTabInfo.length>0 && !partsTabInfo[0].availableVersions){
@@ -228,7 +228,9 @@ const MyServiceDetails = ({navigation}) => {
         setRequestLoading(true);
         setRenderConfirmModal(false);
         setRenderNetworkModal(false);
-        if(!factorTabInfo.factorImage){
+        if(!factorTabInfo.factorImage
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6){
             setRequestLoading(false);
             Alert.alert(
                 'اخطار',
@@ -237,7 +239,9 @@ const MyServiceDetails = ({navigation}) => {
                     { text: 'OK', onPress: () => {} }
                 ],
             );
-        } else if (!factorTabInfo.factorReceivedPrice && factorTabInfo.factorReceivedPrice!==0){
+        } else if (!factorTabInfo.factorReceivedPrice && factorTabInfo.factorReceivedPrice!==0
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6){
             setRequestLoading(false);
             Alert.alert(
                 'اخطار',
@@ -246,7 +250,9 @@ const MyServiceDetails = ({navigation}) => {
                     { text: 'OK', onPress: () => {} }
                 ],
             );
-        } else if (!factorTabInfo.factorTotalPrice && factorTabInfo.factorTotalPrice!==0){
+        } else if (!factorTabInfo.factorTotalPrice && factorTabInfo.factorTotalPrice!==0
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6){
             setRequestLoading(false);
             Alert.alert(
                 'اخطار',
@@ -264,7 +270,9 @@ const MyServiceDetails = ({navigation}) => {
                     { text: 'OK', onPress: () => {} }
                 ],
             );
-        } else if (!serviceTabInfo.finalDate){
+        } else if (!serviceTabInfo.finalDate
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
+            && convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6){
             setRequestLoading(false);
             Alert.alert(
                 'اخطار',
@@ -365,7 +373,7 @@ const MyServiceDetails = ({navigation}) => {
                         type:SET_EDITING_SERVICE,
                         editingService: ""
                     })
-                    navigation.replace("SignedOut");
+                    navigation.navigate("SignedOut");
                 } else {
                     setRequestLoading(false);
                     ToastAndroid.showWithGravity(
@@ -379,7 +387,6 @@ const MyServiceDetails = ({navigation}) => {
                 setRenderNetworkModal(true);
             })
         } else if (!missionTabInfo.startLongitude && !missionTabInfo.endLongitude) {
-            console.log("mamad");
             requestObjectList = [];
            partsTabInfo.map(item=>{
                 requestObjectList.push({
@@ -432,7 +439,7 @@ const MyServiceDetails = ({navigation}) => {
                         type:SET_EDITING_SERVICE,
                         editingService: ""
                     })
-                    navigation.replace("SignedOut");
+                    navigation.navigate("SignedOut");
                 } else {
                     setRequestLoading(false);
                     ToastAndroid.showWithGravity(
@@ -462,9 +469,9 @@ const MyServiceDetails = ({navigation}) => {
             case 'services':
                 return <ServiceServicesTab setInfo={(e)=>setServiceInfo(e)} info={serviceTabInfo}/>;
             case 'factor':
-                return <ServiceFactorTab setInfo={(e)=>setFactorInfo(e)} info={factorTabInfo} />;
+                return <ServiceFactorTab setInfo={(e)=>setFactorInfo(e)} info={factorTabInfo} serviceInfo={serviceTabInfo}/>;
             case 'parts':
-                return <ServicePartsTab setInfo={setPartsTabInfo} info={partsTabInfo}/>;
+                return <ServicePartsTab setInfo={setPartsTabInfo} info={partsTabInfo} navigation={navigation}/>;
             case 'mission':
                 return <ServiceMissionTab setInfo={(e)=>setMissionInfo(e)} info={missionTabInfo} navigation={navigation}/>;
             case 'info':

@@ -163,8 +163,8 @@ export const rejectedServiceDetail = (serviceId, token) => {
   }).then((response) => response.json());
 }
 
-export const unsettledServiceList = (sevicemanId, token) => {
-  return fetch(`${LOCAL_HOST}/GetAllSettlementDocuments?ServiceManId=${sevicemanId}`, {
+export const unsettledServiceList = (servicemanId, token) => {
+  return fetch(`${LOCAL_HOST}/GetAllSettlementDocuments?ServiceManId=${servicemanId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -194,7 +194,6 @@ export const personalPayment = (serviceId, token) => {
 }
 
 export const companyPayment = (serviceId, servicemanId, image, token) => {
-  // console.log("company", serviceId, servicemanId, token);
   const msg = JSON.stringify({
     ID:serviceId,
     ServiceManId: servicemanId,
@@ -276,7 +275,6 @@ export const sendServiceData = (
     serviceManId,
     billImage,
 )=>{
-  console.log("missionnnnnnn", mission);
   const msg = JSON.stringify({
     ServiceManId: serviceManId,
     projectID: serviceId,

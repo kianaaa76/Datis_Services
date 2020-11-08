@@ -52,7 +52,10 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
             keyboardType="numeric"
           />
           <View style={{width: 70}}>
-            <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+            {serviceInfo.serviceResult !== 'لغو موفق' &&
+            serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+            )}
             <Text style={Styles.labelStyle}>مبلغ دریافتی:</Text>
           </View>
         </View>
@@ -70,7 +73,10 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
             keyboardType="numeric"
           />
           <View style={{width: 70}}>
-            <Icon name={'star'} style={{color: 'red'}} />
+            {serviceInfo.serviceResult !== 'لغو موفق' &&
+            serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+            )}
             <Text style={Styles.labelStyle}>جمع فاکتور:</Text>
           </View>
         </View>
@@ -101,7 +107,6 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
-                  console.log('response', response);
                   setInfo({...info, factorImage: response.data});
                 });
               }}
@@ -117,7 +122,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
             )}
           </View>
           <View style={{width: 70}}>
-            {serviceInfo.serviceResult !== 'سرویس جدید- کسری قطعات' &&
+            {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
               )}

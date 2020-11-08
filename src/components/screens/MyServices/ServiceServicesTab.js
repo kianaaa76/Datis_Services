@@ -221,7 +221,7 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
                 )}`}
               </Text>
             )}
-            {info.serviceResult !== 'سرویس جدید- کسری قطعات' &&
+            {info.serviceResult !== 'لغو موفق' &&
               info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
               )}

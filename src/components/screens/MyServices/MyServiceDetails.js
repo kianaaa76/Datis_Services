@@ -264,20 +264,24 @@ const MyServiceDetails = ({navigation}) => {
     setRenderNetworkModal(false);
     if (
       !factorTabInfo.factorImage &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) != 3 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) != 4
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
         console.log("1111", convertResultTitleToNum(serviceTabInfo.serviceResult));
       setRequestLoading(false);
       Alert.alert('اخطار', 'لطفا عکس فاکتور را بارگذاری کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
-    } else if (!factorTabInfo.factorReceivedPrice) {
+    } else if (!factorTabInfo.factorReceivedPrice && factorTabInfo.factorReceivedPrice!==0 &&
+        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4) {
       setRequestLoading(false);
       Alert.alert('اخطار', 'لطفا مبلغ دریافتی فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
-    } else if (!factorTabInfo.factorTotalPrice) {
+    } else if (!factorTabInfo.factorTotalPrice && factorTabInfo.factorTotalPrice!==0 &&
+        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4) {
       setRequestLoading(false);
       Alert.alert('اخطار', 'لطفا جمع فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
@@ -289,7 +293,7 @@ const MyServiceDetails = ({navigation}) => {
       ]);
     } else if (
       !serviceTabInfo.finalDate &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 3 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
       setRequestLoading(false);
@@ -385,7 +389,7 @@ const MyServiceDetails = ({navigation}) => {
               type: SET_EDITING_SERVICE,
               editingService: '',
             });
-            navigation.replace('SignedOut');
+            navigation.navigate('SignedOut');
           } else {
             setRequestLoading(false);
             ToastAndroid.showWithGravity(
@@ -458,7 +462,7 @@ const MyServiceDetails = ({navigation}) => {
               type: SET_EDITING_SERVICE,
               editingService: '',
             });
-            navigation.replace('SignedOut');
+            navigation.navigate('SignedOut');
           } else {
             setRequestLoading(false);
             ToastAndroid.showWithGravity(
@@ -493,7 +497,7 @@ const MyServiceDetails = ({navigation}) => {
             type: SET_EDITING_SERVICE,
             editingService: '',
           });
-          navigation.replace('SignedOut');
+          navigation.navigate('SignedOut');
         } else {
           dispatch({
             type: GET_SERVICE_DETAIL,

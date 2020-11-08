@@ -27,7 +27,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 
-const ServicePartsTab = ({setInfo, info}) => {
+const ServicePartsTab = ({setInfo, info, navigation}) => {
     const selector = useSelector((state) => state);
     const [fieldsObject, setFieldsObject] = useState({
         objectType:"",
@@ -128,48 +128,99 @@ const ServicePartsTab = ({setInfo, info}) => {
         }
     }
 
-    const searchBarcode = ()=>{
+    const searchBarcode = (selectedItemList)=>{
         setSearchBarcodeLoading(true);
-        let object = {};
-        const sserial = !!selectedItemList.id ? selectedItemList.serial : fieldsObject.serial;
-        console.log("sserial", sserial);
-        partsListName.map(item=>{
-            let serialFormatHeader = item.value.SerialFormat.substr(0,item.value.SerialFormat.indexOf('#'));
-            if(!!serialFormatHeader && serialFormatHeader == sserial.substr(0,item.value.SerialFormat.indexOf('#'))){
-                object = item;
-            }
-        });
-        if (!!object.label){
-            getObjBySerial(selector.token, sserial, object.value.Id).then(data=>{
-                if (data.errorCode == 0) {
-                    let selectedVersion = object.value.Versions.filter(item=>item.Key == data.result.VersionId);
-                    if(!!selectedItemList.id){
-                        refactorObjectListItems("partType", object, selectedItemList.index);
-                        refactorObjectListItems("version", selectedVersion[0], selectedItemList.index);
-                        setSelectedItemList({});
-                    } else {
-                        setFieldsObject({...fieldsObject,
-                            partTypeSelected: object,
-                            partVersionSelected: selectedVersion[0]
-                        });
+        const object = !!selectedItemList && !!selectedItemList.id ? !!selectedItemList.partType ? selectedItemList.partType : null : !!fieldsObject.partTypeSelected ? fieldsObject.partTypeSelected: null;
+        const sserial = !!selectedItemList && !!selectedItemList.id ? selectedItemList.serial.toUpperCase() : fieldsObject.serial.toUpperCase();
+        if (!!object){
+            if (!!object.value.SerialFormat.length > 0){
+                let serialFormatHeader = object.value.SerialFormat.substr(0,object.value.SerialFormat.indexOf('#'));
+                let serialLengthWithoutHeader = object.value.SerialFormat.length - serialFormatHeader.length;
+                let leftOfSerialFormat = object.value.SerialFormat.substr(object.value.SerialFormat.indexOf('#'),object.value.SerialFormat.length)
+                if (sserial.length === object.value.SerialFormat.length){
+                    if (serialFormatHeader === sserial.substr(0,serialFormatHeader.length)) {
+                        getObjBySerial(selector.token, sserial, object.value.Id).then(data => {
+                            console.log("######", data);
+                            if (data.errorCode == 0) {
+                                let selectedVersion = object.value.Versions.filter(item => item.Key == data.result.VersionId);
+                                if (!!selectedItemList.id) {
+                                    refactorObjectListItems("partType", object, selectedItemList.index);
+                                    refactorObjectListItems("version", selectedVersion[0], selectedItemList.index);
+                                    setSelectedItemList({});
+                                } else {
+                                    setFieldsObject({
+                                        ...fieldsObject,
+                                        partTypeSelected: object,
+                                        partVersionSelected: selectedVersion[0]
+                                    });
+                                }
+                                setSearchBarcodeLoading(false);
+                            } else {
+                                setSearchBarcodeLoading(false);
+                                ToastAndroid.showWithGravity(
+                                    data.errorCode,
+                                    ToastAndroid.SHORT,
+                                    ToastAndroid.CENTER
+                                )
+                            }
+                        })
+                    } else  {
+                        setSearchBarcodeLoading(false);
+                        ToastAndroid.showWithGravity(
+                            `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+                            ToastAndroid.SHORT,
+                            ToastAndroid.CENTER
+                        )
                     }
-                    setSearchBarcodeLoading(false);
+                } else if (sserial.length === serialLengthWithoutHeader){
+                    getObjBySerial(selector.token, `${serialFormatHeader}${sserial}`, object.value.Id).then(data => {
+                        if (data.errorCode == 0) {
+                            let selectedVersion = object.value.Versions.filter(item => item.Key == data.result.VersionId);
+                            if (!!selectedItemList.id) {
+                                refactorObjectListItems("partType", object, selectedItemList.index);
+                                refactorObjectListItems("version", selectedVersion[0], selectedItemList.index);
+                                setSelectedItemList({});
+                            } else {
+                                setFieldsObject({
+                                    ...fieldsObject,
+                                    partTypeSelected: object,
+                                    partVersionSelected: selectedVersion[0]
+                                });
+                            }
+                            setSearchBarcodeLoading(false);
+                        } else {
+                            setSearchBarcodeLoading(false);
+                            ToastAndroid.showWithGravity(
+                                data.errorCode,
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER
+                            )
+                        }
+                    })
                 } else {
                     setSearchBarcodeLoading(false);
                     ToastAndroid.showWithGravity(
-                        data.errorCode,
+                        `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
                         ToastAndroid.SHORT,
                         ToastAndroid.CENTER
                     )
                 }
-            })
+            } else {
+                setSearchBarcodeLoading(false);
+                ToastAndroid.showWithGravity(
+                    "برای این قطعه باید نسخه را به صورت دستی وارد کنید.",
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER
+                )
+            }
+
         } else {
+            setSearchBarcodeLoading(false);
             ToastAndroid.showWithGravity(
-                "فرمت سریال وارد شده صحیح نیست.",
+                "لطفا نوع قطعه را مشخص کنید.",
                 ToastAndroid.SHORT,
                 ToastAndroid.CENTER
             )
-            setSearchBarcodeLoading(false);
         }
     }
 
@@ -269,9 +320,9 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 <Icon
                                     name={"search"}
                                     style={{color: "#000", fontSize: 30}}
-                                    onPress={()=>{
-                                        setSelectedItemList(Item);
-                                        searchBarcode();
+                                    onPress={async ()=>{
+                                        await setSelectedItemList(Item);
+                                        searchBarcode(Item);
                                     }}
                                 />)}
                             <Icon
@@ -469,10 +520,10 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 <View style={Styles.partTypeContainerStyle}>
                                     <DropdownPicker
                                         list={partsListName}
-                                        onSelect={value=> {
-                                            setFieldsObject({...fieldsObject, partTypeSelected: value, serial:"", partVersionSelected: {}})
+                                        onSelect={async value=> {
+                                            await setFieldsObject({...fieldsObject, partTypeSelected: value, serial:"", partVersionSelected: {}})
                                             setSelectedPartVersionsList(value.value.Versions);
-                                            dropRef.current.setList(value.value.Versions) ;
+                                            dropRef.current.setList(value.value.Versions);
                                         }}
                                         placeholder={!!fieldsObject.partTypeSelected.label
                                             ? fieldsObject.partTypeSelected.label
@@ -487,7 +538,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                                         <Icon
                                             name={"search"}
                                             style={{color: "#000", fontSize: 30, marginHorizontal: 5}}
-                                            onPress={searchBarcode}
+                                            onPress={()=>searchBarcode({})}
                                         />)}
                                     <Icon
                                         name={"qr-code-2"}
@@ -499,8 +550,6 @@ const ServicePartsTab = ({setInfo, info}) => {
                                             setFieldsObject({
                                                 ...fieldsObject,
                                                 serial: text,
-                                                partTypeSelected: {},
-                                                partVersionSelected: ""
                                             });
                                             setSelectedPartVersionsList([]);
                                         }}

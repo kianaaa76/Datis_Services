@@ -155,7 +155,7 @@ const MyService = ({navigation}) => {
                 dispatch({
                     type: LOGOUT
                 });
-                navigation.replace("SignedOut");
+                navigation.navigate("SignedOut");
                 setModalLoading(false);
                 setRenderRestoreModal(false);
             } else {
@@ -257,7 +257,7 @@ const MyService = ({navigation}) => {
                     });
                     setRenderRestoreModal(false);
                     setModalLoading(false);
-                    navigation.replace("SignedOut");
+                    navigation.navigate("SignedOut");
                 } else {
                     setRenderRestoreModal(false);
                     setModalLoading(false);
@@ -291,7 +291,7 @@ const MyService = ({navigation}) => {
                     dispatch({
                         type: LOGOUT
                     });
-                    navigation.replace("SignedOut");
+                    navigation.navigate("SignedOut");
                 } else {
                     ToastAndroid.showWithGravity(
                         data.message,

@@ -152,7 +152,7 @@ const MyService = ({navigation}) => {
               dispatch({
                   type: LOGOUT
               });
-              navigation.replace("SignedOut");
+              navigation.navigate("SignedOut");
           } else {
               ToastAndroid.showWithGravity(
                   data.message,
