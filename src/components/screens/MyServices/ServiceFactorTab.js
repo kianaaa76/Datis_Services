@@ -10,7 +10,7 @@ import {
     TouchableOpacity,
     TouchableHighlight
 } from "react-native";
-import ImageViewer from 'react-native-image-zoom-viewer';
+import ImageViewer from "../../common/ImageViwer";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from 'react-native-image-crop-picker';
 import {BoxShadow} from "react-native-shadow";
@@ -87,6 +87,11 @@ const ServiceFactorTab = ({setInfo, info}) => {
                             setInfo({...info, factorImage:response.data});
                         })
                     }}/>
+                    {!!info.factorImage && (
+                        <Icon name={"delete"} style={{color:"#000", fontSize:30}} onPress={()=>{
+                            setDeletingImage(1);
+                        }}/>
+                    )}
                 </View>
                 <View style={{width: 70}}>
                     <Icon name={"star"} style={{color:"red", fontSize:10}}/>
@@ -94,15 +99,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
                 </View>
             </View>
             {!!info.factorImage && (
-                <TouchableOpacity
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:10}}
-                    onLongPress={()=> {
-                        setDeletingImage(1)
-                    }}>
-                    <Image
-                        source={{uri: `data:image/jpeg;base64,${info.factorImage}`}}
-                        style={{width:"100%", height:"100%"}}/>
-                </TouchableOpacity>
+                <ImageViewer width={pageWidth-30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${info.factorImage}`}/>
             )}
             <View style={Styles.imageRowStyle}>
                 <View style={Styles.getImageContainerViewStyle}>
@@ -127,29 +124,18 @@ const ServiceFactorTab = ({setInfo, info}) => {
                         }).then(response=>{
                             setInfo({...info, billImage:response.data});
                         })}/>
+                    {!!info.billImage && (
+                        <Icon name={"delete"} style={{color:"#000", fontSize:30}} onPress={()=>{
+                            setDeletingImage(2);
+                        }}/>
+                    )}
                 </View>
                 <View style={{width: 100}}>
                     <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
                 </View>
             </View>
             {!!info.billImage && (
-                <TouchableOpacity
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:10}}
-                    onLongPress={()=> {
-                        setDeletingImage(2)
-                    }}>
-                        <ImageViewer
-                            // source={{uri: `data:image/jpeg;base64,${info.billImage}`}}
-                            imageUrls={[{
-                                url:'',
-                                props:{
-                                    source: {uri:`data:image/jpeg;base64,${info.billImage}`},
-                                    width: "100%",
-                                    height:"100%"
-                                }
-                            }]}
-                            style={{width:"100%", height:"100%"}}/>
-                </TouchableOpacity>
+                <ImageViewer width={pageWidth-30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${info.billImage}`}/>
             )}
         </ScrollView>
     {!!deletingImage && (
@@ -203,7 +189,8 @@ const ServiceFactorTab = ({setInfo, info}) => {
 const Styles = StyleSheet.create({
     containerStyle:{
         flex:1,
-        padding:10
+        paddingHorizontal:15,
+        paddingTop:10
     },
     rowDataStyle: {
         flexDirection:"row",
@@ -233,7 +220,7 @@ const Styles = StyleSheet.create({
         justifyContent:"space-between",
         alignItems:"center",
         flexDirection:"row",
-        width:pageWidth*0.25,
+        width:pageWidth*0.3,
         height:"100%"
     },
     rialTextStyle:{

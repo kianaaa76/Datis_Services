@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import {TabView, TabBar} from 'react-native-tab-view';
-import ImageResizer from 'react-native-image-resizer';
 import Header from "../../common/Header";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import RNFetchBlob from 'rn-fetch-blob';
@@ -529,8 +528,8 @@ const MyServiceDetails = ({navigation}) => {
                     renderTabBar={props => (
                         <TabBar
                             {...props}
-                            style={{backgroundColor: '#FFFFFF', height:60}}
-                            labelStyle={{color: '#000', textAlign:"center", fontSize:13}}
+                            style={{backgroundColor: '#FFFFFF', height:pageHeight*0.08}}
+                            labelStyle={{color: '#000', textAlign:"center", fontSize:pageHeight*0.017}}
                             indicatorStyle={{backgroundColor: '#660000'}}/>)}
                     navigationState={{index, routes}}
                     style={{flex:1}}

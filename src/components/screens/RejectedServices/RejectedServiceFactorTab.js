@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from 'react-native-image-crop-picker';
+import ImageViewer from "../../common/ImageViwer";
 import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -61,7 +62,6 @@ const ServiceFactorTab = ({setInfo, info}) => {
                            value={info.factorTotalPrice.toString()}
                            keyboardType="numeric"/>
                 <View style={{width: 70}}>
-                    <Icon name={"star"} style={{color:"red"}}/>
                     <Text style={Styles.labelStyle}>جمع فاکتور:</Text>
                 </View>
             </View>
@@ -96,20 +96,15 @@ const ServiceFactorTab = ({setInfo, info}) => {
                                 });
                             })
                         }}/>
+                    )}
                 </View>
                 <View style={{width: 70}}>
                     <Icon name={"star"} style={{color:"red", fontSize:10}}/>
                     <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
                 </View>
             </View>
-            {!!info.factorImage&& (
-                <TouchableOpacity
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
-                    onLongPress={()=>{setDeletingImage(1)}}>
-                    <Image
-                        source={{uri: `data:image/jpeg;base64,${info.factorImage}`}}
-                        style={{width:"100%", height:"100%"}}/>
-                </TouchableOpacity>
+            {!!info.factorImage && (
+                <ImageViewer width={pageWidth - 30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${info.factorImage}`}/>
             )}
             <View style={Styles.imageRowStyle}>
                 <View style={Styles.getImageContainerViewStyle}>
@@ -140,19 +135,18 @@ const ServiceFactorTab = ({setInfo, info}) => {
                                 billImage:response.data
                             });
                         })}/>
+                    {!!info.billImage && (
+                        <Icon name={"delete"} style={{color:"#000", fontSize:30}} onPress={()=>{
+                            setDeletingImage(2);
+                        }}/>
+                    )}
                 </View>
                 <View style={{width: 100}}>
                     <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
                 </View>
             </View>
             {!!info.billImage && (
-                <TouchableOpacity
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
-                    onLongPress={()=>setDeletingImage(2)}>
-                    <Image
-                        source={{uri: `data:image/jpeg;base64,${info.billImage}`}}
-                        style={{width:"100%", height:"100%"}}/>
-                </TouchableOpacity>
+                <ImageViewer width={pageWidth - 30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${info.billImage}`}/>
             )}
         </ScrollView>
         {!!deletingImage && (
@@ -179,11 +173,7 @@ const ServiceFactorTab = ({setInfo, info}) => {
                             <TouchableOpacity
                                 style={Styles.modalButtonStyle}
                                 onPress={()=> {
-                                    if (deletingImage === 1){
-                                        setInfo({
-                                            ...info, factorImage: ""
-                                        });
-                                    } else if (deletingImage === 2){
+                                    if (deletingImage === 2){
                                         setInfo({
                                             ...info, billImage: ""
                                         });
@@ -206,7 +196,8 @@ const ServiceFactorTab = ({setInfo, info}) => {
 const Styles = StyleSheet.create({
     containerStyle:{
         flex:1,
-        padding:10
+        paddingHorizontal:15,
+        paddingTop:10
     },
     rowDataStyle: {
         flexDirection:"row",
@@ -235,7 +226,7 @@ const Styles = StyleSheet.create({
         justifyContent:"space-between",
         alignItems:"center",
         flexDirection:"row",
-        width:pageWidth*0.25,
+        width:pageWidth*0.3,
         height:"100%"
     },
     rialTextStyle:{

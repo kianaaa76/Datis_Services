@@ -17,6 +17,7 @@ import {LOGOUT} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-crop-picker";
+import ImageViewer from "../../common/ImageViwer";
 import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -277,15 +278,14 @@ const RemainingServiceDetail = ({navigation}) => {
                         }).then(response=>{
                             setFactorImage(response.data)
                         })}/>
+                    {!!factorImage && (
+                        <Icon name={"delete"} style={{color:"#000", fontSize:30}} onPress={()=>{
+                            setDeletingImage(1);
+                        }}/>
+                    )}
                 </View>
                 {!!factorImage && (
-                    <TouchableOpacity
-                        style={{width:pageWidth*0.8, height:pageWidth*0.8, marginTop:15}}
-                        onLongPress={()=>setDeletingImage(1)}>
-                        <Image
-                            source={{uri: `data:image/jpeg;base64,${factorImage}`}}
-                            style={{width:"100%", height:"100%"}}/>
-                    </TouchableOpacity>
+                    <ImageViewer width={pageWidth-30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${factorImage}`}/>
                 )}
             </View>)}
         </ScrollView>

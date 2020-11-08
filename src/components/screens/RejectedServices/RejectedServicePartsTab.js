@@ -11,7 +11,8 @@ import {
     ActivityIndicator,
     TouchableHighlight,
     Alert,
-    Keyboard
+    Keyboard,
+    BackHandler
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -68,6 +69,19 @@ const ServicePartsTab = ({setInfo, info}) => {
             keyboardDidShowListener.remove();
         };
     }, []);
+
+    useEffect(() => {
+        const backAction = () => {
+            if(screenMode){
+                setScreenMode(false);
+            } else {
+                navigation.goBack();
+            }
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+        return () => backHandler.remove();
+    });
 
     const onSuccess = async (code) => {
         await setScreenMode(false);
@@ -318,6 +332,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 style={Styles.descriptionInputStyle}
                                 onChangeText={text=>refactorObjectListItems("failureDescription", text, Item.index)}
                                 value={Item.failureDescription}
+                                multiline
                             />
                         </View>
                         <View style={Styles.garanteeContainerStyle}>
@@ -536,6 +551,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                                         style={Styles.descriptionInputStyle}
                                         onChangeText={text=>setFieldsObject({...fieldsObject, failureDescription: text})}
                                         value={fieldsObject.failureDescription}
+                                        multiline
                                     />
                                 </View>
                                 <View style={Styles.garanteeContainerStyle}>

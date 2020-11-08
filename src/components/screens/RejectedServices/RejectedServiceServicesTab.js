@@ -14,6 +14,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import Foundation from "react-native-vector-icons/Foundation";
 import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
 import ImagePicker from "react-native-image-crop-picker";
+import ImageViewer from "../../common/ImageViwer";
 import PersianCalendarPicker from 'react-native-persian-calendar-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment-jalaali";
@@ -47,6 +48,9 @@ const ServiceServicesTab = ({setInfo, info}) => {
     const [renderTimePicker, setRenderTimePicker] = useState(false);
     const [date, setDate] = useState("");
     const [dateIsSelected, setDateIsSelected] = useState(false);
+    const [userLatitude, setUserLatitude] = useState("");
+    const [userLongitude, setUserLongitude] = useState("");
+    const [areaHasChanged, setAreaHasChanged] = useState(false);
 
     const renderCheckbox = (title, checkboxPurpose) => {
         return (
@@ -93,6 +97,7 @@ const ServiceServicesTab = ({setInfo, info}) => {
                         })
                     }}
                     value={info.description}
+                    multiline
                 />
             </View>
             <View style={Styles.addressRowStyle}>
@@ -135,19 +140,18 @@ const ServiceServicesTab = ({setInfo, info}) => {
                         }).then(response=>{
                             setInfo({...info, image:response.data})
                         })}/>
+                    {!!info.image && (
+                        <Icon name={"delete"} style={{color:"#000", fontSize:30}} onPress={()=>{
+                            setDeletingImage(3);
+                        }}/>
+                    )}
                 </View>
                 <View style={{width: 70}}>
                     <Text style={Styles.labelStyle}>عکس:</Text>
                 </View>
             </View>
             {!!info.image && (
-                <TouchableOpacity
-                    style={{width:"100%", height:pageHeight*0.4, marginVertical:20}}
-                    onLongPress={()=>setDeletingImage(3)}>
-                    <Image
-                        source={{uri: `data:image/jpeg;base64,${info.image}`}}
-                        style={{width:"100%", height:"100%"}}/>
-                </TouchableOpacity>
+                <ImageViewer width={pageWidth-30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${info.image}`}/>
             )}
             <View style={Styles.datePickerRowStyle}>
                 <FontAwesomeIcon name={"calendar"} style={{color:"#000", fontSize:30}} onPress={()=> {
@@ -275,14 +279,19 @@ const ServiceServicesTab = ({setInfo, info}) => {
     </>
     ):(
         <View style={{flex:1}}>
-            <MapboxGL.MapView style={{flex:1}} onPress={feature=>{
-                setSelectedLatitude(feature.geometry.coordinates[1]);
-                setSelectedLongitude(feature.geometry.coordinates[0]);
-            }}>
+            <MapboxGL.MapView style={{flex:1}} 
+                onPress={feature=>{
+                    setSelectedLatitude(feature.geometry.coordinates[1]);
+                    setSelectedLongitude(feature.geometry.coordinates[0]);}}
+                onRegionDidChange={()=>setAreaHasChanged(true)}>
                 <MapboxGL.UserLocation
                     onUpdate={location => {
-                        cameraRef.moveTo([location.coords.longitude, location.coords.latitude], 500);
-                        cameraRef.zoomTo(11, 500)
+                        setUserLatitude(location.coords.latitude);
+                        setUserLongitude(location.coords.longitude);
+                        if(!selectedLatitude && !selectedLongitude && !areaHasChanged){
+                            cameraRef.moveTo([location.coords.longitude, location.coords.latitude], 500);
+                            cameraRef.zoomTo(11, 500)
+                        }
                     }}
                 />
                     <MapboxGL.Camera
@@ -307,6 +316,22 @@ const ServiceServicesTab = ({setInfo, info}) => {
                     </View>
                 )}
             </MapboxGL.MapView>
+            <View style={{
+                position:"absolute", 
+                top: 20, 
+                right:20, 
+                borderRadius:10,
+                justifyContent:"center",
+                alignItems:"center"
+            }}>
+                <Icon 
+                    name={"my-location"} 
+                    style={{fontSize:30, color:"#000"}} 
+                    onPress={async()=>{
+                        await cameraRef.moveTo([userLongitude, userLatitude]);
+                        await cameraRef.zoomTo(11);
+                    }}/>
+            </View>
             <View style={Styles.bottomBoxContainerStyle}>
                 {(!!selectedLatitude && !!selectedLongitude) ? (
                     <TouchableOpacity style={Styles.confirmButtonStyle} onPress={()=> {
@@ -344,7 +369,8 @@ const ServiceServicesTab = ({setInfo, info}) => {
 const Styles = StyleSheet.create({
     containerStyle:{
         flex:1,
-        padding:20,
+        paddingHorizontal:15,
+        paddingTop:10
     },
     descriptionRowStyle: {
         alignItems:"flex-end",
@@ -399,7 +425,7 @@ const Styles = StyleSheet.create({
         justifyContent:"space-between",
         alignItems:"center",
         flexDirection:"row",
-        width:pageWidth*0.23,
+        width:pageWidth*0.3,
         height:"100%",
     },
     bottomBoxContainerStyle:{

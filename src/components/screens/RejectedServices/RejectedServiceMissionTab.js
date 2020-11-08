@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react';
 import {View, Dimensions, Text, StyleSheet, TextInput, Switch, BackHandler} from "react-native";
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from "react-native-vector-icons/Foundation";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import {API_KEY, MAPBOX_API_KEY} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
 
@@ -18,6 +19,9 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
         endLatitude:info.endLatitude,
         endLongitude: info.endLongitude
     });
+    const [userLatitude, setUserLatitude] = useState("");
+    const [userLongitude, setUserLongitude] = useState("");
+    const [areaHasChanged, setAreaHasChanged] = useState(false);
     const [startCity, setStartCity] = useState(info.startCity);
     const [endCity, setEndCity] = useState(info.endCity);
     const [travel, setTravel] = useState(info.travel);
@@ -76,6 +80,7 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
 
     const mapOnLongPress = (feature) => {
         if (!startLocation.startLatitude){
+            setAreaHasChanged(false);
             setStartLocation({
                 startLatitude: feature.geometry.coordinates[1],
                 startLongitude: feature.geometry.coordinates[0]
@@ -138,7 +143,7 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
                     endCity: EndObject
                 })
             })
-            cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],100,100);
+            cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[feature.geometry.coordinates[0], feature.geometry.coordinates[1]],[pageHeight*0.1,100,pageHeight*0.4,100],100);
         }
     }
 
@@ -146,20 +151,20 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
         <View style={Styles.containerStyle}>
             <MapboxGL.MapView
                 style={{width:pageWidth, height:pageHeight}}
-                onLongPress={feature => mapOnLongPress(feature)}>
+                onLongPress={feature => mapOnLongPress(feature)}
+                onRegionDidChange={()=>setAreaHasChanged(true)}>
                 <MapboxGL.UserLocation
                     onUpdate={location => {
-                        if (!startLocation.startLatitude && !endLocation.endLongitude) {
+                        setUserLatitude(location.coords.latitude);
+                        setUserLongitude(location.coords.longitude);
+                        if (!startLocation.startLatitude && !endLocation.endLongitude && !areaHasChanged) {
                             cameraRef.moveTo([location.coords.longitude, location.coords.latitude]);
                             cameraRef.zoomTo(11)
-                        } else if (!startLocation.startLatitude && !endLocation.endLongitude){
-                        cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[endLocation.endLongitude, endLocation.endLatitude],100,100);
-                        } else if (!startLocation.startLatitude && !!endLocation.endLatitude){
-                            cameraRef.moveTo([endLocation.endLongitude, endLocation.endLatitude]);
-                            cameraRef.zoomTo(11)
-                        } else {
+                        } else if (!!startLocation.startLatitude && !!endLocation.endLongitude){
+                        cameraRef.fitBounds([startLocation.startLongitude,startLocation.startLatitude],[endLocation.endLongitude, endLocation.endLatitude],[pageHeight*0.1,100,pageHeight*0.4,100],100);
+                        } else if (!!startLocation.startLatitude && !endLocation.endLatitude && !areaHasChanged){
                             cameraRef.moveTo([startLocation.startLongitude, startLocation.startLatitude]);
-                            cameraRef.zoomTo(11)
+                            cameraRef.zoomTo(11);
                         }
                     }}
                 />
@@ -182,6 +187,22 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
                     </Text>
                 </View>
             )}
+            <View style={{
+                position:"absolute", 
+                bottom:!!startLocation.startLatitude && !!endLocation.endLatitude ? pageHeight*0.35 + 25 : 20, 
+                right:20, 
+                borderRadius:10,
+                justifyContent:"center",
+                alignItems:"center"
+            }}>
+                <MaterialIcons 
+                name={"my-location"} 
+                style={{fontSize:30, color:"#000"}} 
+                onPress={async()=>{
+                    await cameraRef.moveTo([userLongitude, userLatitude]);
+                    await cameraRef.zoomTo(11);
+                }}/>
+            </View>
             {!!startLocation.startLongitude && !!endLocation.endLongitude && (
                 <View style={Styles.cardContainerStyle}>
                     <View style={Styles.cardContentContainerStyle}>
@@ -198,7 +219,7 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
                         <View style={Styles.distanceRowStyle}>
                             <View style={Styles.distanceContainerStyle}>
                                 <Text>کیلومتر</Text>
-                                <Text style={{marginHorizontal:5}}>{toFaDigit(distance).substr(0,15)}</Text>
+                                <Text style={{marginHorizontal:5}}>{toFaDigit(distance).substr(0,10)}</Text>
                                 <Text style={Styles.titleStyle}>فاصله: </Text>
                             </View>
                             <View style={Styles.switchContainerStyle}>
@@ -215,7 +236,7 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
                                     value={travel}
                                 />
                                 <Text style={Styles.titleStyle}>
-                                    بازگشت به مبدا:
+                                    بازگشت به منزل:
                                 </Text>
                             </View>
                         </View>

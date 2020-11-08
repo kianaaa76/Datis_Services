@@ -18,7 +18,6 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedProjectId, renderLoading}) => {
-    console.log("itemmmm1233333", item);
     let dirs = RNFetchBlob.fs.dirs;
     const shadowOpt = {
         width: pageWidth * 0.9,
