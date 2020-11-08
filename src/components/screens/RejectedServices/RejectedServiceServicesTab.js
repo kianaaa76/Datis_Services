@@ -7,7 +7,9 @@ import {
     Dimensions,
     ScrollView,
     Image,
-    TouchableOpacity, TouchableHighlight,
+    TouchableOpacity, 
+    TouchableHighlight,
+    BackHandler
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -51,6 +53,19 @@ const ServiceServicesTab = ({setInfo, info}) => {
     const [userLatitude, setUserLatitude] = useState("");
     const [userLongitude, setUserLongitude] = useState("");
     const [areaHasChanged, setAreaHasChanged] = useState(false);
+
+    useEffect(() => {
+        const backAction = () => {
+            if(screenMode === "map"){
+                setScreenMode("tab");
+            } else {
+                navigation.goBack();
+            }
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+        return () => backHandler.remove();
+    });
 
     const renderCheckbox = (title, checkboxPurpose) => {
         return (
