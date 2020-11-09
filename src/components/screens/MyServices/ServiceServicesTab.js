@@ -9,7 +9,7 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
-  BackHandler,
+  BackHandler, ToastAndroid,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -24,6 +24,7 @@ import {API_KEY} from '../../../actions/types';
 import {toFaDigit} from '../../utils/utilities';
 import {BoxShadow} from 'react-native-shadow';
 import ImageViewer from '../../common/ImageViwer';
+import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -417,8 +418,28 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
           name={'my-location'}
           style={{fontSize: 30, color: '#000'}}
           onPress={async () => {
-            await cameraRef.moveTo([userLongitude, userLatitude]);
-            await cameraRef.zoomTo(11);
+            LocationServicesDialogBox.checkLocationServicesIsEnabled({
+              message: "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+              ok: "YES",
+              cancel: "NO",
+              enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+              showDialog: true, // false => Opens the Location access page directly
+              openLocationServices: true, // false => Directly catch method is called if location services are turned off
+              preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
+              preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
+              providerListener: false // true ==> Trigger locationProviderStatusChange listener when the location state changes
+            }).then(async success => {
+              console.log(success);
+              await cameraRef.moveTo([userLongitude, userLatitude]);
+              await cameraRef.zoomTo(11);
+            }).catch(error => {
+              console.log(error);
+              ToastAndroid.showWithGravity(
+                  "موقعیت در دسترس نیست.",
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+              );
+            });
           }}
         />
       </View>

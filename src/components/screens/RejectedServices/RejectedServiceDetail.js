@@ -7,7 +7,9 @@ import {
     ActivityIndicator,
     Alert,
     TouchableHighlight,
-    Text, TouchableOpacity
+    Text,
+    TouchableOpacity,
+    BackHandler
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import {TabView, TabBar} from 'react-native-tab-view';
@@ -89,8 +91,9 @@ const MyServiceDetails = ({navigation}) => {
     const [partsListName, setPartsListName] = useState(selector.objectsList);
     const [renderConfirmModal,setRenderConfirmModal] = useState(false);
     const [renderNetworkModal,setRenderNetworkModal] = useState(false);
+    const [renderSaveModal, setRenderSaveModal] = useState(false);
 
-        useEffect(()=>{
+    useEffect(()=>{
             if (partsTabInfo.length>0 && !partsTabInfo[0].availableVersions){
                 let temp = []
                 partsTabInfo.map((item, index)=>{
@@ -113,6 +116,19 @@ const MyServiceDetails = ({navigation}) => {
                 setPartsTabInfo(temp);
             }
         },[])
+
+    useEffect(() => {
+        const backAction = () => {
+            if(!renderSaveModal){
+                setRenderSaveModal(true)
+            } else {
+                navigation.replace("RejectedServices");
+            }
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+        return () => backHandler.remove();
+    });
 
     const setFactorInfo = (e) => {
         setFactorTabInfo(
@@ -467,7 +483,7 @@ const MyServiceDetails = ({navigation}) => {
     const renderScene = ({ route }) => {
         switch (route.key) {
             case 'services':
-                return <ServiceServicesTab setInfo={(e)=>setServiceInfo(e)} info={serviceTabInfo}/>;
+                return <ServiceServicesTab setInfo={(e)=>setServiceInfo(e)} info={serviceTabInfo} navigation={navigation}/>;
             case 'factor':
                 return <ServiceFactorTab setInfo={(e)=>setFactorInfo(e)} info={factorTabInfo} serviceInfo={serviceTabInfo}/>;
             case 'parts':
@@ -541,6 +557,38 @@ const MyServiceDetails = ({navigation}) => {
                                     <Text style={Styles.modalButtonTextStyle}>
                                         بله
                                     </Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+            )}
+            {renderSaveModal && (
+                <TouchableHighlight
+                    style={Styles.modalBackgroundStyle}
+                    onPress={() => setRenderSaveModal(false)}>
+                    <View style={Styles.modalContainerStyle}>
+                        <View style={Styles.modalBodyContainerStyle2}>
+                            <Text>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
+                        </View>
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <BoxShadow setting={shadowOpt2}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={() => {
+                                        setRenderSaveModal(false);
+                                        navigation.replace("RejectedServices");
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+                                </TouchableOpacity>
+                            </BoxShadow>
+                            <BoxShadow setting={shadowOpt2}>
+                                <TouchableOpacity
+                                    style={Styles.modalButtonStyle}
+                                    onPress={() => {
+                                        onSavePress("self");
+                                    }}>
+                                    <Text style={Styles.modalButtonTextStyle}>بله</Text>
                                 </TouchableOpacity>
                             </BoxShadow>
                         </View>

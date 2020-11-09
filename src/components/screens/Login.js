@@ -16,7 +16,6 @@ import {
   LOGIN, LOGOUT,
 } from '../../actions/types';
 import { useDispatch} from 'react-redux';
-import {BoxShadow} from 'react-native-shadow';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit} from '../utils/utilities';
 import {loginUser, loginVerification, getUsers} from '../../actions/api';
@@ -50,6 +49,7 @@ const Login = ({navigation}) => {
       setPersistLoading(false);
     }
   });
+
 
   const onReceiveCodePress = () => {
     setReceiveCodeLoading(true);
@@ -117,17 +117,6 @@ const Login = ({navigation}) => {
       }
     }
 
-  const shadowOpt = {
-    width: pageWidth * 0.45,
-    height: pageWidth * 0.11,
-    color: '#000',
-    radius: 7,
-    opacity: 0.1,
-    x: 0,
-    y: 5,
-    style: {marginTop: 30},
-  };
-
   return persistLoading ? (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <ActivityIndicator size="large" color="#660000" />
@@ -189,7 +178,6 @@ const Login = ({navigation}) => {
           </View>
           {hasCode ? (
             <View>
-              <BoxShadow setting={shadowOpt}>
                 {receiveCodeLoading ? (
                   <View style={Styles.buttonStyle}>
                     <ActivityIndicator size="small" color="gray" />
@@ -213,8 +201,6 @@ const Login = ({navigation}) => {
                     </Text>
                   </View>
                 )}
-              </BoxShadow>
-              <BoxShadow setting={shadowOpt}>
                 {enterSystemLoading ? (
                   <View style={Styles.buttonStyle}>
                     <ActivityIndicator size="small" color="gray" />
@@ -226,11 +212,9 @@ const Login = ({navigation}) => {
                     <Text style={Styles.buttonTextStyle}>ورود به سیستم</Text>
                   </TouchableOpacity>
                 )}
-              </BoxShadow>
             </View>
           ) : (
             <View style={Styles.buttonContainerStyle}>
-              <BoxShadow setting={shadowOpt}>
                 {receiveCodeLoading ? (
                   <View style={Styles.buttonStyle}>
                     <ActivityIndicator size="small" color="gray" />
@@ -244,7 +228,6 @@ const Login = ({navigation}) => {
                     </Text>
                   </TouchableOpacity>
                 )}
-              </BoxShadow>
             </View>
           )}
         </View>
@@ -273,6 +256,8 @@ const Styles = StyleSheet.create({
     width: pageWidth * 0.45,
     height: pageWidth * 0.11,
     borderRadius: 7,
+    elevation: 4,
+    marginTop:30
   },
   buttonTextStyle: {
     fontSize: 14,
@@ -307,5 +292,6 @@ const Styles = StyleSheet.create({
     width: pageWidth * 0.4,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation:3
   },
 });

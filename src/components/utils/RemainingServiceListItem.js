@@ -26,13 +26,7 @@ const RemainingServiceListItem = ({item, navigation}) => {
 
     const Item = item.item;
     return (
-        <View style={{flex: 1}}>
-            <BoxShadow setting={shadowOpt}>
                 <TouchableWithoutFeedback
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                    }}
                     onPress={() => {
                         navigation.navigate('RemainingServiceDetail', {service: Item})
                     }}>
@@ -41,11 +35,11 @@ const RemainingServiceListItem = ({item, navigation}) => {
                         height: pageHeight * 0.1,
                         backgroundColor: '#fff',
                         padding: 10,
-                        marginVertical: 10,
+                        marginVertical: 4,
+                        marginHorizontal:3,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        borderWidth: 1,
-                        borderColor: 'rgba(158, 150, 150, 0.3)',
+                        elevation:3
                     }}>
                         <View style={Styles.secondRowContainerStyle}>
                             <View style={Styles.singleItemStyle}>
@@ -61,8 +55,7 @@ const RemainingServiceListItem = ({item, navigation}) => {
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
-            </BoxShadow>
-        </View>
+
     );
 };
 

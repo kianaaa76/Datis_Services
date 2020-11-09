@@ -6,25 +6,12 @@ import {
     Text,
     TouchableWithoutFeedback,
 } from 'react-native';
-import {BoxShadow} from 'react-native-shadow';
 import {toFaDigit} from '../utils/utilities';
-import {unsettledServiceDetail} from "../../actions/api";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const MissionListItem = ({item, navigation}) => {
-    const shadowOpt = {
-        width: pageWidth * 0.9,
-        height: pageHeight * 0.1,
-        color: '#000',
-        radius: 5,
-        opacity: 0.1,
-        x: 2,
-        y: 3,
-        style: {justifyContent: 'center', alignItems: 'center', marginVertical: 6},
-    };
-
     const getState = (stateNum) =>{
         switch (stateNum) {
             case 0:
@@ -93,13 +80,7 @@ const MissionListItem = ({item, navigation}) => {
 
     const Item = item.item;
     return (
-        <View style={{flex: 1}}>
-            <BoxShadow setting={shadowOpt}>
                 <TouchableWithoutFeedback
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                    }}
                     onPress={() => {
                         navigation.navigate('ServiceArchiveDetail', {service: Item})
                     }}>
@@ -108,11 +89,11 @@ const MissionListItem = ({item, navigation}) => {
                         height: pageHeight * 0.1,
                         backgroundColor: '#fff',
                         padding: 10,
-                        marginVertical: 10,
+                        marginVertical: 4,
+                        marginHorizontal:3,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        borderWidth: 1,
-                        borderColor: 'rgba(158, 150, 150, 0.3)',
+                        elevation:3
                     }}>
                         <View style={Styles.firstRowContainerStyle}>
                             <View style={Styles.singleItemStyle}>
@@ -136,8 +117,6 @@ const MissionListItem = ({item, navigation}) => {
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
-            </BoxShadow>
-        </View>
     );
 };
 

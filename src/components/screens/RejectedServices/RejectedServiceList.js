@@ -205,7 +205,6 @@ const MyService = ({navigation}) => {
                     Index = index;
                 }
             });
-            console.log("(((((((((((()))))))))))",currentList[Index].objectList);
             dispatch({
                 type:RESTORE_SERVICE_DATA,
                 savedServiceInfo:{
@@ -469,6 +468,7 @@ const Styles = StyleSheet.create({
         width: pageWidth * 0.95,
         justifyContent: 'center',
         alignItems: 'center',
+        height:pageHeight
     },
     newServiceButtonStyle: {
         width: pageWidth * 0.2,

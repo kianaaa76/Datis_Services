@@ -6,29 +6,17 @@ import {
     Text,
     Dimensions, ToastAndroid, Alert,
 } from 'react-native';
-import {BoxShadow} from 'react-native-shadow';
 import {useDispatch, useSelector} from 'react-redux';
 import {toFaDigit} from './utilities';
 import AsyncStorage from "@react-native-community/async-storage";
 import {LOGOUT, RESTORE_SERVICE_DATA} from "../../actions/types";
 import {rejectedServiceDetail} from "../../actions/api";
-import RNFetchBlob from "rn-fetch-blob";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedProjectId, renderLoading}) => {
-    let dirs = RNFetchBlob.fs.dirs;
-    const shadowOpt = {
-        width: pageWidth * 0.9,
-        height: pageHeight * 0.13,
-        color: '#000',
-        radius: 5,
-        opacity: 0.1,
-        x: 2,
-        y: 3,
-        style: {justifyContent: 'center', alignItems: 'center', marginVertical: 6},
-    };
+
     const Item = item.item;
     const dispatch = useDispatch();
     const selector = useSelector((state) => state);
@@ -82,13 +70,7 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
 
 
     return (
-        <View style={{flex: 1}}>
-            <BoxShadow setting={shadowOpt}>
                 <TouchableWithoutFeedback
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                    }}
                     onPress={async () =>{
                         await AsyncStorage.getItem("savedServicesList").then(list=> {
                             if(!!list){
@@ -260,8 +242,9 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                             paddingVertical: 2,
                             justifyContent: 'center',
                             alignItems: 'center',
-                            borderWidth: 1,
-                            borderColor: 'rgba(158, 150, 150, 0.3)',
+                            elevation:3,
+                            marginVertical: 4,
+                            marginHorizontal:3,
                         }}>
                         <View style={Styles.secondRowContainerStyle}>
                             <View style={Styles.singleItemStyle}>
@@ -287,8 +270,6 @@ const RejectedServiceListItem = ({item, navigation, setModalState, setSelectedPr
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
-            </BoxShadow>
-        </View>
     );
 };
 

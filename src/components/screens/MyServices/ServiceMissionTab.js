@@ -7,10 +7,12 @@ import {
   StyleSheet,
   TextInput,
   BackHandler,
+  ToastAndroid
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from 'react-native-vector-icons/Foundation';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 import {API_KEY, MAPBOX_API_KEY} from '../../../actions/types';
 import {toFaDigit} from '../../utils/utilities';
 
@@ -18,6 +20,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 let EndObject = {};
 let cameraRef = {};
+
 const ServiceMissionTab = ({info, setInfo, navigation}) => {
   const [startLocation, setStartLocation] = useState({
     startLatitude: info.startLatitude,
@@ -278,82 +281,98 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
         <MaterialIcons
           name={'my-location'}
           style={{fontSize: 30, color: '#000'}}
-          onPress={async () => {
-            await cameraRef.moveTo([userLongitude, userLatitude]);
-            await cameraRef.zoomTo(11);
+          onPress={() => {
+            LocationServicesDialogBox.checkLocationServicesIsEnabled({
+              message: "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+              ok: "YES",
+              cancel: "NO",
+              enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+              showDialog: true, // false => Opens the Location access page directly
+              openLocationServices: true, // false => Directly catch method is called if location services are turned off
+              preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
+              preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
+              providerListener: false // true ==> Trigger locationProviderStatusChange listener when the location state changes
+            }).then(async () => {
+              await cameraRef.moveTo([userLongitude, userLatitude],500);
+              await cameraRef.zoomTo(11,500);
+            }).catch(() => {
+              ToastAndroid.showWithGravity(
+                  "موقعیت در دسترس نیست.",
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+              );
+            });
           }}
         />
       </View>
       {!!startLocation.startLongitude && !!endLocation.endLongitude && (
-        <View style={Styles.cardContainerStyle}>
-          <View style={Styles.cardContentContainerStyle}>
-            <View style={Styles.cityDataContainerStyle}>
-              <View style={Styles.cityDataContentContainerStyle}>
+            <View style={Styles.cardContentContainerStyle}>
+              <View style={Styles.cityDataContainerStyle}>
+                <View style={Styles.cityDataContentContainerStyle}>
+                  <TextInput
+                    style={Styles.cityDataTextStyle}
+                    onChangeText={text => {
+                      setInfo({
+                        ...info,
+                        endCity: text,
+                      });
+                      setEndCity(text);
+                    }}
+                    value={endCity}
+                  />
+                  <Text style={Styles.titleStyle}>شهر مقصد: </Text>
+                </View>
+                <View style={Styles.cityDataContentContainerStyle}>
+                  <TextInput
+                    style={Styles.cityDataTextStyle}
+                    onChangeText={text => {
+                      setInfo({
+                        ...info,
+                        start: text,
+                      });
+                      setStartCity(text);
+                    }}
+                    value={startCity}
+                  />
+                  <Text style={Styles.titleStyle}>شهر مبدا: </Text>
+                </View>
+              </View>
+              <View style={Styles.distanceRowStyle}>
+                <View style={Styles.distanceContainerStyle}>
+                  <Text>کیلومتر</Text>
+                  <Text style={{marginHorizontal: 5}}>
+                    {toFaDigit(distance).substr(0, 10)}
+                  </Text>
+                  <Text style={Styles.titleStyle}>فاصله: </Text>
+                </View>
+                <View style={Styles.switchContainerStyle}>
+                  <Switch
+                    trackColor={{false: 'gray', true: '#660000'}}
+                    thumbColor={travel ? '#990000' : '#C0C0C0'}
+                    onValueChange={() => {
+                      setTravel(!travel);
+                      setInfo({
+                        ...info,
+                        travel: !info.travel,
+                      });
+                    }}
+                    value={travel}
+                  />
+                  <Text style={Styles.titleStyle}>بازگشت به منزل:</Text>
+                </View>
+              </View>
+              <View style={Styles.descriptionContainerStyle}>
+                <Text style={Styles.descriptionTitleTextStyle}>توضیحات: </Text>
                 <TextInput
-                  style={Styles.cityDataTextStyle}
-                  onChangeText={text => {
-                    setInfo({
-                      ...info,
-                      endCity: text,
-                    });
-                    setEndCity(text);
-                  }}
-                  value={endCity}
+                  value={info.missionDescription}
+                  style={Styles.descriptionTextInputStyle}
+                  multiline
+                  onChangeText={description =>
+                    setInfo({...info, missionDescription: description})
+                  }
                 />
-                <Text style={Styles.titleStyle}>شهر مقصد: </Text>
-              </View>
-              <View style={Styles.cityDataContentContainerStyle}>
-                <TextInput
-                  style={Styles.cityDataTextStyle}
-                  onChangeText={text => {
-                    setInfo({
-                      ...info,
-                      start: text,
-                    });
-                    setStartCity(text);
-                  }}
-                  value={startCity}
-                />
-                <Text style={Styles.titleStyle}>شهر مبدا: </Text>
               </View>
             </View>
-            <View style={Styles.distanceRowStyle}>
-              <View style={Styles.distanceContainerStyle}>
-                <Text>کیلومتر</Text>
-                <Text style={{marginHorizontal: 5}}>
-                  {toFaDigit(distance).substr(0, 10)}
-                </Text>
-                <Text style={Styles.titleStyle}>فاصله: </Text>
-              </View>
-              <View style={Styles.switchContainerStyle}>
-                <Switch
-                  trackColor={{false: 'gray', true: '#660000'}}
-                  thumbColor={travel ? '#990000' : '#C0C0C0'}
-                  onValueChange={() => {
-                    setTravel(!travel);
-                    setInfo({
-                      ...info,
-                      travel: !info.travel,
-                    });
-                  }}
-                  value={travel}
-                />
-                <Text style={Styles.titleStyle}>بازگشت به منزل:</Text>
-              </View>
-            </View>
-            <View style={Styles.descriptionContainerStyle}>
-              <Text style={Styles.descriptionTitleTextStyle}>توضیحات: </Text>
-              <TextInput
-                value={info.missionDescription}
-                style={Styles.descriptionTextInputStyle}
-                multiline
-                onChangeText={description =>
-                  setInfo({...info, missionDescription: description})
-                }
-              />
-            </View>
-          </View>
-        </View>
       )}
     </View>
   );
@@ -386,23 +405,17 @@ const Styles = StyleSheet.create({
   markerLabelContainerStyle: {
     backgroundColor: 'red',
   },
-  cardContainerStyle: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#505050',
-    borderRadius: 5,
-    padding: 6,
+  cardContentContainerStyle: {
     width: pageWidth * 0.9,
     height: pageHeight * 0.35,
-    position: 'absolute',
-    bottom: 15,
-  },
-  cardContentContainerStyle: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(255,255,255,1)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 5,
+    paddingHorizontal: 7,
+    borderRadius:15,
+    elevation: 6,
+    position: 'absolute',
+    bottom: 15,
   },
   cityContainerStyle: {
     flexDirection: 'row',

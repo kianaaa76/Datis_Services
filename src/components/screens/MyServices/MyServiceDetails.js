@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   Alert,
+  BackHandler
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {TabView, TabBar} from 'react-native-tab-view';
@@ -72,6 +73,7 @@ const MyServiceDetails = ({navigation}) => {
   const [requestLoading, setRequestLoading] = useState(false);
   const [renderNetworkModal, setRenderNetworkModal] = useState(false);
   const [renderConfirmModal, setRenderConfirmModal] = useState(false);
+  const [renderSaveModal, setRenderSaveModal] = useState(false);
   const serviceID = navigation.getParam('serviceID');
   const [factorTabInfo, setFactorTabInfo] = useState({
     factorReceivedPrice: selector.savedServiceInfo.factorReceivedPrice,
@@ -135,6 +137,19 @@ const MyServiceDetails = ({navigation}) => {
       });
   }, []);
 
+  useEffect(() => {
+    const backAction = () => {
+      if(!renderSaveModal){
+        setRenderSaveModal(true)
+      } else {
+        navigation.replace("MyServices");
+      }
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+    return () => backHandler.remove();
+  });
+
   const setFactorInfo = e => {
     setFactorTabInfo({
       factorReceivedPrice: e.factorReceivedPrice,
@@ -170,7 +185,6 @@ const MyServiceDetails = ({navigation}) => {
   };
 
   const convertResultTitleToNum = title => {
-      console.log("titleee", title);
     switch (title) {
       case 'موفق':
         return 1;
@@ -649,6 +663,38 @@ const MyServiceDetails = ({navigation}) => {
             </View>
           </View>
         </TouchableHighlight>
+      )}
+      {renderSaveModal && (
+          <TouchableHighlight
+              style={Styles.modalBackgroundStyle}
+              onPress={() => setRenderSaveModal(false)}>
+            <View style={Styles.modalContainerStyle}>
+              <View style={Styles.modalBodyContainerStyle2}>
+                <Text>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
+              </View>
+              <View style={Styles.modalFooterContainerStyle}>
+                <BoxShadow setting={shadowOpt2}>
+                  <TouchableOpacity
+                      style={Styles.modalButtonStyle}
+                      onPress={() => {
+                        setRenderSaveModal(false);
+                        navigation.replace("MyServices");
+                      }}>
+                    <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+                  </TouchableOpacity>
+                </BoxShadow>
+                <BoxShadow setting={shadowOpt2}>
+                  <TouchableOpacity
+                      style={Styles.modalButtonStyle}
+                      onPress={() => {
+                        onSavePress("self");
+                      }}>
+                    <Text style={Styles.modalButtonTextStyle}>بله</Text>
+                  </TouchableOpacity>
+                </BoxShadow>
+              </View>
+            </View>
+          </TouchableHighlight>
       )}
       {renderNetworkModal && (
         <TouchableHighlight
