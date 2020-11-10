@@ -66,15 +66,16 @@ const Styles = StyleSheet.create({
         marginBottom:15,
     },
     titleTextStyle: {
-        fontSize:15,
-        fontWeight:"bold",
-        width:100,
+        fontSize:14,
+        fontFamily:"IRANSansMobile_Medium",
+        width:110,
     },
     textStyle: {
-        fontSize: 15,
+        fontSize: 14,
         textAlign:"right",
         width: pageWidth-160,
         height:55,
+        fontFamily:"IRANSansMobile_Light"
     },
     rightSideContainerStyle:{
         flexDirection:"row",

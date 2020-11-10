@@ -32,7 +32,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                     }}
                     value={info.factorReceivedPrice.toString()}
                     keyboardType="numeric"/>
-                <View style={{width: 70}}>
+                <View style={{width: 85, flexDirection:"row"}}>
                     {serviceInfo.serviceResult !== 'لغو موفق' &&
                     serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                         <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -51,7 +51,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                            }}
                            value={info.factorTotalPrice.toString()}
                            keyboardType="numeric"/>
-                <View style={{width: 70}}>
+                <View style={{width: 80, flexDirection:"row", justifyContent:"flex-end"}}>
                     {serviceInfo.serviceResult !== 'لغو موفق' &&
                     serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                         <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -91,7 +91,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                             })
                         }}/>
                 </View>
-                <View style={{width: 70}}>
+                <View style={{width: 80, flexDirection:"row"}}>
                     {serviceInfo.serviceResult !== 'لغو موفق' &&
                     serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                         <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -137,7 +137,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                         }}/>
                     )}
                 </View>
-                <View style={{width: 100}}>
+                <View style={{width: 120}}>
                     <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
                 </View>
             </View>
@@ -197,7 +197,7 @@ const Styles = StyleSheet.create({
         height:65,
         marginBottom:15,
         alignItems:"center",
-        justifyContent:"center"
+        justifyContent:"flex-end"
     },
     textInputStyle: {
         width: pageWidth*0.5,
@@ -209,7 +209,7 @@ const Styles = StyleSheet.create({
     },
     imageRowStyle:{
         flexDirection: "row",
-        width:pageWidth*0.8,
+        width:"100%",
         height:65,
         alignItems:"center",
         justifyContent:"space-between",
@@ -222,10 +222,11 @@ const Styles = StyleSheet.create({
         height:"100%"
     },
     rialTextStyle:{
-        width:pageWidth*0.1
+        fontSize:13,
+        fontFamily:"IRANSansMobile_Light"
     },
     labelStyle: {
-        width:"100%",
+        fontFamily:"IRANSansMobile_Light",
     },
     modalBackgroundStyle:{
         flex:1,

@@ -74,7 +74,7 @@ const NewService = ({navigation}) => {
         <Header headerText={"سرویس جدید"}/>
         <View style={Styles.contentStyle}>
           <View style={Styles.singleItemContainerStyle}>
-            <Text>نام و نام خانوادگی صاحب پروژه</Text>
+            <Text style={{fontSize:14, fontFamily:"IRANSansMobile_Light"}}>نام و نام خانوادگی صاحب پروژه</Text>
             <View style={Styles.nameRowInputStyle}>
               <View style={Styles.iconContainerStyle}>
                 <FontAwesome
@@ -93,7 +93,7 @@ const NewService = ({navigation}) => {
             </View>
           </View>
           <View style={Styles.singleItemContainerStyle}>
-            <Text>شماره تماس صاحب پروژه</Text>
+            <Text style={{fontSize:14, fontFamily:"IRANSansMobile_Light"}}>شماره تماس صاحب پروژه</Text>
             <TextInput
                 placeholder={"شماره همراه"}
                 style={Styles.textInputStyle}
@@ -104,7 +104,7 @@ const NewService = ({navigation}) => {
             />
           </View>
           <View style={Styles.singleItemContainerStyle}>
-            <Text>آدرس محل پروژه</Text>
+            <Text style={{fontSize:14, fontFamily:"IRANSansMobile_Light"}}>آدرس محل پروژه</Text>
             <TextInput
                 placeholder={"آدرس"}
                 style={Styles.textInputStyle}
@@ -114,7 +114,7 @@ const NewService = ({navigation}) => {
             />
           </View>
           <View style={Styles.singleItemContainerStyle}>
-            <Text>سریال پروژه</Text>
+            <Text style={{fontSize:14, fontFamily:"IRANSansMobile_Light"}}>سریال پروژه</Text>
             <TextInput
                 placeholder={"سریال"}
                 style={Styles.textInputStyle}
@@ -166,7 +166,8 @@ const Styles = StyleSheet.create({
     height:pageHeight*0.07,
     borderBottomWidth:2,
     borderBottomColor:"#660000",
-    textAlign: "center"
+    textAlign: "center",
+    fontFamily:"IRANSansMobile_Light"
   },
   buttonStyle:{
     backgroundColor: "#660000",
@@ -179,7 +180,8 @@ const Styles = StyleSheet.create({
   buttonTextStyle:{
     textAlign:"center",
     color: "#fff",
-    fontSize:17
+    fontSize:16,
+    fontFamily:"IRANSansMobile_Medium"
   },
   singleItemContainerStyle:{
     width:"100%",

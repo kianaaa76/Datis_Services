@@ -602,7 +602,8 @@ const MyServiceDetails = ({navigation}) => {
               labelStyle={{
                 color: '#000',
                 textAlign: 'center',
-                fontSize: pageHeight * 0.017,
+                fontSize: pageHeight * 0.016,
+                fontFamily:"IRANSansMobile_Light",
               }}
               indicatorStyle={{backgroundColor: '#660000'}}
             />
@@ -620,7 +621,7 @@ const MyServiceDetails = ({navigation}) => {
           onPress={() => setRenderConfirmModal(false)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: 15, fontWeight: 'bold'}}>
+              <Text style={{fontSize: 15, fontFamily:"IRANSansMobile_Medium"}}>
                 آیا از ارسال اطلاعات اطمینان دارید؟
               </Text>
             </View>
@@ -649,7 +650,7 @@ const MyServiceDetails = ({navigation}) => {
           onPress={() => setRenderSaveModal(false)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
+              <Text style={{fontSize: 14, fontFamily:"IRANSansMobile_Medium", textAlign:"center"}}>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
               <TouchableOpacity
@@ -757,7 +758,8 @@ const Styles = StyleSheet.create({
   },
   modalHeaderTextStyle: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily:"IRANSansMobile_Medium"
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -768,14 +770,16 @@ const Styles = StyleSheet.create({
   modalBodyContainerStyle2: {
     width: '100%',
     height: '40%',
+    marginTop:"5%",
     alignItems: 'center',
     padding: 10,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily:"IRANSansMobile_Light"
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -806,7 +810,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium"
   },
   onScreenLoadingContainerStyle: {
     width: pageWidth,

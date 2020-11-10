@@ -162,7 +162,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
               />
             )}
           </View>
-          <View style={{width: 100}}>
+          <View style={{width: 120}}>
             <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
           </View>
         </View>
@@ -180,7 +180,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
           onPress={() => setDeletingImage(0)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize:15, fontWeight:"bold"}}>آیا از پاک کردن عکس اطمینان دارید؟</Text>
+              <Text style={{fontSize:14, fontFamily:"IRANSansMobile_Medium"}}>آیا از پاک کردن عکس اطمینان دارید؟</Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
                 <TouchableOpacity
@@ -255,9 +255,13 @@ const Styles = StyleSheet.create({
   },
   rialTextStyle: {
     width: pageWidth * 0.1,
+    fontSize:13,
+    fontFamily:"IRANSansMobile_Light"
   },
   labelStyle: {
     width: '100%',
+    fontSize:13, 
+    fontFamily:'IRANSansMobile_Light'
   },
   modalBackgroundStyle: {
     flex: 1,
@@ -317,7 +321,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium"
   },
 });
 

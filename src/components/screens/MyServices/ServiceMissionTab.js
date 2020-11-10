@@ -340,8 +340,8 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
           </View>
           <View style={Styles.distanceRowStyle}>
             <View style={Styles.distanceContainerStyle}>
-              <Text>کیلومتر</Text>
-              <Text style={{marginHorizontal: 5}}>
+              <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13}}>کیلومتر</Text>
+              <Text style={{marginHorizontal: 5, fontFamily:"IRANSansMobile(FaNum)_Light", fontSize:13}}>
                 {toFaDigit(distance).substr(0, 10)}
               </Text>
               <Text style={Styles.titleStyle}>فاصله: </Text>
@@ -386,8 +386,8 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTextStyle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontFamily:"IRANSansMobile_Medium",
     textAlign: 'center',
   },
   headerTextContainerStyle: {
@@ -435,10 +435,11 @@ const Styles = StyleSheet.create({
   cityDataTextStyle: {
     borderBottomWidth: 1,
     borderBottomColor: '#000',
-    fontSize: 15,
+    fontSize: 14,
     marginLeft: 10,
     width: '35%',
     textAlign: 'center',
+    fontFamily:"IRANSansMobile_Light"
   },
   cityDataContentContainerStyle: {
     flexDirection: 'row',
@@ -453,9 +454,9 @@ const Styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   descriptionTitleTextStyle: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 14,
     marginBottom: 10,
+    fontFamily:"IRANSansMobile_Medium"
   },
   descriptionTextInputStyle: {
     width: '100%',
@@ -464,16 +465,22 @@ const Styles = StyleSheet.create({
     borderColor: '#000',
     borderRadius: 10,
     textAlignVertical: 'top',
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical:8,
+    fontSize:13,
+    fontFamily:"IRANSansMobile_Light"
   },
   markerLabelStyle: {
     width: 50,
     height: 20,
     justifyContent: 'center',
+    alignSelf:"center",
     textAlign: 'center',
     borderRadius: 10,
     backgroundColor: '#A8A7A7',
     color: '#000',
+    fontFamily:"IRANSansMobile_Medium",
+    fontSize:12
   },
   switchContainerStyle: {
     flexDirection: 'row',
@@ -490,10 +497,9 @@ const Styles = StyleSheet.create({
     marginTop: 8,
   },
   titleStyle: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 14,
     textAlign: 'center',
-    // marginBottom: 10,
+    fontFamily:"IRANSansMobile_Medium"
   },
   distanceContainerStyle: {
     flexDirection: 'row',

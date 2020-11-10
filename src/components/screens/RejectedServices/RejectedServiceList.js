@@ -8,7 +8,8 @@ import {
     TouchableOpacity,
     ToastAndroid,
     Text,
-    TouchableHighlight, Alert,
+    TouchableHighlight, 
+    Alert,
 } from 'react-native';
 import AsyncStorage from "@react-native-community/async-storage";
 import RNFetchBlob from 'rn-fetch-blob';
@@ -82,7 +83,7 @@ const MyService = ({navigation}) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
-                <Text style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
+                <Text style={{fontSize: 15, fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
                     درحال حاضر سرویسی وجود ندارد.
                 </Text>
             </View>
@@ -91,7 +92,6 @@ const MyService = ({navigation}) => {
 
     const onNewDataPress = (projectId) => {
         setModalLoading(true);
-        setRenderRestoreModal(false);
         AsyncStorage.getItem("savedServicesList").then(list=>{
             let tempList = !!list ? JSON.parse(list).filter(service=>service.projectId !== projectId): [];
             AsyncStorage.setItem("savedServicesList", JSON.stringify(tempList));
@@ -141,6 +141,7 @@ const MyService = ({navigation}) => {
                         "billImage":data.result.BillImage
                     }});
                 setModalLoading(false);
+                setRenderRestoreModal(false);
             } else if (data.errorCode === 3){
                 dispatch({
                     type: LOGOUT
@@ -170,7 +171,7 @@ const MyService = ({navigation}) => {
     }
 
     const onConfirmDataPress = (projectId)=>{
-        setRenderRestoreModal(false);
+        setModalLoading(true);
         RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${projectId}/1.png`, 'base64').then(data=>{
             if (!!data){
                 FACTOR_IMAGE = data;
@@ -186,7 +187,6 @@ const MyService = ({navigation}) => {
                 IMAGE=data;
             }
         });
-        setModalLoading(true);
         AsyncStorage.getItem("savedServicesList").then(list=>{
             let currentList = JSON.parse(list);
             let Index = 0;
@@ -488,7 +488,8 @@ const Styles = StyleSheet.create({
     },
     modalHeaderTextStyle:{
         color:"#fff",
-        fontSize:18
+        fontSize:17,
+        fontFamily:"IRANSansMobile_Light"
     },
     modalBodyContainerStyle:{
         width:"100%",
@@ -500,7 +501,8 @@ const Styles = StyleSheet.create({
     modalBodyTextStyle:{
         color: "#660000",
         textAlign:"center",
-        fontSize: 17
+        fontSize: 15,
+        fontFamily:'IRANSansMobile_Light'
     },
     modalFooterContainerStyle:{
         flexDirection:"row",
@@ -520,7 +522,7 @@ const Styles = StyleSheet.create({
     modalButtonTextStyle:{
         color:"gray",
         fontSize:16,
-        fontWeight:"bold"
+        fontFamily:"IRANSansMobile_Medium"
     },
     onScreenLoadingContainerStyle:{
         width:pageWidth,

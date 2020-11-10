@@ -9,7 +9,8 @@ import {
   Image,
   TouchableOpacity,
   TouchableHighlight,
-  BackHandler, ToastAndroid,
+  BackHandler,
+  ToastAndroid,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -23,7 +24,7 @@ import MapboxGL from '@react-native-mapbox-gl/maps';
 import {API_KEY} from '../../../actions/types';
 import {toFaDigit} from '../../utils/utilities';
 import ImageViewer from '../../common/ImageViwer';
-import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
+import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -101,9 +102,15 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
           alignItems: 'center',
         }}>
         <View style={Styles.descriptionRowStyle}>
-          <View style={{width: 70, marginBottom: 10}}>
+          <View
+            style={{
+              width: 70,
+              marginBottom: 10,
+              justifyContent: 'center',
+              flexDirection: 'row',
+            }}>
             <Icon name={'star'} style={{color: 'red'}} />
-            <Text>توضیحات:</Text>
+            <Text style={Styles.labelStyle}>توضیحات:</Text>
           </View>
           <TextInput
             style={Styles.descriptionInputStyle}
@@ -310,29 +317,31 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
           onPress={() => setDeletingImage(0)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize:15, fontWeight:"bold"}}>آیا از پاک کردن عکس اطمینان دارید؟</Text>
+              <Text style={{fontSize: 14, fontFamily:"IRANSansMobile_Medium"}}>
+                آیا از پاک کردن عکس اطمینان دارید؟
+              </Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle}
-                  onPress={() => {
-                    setDeletingImage(0);
-                  }}>
-                  <Text style={Styles.modalButtonTextStyle}>خیر</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle}
-                  onPress={() => {
-                    if (deletingImage === 3) {
-                      setInfo({
-                        ...info,
-                        image: '',
-                      });
-                    }
-                    setDeletingImage(0);
-                  }}>
-                  <Text style={Styles.modalButtonTextStyle}>بله</Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  setDeletingImage(0);
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  if (deletingImage === 3) {
+                    setInfo({
+                      ...info,
+                      image: '',
+                    });
+                  }
+                  setDeletingImage(0);
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>بله</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableHighlight>
@@ -387,40 +396,36 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
         )}
       </MapboxGL.MapView>
       <View
-        style={{
-          position: 'absolute',
-          top: 20,
-          right: 20,
-          borderRadius: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+        style={Styles.myLocationContainerStye}>
         <Icon
           name={'my-location'}
           style={{fontSize: 30, color: '#000'}}
           onPress={async () => {
             LocationServicesDialogBox.checkLocationServicesIsEnabled({
-              message: "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
-              ok: "YES",
-              cancel: "NO",
+              message:
+                "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+              ok: 'YES',
+              cancel: 'NO',
               enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
               showDialog: true, // false => Opens the Location access page directly
               openLocationServices: true, // false => Directly catch method is called if location services are turned off
               preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
               preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
-              providerListener: false // true ==> Trigger locationProviderStatusChange listener when the location state changes
-            }).then(async success => {
-              console.log(success);
-              await cameraRef.moveTo([userLongitude, userLatitude]);
-              await cameraRef.zoomTo(11);
-            }).catch(error => {
-              console.log(error);
-              ToastAndroid.showWithGravity(
-                  "موقعیت در دسترس نیست.",
+              providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
+            })
+              .then(async success => {
+                console.log(success);
+                await cameraRef.moveTo([userLongitude, userLatitude]);
+                await cameraRef.zoomTo(11);
+              })
+              .catch(error => {
+                console.log(error);
+                ToastAndroid.showWithGravity(
+                  'موقعیت در دسترس نیست.',
                   ToastAndroid.SHORT,
                   ToastAndroid.CENTER,
-              );
-            });
+                );
+              });
           }}
         />
       </View>
@@ -479,8 +484,9 @@ const Styles = StyleSheet.create({
     padding: 15,
   },
   serviceTypeTextStyle: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#660000',
+    fontFamily: 'IRANSansMobile_Light',
   },
   addressRowStyle: {
     flexDirection: 'row',
@@ -531,6 +537,7 @@ const Styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation:10
   },
   confirmButtonStyle: {
     width: pageWidth * 0.7,
@@ -541,7 +548,7 @@ const Styles = StyleSheet.create({
   },
   buttonTextStyle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'IRANSansMobile_Medium',
     textAlign: 'center',
   },
   selectTextContainerStyle: {
@@ -555,7 +562,7 @@ const Styles = StyleSheet.create({
   selectTextStyle: {
     fontSize: 16,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: 'IRANSansMobile_Medium',
   },
   datePickerContainerStyle: {
     flex: 1,
@@ -612,6 +619,7 @@ const Styles = StyleSheet.create({
   checkboxTextStyle: {
     fontSize: 12,
     width: '75%',
+    fontFamily: 'IRANSansMobile_Light',
   },
   modalBackgroundStyle: {
     flex: 1,
@@ -666,12 +674,29 @@ const Styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: pageHeight * 0.03,
-    elevation:5
+    elevation: 5,
   },
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium"
+  },
+  labelStyle: {
+    fontSize: 13,
+    fontFamily: 'IRANSansMobile_Light',
+  },
+  myLocationContainerStye: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    elevation: 10,
   },
 });
 

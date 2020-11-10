@@ -140,11 +140,11 @@ const ServiceArchiveDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text>{text}</Text>
+        <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Light"}}>{text}</Text>
         <Text
           style={{
-            fontSize: 14,
-            fontWeight: 'bold',
+            fontSize: 13,
+            fontFamily:"IRANSansMobile_Medium",
             marginLeft: 10,
             color: titleColor,
           }}>
@@ -308,7 +308,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                             toFaDigit(serviceDetail.DocumentDetails.Date),
                           )}
                           <View style={{width: '100%'}}>
-                            <Text>
+                            <Text style={{fontSize:13, fontFamily:"IRANSansMobile(FaNum)_Light"}}>
                               {toFaDigit(
                                 serviceDetail.DocumentDetails.Msg.substr(
                                   serviceDetail.DocumentDetails.Msg.length - 12,
@@ -349,7 +349,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                             : pageHeight * 0.67,
                         }]}>
                           <View style={Styles.descriptionRowStyle}>
-                            <Text style={{width: 60, marginBottom: 10}}>
+                            <Text style={{width: 60, marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
                               توضیحات:
                             </Text>
                             <TextInput
@@ -370,7 +370,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                                   setIsMapModeOn(true);
                                 }}
                               />
-                              <Text style={{width: 60, marginBottom: 10}}>
+                              <Text style={{width: 60, marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
                                 آدرس:
                               </Text>
                             </View>
@@ -520,7 +520,7 @@ const ServiceArchiveDetail = ({navigation}) => {
           onPress={() => setDeletingImage(0)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: 15, fontWeight: 'bold'}}>
+              <Text style={{fontSize: 14, fontFamily:"IRANSansMobile_Medium"}}>
                 آیا از پاک کردن عکس اطمینان دارید؟
               </Text>
             </View>
@@ -556,7 +556,7 @@ const Styles = StyleSheet.create({
   contentContainerStyle: {
     backgroundColor: '#fff',
     width: pageWidth * 0.9,
-    height: pageHeight * 0.65,
+    height: pageHeight * 0.75,
     justifyContent: 'center',
     alignItems: 'flex-end',
     padding: 10,
@@ -609,7 +609,7 @@ const Styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium"
   },
   imageIconContainerStyle: {
     flexDirection: 'row',
@@ -677,7 +677,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium"
   },
   descriptionContainerStyle: {
     flexDirection: 'row',
@@ -699,7 +699,10 @@ const Styles = StyleSheet.create({
     borderColor: '#000',
     borderRadius: 10,
     textAlignVertical: 'top',
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical:5,
+    fontSize:13, 
+    fontFamily:"IRANSansMobile_Light"
   },
   addressTitleContainerStyle: {
     flexDirection: 'row',
@@ -714,7 +717,10 @@ const Styles = StyleSheet.create({
     borderColor: '#000',
     borderRadius: 10,
     textAlignVertical: 'top',
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical:5,
+    fontSize:13, 
+    fontFamily:"IRANSansMobile_Light"
   },
 
   imageRowStyle: {
@@ -769,6 +775,10 @@ const Styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
+  labelStyle:{
+    fontSize:13,
+    fontFamily:"IRANSansMobile_Light"
+  }
 });
 
 export default ServiceArchiveDetail;

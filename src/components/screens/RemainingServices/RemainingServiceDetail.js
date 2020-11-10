@@ -163,11 +163,11 @@ const RemainingServiceDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text>{text}</Text>
+        <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13}}>{text}</Text>
         <Text
           style={{
-            fontSize: 14,
-            fontWeight: 'bold',
+            fontSize: 12,
+            fontFamily:"IRANSansMobile_Medium",
             marginLeft: 10,
             color: titleColor,
           }}>
@@ -254,7 +254,7 @@ const RemainingServiceDetail = ({navigation}) => {
                     toFaDigit(serviceDetail.DocumentDetails.Date),
                   )}
                   <View style={{width: '100%'}}>
-                    <Text>
+                    <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13}}>
                       {toFaDigit(
                         serviceDetail.DocumentDetails.Msg.substr(
                           serviceDetail.DocumentDetails.Msg.length - 12,
@@ -466,7 +466,7 @@ const Styles = StyleSheet.create({
   contentContainerStyle: {
     backgroundColor: '#fff',
     width: '93%',
-    height: pageHeight * 0.66,
+    height: pageHeight * 0.75,
     justifyContent: 'center',
     alignItems: 'flex-end',
     padding: 10,
@@ -480,12 +480,12 @@ const Styles = StyleSheet.create({
   },
   itemLabelStyle: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium",
     marginLeft: 10,
   },
   itemLabelStyle2: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium",
     marginLeft: 10,
     color: '#CB3434',
   },
@@ -504,10 +504,10 @@ const Styles = StyleSheet.create({
     backgroundColor: '#660000',
   },
   buttonTextStyle: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#fff',
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily:"IRANSansMobile_Medium",
   },
   imageIconContainerStyle: {
     flexDirection: 'row',

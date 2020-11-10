@@ -281,10 +281,10 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                 <Feather name={"plus"} style={{color:"#fff", fontSize:17}}/>
                             )}
                         </TouchableOpacity>
-                        <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                        <Text style={{color:"#660000", fontSize:12, textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
                             {!!Item.serial? Item.serial : "سریال"}
                         </Text>
-                        <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                        <Text style={{color:"#660000", fontSize:12, textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
                             {!!Item.partType? Item.partType.label : "نام"}
                         </Text>
                         {Item.objectType == "new" ? (
@@ -311,7 +311,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
                                 listHeight={150}
                             />
-                            <Text style={{width:"20%"}}>نوع قطعه:</Text>
+                            <Text style={{width:"20%", fontSize:13, fontFamily:"IRANSansMobile_Light"}}>نوع قطعه:</Text>
                         </View>
                         <View style={Styles.serialContainerStyle}>
                             {searchBarcodeLoading ? (
@@ -355,13 +355,13 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                 onSelect={item=>refactorObjectListItems("version", item, Item.index)}
                                 listHeight={150}
                             />
-                            <Text style={{width:65}}>   نسخه:  </Text>
+                            <Text style={[Styles.labelStyle,{width:"20%"}]}>   نسخه:  </Text>
                         </View>
                     </View>
                 )}
                 {Item.isExpanded && Item.objectType === "new" ? (
                     <View style={Styles.priceContainerStyle}>
-                        <Text>
+                        <Text style={Styles.labelStyle}>
                             ریال
                         </Text>
                         <TextInput
@@ -370,15 +370,15 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                             value={Item.Price}
                             keyboardType="numeric"
                         />
-                        <Text>
+                        <Text style={Styles.labelStyle}>
                             قیمت:
                         </Text>
                     </View>
                 ) :Item.isExpanded && Item.objectType === "failed" ? (
                     <View style={{marginTop:15, width:"100%"}}>
-                        <Text>شرح نوع خرابی و علت احتمالی آن: </Text>
+                        <Text style={Styles.labelStyle}>شرح نوع خرابی و علت احتمالی آن: </Text>
                         <View style={Styles.failureDescriptionContainerStyle}>
-                            <Text style={{marginBottom:5}}>توضیحات: </Text>
+                            <Text style={[Styles.labelStyle,{marginBottom:5}]}>توضیحات: </Text>
                             <TextInput
                                 style={Styles.descriptionInputStyle}
                                 onChangeText={text=>refactorObjectListItems("failureDescription", text, Item.index)}
@@ -388,12 +388,12 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                         </View>
                         <View style={Styles.garanteeContainerStyle}>
                             <Text style={{marginRight:10}}>{!!Item.hasGarantee ? Item.hasGarantee : "-"}</Text>
-                            <Text>
+                            <Text style={Styles.labelStyle}>
                                 گارانتی:
                             </Text>
                         </View>
                         <View style={Styles.prePriceContainerStyle}>
-                            <Text>
+                            <Text style={Styles.labelStyle}>
                                 ریال
                             </Text>
                             <TextInput
@@ -402,7 +402,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                 value={Item.Price}
                                 keyboardType="numeric"
                             />
-                            <Text>
+                            <Text style={Styles.labelStyle}>
                                 مبلغ عودت داده شده:
                             </Text>
                         </View>
@@ -475,10 +475,10 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                     <Feather name={"plus"} style={{color:"#fff", fontSize:17}}/>
                                 )}
                             </TouchableOpacity>
-                            <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                            <Text style={{color:"#660000", fontSize:12, textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
                                 {!!fieldsObject.serial? fieldsObject.serial : "سریال"}
                             </Text>
-                            <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                            <Text style={{color:"#660000", fontSize:12, textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
                                 {!!fieldsObject.partTypeSelected.label? fieldsObject.partTypeSelected.label : "نام"}
                             </Text>
                         </View>
@@ -496,7 +496,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                     value={fieldsObject.objectType === "failed" ? true : false}
                                     tintColors={{ true: 'red', false: 'red' }}
                                 />
-                                <Text style={{color:"#000", fontSize:12, fontWeight:"bold"}}>قطعه معیوب</Text>
+                                <Text style={{color:"#000", fontSize:12, fontFamily:"IRANSansMobile_Medium"}}>قطعه معیوب</Text>
                             </View>
                             <View style={{flexDirection:"row", alignItems:"center"}}>
                                 <CheckBox
@@ -512,7 +512,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                     tintColors={{ true: 'green', false: 'green' }}
                                     style={{marginLeft:20}}
                                 />
-                                <Text style={{color:"#000", fontSize:12, fontWeight:"bold"}}>قطعه جدید</Text>
+                                <Text style={{color:"#000", fontSize:12, fontFamily:"IRANSansMobile_Medium"}}>قطعه جدید</Text>
                             </View>
                         </View>
                         {!!fieldsObject.objectType && isNewPartFormExpanded && (
@@ -529,7 +529,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                             ? fieldsObject.partTypeSelected.label
                                             :"قطعه مورد نظر خود را انتخاب کنید."}
                                         listHeight={150}/>
-                                    <Text style={{width:"20%"}}>نوع قطعه:</Text>
+                                    <Text style={[Styles.labelStyle,{width:"20%"}]}>نوع قطعه:</Text>
                                 </View>
                                 <View style={Styles.serialContainerStyle}>
                                     {searchBarcodeLoading ? (
@@ -572,13 +572,13 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                         onSelect={item=>setFieldsObject({...fieldsObject, partVersionSelected: item})}
                                         listHeight={150}
                                     />
-                                    <Text style={{width:65}}>نسخه:  </Text>
+                                    <Text style={[Styles.labelStyle,{width:"20%"}]}>نسخه:  </Text>
                                 </View>
                             </View>
                         )}
                         {isNewPartFormExpanded && fieldsObject.objectType === "new" ? (
                             <View style={Styles.priceContainerStyle}>
-                                <Text>
+                                <Text style={Styles.labelStyle}>
                                     ریال
                                 </Text>
                                 <TextInput
@@ -587,15 +587,15 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                     value={fieldsObject.Price}
                                     keyboardType="numeric"
                                 />
-                                <Text>
+                                <Text style={Styles.labelStyle}>
                                     قیمت:
                                 </Text>
                             </View>
                         ) : isNewPartFormExpanded && fieldsObject.objectType === "failed" ? (
                             <View style={{marginTop:15, width:"100%"}}>
-                                <Text>شرح نوع خرابی و علت احتمالی آن: </Text>
+                                <Text style={Styles.labelStyle}>شرح نوع خرابی و علت احتمالی آن: </Text>
                                 <View style={Styles.failureDescriptionContainerStyle}>
-                                    <Text style={{marginBottom:5}}>توضیحات: </Text>
+                                    <Text style={[Styles.labelStyle,{marginBottom:5}]}>توضیحات: </Text>
                                     <TextInput
                                         style={Styles.descriptionInputStyle}
                                         onChangeText={text=>setFieldsObject({...fieldsObject, failureDescription: text})}
@@ -605,12 +605,12 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                 </View>
                                 <View style={Styles.garanteeContainerStyle}>
                                     <Text style={{marginRight:10}}>{!!fieldsObject.hasGarantee ? fieldsObject.hasGarantee : "-"}</Text>
-                                    <Text>
+                                    <Text style={Styles.labelStyle}>
                                         گارانتی:
                                     </Text>
                                 </View>
                                 <View style={Styles.prePriceContainerStyle}>
-                                    <Text>
+                                    <Text style={Styles.labelStyle}>
                                         ریال
                                     </Text>
                                     <TextInput
@@ -619,7 +619,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                         value={fieldsObject.Price}
                                         keyboardType="numeric"
                                     />
-                                    <Text>
+                                    <Text style={Styles.labelStyle}>
                                         مبلغ عودت داده شده:
                                     </Text>
                                 </View>
@@ -883,9 +883,13 @@ const Styles = StyleSheet.create({
         borderBottomWidth:2,
         borderBottomColor:"#000",
         padding:10,
-        width:pageWidth*0.5,
+        width:pageWidth*0.45,
         marginHorizontal:5
     },
+    labelStyle:{
+        fontSize:13,
+        fontFamily:"IRANSansMobile_Light"
+    }
 })
 
 export default ServicePartsTab;

@@ -44,7 +44,7 @@ const MyService = ({navigation}) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
+        <Text style={{fontSize: 15, fontFamily:'IRANSansMobile_Medium', color: '#000'}}>
           درحال حاضر سرویسی وجود ندارد.
         </Text>
       </View>
@@ -347,7 +347,8 @@ const Styles = StyleSheet.create({
     },
     modalHeaderTextStyle:{
       color:"#fff",
-        fontSize:18
+        fontSize:17,
+        fontFamily:"IRANSansMobile_Light"
     },
     modalBodyContainerStyle:{
       width:"100%",
@@ -359,7 +360,8 @@ const Styles = StyleSheet.create({
     modalBodyTextStyle:{
         color: "#660000",
         textAlign:"center",
-        fontSize: 17
+        fontSize: 15,
+        fontFamily:"IRANSansMobile_Light"
     },
     modalFooterContainerStyle:{
       flexDirection:"row",
@@ -379,7 +381,7 @@ const Styles = StyleSheet.create({
     modalButtonTextStyle:{
       color:"gray",
         fontSize:16,
-        fontWeight:"bold"
+        fontFamily:"IRANSansMobile_Medium"
     }
 });
 export default MyService;

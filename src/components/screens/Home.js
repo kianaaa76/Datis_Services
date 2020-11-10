@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   ImageBackground,
@@ -11,51 +11,53 @@ import {
   TextInput,
   ScrollView,
   Keyboard,
-  Linking, Alert, ToastAndroid, TouchableHighlight
+  Linking,
+  Alert,
+  ToastAndroid,
+  TouchableHighlight,
 } from 'react-native';
 import backgroundImage from '../../../assets/images/background_main_activity.jpg';
 import Header from '../common/Header';
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {useSelector, useDispatch} from 'react-redux';
-import {GET_OBJECTS_LIST, LOGIN, LOGOUT} from "../../actions/types";
-import {call, getObjects} from "../../actions/api";
+import {GET_OBJECTS_LIST, LOGIN, LOGOUT} from '../../actions/types';
+import {call, getObjects} from '../../actions/api';
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
 
 const Home = ({navigation}) => {
   const dispatch = useDispatch();
-  const selector = useSelector((state) => state);
-  const userList = JSON.stringify(navigation.getParam("users"));
-  const [user, setUser] = useState("");
+  const selector = useSelector(state => state);
+  const userList = JSON.stringify(navigation.getParam('users'));
+  const [user, setUser] = useState('');
   const [showUserList, setShowUserList] = useState(false);
   const [ShowinUserList, setShowingUserList] = useState(JSON.parse(userList));
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
 
-
-  useEffect(()=>{
-    if(!!userList){
-      JSON.parse(userList).map(item=>{
-        if(item.ID == selector.userId){
+  useEffect(() => {
+    if (!!userList) {
+      JSON.parse(userList).map(item => {
+        if (item.ID == selector.userId) {
           setUser(item);
         }
-      })
+      });
     }
-  },[]);
+  }, []);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
-        'keyboardDidShow',
-        () => {
-          setKeyboardVisible(true);
-        }
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
     );
     const keyboardDidHideListener = Keyboard.addListener(
-        'keyboardDidHide',
-        () => {
-          setKeyboardVisible(false);
-        }
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
     );
 
     return () => {
@@ -64,23 +66,25 @@ const Home = ({navigation}) => {
     };
   }, []);
 
-  useEffect(()=>{
-    getObjects(selector.token).then(data=>{
-      if (data.errorCode == 0){
+  useEffect(() => {
+    getObjects(selector.token).then(data => {
+      if (data.errorCode == 0) {
         const partsList = [];
-        data.result.map(item=>partsList.push({label:item.Name, value:item}));
+        data.result.map(item =>
+          partsList.push({label: item.Name, value: item}),
+        );
         dispatch({
           type: GET_OBJECTS_LIST,
-          objectsList: partsList
-        })
-      } else if (data.errorCode === 3){
-        dispatch({
-          type:LOGOUT
+          objectsList: partsList,
         });
-        navigation.navigate("SignedOut");
+      } else if (data.errorCode === 3) {
+        dispatch({
+          type: LOGOUT,
+        });
+        navigation.navigate('SignedOut');
       }
-    })
-  },[])
+    });
+  }, []);
 
   const images = [
     require('../../../assets/images/icon_rejected.png'),
@@ -94,11 +98,11 @@ const Home = ({navigation}) => {
   const renderHomeItems = (title, imageSource, onClick) => {
     return (
       <View style={Styles.singleItemContainerStyle}>
-          <TouchableOpacity
-            style={Styles.itemImageContainerStyle}
-            onPress={onClick}>
-            <Image source={imageSource} style={Styles.itemImageStyle} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={Styles.itemImageContainerStyle}
+          onPress={onClick}>
+          <Image source={imageSource} style={Styles.itemImageStyle} />
+        </TouchableOpacity>
         <View style={Styles.itemTitleContainerStyle}>
           <Text style={Styles.itemTitleStyle}>{title}</Text>
         </View>
@@ -106,88 +110,119 @@ const Home = ({navigation}) => {
     );
   };
 
-  const search = (text)=>{
-    let temp = JSON.parse(userList).filter(item=>item.Name.includes(text))
+  const search = text => {
+    let temp = JSON.parse(userList).filter(item => item.Name.includes(text));
     setShowingUserList(temp);
-  }
+  };
 
-  const callCenter = ()=>{
+  const callCenter = () => {
     setShowCallModal(false);
-    call(selector.token).then(data=>{
-      if (data.errorCode === 0){
+    call(selector.token).then(data => {
+      if (data.errorCode === 0) {
         Alert.alert(
-            '',
-            'درخواست تماس شما با موفقیت ثبت شد. کارشناسان مرکز خدمات داتیس به زودی با شما تماس خواهند گرفت.',
-            [
-              { text: 'OK', onPress: () => {} }
-            ],
+          '',
+          'درخواست تماس شما با موفقیت ثبت شد. کارشناسان مرکز خدمات داتیس به زودی با شما تماس خواهند گرفت.',
+          [{text: 'OK', onPress: () => {}}],
         );
-      } else if(data.errorCode === 3){
+      } else if (data.errorCode === 3) {
         dispatch({
-          type: LOGOUT
+          type: LOGOUT,
         });
-        navigation.navigate("SignedOut");
+        navigation.navigate('SignedOut');
       } else {
         ToastAndroid.showWithGravity(
-            data.message,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER
+          data.message,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
         );
       }
-    })
-  }
+    });
+  };
 
   return (
-      <View  style={{flex: 1,backgroundColor: 'transparent'}}>
-        <ImageBackground
-            source={backgroundImage}
-            style={Styles.containerStyle}
-            imageStyle={{resizeMode: isKeyboardVisible?'cover':'stretch'}}
+    <View style={{flex: 1, backgroundColor: 'transparent'}}>
+      <ImageBackground
+        source={backgroundImage}
+        style={Styles.containerStyle}
+        imageStyle={{resizeMode: isKeyboardVisible ? 'cover' : 'stretch'}}
+      />
+      <ScrollView
+        style={{flex: 1, backgroundColor: 'transparent'}}
+        keyboardShouldPersistTaps="handled">
+        <Header
+          headerText="داتیس سرویس"
+          leftIcon={
+            selector.constantUserId == 40 ||
+            selector.constantUserId == 41 ||
+            selector.constantUserId == 43 ||
+            selector.constantUserId == 51 ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setShowUserList(!showUserList);
+                  setShowingUserList(JSON.parse(userList));
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 16,
+                    fontFamily: 'IRANSansMobile_Light',
+                  }}>
+                  {user.Name}
+                </Text>
+              </TouchableOpacity>
+            ) : null
+          }
         />
-      <ScrollView style={{flex: 1,backgroundColor: 'transparent'}} keyboardShouldPersistTaps="handled">
-
-      <Header headerText="داتیس سرویس" leftIcon={
-        (selector.constantUserId == 40 || selector.constantUserId == 41 || selector.constantUserId == 43 || selector.constantUserId == 51 )
-            ?(<TouchableOpacity onPress={()=>{
-              setShowUserList(!showUserList);
-              setShowingUserList(JSON.parse(userList));
-            }}>
-              <Text style={{color:"#fff", fontSize: 17}}>
-                {user.Name}
-              </Text>
-            </TouchableOpacity>)
-            :null
-      }/>
 
         {showUserList && (
-            <View style={Styles.userListContainerStyle}>
-              <View style={{flexDirection: "row", alignItems:"center",justifyContent:"flex-end"}}>
-                <TextInput placeholder={"جستجو کنید..."} onChangeText={text=>search(text)}/>
-                <Icon name={"search"} style={{fontSize: 20, color:"gray", marginLeft:5}}/>
-              </View>
-              <FlatList
-                  data={ShowinUserList}
-                  renderItem={item=>(
-                      <TouchableOpacity style={{height:30, marginVertical:5}} onPress={()=> {
-                        dispatch({
-                          type:LOGIN,
-                          token:item.item.Token,
-                          userId: item.item.ID,
-                          constantUserId: selector.constantUserId
-                        });
-                        setUser(item.item)
-                        setShowUserList(false);
-                        setShowingUserList(userList);
-                      }}>
-                        <Text style={{color:"#000", fontSize: 14}}>{item.item.Name}</Text>
-                      </TouchableOpacity>
-                  )}
-                  // keyExtractor={(item) => item.index.toString()}
-                  ListEmptyComponent={()=>(
-                      <Text style={{width:"100%", textAlign: "center"}}>کاربری یافت نشد.</Text>
-                  )}
+          <View style={Styles.userListContainerStyle}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                borderBottomWidth: 1,
+                borderBottomColor: 'gray'
+              }}>
+              <TextInput
+                placeholder={'جستجو کنید...'}
+                onChangeText={text => search(text)}
+                style={{fontFamily:"IRANSansMobile_Light", fontSize:12, width:"100%"}}
+              />
+              <Icon
+                name={'search'}
+                style={{fontSize: 20, color: 'gray', marginLeft: 5}}
               />
             </View>
+            <FlatList
+              data={ShowinUserList}
+              renderItem={item => (
+                <TouchableOpacity
+                  style={{height: 30, marginVertical: 5}}
+                  onPress={() => {
+                    dispatch({
+                      type: LOGIN,
+                      token: item.item.Token,
+                      userId: item.item.ID,
+                      constantUserId: selector.constantUserId,
+                    });
+                    setUser(item.item);
+                    setShowUserList(false);
+                    setShowingUserList(userList);
+                  }}>
+                  <Text style={{color: '#000', fontSize: 13, fontFamily:"IRANSansMobile_Light"}}>
+                    {item.item.Name}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              // keyExtractor={(item) => item.index.toString()}
+              ListEmptyComponent={() => (
+                <Text style={{width: '100%', textAlign: 'center'}}>
+                  کاربری یافت نشد.
+                </Text>
+              )}
+            />
+          </View>
         )}
 
         <View style={Styles.contentStyle}>
@@ -201,18 +236,18 @@ const Home = ({navigation}) => {
           </View>
           <View style={Styles.SingleRowStyle}>
             {renderHomeItems('سرویس‌های مانده‌دار', images[2], () => {
-              navigation.navigate("RemainingServices");
+              navigation.navigate('RemainingServices');
             })}
             {renderHomeItems('آرشیو سرویس‌ها', images[3], () => {
-              navigation.navigate("ServiceArchiveList");
+              navigation.navigate('ServiceArchiveList');
             })}
           </View>
           <View style={Styles.SingleRowStyle}>
             {renderHomeItems('انبارداری', images[4], () => {
               ToastAndroid.showWithGravity(
-                  "این قسمت بعدا اضافه خواهد شد.",
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER
+                'این قسمت بعدا اضافه خواهد شد.',
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
               );
             })}
             {renderHomeItems('ماموریت‌های من', images[5], () => {
@@ -220,68 +255,70 @@ const Home = ({navigation}) => {
             })}
           </View>
         </View>
-
       </ScrollView>
-        <TouchableOpacity style={[Styles.callIconContainerStyle,{bottom: isKeyboardVisible ? -pageHeight*0.3 : pageHeight*0.01}]} onPress={()=>Linking.openURL(`tel:02188355621`)}>
-          <Image
-              source={require('../../../assets/images/icon_call.png')}
-              style={Styles.callIconStyle}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={Styles.missCallIconContainerStyle} onPress={()=>setShowCallModal(true)}>
-          <Image
-              source={require('../../../assets/images/icon_miss_call.png')}
-              style={Styles.callIconStyle}
-          />
-        </TouchableOpacity>
-        {showCallModal && (
-            <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setShowCallModal(false)}>
-              <View style={Styles.modalContainerStyle}>
-                <View style={Styles.modalHeaderContainerStyle}>
-                  <Text style={Styles.modalHeaderTextStyle}>
-                    داتیس سرویس
-                  </Text>
-                </View>
-                <View style={Styles.modalBodyContainerStyle}>
-                  <Text style={Styles.modalBodyTextStyle}>
-                    آیا از درخواست تماس خود اطمینان دارید؟
-                  </Text>
-                </View>
-                <View style={Styles.modalFooterContainerStyle}>
-                    <TouchableOpacity
-                        style={Styles.modalButtonStyle}
-                        onPress={()=>setShowCallModal(false)}>
-                      <Text style={Styles.modalButtonTextStyle}>
-                        خیر
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={Styles.modalButtonStyle}
-                        onPress={()=>callCenter()}>
-                      <Text style={Styles.modalButtonTextStyle}>
-                        بله
-                      </Text>
-                    </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableHighlight>
-        )}
-      </View>
+      <TouchableOpacity
+        style={[
+          Styles.callIconContainerStyle,
+          {bottom: isKeyboardVisible ? -pageHeight * 0.3 : pageHeight * 0.01},
+        ]}
+        onPress={() => Linking.openURL(`tel:02188355621`)}>
+        <Image
+          source={require('../../../assets/images/icon_call.png')}
+          style={Styles.callIconStyle}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={Styles.missCallIconContainerStyle}
+        onPress={() => setShowCallModal(true)}>
+        <Image
+          source={require('../../../assets/images/icon_miss_call.png')}
+          style={Styles.callIconStyle}
+        />
+      </TouchableOpacity>
+      {showCallModal && (
+        <TouchableHighlight
+          style={Styles.modalBackgroundStyle}
+          onPress={() => setShowCallModal(false)}>
+          <View style={Styles.modalContainerStyle}>
+            <View style={Styles.modalHeaderContainerStyle}>
+              <Text style={Styles.modalHeaderTextStyle}>داتیس سرویس</Text>
+            </View>
+            <View style={Styles.modalBodyContainerStyle}>
+              <Text style={Styles.modalBodyTextStyle}>
+                آیا از درخواست تماس خود اطمینان دارید؟
+              </Text>
+            </View>
+            <View style={Styles.modalFooterContainerStyle}>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => setShowCallModal(false)}>
+                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => callCenter()}>
+                <Text style={Styles.modalButtonTextStyle}>بله</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableHighlight>
+      )}
+    </View>
   );
 };
 
 const Styles = StyleSheet.create({
-  containerStyle : {
+  containerStyle: {
     flex: 1,
-    width:pageWidth,
+    width: pageWidth,
     justifyContent: 'center',
-    alignItems:'center',
+    alignItems: 'center',
     alignSelf: 'center',
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0
+    bottom: 0,
   },
   contentStyle: {
     flex: 1,
@@ -292,14 +329,13 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginVertical:5
+    marginVertical: 5,
   },
   itemImageContainerStyle: {
     width: pageWidth * 0.258,
     height: pageWidth * 0.258,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5
   },
   itemImageStyle: {
     width: pageWidth * 0.3,
@@ -320,7 +356,7 @@ const Styles = StyleSheet.create({
     color: 'gray',
     fontSize: 13,
     textAlign: 'center',
-    fontFamily:"IRANSansMobile(FaNum)_Light"
+    fontFamily: 'IRANSansMobile(FaNum)_Light',
   },
   callIconStyle: {
     width: pageWidth * 0.14,
@@ -338,77 +374,79 @@ const Styles = StyleSheet.create({
     right: pageWidth * 0.2,
     width: pageWidth * 0.14,
   },
-  userListContainerStyle:{
-    width:150,
-    height: pageHeight*0.7,
-    position:"absolute",
-    backgroundColor:"#fff",
-    zIndex:10,
-    paddingHorizontal:10,
-    borderWidth:1,
-    borderColor:"#C0C0C0",
-    borderRadius:10,
-    top:pageHeight*0.075
+  userListContainerStyle: {
+    width: 150,
+    height: pageHeight * 0.7,
+    position: 'absolute',
+    backgroundColor: '#fff',
+    zIndex: 999,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#C0C0C0',
+    borderRadius: 10,
+    top: pageHeight * 0.075,
   },
-  modalBackgroundStyle:{
-    width:pageWidth,
+  modalBackgroundStyle: {
+    width: pageWidth,
     height: pageHeight,
-    position: "absolute",
-    backgroundColor:"rgba(0,0,0,0.5)",
-    justifyContent:"center",
-    alignItems:"center",
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  modalContainerStyle:{
-    width:pageWidth*0.85,
-    height:pageHeight*0.35,
-    backgroundColor:"#E8E8E8",
-    marginBottom:pageHeight*0.25,
+  modalContainerStyle: {
+    width: pageWidth * 0.85,
+    height: pageHeight * 0.35,
+    backgroundColor: '#E8E8E8',
+    marginBottom: pageHeight * 0.25,
     borderRadius: 15,
-    overflow:"hidden"
+    overflow: 'hidden',
   },
-  modalHeaderContainerStyle:{
-    width:"100%",
-    height:"20%",
-    backgroundColor:"#660000",
-    justifyContent:"center",
-    paddingHorizontal:10
+  modalHeaderContainerStyle: {
+    width: '100%',
+    height: '20%',
+    backgroundColor: '#660000',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
   },
-  modalHeaderTextStyle:{
-    color:"#fff",
-    fontSize:18
+  modalHeaderTextStyle: {
+    color: '#fff',
+    fontSize: 17,
+    fontFamily: 'IRANSansMobile_Light',
   },
-  modalBodyContainerStyle:{
-    width:"100%",
-    height:"50%",
-    justifyContent:"center",
-    alignItems:"center",
-    padding: 10
+  modalBodyContainerStyle: {
+    width: '100%',
+    height: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
   },
-  modalBodyTextStyle:{
-    color: "#660000",
-    textAlign:"center",
-    fontSize: 17
+  modalBodyTextStyle: {
+    color: '#660000',
+    textAlign: 'center',
+    fontSize: 15,
+    fontFamily: 'IRANSansMobile_Light',
   },
-  modalFooterContainerStyle:{
-    flexDirection:"row",
-    width:"100%",
-    height:"30%",
-    justifyContent:"space-around",
+  modalFooterContainerStyle: {
+    flexDirection: 'row',
+    width: '100%',
+    height: '30%',
+    justifyContent: 'space-around',
   },
-  modalButtonStyle:{
-    backgroundColor:"#fff",
+  modalButtonStyle: {
+    backgroundColor: '#fff',
     width: pageWidth * 0.28,
     height: pageWidth * 0.14,
-    borderRadius:7,
-    justifyContent:"center",
-    alignItems:"center",
-    elevation:5
+    borderRadius: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
   },
-  modalButtonTextStyle:{
-    color:"gray",
-    fontSize:16,
-    fontWeight:"bold"
-  }
+  modalButtonTextStyle: {
+    color: 'gray',
+    fontSize: 16,
+    fontFamily: 'IRANSansMobile_Medium',
+  },
 });
 
 export default Home;

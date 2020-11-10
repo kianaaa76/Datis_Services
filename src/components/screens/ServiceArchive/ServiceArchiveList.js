@@ -81,7 +81,7 @@ const ServiceArchiveList = ({navigation}) => {
     const renderEmptyList = () => {
         return (
             <View style={{height:pageHeight*0.8, width:pageWidth, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
+                <Text style={{fontSize: 15, fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
                     سرویس مورد نظر یافت نشد.
                 </Text>
             </View>
@@ -228,7 +228,8 @@ const Styles = StyleSheet.create({
     },
     modalHeaderTextStyle:{
         color:"#fff",
-        fontSize:16
+        fontSize:16,
+        fontFamily:"IRANSansMobile_Light"
     },
     modalBodyContainerStyle:{
         width:"100%",
@@ -240,7 +241,8 @@ const Styles = StyleSheet.create({
     modalBodyTextStyle:{
         color: "#5B5B5B",
         textAlign:"center",
-        fontSize: 13
+        fontSize: 13,
+        fontFamily:"IRANSansMobile_Light"
     },
     modalFooterContainerStyle:{
         flexDirection:"row",
@@ -261,7 +263,7 @@ const Styles = StyleSheet.create({
     modalButtonTextStyle:{
         color:"#fff",
         fontSize:14,
-        fontWeight:"bold"
+        fontFamily:'IRANSansMobile_Medium'
     },
     modalBodyInputContainerStyle:{
         flexDirection: "row",
@@ -279,12 +281,14 @@ const Styles = StyleSheet.create({
         height:"100%",
         paddingHorizontal: 8,
         backgroundColor:"transparent",
-        textAlign:"center"
+        textAlign:"center",
+        fontFamily:"IRANSansMobile_Light"
     },
     inputLabelStyle:{
         fontSize:13,
         color:"#5B5B5B",
-        textAlign: "center"
+        textAlign: "center",
+        fontFamily:"IRANSansMobile_Light"
     }
 });
 

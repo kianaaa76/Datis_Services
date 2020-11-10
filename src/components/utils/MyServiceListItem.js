@@ -126,28 +126,28 @@ const MyServiceListItem = ({item, navigation, setModalState, setSelectedProjectI
 
               {isNetworkSaved?
                   (<View style={Styles.secondRowContainerStyle}>
-                      <Text>درحال ارسال</Text>
+                      <Text style={{fontSize:12, fontFamily:"IRANSansMobile_Light"}}>درحال ارسال</Text>
                       <View style={Styles.singleItemStyle}>
                           <Text>{toFaDigit(Item.Name)}</Text>
-                          <Text style={{fontWeight: 'bold'}}>نام: </Text>
+                          <Text style={{fontSize:13, fontFamily:"IRANSansMobile_Medium"}}>نام: </Text>
                       </View>
                   </View>
               ):(
                 <View style={Styles.firstRowContainerStyle}>
                   <View style={Styles.singleItemStyle}>
                       <Text>{toFaDigit(Item.Name)}</Text>
-                      <Text style={{fontWeight: 'bold'}}>نام: </Text>
+                      <Text style={{fontSize:13, fontFamily:"IRANSansMobile_Medium"}}>نام: </Text>
                   </View>
                 </View>
               )}
             <View style={Styles.secondRowContainerStyle}>
                 <View style={Styles.singleItemStyle}>
                     <Text>{toFaDigit(Item.projectID)}</Text>
-                    <Text style={{fontSize: 13}}>شماره‌‌ماموریت: </Text>
+                    <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Medium"}}>شماره‌‌ماموریت: </Text>
                 </View>
               <View style={Styles.singleItemStyle}>
-                <Text>{toFaDigit(Item.cell)}</Text>
-                <Text style={{fontSize: 13}}>همراه: </Text>
+                <Text style={{textAlign:"center"}}>{toFaDigit(Item.cell)}</Text>
+                <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Medium", textAlign:"center"}}>همراه: </Text>
               </View>
             </View>
           </View>
@@ -172,6 +172,8 @@ const Styles = StyleSheet.create({
     },
     singleItemStyle: {
         flexDirection: 'row',
+        justifyContent:"center",
+        alignItems:"center"
     },
 });
 

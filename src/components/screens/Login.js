@@ -12,10 +12,8 @@ import {
   ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
-import {
-  LOGIN, LOGOUT,
-} from '../../actions/types';
-import { useDispatch} from 'react-redux';
+import {LOGIN, LOGOUT} from '../../actions/types';
+import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit} from '../utils/utilities';
 import {loginUser, loginVerification, getUsers} from '../../actions/api';
@@ -36,27 +34,26 @@ const Login = ({navigation}) => {
   const [code, setCode] = useState('');
 
   useEffect(() => {
-    if (usersList.length === 0){
-      getUsers().then(data=>{
-        if (data.errorCode === 0){
-            setUsersList(data.result)
-          } else{
+    if (usersList.length === 0) {
+      getUsers().then(data => {
+        if (data.errorCode === 0) {
+          setUsersList(data.result);
+        } else {
           dispatch({
-            type:LOGOUT
+            type: LOGOUT,
           });
         }
-      })
+      });
       setPersistLoading(false);
     }
   });
-
 
   const onReceiveCodePress = () => {
     setReceiveCodeLoading(true);
     setCounter(120);
     var iteration = 120;
     setCode('');
-    loginUser(phoneNumber).then((data) => {
+    loginUser(phoneNumber).then(data => {
       if (data.errorCode == 0) {
         setHasCode(true);
         const counterInterval = setInterval(() => {
@@ -90,32 +87,32 @@ const Login = ({navigation}) => {
       if (code.length !== 4) {
         setEnterSystemLoading(false);
         ToastAndroid.showWithGravity(
-            'کد فعالسازی نادرست است.',
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
+          'کد فعالسازی نادرست است.',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
         );
       } else {
-          loginVerification(phoneNumber, code).then((data) => {
-            if (data.errorCode === 0) {
-              dispatch({
-                type: LOGIN,
-                token: data.result.Token,
-                userId: data.result.ID,
-                constantUserId: data.result.ID,
-              });
-              setEnterSystemLoading(false);
-              navigation.navigate('Home', {users: usersList});
-              setPersistLoading(false);
-            } else {
-              dispatch({
-                type: LOGOUT
-              });
-              setPersistLoading(false);
-            }
-          })
-        }
+        loginVerification(phoneNumber, code).then(data => {
+          if (data.errorCode === 0) {
+            dispatch({
+              type: LOGIN,
+              token: data.result.Token,
+              userId: data.result.ID,
+              constantUserId: data.result.ID,
+            });
+            setEnterSystemLoading(false);
+            navigation.navigate('Home', {users: usersList});
+            setPersistLoading(false);
+          } else {
+            dispatch({
+              type: LOGOUT,
+            });
+            setPersistLoading(false);
+          }
+        });
       }
     }
+  };
 
   return persistLoading ? (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -123,7 +120,7 @@ const Login = ({navigation}) => {
     </View>
   ) : (
     <ScrollView
-      style={{flex:1}}
+      style={{flex: 1}}
       scrollEnabled={false}
       keyboardShouldPersistTaps="handled">
       <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
@@ -134,12 +131,9 @@ const Login = ({navigation}) => {
               style={Styles.iconStyle}
             />
             <TextInput
-              style={[
-                Styles.textInputStyle,
-                {fontWeight: phoneNumber ? null : 'bold'},
-              ]}
+              style={Styles.textInputStyle}
               placeholder="شماره تلفن"
-              onChangeText={(phoneNumber) => {
+              onChangeText={phoneNumber => {
                 setPhoneNumber(phoneNumber);
               }}
               keyboardType="numeric"
@@ -165,12 +159,9 @@ const Login = ({navigation}) => {
               style={Styles.iconStyle}
             />
             <TextInput
-              style={[
-                Styles.textInputStyle,
-                {fontWeight: code ? null : 'bold'},
-              ]}
+              style={Styles.textInputStyle}
               placeholder="کد فعالسازی"
-              onChangeText={(code) => setCode(code)}
+              onChangeText={code => setCode(code)}
               keyboardType="numeric"
               placeholderTextColor={hasCode ? '#660000' : 'gray'}
               value={code}
@@ -178,56 +169,56 @@ const Login = ({navigation}) => {
           </View>
           {hasCode ? (
             <View>
-                {receiveCodeLoading ? (
-                  <View style={Styles.buttonStyle}>
-                    <ActivityIndicator size="small" color="gray" />
-                  </View>
-                ) : counter == 0 ? (
-                  <TouchableOpacity
-                    style={Styles.buttonStyle}
-                    onPress={() => {
-                      onReceiveCodePress();
-                    }}>
-                    <Text style={Styles.buttonTextStyle}>درخواست مجدد</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <View style={Styles.buttonStyle}>
-                    <Text
-                      style={[
-                        Styles.buttonTextStyle,
-                        {color: inputDeactiveColor},
-                      ]}>
-                      {`${toFaDigit(counter)} ثانیه تا درخواست مجدد`}
-                    </Text>
-                  </View>
-                )}
-                {enterSystemLoading ? (
-                  <View style={Styles.buttonStyle}>
-                    <ActivityIndicator size="small" color="gray" />
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    style={Styles.buttonStyle}
-                    onPress={() => onEnterSystemPress()}>
-                    <Text style={Styles.buttonTextStyle}>ورود به سیستم</Text>
-                  </TouchableOpacity>
-                )}
+              {receiveCodeLoading ? (
+                <View style={Styles.buttonStyle}>
+                  <ActivityIndicator size="small" color="gray" />
+                </View>
+              ) : counter == 0 ? (
+                <TouchableOpacity
+                  style={Styles.buttonStyle}
+                  onPress={() => {
+                    onReceiveCodePress();
+                  }}>
+                  <Text style={Styles.buttonTextStyle}>درخواست مجدد</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={Styles.buttonStyle}>
+                  <Text
+                    style={[
+                      Styles.buttonTextStyle,
+                      {color: inputDeactiveColor},
+                    ]}>
+                    {`${toFaDigit(counter)} ثانیه تا درخواست مجدد`}
+                  </Text>
+                </View>
+              )}
+              {enterSystemLoading ? (
+                <View style={Styles.buttonStyle}>
+                  <ActivityIndicator size="small" color="gray" />
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={Styles.buttonStyle}
+                  onPress={() => onEnterSystemPress()}>
+                  <Text style={Styles.buttonTextStyle}>ورود به سیستم</Text>
+                </TouchableOpacity>
+              )}
             </View>
           ) : (
             <View style={Styles.buttonContainerStyle}>
-                {receiveCodeLoading ? (
-                  <View style={Styles.buttonStyle}>
-                    <ActivityIndicator size="small" color="gray" />
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    style={Styles.buttonStyle}
-                    onPress={() => onReceiveCodePress()}>
-                    <Text style={Styles.buttonTextStyle}>
-                      درخواست کد فعالسازی
-                    </Text>
-                  </TouchableOpacity>
-                )}
+              {receiveCodeLoading ? (
+                <View style={Styles.buttonStyle}>
+                  <ActivityIndicator size="small" color="gray" />
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={Styles.buttonStyle}
+                  onPress={() => onReceiveCodePress()}>
+                  <Text style={Styles.buttonTextStyle}>
+                    درخواست کد فعالسازی
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
@@ -257,21 +248,21 @@ const Styles = StyleSheet.create({
     height: pageWidth * 0.11,
     borderRadius: 7,
     elevation: 4,
-    marginTop:30
+    marginTop: 30,
   },
   buttonTextStyle: {
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
-    fontWeight: 'bold',
     color: '#660000',
+    fontFamily:"IRANSansMobile_Bold"
   },
   textInputStyle: {
     width: pageWidth * 0.45,
     height: pageWidth * 0.2,
     backgroundColor: 'transparent',
     margin: 10,
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontFamily: 'IRANSansMobile',
   },
   textInputContainerStyle: {
     justifyContent: 'center',
@@ -292,6 +283,6 @@ const Styles = StyleSheet.create({
     width: pageWidth * 0.4,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation:3
+    elevation: 3,
   },
 });
