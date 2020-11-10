@@ -6,24 +6,12 @@ import {
     Text,
     TouchableWithoutFeedback,
 } from 'react-native';
-import {BoxShadow} from 'react-native-shadow';
 import {toFaDigit} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const RemainingServiceListItem = ({item, navigation}) => {
-    const shadowOpt = {
-        width: pageWidth * 0.9,
-        height: pageHeight * 0.1,
-        color: '#000',
-        radius: 5,
-        opacity: 0.1,
-        x: 2,
-        y: 3,
-        style: {justifyContent: 'center', alignItems: 'center', marginVertical: 6},
-    };
-
     const Item = item.item;
     return (
                 <TouchableWithoutFeedback

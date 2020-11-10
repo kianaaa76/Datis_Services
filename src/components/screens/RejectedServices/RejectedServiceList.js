@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import AsyncStorage from "@react-native-community/async-storage";
 import RNFetchBlob from 'rn-fetch-blob';
-import {BoxShadow} from 'react-native-shadow';
 import {useSelector, useDispatch} from 'react-redux';
 import Header from '../../common/Header';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -28,16 +27,7 @@ let IMAGE="";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-const shadowOpt = {
-    width: pageWidth * 0.32,
-    height: pageWidth * 0.16,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {justifyContent:"center", alignItems:"center"},
-};
+
 
 let serviceList = [];
 const MyService = ({navigation}) => {
@@ -370,7 +360,6 @@ const MyService = ({navigation}) => {
                                         <ActivityIndicator size={"small"} color={"#660000"}/>
                                     </View>
                                 ):(<View style={Styles.modalFooterContainerStyle}>
-                                    <BoxShadow setting={shadowOpt}>
                                         <TouchableOpacity
                                             style={Styles.modalButtonStyle}
                                             onPress={() => onNewDataPress(selectedProjectId)}>
@@ -378,8 +367,6 @@ const MyService = ({navigation}) => {
                                                 اطلاعات جدید
                                             </Text>
                                         </TouchableOpacity>
-                                    </BoxShadow>
-                                    <BoxShadow setting={shadowOpt}>
                                         <TouchableOpacity
                                             style={Styles.modalButtonStyle}
                                             onPress={() => onConfirmDataPress(selectedProjectId)}>
@@ -387,7 +374,6 @@ const MyService = ({navigation}) => {
                                                 تایید
                                             </Text>
                                         </TouchableOpacity>
-                                    </BoxShadow>
                                 </View>)}
                             </View>
                         </TouchableHighlight>
@@ -406,7 +392,6 @@ const MyService = ({navigation}) => {
                                     </Text>
                                 </View>
                                 <View style={Styles.modalFooterContainerStyle}>
-                                    <BoxShadow setting={shadowOpt}>
                                         <TouchableOpacity
                                             style={Styles.modalButtonStyle}
                                             onPress={()=>setRenderSendDataModal(false)}>
@@ -414,8 +399,6 @@ const MyService = ({navigation}) => {
                                                 بازگشت
                                             </Text>
                                         </TouchableOpacity>
-                                    </BoxShadow>
-                                    <BoxShadow setting={shadowOpt}>
                                         <TouchableOpacity
                                             style={Styles.modalButtonStyle}
                                             onPress={()=> {
@@ -442,7 +425,6 @@ const MyService = ({navigation}) => {
                                                 ویرایش
                                             </Text>
                                         </TouchableOpacity>
-                                    </BoxShadow>
                                 </View>
                             </View>
                         </TouchableHighlight>
@@ -528,11 +510,12 @@ const Styles = StyleSheet.create({
     },
     modalButtonStyle:{
         backgroundColor:"#fff",
-        width:"97%",
-        height:"97%",
+        width: pageWidth * 0.32,
+        height: pageWidth * 0.16,
         borderRadius:7,
         justifyContent:"center",
-        alignItems:"center"
+        alignItems:"center",
+        elevation:5
     },
     modalButtonTextStyle:{
         color:"gray",

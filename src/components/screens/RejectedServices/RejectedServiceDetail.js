@@ -24,32 +24,9 @@ import ServicePartsTab from "./RejectedServicePartsTab";
 import ServiceMissionTab from "./RejectedServiceMissionTab";
 import {sendServiceData} from "../../../actions/api";
 import {LOGOUT, SET_EDITING_SERVICE} from "../../../actions/types";
-import {BoxShadow} from "react-native-shadow";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-
-const shadowOpt2 = {
-    width: pageWidth * 0.2,
-    height: 35,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
-}
-
-const shadowOpt = {
-    width: pageWidth * 0.23,
-    height: 45,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
-}
 
 let requestObjectList = [];
 const MyServiceDetails = ({navigation}) => {
@@ -537,7 +514,6 @@ const MyServiceDetails = ({navigation}) => {
                             </Text>
                         </View>
                         <View style={Styles.modalFooterContainerStyle}>
-                            <BoxShadow setting={shadowOpt2}>
                                 <TouchableOpacity
                                     style={Styles.modalButtonStyle}
                                     onPress={()=> {
@@ -547,8 +523,6 @@ const MyServiceDetails = ({navigation}) => {
                                         خیر
                                     </Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
-                            <BoxShadow setting={shadowOpt2}>
                                 <TouchableOpacity
                                     style={Styles.modalButtonStyle}
                                     onPress={()=> {
@@ -558,7 +532,6 @@ const MyServiceDetails = ({navigation}) => {
                                         بله
                                     </Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
                         </View>
                     </View>
                 </TouchableHighlight>
@@ -572,7 +545,6 @@ const MyServiceDetails = ({navigation}) => {
                             <Text>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
                         </View>
                         <View style={Styles.modalFooterContainerStyle}>
-                            <BoxShadow setting={shadowOpt2}>
                                 <TouchableOpacity
                                     style={Styles.modalButtonStyle}
                                     onPress={() => {
@@ -581,8 +553,6 @@ const MyServiceDetails = ({navigation}) => {
                                     }}>
                                     <Text style={Styles.modalButtonTextStyle}>خیر</Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
-                            <BoxShadow setting={shadowOpt2}>
                                 <TouchableOpacity
                                     style={Styles.modalButtonStyle}
                                     onPress={() => {
@@ -590,7 +560,6 @@ const MyServiceDetails = ({navigation}) => {
                                     }}>
                                     <Text style={Styles.modalButtonTextStyle}>بله</Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
                         </View>
                     </View>
                 </TouchableHighlight>
@@ -609,24 +578,20 @@ const MyServiceDetails = ({navigation}) => {
                             </Text>
                         </View>
                         <View style={Styles.modalFooterContainerStyle}>
-                            <BoxShadow setting={shadowOpt}>
                                 <TouchableOpacity
-                                    style={Styles.modalButtonStyle}
+                                    style={Styles.modalButtonStyle2}
                                     onPress={()=>onSavePress("network")}>
                                     <Text style={Styles.modalButtonTextStyle}>
                                         ذخیره
                                     </Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
-                            <BoxShadow setting={shadowOpt}>
                                 <TouchableOpacity
-                                    style={Styles.modalButtonStyle}
+                                    style={Styles.modalButtonStyle2}
                                     onPress={()=>onFinishServicePress()}>
                                     <Text style={Styles.modalButtonTextStyle}>
                                         تلاش مجدد
                                     </Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
                         </View>
                     </View>
                 </TouchableHighlight>
@@ -716,11 +681,23 @@ const Styles = StyleSheet.create({
     },
     modalButtonStyle:{
         backgroundColor:"#fff",
-        width:"97%",
-        height:"97%",
+        width: pageWidth * 0.2,
+        height: 35,
         borderRadius:7,
         justifyContent:"center",
-        alignItems:"center"
+        alignItems:"center",
+        marginTop:pageHeight*0.03,
+        elevation:5
+    },
+    modalButtonStyle2:{
+        backgroundColor:"#fff",
+        width: pageWidth * 0.23,
+        height: 45,
+        borderRadius:7,
+        justifyContent:"center",
+        alignItems:"center",
+        marginTop:pageHeight*0.03,
+        elevation:5
     },
     modalButtonTextStyle:{
         color:"gray",

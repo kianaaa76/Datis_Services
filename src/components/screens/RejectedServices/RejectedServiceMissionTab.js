@@ -188,14 +188,12 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
                     </Text>
                 </View>
             )}
-            <View style={{
-                position:"absolute", 
-                bottom:!!startLocation.startLatitude && !!endLocation.endLatitude ? pageHeight*0.35 + 25 : 20, 
-                right:20, 
-                borderRadius:10,
-                justifyContent:"center",
-                alignItems:"center"
-            }}>
+            <View style={[Styles.myLocationContainerStyle,{
+                bottom:
+                !!startLocation.startLatitude && !!endLocation.endLatitude
+                  ? pageHeight * 0.35 + 25
+                  : 20,
+            }]}>
                 <MaterialIcons 
                 name={"my-location"} 
                 style={{fontSize:30, color:"#000"}} 
@@ -400,8 +398,19 @@ const Styles = StyleSheet.create({
         width:"50%",
         alignItems:"center",
         justifyContent:"flex-end"
-
-    }
+    },
+    myLocationContainerStyle: {
+        position: 'absolute',
+        right: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        elevation: 5,
+      },
 })
 
 export default ServiceMissionTab;

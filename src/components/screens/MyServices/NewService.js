@@ -14,24 +14,12 @@ import {
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { selectContactPhone } from 'react-native-select-contact';
 import {useSelector, useDispatch} from 'react-redux';
-import {BoxShadow} from 'react-native-shadow';
 import Header from "../../common/Header";
 import {submitNewService} from "../../../actions/api";
 import {LOGOUT} from "../../../actions/types";
 
 const pageWidth = Dimensions.get("screen").width;
 const pageHeight = Dimensions.get("screen").height;
-
-const shadowOpt = {
-  width: pageWidth * 0.32,
-  height: pageWidth * 0.16,
-  color: '#000',
-  radius: 1,
-  opacity: 0.2,
-  x: 0,
-  y: 3,
-  style: {justifyContent:"center", alignItems:"center"},
-};
 
 const NewService = ({navigation}) => {
   const dispatch = useDispatch();
@@ -136,7 +124,6 @@ const NewService = ({navigation}) => {
                 value={projectSerial}
             />
           </View>
-              <BoxShadow setting={shadowOpt}>
                 {confirmLoading?(
                     <View style={Styles.buttonStyle}>
                       <ActivityIndicator size={"small"} color={"#fff"}/>
@@ -148,7 +135,6 @@ const NewService = ({navigation}) => {
                     ثبت
                   </Text>
                 </TouchableOpacity>)}
-              </BoxShadow>
         </View>
       </ScrollView>
   );
@@ -187,7 +173,8 @@ const Styles = StyleSheet.create({
     width: pageWidth * 0.32,
     height: pageWidth * 0.16,
     justifyContent:"center",
-    alignItems:"center"
+    alignItems:"center",
+    elevation:5
   },
   buttonTextStyle:{
     textAlign:"center",

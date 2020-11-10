@@ -7,7 +7,6 @@ import {
     ActivityIndicator,
     StyleSheet,
     Text,
-    TouchableHighlight,
     TouchableOpacity,
     TextInput
 } from 'react-native';
@@ -16,23 +15,11 @@ import {useSelector, useDispatch} from 'react-redux';
 import {serviceArchiveListWithSerial, serviceArchiveListWithoutSerial} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
-import {BoxShadow} from "react-native-shadow";
 import {toFaDigit} from "../../utils/utilities";
 import ServiceArchiveListItem from "../../utils/ServiceArchiveListItem";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-
-const shadowOpt = {
-    width: pageWidth * 0.21,
-    height: pageWidth * 0.11,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {justifyContent:"center", alignItems:"center"},
-};
 
 
 const ServiceArchiveList = ({navigation}) => {
@@ -163,7 +150,6 @@ const ServiceArchiveList = ({navigation}) => {
                             </View>
                         </View>
                         <View style={Styles.modalFooterContainerStyle}>
-                            <BoxShadow setting={shadowOpt}>
                                 <TouchableOpacity
                                     style={Styles.modalButtonStyle}
                                     onPress={()=>setRenderModal(false)}>
@@ -171,8 +157,6 @@ const ServiceArchiveList = ({navigation}) => {
                                         بازگشت
                                     </Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
-                            <BoxShadow setting={shadowOpt}>
                                 <TouchableOpacity
                                     style={Styles.modalButtonStyle}
                                     onPress={()=> {
@@ -183,7 +167,6 @@ const ServiceArchiveList = ({navigation}) => {
                                         تایید
                                     </Text>
                                 </TouchableOpacity>
-                            </BoxShadow>
                         </View>
                     </View>
                 </View>
@@ -268,11 +251,12 @@ const Styles = StyleSheet.create({
     },
     modalButtonStyle:{
         backgroundColor:"#660000",
-        width:"97%",
-        height:"97%",
+        width: pageWidth * 0.21,
+        height: pageWidth * 0.11,
         borderRadius:7,
         justifyContent:"center",
-        alignItems:"center"
+        alignItems:"center",
+        elevation:5
     },
     modalButtonTextStyle:{
         color:"#fff",

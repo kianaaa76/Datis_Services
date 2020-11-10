@@ -51,9 +51,9 @@ const Styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   headerTitleStyle: {
-    fontSize: 17,
-    fontWeight:"bold",
-    color: "#dadfe1"
+    fontSize: 16,
+    color: "#dadfe1",
+    fontFamily:"IRANSansMobile"
   },
   headerTextContainerStyle: {
     width:"50%"

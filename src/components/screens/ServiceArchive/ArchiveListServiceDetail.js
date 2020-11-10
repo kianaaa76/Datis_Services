@@ -20,7 +20,6 @@ import {toFaDigit} from '../../utils/utilities';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from "../../common/ImageViwer";
-import {BoxShadow} from 'react-native-shadow';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Foundation from 'react-native-vector-icons/Foundation';
 
@@ -44,48 +43,6 @@ const ServiceArchiveDetail = ({navigation}) => {
   const [userLongitude, setUserLongitude] = useState(null);
   const [confrimRequestLoading, setConfrimRequestLoading] = useState(false);
   const SERVICE = navigation.getParam('service');
-
-  const shadowOpt = {
-    width: pageWidth * 0.9,
-    height: pageHeight * 0.65,
-    color: '#000',
-    radius: 1,
-    opacity: 0.1,
-    x: 6,
-    y: 6,
-    style: {justifyContent: 'center', alignItems: 'center', marginBottom: 10},
-  };
-
-  const shadowOpt2 = {
-    width: pageWidth * 0.9,
-    height:
-      !!image && !!factorImage
-        ? pageHeight * 1.6
-        : (!!image && !factorImage) || (!image && !!factorImage)
-        ? pageHeight * 1.12
-        : pageHeight * 0.67,
-    color: '#000',
-    radius: 1,
-    opacity: 0.1,
-    x: 6,
-    y: 6,
-    style: {justifyContent: 'center', alignItems: 'center', marginBottom: 10},
-  };
-
-  const shadowOpt3 = {
-    width: pageWidth * 0.2,
-    height: 35,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: pageHeight * 0.03,
-    },
-  };
 
   const getServiceResult = resultNum => {
     switch (resultNum) {
@@ -299,7 +256,6 @@ const ServiceArchiveDetail = ({navigation}) => {
                 {!!serviceDetail.DoneDetails &&
                   !!serviceDetail.DoneDetails.projectID && (
                     <View>
-                      <BoxShadow setting={shadowOpt}>
                         <View style={Styles.contentContainerStyle}>
                           <Text
                             style={[
@@ -384,9 +340,14 @@ const ServiceArchiveDetail = ({navigation}) => {
                             getServiceResult(serviceDetail.DoneDetails.Result),
                           )}
                         </View>
-                      </BoxShadow>
-                      <BoxShadow setting={shadowOpt2}>
-                        <View style={Styles.contentContainerStyle}>
+                        <View style={[Styles.contentContainerStyle2,{
+                          height:
+                          !!image && !!factorImage
+                            ? pageHeight * 1.6
+                            : (!!image && !factorImage) || (!image && !!factorImage)
+                            ? pageHeight * 1.12
+                            : pageHeight * 0.67,
+                        }]}>
                           <View style={Styles.descriptionRowStyle}>
                             <Text style={{width: 60, marginBottom: 10}}>
                               توضیحات:
@@ -514,7 +475,6 @@ const ServiceArchiveDetail = ({navigation}) => {
                             />
                           )}
                         </View>
-                      </BoxShadow>
                     </View>
                   )}
               </View>
@@ -565,7 +525,6 @@ const ServiceArchiveDetail = ({navigation}) => {
               </Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
-              <BoxShadow setting={shadowOpt3}>
                 <TouchableOpacity
                   style={Styles.modalButtonStyle}
                   onPress={() => {
@@ -573,8 +532,6 @@ const ServiceArchiveDetail = ({navigation}) => {
                   }}>
                   <Text style={Styles.modalButtonTextStyle}>خیر</Text>
                 </TouchableOpacity>
-              </BoxShadow>
-              <BoxShadow setting={shadowOpt3}>
                 <TouchableOpacity
                   style={Styles.modalButtonStyle}
                   onPress={() => {
@@ -587,7 +544,6 @@ const ServiceArchiveDetail = ({navigation}) => {
                   }}>
                   <Text style={Styles.modalButtonTextStyle}>بله</Text>
                 </TouchableOpacity>
-              </BoxShadow>
             </View>
           </View>
         </TouchableHighlight>
@@ -599,11 +555,22 @@ const ServiceArchiveDetail = ({navigation}) => {
 const Styles = StyleSheet.create({
   contentContainerStyle: {
     backgroundColor: '#fff',
-    width: '100%',
-    height: '100%',
+    width: pageWidth * 0.9,
+    height: pageHeight * 0.65,
     justifyContent: 'center',
     alignItems: 'flex-end',
     padding: 10,
+    marginBottom: 10,
+    elevation:4
+  },
+  contentContainerStyle2: {
+    backgroundColor: '#fff',
+    width: pageWidth * 0.9,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    padding: 10,
+    marginBottom: 10,
+    elevation:4
   },
   singleItemContainerstyle: {
     width: '90%',
@@ -699,11 +666,13 @@ const Styles = StyleSheet.create({
   },
   modalButtonStyle: {
     backgroundColor: '#fff',
-    width: '97%',
-    height: '97%',
+    width: pageWidth * 0.2,
+    height: 35,
     borderRadius: 7,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: pageHeight * 0.03,
+    elevation:5
   },
   modalButtonTextStyle: {
     color: 'gray',

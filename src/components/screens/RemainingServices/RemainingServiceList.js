@@ -6,12 +6,11 @@ import {
     ToastAndroid,
     ActivityIndicator,
     StyleSheet,
-    TouchableOpacity,
     Text,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
-import {getMissionList, unsettledServiceList} from '../../../actions/api';
+import {unsettledServiceList} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
 import RemainingServiceListItem from '../../utils/RemainingServiceListItem';

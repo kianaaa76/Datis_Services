@@ -151,7 +151,8 @@ const Styles = StyleSheet.create({
     textAlign:"center",
     borderRadius:10,
     backgroundColor:"#A8A7A7",
-    color:"#000"
+    color:"#000",
+    fontFamily:"IRANSansMobile(FaNum)_Medium"
   }
 });
 

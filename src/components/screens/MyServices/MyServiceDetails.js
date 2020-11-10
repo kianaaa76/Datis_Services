@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   Alert,
-  BackHandler
+  BackHandler,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {TabView, TabBar} from 'react-native-tab-view';
@@ -28,40 +28,9 @@ import ServiceFactorTab from './ServiceFactorTab';
 import ServiceServicesTab from './ServiceServicesTab';
 import ServicePartsTab from './ServicePartsTab';
 import ServiceMissionTab from './ServiceMissionTab';
-import {BoxShadow} from 'react-native-shadow';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-
-const shadowOpt2 = {
-  width: pageWidth * 0.2,
-  height: 35,
-  color: '#000',
-  radius: 7,
-  opacity: 0.2,
-  x: 0,
-  y: 3,
-  style: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: pageHeight * 0.03,
-  },
-};
-
-const shadowOpt = {
-  width: pageWidth * 0.23,
-  height: 45,
-  color: '#000',
-  radius: 7,
-  opacity: 0.2,
-  x: 0,
-  y: 3,
-  style: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: pageHeight * 0.03,
-  },
-};
 
 let requestObjectList = [];
 
@@ -139,14 +108,17 @@ const MyServiceDetails = ({navigation}) => {
 
   useEffect(() => {
     const backAction = () => {
-      if(!renderSaveModal){
-        setRenderSaveModal(true)
+      if (!renderSaveModal) {
+        setRenderSaveModal(true);
       } else {
-        navigation.replace("MyServices");
+        navigation.replace('MyServices');
       }
       return true;
     };
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
     return () => backHandler.remove();
   });
 
@@ -281,21 +253,30 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
-        console.log("1111", convertResultTitleToNum(serviceTabInfo.serviceResult));
+      console.log(
+        '1111',
+        convertResultTitleToNum(serviceTabInfo.serviceResult),
+      );
       setRequestLoading(false);
       Alert.alert('اخطار', 'لطفا عکس فاکتور را بارگذاری کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
-    } else if (!factorTabInfo.factorReceivedPrice && factorTabInfo.factorReceivedPrice!==0 &&
-        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
-        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4) {
+    } else if (
+      !factorTabInfo.factorReceivedPrice &&
+      factorTabInfo.factorReceivedPrice !== 0 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
+    ) {
       setRequestLoading(false);
       Alert.alert('اخطار', 'لطفا مبلغ دریافتی فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
-    } else if (!factorTabInfo.factorTotalPrice && factorTabInfo.factorTotalPrice!==0 &&
-        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
-        convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4) {
+    } else if (
+      !factorTabInfo.factorTotalPrice &&
+      factorTabInfo.factorTotalPrice !== 0 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
+    ) {
       setRequestLoading(false);
       Alert.alert('اخطار', 'لطفا جمع فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
@@ -639,62 +620,56 @@ const MyServiceDetails = ({navigation}) => {
           onPress={() => setRenderConfirmModal(false)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text>آیا از ارسال اطلاعات اطمینان دارید؟</Text>
+              <Text style={{fontSize: 15, fontWeight: 'bold'}}>
+                آیا از ارسال اطلاعات اطمینان دارید؟
+              </Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
-              <BoxShadow setting={shadowOpt2}>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle}
-                  onPress={() => {
-                    setRenderConfirmModal(false);
-                  }}>
-                  <Text style={Styles.modalButtonTextStyle}>خیر</Text>
-                </TouchableOpacity>
-              </BoxShadow>
-              <BoxShadow setting={shadowOpt2}>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle}
-                  onPress={() => {
-                    onFinishServicePress();
-                  }}>
-                  <Text style={Styles.modalButtonTextStyle}>بله</Text>
-                </TouchableOpacity>
-              </BoxShadow>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  setRenderConfirmModal(false);
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  onFinishServicePress();
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>بله</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableHighlight>
       )}
       {renderSaveModal && (
-          <TouchableHighlight
-              style={Styles.modalBackgroundStyle}
-              onPress={() => setRenderSaveModal(false)}>
-            <View style={Styles.modalContainerStyle}>
-              <View style={Styles.modalBodyContainerStyle2}>
-                <Text>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
-              </View>
-              <View style={Styles.modalFooterContainerStyle}>
-                <BoxShadow setting={shadowOpt2}>
-                  <TouchableOpacity
-                      style={Styles.modalButtonStyle}
-                      onPress={() => {
-                        setRenderSaveModal(false);
-                        navigation.replace("MyServices");
-                      }}>
-                    <Text style={Styles.modalButtonTextStyle}>خیر</Text>
-                  </TouchableOpacity>
-                </BoxShadow>
-                <BoxShadow setting={shadowOpt2}>
-                  <TouchableOpacity
-                      style={Styles.modalButtonStyle}
-                      onPress={() => {
-                        onSavePress("self");
-                      }}>
-                    <Text style={Styles.modalButtonTextStyle}>بله</Text>
-                  </TouchableOpacity>
-                </BoxShadow>
-              </View>
+        <TouchableHighlight
+          style={Styles.modalBackgroundStyle}
+          onPress={() => setRenderSaveModal(false)}>
+          <View style={Styles.modalContainerStyle}>
+            <View style={Styles.modalBodyContainerStyle2}>
+              <Text>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
             </View>
-          </TouchableHighlight>
+            <View style={Styles.modalFooterContainerStyle}>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  setRenderSaveModal(false);
+                  navigation.replace('MyServices');
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  onSavePress('self');
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>بله</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableHighlight>
       )}
       {renderNetworkModal && (
         <TouchableHighlight
@@ -711,20 +686,16 @@ const MyServiceDetails = ({navigation}) => {
               </Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
-              <BoxShadow setting={shadowOpt}>
                 <TouchableOpacity
-                  style={Styles.modalButtonStyle}
+                  style={Styles.modalButtonStyle2}
                   onPress={() => onSavePress('network')}>
                   <Text style={Styles.modalButtonTextStyle}>ذخیره</Text>
                 </TouchableOpacity>
-              </BoxShadow>
-              <BoxShadow setting={shadowOpt}>
                 <TouchableOpacity
-                  style={Styles.modalButtonStyle}
+                  style={Styles.modalButtonStyle2}
                   onPress={() => onFinishServicePress()}>
                   <Text style={Styles.modalButtonTextStyle}>تلاش مجدد</Text>
                 </TouchableOpacity>
-              </BoxShadow>
             </View>
           </View>
         </TouchableHighlight>
@@ -814,11 +785,23 @@ const Styles = StyleSheet.create({
   },
   modalButtonStyle: {
     backgroundColor: '#fff',
-    width: '97%',
-    height: '97%',
+    width: pageWidth * 0.2,
+    height: 35,
     borderRadius: 7,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: pageHeight * 0.03,
+    elevation: 5,
+  },
+  modalButtonStyle2: {
+    backgroundColor: '#fff',
+    width: pageWidth * 0.23,
+    height: 45,
+    borderRadius: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: pageHeight * 0.03,
+    elevation: 5,
   },
   modalButtonTextStyle: {
     color: 'gray',

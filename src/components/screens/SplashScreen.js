@@ -11,7 +11,6 @@ import {
     Linking,
     ActivityIndicator
 } from 'react-native';
-import {BoxShadow} from 'react-native-shadow';
 import {useSelector} from 'react-redux';
 import VersionInfo from 'react-native-version-info';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
@@ -21,16 +20,6 @@ import {checkUpdate, getUsers} from "../../actions/api";
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
 
-const shadowOpt = {
-    width: pageWidth * 0.32,
-    height: pageWidth * 0.16,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {justifyContent:"center", alignItems:"center"},
-};
 
 const Splash = ({navigation}) => {
     const selector = useSelector((state) => state);
@@ -80,7 +69,6 @@ const Splash = ({navigation}) => {
                         </Text>
                     </View>
                     <View style={Styles.modalFooterContainerStyle}>
-                        <BoxShadow setting={shadowOpt}>
                             <TouchableOpacity
                                 style={Styles.modalButtonStyle}
                                 onPress={() => {
@@ -90,8 +78,7 @@ const Splash = ({navigation}) => {
                                     بازگشت
                                 </Text>
                             </TouchableOpacity>
-                        </BoxShadow>
-                        <BoxShadow setting={shadowOpt}>
+
                             <TouchableOpacity
                                 style={Styles.modalButtonStyle}
                                 onPress={() => {
@@ -101,7 +88,6 @@ const Splash = ({navigation}) => {
                                     به روزرسانی
                                 </Text>
                             </TouchableOpacity>
-                        </BoxShadow>
                     </View>
                 </View>
             </View>)}
@@ -168,11 +154,12 @@ const Styles = StyleSheet.create({
     },
     modalButtonStyle:{
         backgroundColor:"#fff",
-        width:"97%",
-        height:"97%",
+        width: pageWidth * 0.32,
+        height: pageWidth * 0.16,
         borderRadius:7,
         justifyContent:"center",
-        alignItems:"center"
+        alignItems:"center",
+        elevation:5
     },
     modalButtonTextStyle:{
         color:"gray",

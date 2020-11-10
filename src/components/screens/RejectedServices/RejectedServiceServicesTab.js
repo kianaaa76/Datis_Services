@@ -22,22 +22,11 @@ import moment from "moment-jalaali";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import {API_KEY} from "../../../actions/types";
 import {toFaDigit} from "../../utils/utilities";
-import {BoxShadow} from "react-native-shadow";
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const shadowOpt2 = {
-    width: pageWidth * 0.2,
-    height: 35,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {justifyContent:"center", alignItems:"center", marginTop:pageHeight*0.03},
-}
 
 let cameraRef={};
 
@@ -263,7 +252,6 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
                     </Text>
                 </View>
                 <View style={Styles.modalFooterContainerStyle}>
-                    <BoxShadow setting={shadowOpt2}>
                         <TouchableOpacity
                             style={Styles.modalButtonStyle}
                             onPress={()=> {
@@ -273,8 +261,6 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
                                 خیر
                             </Text>
                         </TouchableOpacity>
-                    </BoxShadow>
-                    <BoxShadow setting={shadowOpt2}>
                         <TouchableOpacity
                             style={Styles.modalButtonStyle}
                             onPress={()=> {
@@ -289,7 +275,6 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
                                 بله
                             </Text>
                         </TouchableOpacity>
-                    </BoxShadow>
                 </View>
             </View>
         </TouchableHighlight>
@@ -605,11 +590,13 @@ const Styles = StyleSheet.create({
     },
     modalButtonStyle:{
         backgroundColor:"#fff",
-        width:"97%",
-        height:"97%",
+        width: pageWidth * 0.2,
+        height: 35,
         borderRadius:7,
         justifyContent:"center",
-        alignItems:"center"
+        alignItems:"center",
+        marginTop:pageHeight*0.03,
+        elevation:5
     },
     modalButtonTextStyle:{
         color:"gray",

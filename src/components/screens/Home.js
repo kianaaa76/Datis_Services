@@ -13,7 +13,6 @@ import {
   Keyboard,
   Linking, Alert, ToastAndroid, TouchableHighlight
 } from 'react-native';
-import {BoxShadow} from 'react-native-shadow';
 import backgroundImage from '../../../assets/images/background_main_activity.jpg';
 import Header from '../common/Header';
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -33,27 +32,7 @@ const Home = ({navigation}) => {
   const [ShowinUserList, setShowingUserList] = useState(JSON.parse(userList));
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
-  const shadowOpt = {
-    width: pageWidth * 0.258,
-    height: pageWidth * 0.258,
-    color: '#000',
-    radius: 15,
-    opacity: 0.1,
-    x: 0,
-    y: 0,
-    style: {justifyContent: 'center', alignItems: 'center'},
-  };
 
-  const shadowOpt2 = {
-    width: pageWidth * 0.28,
-    height: pageWidth * 0.14,
-    color: '#000',
-    radius: 7,
-    opacity: 0.2,
-    x: 0,
-    y: 3,
-    style: {justifyContent:"center", alignItems:"center"},
-  };
 
   useEffect(()=>{
     if(!!userList){
@@ -115,13 +94,11 @@ const Home = ({navigation}) => {
   const renderHomeItems = (title, imageSource, onClick) => {
     return (
       <View style={Styles.singleItemContainerStyle}>
-        <BoxShadow setting={shadowOpt}>
           <TouchableOpacity
             style={Styles.itemImageContainerStyle}
             onPress={onClick}>
             <Image source={imageSource} style={Styles.itemImageStyle} />
           </TouchableOpacity>
-        </BoxShadow>
         <View style={Styles.itemTitleContainerStyle}>
           <Text style={Styles.itemTitleStyle}>{title}</Text>
         </View>
@@ -271,7 +248,6 @@ const Home = ({navigation}) => {
                   </Text>
                 </View>
                 <View style={Styles.modalFooterContainerStyle}>
-                  <BoxShadow setting={shadowOpt2}>
                     <TouchableOpacity
                         style={Styles.modalButtonStyle}
                         onPress={()=>setShowCallModal(false)}>
@@ -279,8 +255,6 @@ const Home = ({navigation}) => {
                         خیر
                       </Text>
                     </TouchableOpacity>
-                  </BoxShadow>
-                  <BoxShadow setting={shadowOpt2}>
                     <TouchableOpacity
                         style={Styles.modalButtonStyle}
                         onPress={()=>callCenter()}>
@@ -288,7 +262,6 @@ const Home = ({navigation}) => {
                         بله
                       </Text>
                     </TouchableOpacity>
-                  </BoxShadow>
                 </View>
               </View>
             </TouchableHighlight>
@@ -322,10 +295,11 @@ const Styles = StyleSheet.create({
     marginVertical:5
   },
   itemImageContainerStyle: {
-    width: pageWidth * 0.3,
-    height: "85%",
+    width: pageWidth * 0.258,
+    height: pageWidth * 0.258,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 5
   },
   itemImageStyle: {
     width: pageWidth * 0.3,
@@ -346,6 +320,7 @@ const Styles = StyleSheet.create({
     color: 'gray',
     fontSize: 13,
     textAlign: 'center',
+    fontFamily:"IRANSansMobile(FaNum)_Light"
   },
   callIconStyle: {
     width: pageWidth * 0.14,
@@ -422,11 +397,12 @@ const Styles = StyleSheet.create({
   },
   modalButtonStyle:{
     backgroundColor:"#fff",
-    width:"97%",
-    height:"97%",
+    width: pageWidth * 0.28,
+    height: pageWidth * 0.14,
     borderRadius:7,
     justifyContent:"center",
-    alignItems:"center"
+    alignItems:"center",
+    elevation:5
   },
   modalButtonTextStyle:{
     color:"gray",
