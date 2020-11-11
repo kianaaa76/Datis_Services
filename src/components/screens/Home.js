@@ -19,6 +19,7 @@ import {
 import backgroundImage from '../../../assets/images/background_main_activity.jpg';
 import Header from '../common/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import {GET_OBJECTS_LIST, LOGIN, LOGOUT} from '../../actions/types';
 import {call, getObjects} from '../../actions/api';
@@ -150,6 +151,17 @@ const Home = ({navigation}) => {
         style={{flex: 1, backgroundColor: 'transparent'}}
         keyboardShouldPersistTaps="handled">
         <Header
+          rightIcon={
+            <MaterialIcons
+              name={'menu'}
+              onPress={() => navigation.openDrawer()}
+              style={{
+                fontSize: 23,
+                color: '#fff',
+                marginLeft: 10,
+              }}
+            />
+          }
           headerText="داتیس سرویس"
           leftIcon={
             selector.constantUserId == 40 ||
@@ -182,12 +194,16 @@ const Home = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'flex-end',
                 borderBottomWidth: 1,
-                borderBottomColor: 'gray'
+                borderBottomColor: 'gray',
               }}>
               <TextInput
                 placeholder={'جستجو کنید...'}
                 onChangeText={text => search(text)}
-                style={{fontFamily:"IRANSansMobile_Light", fontSize:12, width:"100%"}}
+                style={{
+                  fontFamily: 'IRANSansMobile_Light',
+                  fontSize: 12,
+                  width: '100%',
+                }}
               />
               <Icon
                 name={'search'}
@@ -210,7 +226,12 @@ const Home = ({navigation}) => {
                     setShowUserList(false);
                     setShowingUserList(userList);
                   }}>
-                  <Text style={{color: '#000', fontSize: 13, fontFamily:"IRANSansMobile_Light"}}>
+                  <Text
+                    style={{
+                      color: '#000',
+                      fontSize: 13,
+                      fontFamily: 'IRANSansMobile_Light',
+                    }}>
                     {item.item.Name}
                   </Text>
                 </TouchableOpacity>

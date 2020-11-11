@@ -330,3 +330,13 @@ export const checkUpdate = (version) => {
   }).then((response) => response.json());
 }
 
+export const garanteeInquiry = (serial, token) => {
+  return fetch(`${LOCAL_HOST}/SerialInquiry?serial=${serial}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+

@@ -8,6 +8,7 @@ export default class extends Component {
   constructor(props) {
     super(props);
     this.renderHeaderLeft = this.renderHeaderLeft.bind(this);
+    this.renderHeaderRight = this.renderHeaderRight.bind(this);
   }
 
   renderHeaderLeft = () => {
@@ -15,8 +16,13 @@ export default class extends Component {
     return leftIcon;
   };
 
+  renderHeaderRight = ()=>{
+    const {rightIcon} = this.props;
+    return rightIcon;
+  }
+
   render() {
-    const { headerText, leftIcon } = this.props;
+    const { headerText, leftIcon, rightIcon } = this.props;
     return (
       <View style={Styles.headercontainerStyle}>
         <View style={Styles.headerContentStyle}>
@@ -25,6 +31,7 @@ export default class extends Component {
           </View>
           <View style={Styles.headerTextContainerStyle}>
             <Text style={Styles.headerTitleStyle}>{headerText}</Text>
+            {!!rightIcon && this.renderHeaderRight()}
           </View>
         </View>
       </View>
@@ -56,6 +63,9 @@ const Styles = StyleSheet.create({
     fontFamily:"IRANSansMobile"
   },
   headerTextContainerStyle: {
-    width:"50%"
+    width:"50%",
+    flexDirection: "row",
+    justifyContent:"flex-end",
+    alignItems:"center"
   }
 });
