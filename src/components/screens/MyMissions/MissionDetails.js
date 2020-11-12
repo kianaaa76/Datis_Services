@@ -138,21 +138,24 @@ const Styles = StyleSheet.create({
     width:"60%",
   },
   itemTitleStyle: {
-    fontWeight: 'bold',
-    fontSize: 15,
+    fontFamily:"IRANSansMobile_Medium",
+    fontSize: 14,
   },
   itemTextStyle: {
-    fontSize: 15,
+    fontSize: 13,
+    fontFamily:"IRANSansMobile_Light"
   },
   markerLabelStyle:{
-    width:50,
-    height:20,
-    justifyContent:"center",
-    textAlign:"center",
-    borderRadius:10,
-    backgroundColor:"#A8A7A7",
-    color:"#000",
-    fontFamily:"IRANSansMobile(FaNum)_Medium"
+    width: 50,
+    height: 20,
+    justifyContent: 'center',
+    alignSelf:"center",
+    textAlign: 'center',
+    borderRadius: 10,
+    backgroundColor: '#A8A7A7',
+    color: '#000',
+    fontFamily:"IRANSansMobile_Medium",
+    fontSize:12
   }
 });
 

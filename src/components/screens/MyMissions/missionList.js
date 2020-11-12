@@ -54,7 +54,7 @@ const MissionList = ({navigation}) => {
   const renderEmptyList = () => {
     return (
       <View style={{width:pageWidth,height:pageHeight*0.8, justifyContent: 'center', alignItems: 'center'}}>
-        <Text style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
+        <Text style={{fontSize: 15, fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
           ماموریتی وجود ندارد.
         </Text>
       </View>

@@ -12,48 +12,47 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const MissionListItem = ({item, navigation}) => {
-
   const Item = item.item;
   return (
-        <TouchableWithoutFeedback
-          onPress={() => {
-              console.log("ITEM", Item)
-              navigation.navigate('MissionDetail', {mission: Item})
-          }}>
-          <View style={{
-              width: pageWidth * 0.9,
-              height: pageHeight * 0.1,
-              backgroundColor: !!Item.EndDate ? '#fff' : 'red',
-              padding: 10,
-              marginVertical: 4,
-              marginHorizontal:3,
-              justifyContent: 'center',
-              alignItems: 'center',
-              elevation:3
-          }}>
-            <View style={Styles.firstRowContainerStyle}>
-              <View style={Styles.singleItemStyle}>
-                <Text>{toFaDigit(Item.ID)}</Text>
-                <Text style={{fontWeight: 'bold'}}>شماره‌‌ماموریت: </Text>
-              </View>
-              <View style={Styles.singleItemStyle}>
-                <Text>{toFaDigit(Item.StartDate)}</Text>
-                <Text style={{fontWeight: 'bold'}}>شروع: </Text>
-              </View>
-            </View>
-            <View style={Styles.secondRowContainerStyle}>
-              <View style={Styles.singleItemStyle}>
-                <Text>{toFaDigit(Item.EndDate)}</Text>
-                <Text style={{fontWeight: 'bold'}}>پایان: </Text>
-              </View>
-            </View>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        console.log('ITEM', Item);
+        navigation.navigate('MissionDetail', {mission: Item});
+      }}>
+      <View
+        style={{
+          width: pageWidth * 0.9,
+          height: pageHeight * 0.1,
+          backgroundColor: !!Item.EndDate ? '#fff' : 'red',
+          padding: 10,
+          marginVertical: 4,
+          marginHorizontal: 3,
+          justifyContent: 'center',
+          alignItems: 'center',
+          elevation: 3,
+        }}>
+        <View style={Styles.firstRowContainerStyle}>
+          <View style={Styles.singleItemStyle}>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.ID)}</Text>
+            <Text style={Styles.titleTextStyle}>شماره‌‌ماموریت: </Text>
           </View>
-        </TouchableWithoutFeedback>
+          <View style={Styles.singleItemStyle}>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.StartDate)}</Text>
+            <Text style={Styles.titleTextStyle}>شروع: </Text>
+          </View>
+        </View>
+        <View style={Styles.secondRowContainerStyle}>
+          <View style={Styles.singleItemStyle}>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.EndDate)}</Text>
+            <Text style={Styles.titleTextStyle}>پایان: </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const Styles = StyleSheet.create({
-  
   firstRowContainerStyle: {
     width: '100%',
     height: '50%',
@@ -71,6 +70,14 @@ const Styles = StyleSheet.create({
   singleItemStyle: {
     flexDirection: 'row',
   },
+  titleTextStyle:{
+    fontSize: 13, 
+    fontFamily:"IRANSansMobile_Medium"
+  },
+  valueTextStyle:{
+    fontSize: 13, 
+    fontFamily:"IRANSansMobile_Light"
+  }
 });
 
 export default MissionListItem;

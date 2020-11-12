@@ -339,23 +339,23 @@ const RejectedServiceListItem = ({
         }}>
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
-            <Text>{toFaDigit(Item.projectID)}</Text>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.projectID)}</Text>
             <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>پروژه: </Text>
           </View>
           <View style={Styles.singleItemStyle}>
-            <Text>{toFaDigit(Item.Name)}</Text>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
             <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>نام: </Text>
           </View>
         </View>
         <View style={[Styles.firstRowContainerStyle, {marginBottom: 2}]}>
           <View style={Styles.singleItemStyle}>
-            <Text>{toFaDigit(Item.cell)}</Text>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.cell)}</Text>
             <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>همراه: </Text>
           </View>
         </View>
         <View style={Styles.firstRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
-            <Text>
+            <Text style={Styles.valueTextStyle}>
               {Item.Resone.split(/\r\n|\r|\n/).length>1?
                 `${Item.Resone.split(/\r\n|\r|\n/)[0].substr(0,20)}...`:
                   Item.Resone.length > 20
@@ -391,6 +391,10 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent:"center",
     alignItems:"center"
+  },
+  valueTextStyle: {
+    fontSize: 13,
+    fontFamily: 'IRANSansMobile_Light',
   },
 });
 
