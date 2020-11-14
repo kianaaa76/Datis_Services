@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   Alert,
-  BackHandler,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {TabView, TabBar} from 'react-native-tab-view';
@@ -73,6 +72,10 @@ const MyServiceDetails = ({navigation}) => {
     travel: selector.savedServiceInfo.travel,
   });
 
+  const setRenderSaveModalInTabs = () => {
+    setRenderSaveModal(true);
+  }
+
   useEffect(() => {
     RNFetchBlob.fs
       .readFile(`${dirs.DownloadDir}/${serviceID}/1.png`, 'base64')
@@ -105,22 +108,6 @@ const MyServiceDetails = ({navigation}) => {
         }
       });
   }, []);
-
-  useEffect(() => {
-    const backAction = () => {
-      if (!renderSaveModal) {
-        setRenderSaveModal(true);
-      } else {
-        navigation.replace('MyServices');
-      }
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-    return () => backHandler.remove();
-  });
 
   const setFactorInfo = e => {
     setFactorTabInfo({
@@ -253,10 +240,6 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
-      console.log(
-        '1111',
-        convertResultTitleToNum(serviceTabInfo.serviceResult),
-      );
       setRequestLoading(false);
       Alert.alert('اخطار', 'لطفا عکس فاکتور را بارگذاری کنید.', [
         {text: 'OK', onPress: () => {}},
@@ -525,7 +508,7 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={e => setServiceInfo(e)}
             info={serviceTabInfo}
             projectId={serviceID}
-            navigation={navigation}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'factor':
@@ -534,6 +517,7 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={e => setFactorInfo(e)}
             info={factorTabInfo}
             serviceInfo={serviceTabInfo}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'parts':
@@ -541,6 +525,7 @@ const MyServiceDetails = ({navigation}) => {
           <ServicePartsTab
             setInfo={e => setPartsTabInfo(e)}
             info={partsTabInfo}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'mission':
@@ -548,11 +533,11 @@ const MyServiceDetails = ({navigation}) => {
           <ServiceMissionTab
             setInfo={e => setMissionInfo(e)}
             info={missionTabInfo}
-            navigation={navigation}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'info':
-        return <ServiceInfoTab serviceData={selector.selectedService} />;
+        return <ServiceInfoTab serviceData={selector.selectedService} renderSaveModal={setRenderSaveModalInTabs}/>;
       default:
         return null;
     }

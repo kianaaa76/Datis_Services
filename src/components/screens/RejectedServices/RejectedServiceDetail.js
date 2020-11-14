@@ -9,7 +9,6 @@ import {
   TouchableHighlight,
   Text,
   TouchableOpacity,
-  BackHandler,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {TabView, TabBar} from 'react-native-tab-view';
@@ -72,6 +71,10 @@ const MyServiceDetails = ({navigation}) => {
   const [renderNetworkModal, setRenderNetworkModal] = useState(false);
   const [renderSaveModal, setRenderSaveModal] = useState(false);
 
+  const setRenderSaveModalInTabs = () => {
+    setRenderSaveModal(true);
+  }
+
   useEffect(() => {
     if (partsTabInfo.length > 0 && !partsTabInfo[0].availableVersions) {
       let temp = [];
@@ -98,21 +101,6 @@ const MyServiceDetails = ({navigation}) => {
     }
   }, []);
 
-  useEffect(() => {
-    const backAction = () => {
-      if (!renderSaveModal) {
-        setRenderSaveModal(true);
-      } else {
-        navigation.replace('RejectedServices');
-      }
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-    return () => backHandler.remove();
-  });
 
   const setFactorInfo = e => {
     setFactorTabInfo({
@@ -484,6 +472,7 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={e => setServiceInfo(e)}
             info={serviceTabInfo}
             navigation={navigation}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'factor':
@@ -492,6 +481,7 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={e => setFactorInfo(e)}
             info={factorTabInfo}
             serviceInfo={serviceTabInfo}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'parts':
@@ -500,6 +490,7 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={setPartsTabInfo}
             info={partsTabInfo}
             navigation={navigation}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'mission':
@@ -508,10 +499,11 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={e => setMissionInfo(e)}
             info={missionTabInfo}
             navigation={navigation}
+            renderSaveModal={setRenderSaveModalInTabs}
           />
         );
       case 'info':
-        return <ServiceInfoTab serviceData={service} />;
+        return <ServiceInfoTab serviceData={service} renderSaveModal={setRenderSaveModalInTabs}/>;
       default:
         return null;
     }

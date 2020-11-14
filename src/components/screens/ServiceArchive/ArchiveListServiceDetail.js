@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  TouchableHighlight,
+  TouchableHighlight, BackHandler,
 } from 'react-native';
 import Header from '../../common/Header';
 import {updateService, unsettledServiceDetail} from '../../../actions/api';
@@ -22,9 +22,11 @@ import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from "../../common/ImageViwer";
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Foundation from 'react-native-vector-icons/Foundation';
+import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
+let cameraRef = {};
 
 const ServiceArchiveDetail = ({navigation}) => {
   const dispatch = useDispatch();
@@ -43,6 +45,22 @@ const ServiceArchiveDetail = ({navigation}) => {
   const [userLongitude, setUserLongitude] = useState(null);
   const [confrimRequestLoading, setConfrimRequestLoading] = useState(false);
   const SERVICE = navigation.getParam('service');
+
+  useEffect(() => {
+    const backAction = () => {
+      if (isMapModeOn) {
+        setIsMapModeOn(false);
+      } else {
+        navigation.goBack();
+      }
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+    );
+    return () => backHandler.remove();
+  });
 
   const getServiceResult = resultNum => {
     switch (resultNum) {
@@ -118,6 +136,7 @@ const ServiceArchiveDetail = ({navigation}) => {
         setServiceDetail(data.result);
         setAddress(data.result.DocumentDetails.Address);
         setFactorImage(data.result.FactorImage);
+        setImage(data.result.DoneDetails.Image);
         setDetailLoading(false);
       } else if (data.errorCode === 3) {
         dispatch({
@@ -140,7 +159,7 @@ const ServiceArchiveDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Light"}}>{text}</Text>
+        <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Light", flexShrink:1}}>{text}</Text>
         <Text
           style={{
             fontSize: 13,
@@ -160,7 +179,7 @@ const ServiceArchiveDetail = ({navigation}) => {
         <View style={{flex: 1}}>
           <MapboxGL.MapView
             style={{flex: 1}}
-            onPress={feature => {
+            onLongPress={feature => {
               setSelectedLatitude(feature.geometry.coordinates[1]);
               setSelectedLongitude(feature.geometry.coordinates[0]);
             }}>
@@ -172,6 +191,7 @@ const ServiceArchiveDetail = ({navigation}) => {
             />
             {!!userLatitude && !!userLongitude && (
               <MapboxGL.Camera
+                  ref={ref=>cameraRef = ref}
                 centerCoordinate={[userLongitude, userLatitude]}
                 zoomLevel={12}
               />
@@ -196,6 +216,39 @@ const ServiceArchiveDetail = ({navigation}) => {
               </View>
             )}
           </MapboxGL.MapView>
+          <View
+              style={Styles.myLocationContainerStye}>
+            <Icon
+                name={'my-location'}
+                style={{fontSize: 30, color: '#000'}}
+                onPress={async () => {
+                  LocationServicesDialogBox.checkLocationServicesIsEnabled({
+                    message:
+                        "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+                    ok: 'YES',
+                    cancel: 'NO',
+                    enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+                    showDialog: true, // false => Opens the Location access page directly
+                    openLocationServices: true, // false => Directly catch method is called if location services are turned off
+                    preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
+                    preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
+                    providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
+                  })
+                      .then(async () => {
+                        await cameraRef.moveTo([userLongitude, userLatitude]);
+                        await cameraRef.zoomTo(11);
+                      })
+                      .catch(error => {
+                        console.log(error);
+                        ToastAndroid.showWithGravity(
+                            'موقعیت در دسترس نیست.',
+                            ToastAndroid.SHORT,
+                            ToastAndroid.CENTER,
+                        );
+                      });
+                }}
+            />
+          </View>
           <View style={Styles.bottomBoxContainerStyle}>
             {!!selectedLatitude && !!selectedLongitude ? (
               <TouchableOpacity
@@ -340,16 +393,9 @@ const ServiceArchiveDetail = ({navigation}) => {
                             getServiceResult(serviceDetail.DoneDetails.Result),
                           )}
                         </View>
-                        <View style={[Styles.contentContainerStyle2,{
-                          height:
-                          !!image && !!factorImage
-                            ? pageHeight * 1.6
-                            : (!!image && !factorImage) || (!image && !!factorImage)
-                            ? pageHeight * 1.12
-                            : pageHeight * 0.67,
-                        }]}>
+                        <View style={Styles.contentContainerStyle2}>
                           <View style={Styles.descriptionRowStyle}>
-                            <Text style={{width: 60, marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
+                            <Text style={{ marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
                               توضیحات:
                             </Text>
                             <TextInput
@@ -370,7 +416,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                                   setIsMapModeOn(true);
                                 }}
                               />
-                              <Text style={{width: 60, marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
+                              <Text style={{marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
                                 آدرس:
                               </Text>
                             </View>
@@ -382,39 +428,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                             />
                           </View>
                           <View style={Styles.imageRowStyle}>
-                            <View style={Styles.getImageContainerViewStyle}>
-                              <Icon
-                                name={'camera-alt'}
-                                style={{color: '#000', fontSize: 35}}
-                                onPress={() => {
-                                  ImagePicker.openCamera({
-                                    width: pageWidth - 20,
-                                    height: pageHeight * 0.4,
-                                    includeBase64: true,
-                                    compressImageQuality: 0.7,
-                                  }).then(response => {
-                                    setFactorImage(response.data);
-                                  });
-                                }}
-                              />
-                              <Icon
-                                name={'file-upload'}
-                                style={{color: '#000', fontSize: 35}}
-                                onPress={() => {
-                                  ImagePicker.openPicker({
-                                    width: pageWidth - 20,
-                                    height: pageHeight * 0.4,
-                                    includeBase64: true,
-                                    compressImageQuality: 0.7,
-                                  }).then(response => {
-                                    setFactorImage(response.data);
-                                  });
-                                }}
-                              />
-                            </View>
-                            <View style={{width: 70}}>
                               <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
-                            </View>
                           </View>
                           {!!factorImage && (
                             <ImageViewer
@@ -423,57 +437,19 @@ const ServiceArchiveDetail = ({navigation}) => {
                               imageUrl={`data:image/jpeg;base64,${factorImage}`}
                             />
                           )}
-                          <View style={Styles.imageRowStyle}>
-                            <View style={Styles.getImageContainerViewStyle}>
-                              <Icon
-                                name={'camera-alt'}
-                                style={{color: '#000', fontSize: 35}}
-                                onPress={() => {
-                                  ImagePicker.openCamera({
-                                    width: pageWidth - 20,
-                                    height: pageHeight * 0.4,
-                                    includeBase64: true,
-                                    compressImageQuality: 0.7,
-                                  }).then(response => {
-                                    setImage(response.data);
-                                  });
-                                }}
-                              />
-                              <Icon
-                                name={'file-upload'}
-                                style={{color: '#000', fontSize: 35}}
-                                onPress={() =>
-                                  ImagePicker.openPicker({
-                                    width: pageWidth - 20,
-                                    height: pageHeight * 0.4,
-                                    includeBase64: true,
-                                    compressImageQuality: 0.7,
-                                  }).then(response => {
-                                    setImage(response.data);
-                                  })
-                                }
-                              />
-                              {!!image && (
-                                <Icon
-                                  name={'delete'}
-                                  style={{color: '#000', fontSize: 30}}
-                                  onPress={() => {
-                                    setDeletingImage(2);
-                                  }}
-                                />
-                              )}
-                            </View>
-                            <View style={{width: 100}}>
-                              <Text style={Styles.labelStyle}>عکس:</Text>
-                            </View>
-                          </View>
                           {!!image && (
-                            <ImageViewer
-                              width={pageWidth*0.9 - 20}
-                              height={pageHeight * 0.4}
-                              imageUrl={`data:image/jpeg;base64,${image}`}
-                            />
+                              <>
+                              <View style={Styles.imageRowStyle}>
+                                <Text style={Styles.labelStyle}>عکس:</Text>
+                              </View>
+                                <ImageViewer
+                                    width={pageWidth*0.9 - 20}
+                                    height={pageHeight * 0.4}
+                                    imageUrl={`data:image/jpeg;base64,${image}`}
+                                />
+                              </>
                           )}
+
                         </View>
                     </View>
                   )}
@@ -556,7 +532,6 @@ const Styles = StyleSheet.create({
   contentContainerStyle: {
     backgroundColor: '#fff',
     width: pageWidth * 0.9,
-    height: pageHeight * 0.75,
     justifyContent: 'center',
     alignItems: 'flex-end',
     padding: 10,
@@ -728,7 +703,7 @@ const Styles = StyleSheet.create({
     width: pageWidth * 0.8,
     height: 65,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
   getImageContainerViewStyle: {
     justifyContent: 'space-between',
@@ -778,7 +753,19 @@ const Styles = StyleSheet.create({
   labelStyle:{
     fontSize:13,
     fontFamily:"IRANSansMobile_Light"
-  }
+  },
+  myLocationContainerStye: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    elevation: 10,
+  },
 });
 
 export default ServiceArchiveDetail;

@@ -12,30 +12,29 @@ const MissionDetails = ({navigation}) => {
   const mission = navigation.getParam('mission', {});
   const StartLocation = mission.StartLocation;
   const EndLocation = mission.EndLocation;
-  const StartLatitude = StartLocation.length>1 ? StartLocation.substr(0, StartLocation.indexOf(',')):0;
-  const StartLongitude = StartLocation.length>1 ? StartLocation.substr(StartLocation.indexOf(',') + 1, StartLocation.length,):0;
-  const EndLatitude = EndLocation.length>1 ? EndLocation.substr(0, EndLocation.indexOf(',')):0;
-  const EndLongitude = EndLocation.length>1 ? EndLocation.substr(EndLocation.indexOf(',') + 1, EndLocation.length):0;
+  const StartLatitude = StartLocation.length>0 ? StartLocation.substr(0, StartLocation.indexOf(',')):0;
+  const StartLongitude = StartLocation.length>0 ? StartLocation.substr(StartLocation.indexOf(',') + 1, StartLocation.length,):0;
+  const EndLatitude = EndLocation.length>0 ? EndLocation.substr(0, EndLocation.indexOf(',')):0;
+  const EndLongitude = EndLocation.length>0 ? EndLocation.substr(EndLocation.indexOf(',') + 1, EndLocation.length):0;
 
   const renderMarker = (latitude,longitude, color, size, id, type) =>{
     return(
-        <View>
           <MapboxGL.MarkerView
               id={id}
-              coordinate={[longitude, latitude]}>
-            <View>
+              coordinate={[longitude, latitude]}
+          >
               <View style={{
                 alignItems: 'center',
                 width: 100,
                 backgroundColor: 'transparent',
                 height: 100,
+                zIndex: -9999
               }}>
                 <Icon name="marker" color={color} size={size}/>
                 <Text style={Styles.markerLabelStyle}>{type == "start"? "مبدا" : "مقصد"}</Text>
               </View>
-            </View>
+
           </MapboxGL.MarkerView>
-        </View>
     )
   }
 
@@ -43,21 +42,19 @@ const MissionDetails = ({navigation}) => {
     <View style={{flex: 1}}>
       <Header headerText="داتیس سرویس" />
       <View style={Styles.contentContainerStyle}>
+        <View>
         <MapboxGL.MapView style={{width: '100%', height: pageHeight * 0.57}}>
-          {(!!StartLongitude && !!StartLatitude && !EndLongitude && !EndLatitude) ?
-          (<MapboxGL.Camera
-            centerCoordinate={[parseFloat(StartLongitude), parseFloat(StartLatitude)]}
-          zoomLevel={10}/>)
-              :(!StartLongitude && !StartLatitude && !!EndLongitude && !!EndLatitude) ? (
-                      <MapboxGL.Camera
-                          centerCoordinate={[parseFloat(EndLongitude), parseFloat(EndLatitude),]}
-                          zoomLevel={10}/>
-                  ):null}
-          {!!StartLatitude && !!StartLongitude && (
-            renderMarker(StartLatitude, StartLongitude,"blue", 45, "1",'start'))}
-          {!!EndLatitude && !!EndLongitude && (
-            renderMarker(EndLatitude, EndLongitude, "red", 45, "2", "end"))}
+          <MapboxGL.Camera
+              ref={cameraRef => {
+                if (!!cameraRef){ cameraRef.fitBounds(
+                  [StartLongitude, StartLatitude],
+                  [EndLongitude, EndLatitude],50
+              )}}}
+          />
+          {!!StartLatitude && !!StartLongitude &&(renderMarker(StartLatitude, StartLongitude,"blue", 45, "1",'start'))}
+          {!!EndLatitude && !!EndLongitude &&(renderMarker(EndLatitude, EndLongitude, "red", 45, "2", "end"))}
         </MapboxGL.MapView>
+        </View>
         <View style={Styles.detailsContainerStyle}>
           <View style={Styles.singleRowContainerStyle}>
             <View style={Styles.secondSingleItemContainerStyle}>
@@ -112,30 +109,30 @@ const MissionDetails = ({navigation}) => {
 const Styles = StyleSheet.create({
   contentContainerStyle: {
     flex: 1,
-    padding: 10,
+    zIndex: -9999
   },
   detailsContainerStyle: {
     flex: 1,
-    padding: 15,
+    paddingVertical: 15,
+    backgroundColor: '#fff',
   },
   singleRowContainerStyle: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
+    marginVertical:3
   },
   secondSingleItemContainerStyle: {
-    margin: 12,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    width: "30%",
   },
   firstSingleItemContainerStyle: {
-    margin: 10,
+    marginHorizontal: 10,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    width:"60%",
+    width:"55%",
   },
   itemTitleStyle: {
     fontFamily:"IRANSansMobile_Medium",

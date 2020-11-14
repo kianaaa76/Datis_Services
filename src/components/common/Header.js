@@ -58,12 +58,11 @@ const Styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   headerTitleStyle: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#dadfe1",
     fontFamily:"IRANSansMobile"
   },
   headerTextContainerStyle: {
-    width:"50%",
     flexDirection: "row",
     justifyContent:"flex-end",
     alignItems:"center"

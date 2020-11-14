@@ -16,6 +16,7 @@ const DropdownPicker = forwardRef(({placeholder, list, onSelect, listHeight},ref
     useImperativeHandle(ref, () => ({
         setList(LIST) {
             setShowingList(LIST);
+            setSelecedItemName("");
         }
     }));
 
@@ -65,7 +66,7 @@ const DropdownPicker = forwardRef(({placeholder, list, onSelect, listHeight},ref
                 setListIsShown(!listIsShown)
             }}>
                 <Text style={{color: !!selectedItemName ? "#000" : "gray"}}>
-                    {!!selectedItemName ? selectedItemName: placeholder}
+                    {!!selectedItemName ? selectedItemName.length>25 ? `${selectedItemName.substr(0,25)}...`: selectedItemName : placeholder}
                 </Text>
                 {listIsShown?(
                     <FontAwesome name={"chevron-up"} style={Styles.upDownIconStyle} onPress={()=> {
@@ -123,13 +124,13 @@ const Styles= StyleSheet.create({
     },
     listItemsContainerStyle:{
         width:"100%",
-        height:30,
+        paddingVertical:5,
         justifyContent: "center",
         alignItems: "flex-start",
         backgroundColor:"#fff",
         paddingHorizontal:8,
         borderBottomWidth: 1,
-        borderBottomColor:"gray"
+        borderBottomColor:"#E0E0E0"
     },
     containerStyle:{
         flexDirection: "row",

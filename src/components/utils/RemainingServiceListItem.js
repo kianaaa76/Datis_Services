@@ -41,7 +41,7 @@ const RemainingServiceListItem = ({item, navigation}) => {
             <Text style={{color: '#CB3434', fontSize:13, fontFamily: 'IRANSansMobile_Light'}}>
               {Item.remaind == 0
                 ? `${toFaDigit(0)} ریال`
-                : ` ${toFaDigit(Item.remaind)}-  ریال`}
+                : ` ${toFaDigit(Item.remaind.toString().substr(1,Item.remaind.length))}-  ریال`}
             </Text>
             <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium', color: '#CB3434'}}>
               مانده:{' '}

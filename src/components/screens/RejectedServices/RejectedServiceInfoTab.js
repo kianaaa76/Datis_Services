@@ -1,13 +1,26 @@
-import React from "react";
-import {View, StyleSheet, Text, ScrollView, Linking, Dimensions} from "react-native";
+import React,{useEffect} from "react";
+import {View, StyleSheet, Text, ScrollView, Linking, Dimensions, BackHandler} from "react-native";
 import {toFaDigit} from "../../utils/utilities";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServiceInfoTab = ({serviceData}) => {
+const ServiceInfoTab = ({serviceData,renderSaveModal}) => {
     const data = serviceData;
+
+    useEffect(() => {
+        const backAction = () => {
+            renderSaveModal();
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+        );
+        return () => backHandler.remove();
+    });
+
     const renderSingleRow = (title, text) => {
         return (
             <View style={Styles.singleRowStyle}>
@@ -71,7 +84,8 @@ const Styles = StyleSheet.create({
         textAlign:"right",
         width: pageWidth-160,
         height:38,
-        fontFamily:"IRANSansMobile_Light"
+        fontFamily:"IRANSansMobile_Light",
+        flexShrink:1
     },
     rightSideContainerStyle:{
         flexDirection:"row",

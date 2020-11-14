@@ -143,6 +143,7 @@ const ServiceArchiveList = ({navigation}) => {
                                     placeholder="شماره پرونده یا سریال"
                                     onChangeText={value=>setSerial(value)}
                                     value={serial}
+                                    keyboardType={"numeric"}
                                 />
                                 <Text style={Styles.inputLabelStyle}>
                                     شماره پرونده یا سریال:
@@ -288,7 +289,8 @@ const Styles = StyleSheet.create({
         fontSize:13,
         color:"#5B5B5B",
         textAlign: "center",
-        fontFamily:"IRANSansMobile_Light"
+        fontFamily:"IRANSansMobile_Light",
+        width:"40%"
     }
 });
 

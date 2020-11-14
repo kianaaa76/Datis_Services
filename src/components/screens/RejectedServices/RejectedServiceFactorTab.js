@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     View,
     StyleSheet,
@@ -7,7 +7,7 @@ import {
     Dimensions,
     ScrollView,
     TouchableOpacity,
-    TouchableHighlight
+    TouchableHighlight, BackHandler
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from 'react-native-image-crop-picker';
@@ -16,8 +16,21 @@ import ImageViewer from "../../common/ImageViwer";
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
+const ServiceFactorTab = ({setInfo, info, serviceInfo,renderSaveModal}) => {
     const [deletingImage, setDeletingImage] = useState(0);
+
+    useEffect(() => {
+        const backAction = () => {
+            renderSaveModal();
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+        );
+        return () => backHandler.remove();
+    });
+
     return (
         <>
         <ScrollView style={Styles.containerStyle} contentContainerStyle={{justifyContent:"center", alignItems:"center"}}>
@@ -32,7 +45,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                     }}
                     value={info.factorReceivedPrice.toString()}
                     keyboardType="numeric"/>
-                <View style={{width: 85, flexDirection:"row"}}>
+                <View style={{ flexDirection:"row"}}>
                     {serviceInfo.serviceResult !== 'لغو موفق' &&
                     serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                         <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -51,7 +64,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                            }}
                            value={info.factorTotalPrice.toString()}
                            keyboardType="numeric"/>
-                <View style={{width: 80, flexDirection:"row", justifyContent:"flex-end"}}>
+                <View style={{ flexDirection:"row", justifyContent:"flex-end"}}>
                     {serviceInfo.serviceResult !== 'لغو موفق' &&
                     serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                         <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -91,7 +104,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                             })
                         }}/>
                 </View>
-                <View style={{width: 80, flexDirection:"row"}}>
+                <View style={{ flexDirection:"row"}}>
                     {serviceInfo.serviceResult !== 'لغو موفق' &&
                     serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                         <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -137,7 +150,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
                         }}/>
                     )}
                 </View>
-                <View style={{width: 120}}>
+                <View>
                     <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
                 </View>
             </View>

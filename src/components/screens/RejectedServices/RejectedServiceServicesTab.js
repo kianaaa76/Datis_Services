@@ -30,7 +30,7 @@ const pageHeight = Dimensions.get('screen').height;
 
 let cameraRef = {};
 
-const ServiceServicesTab = ({setInfo, info, navigation}) => {
+const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
   const [showDatePicker, setShowDatePicke] = useState(false);
   const [screenMode, setScreenMode] = useState('tab');
   const [selectedLatitude, setSelectedLatitude] = useState(null);
@@ -48,7 +48,7 @@ const ServiceServicesTab = ({setInfo, info, navigation}) => {
       if (screenMode === 'map') {
         setScreenMode('tab');
       } else {
-        navigation.goBack();
+        renderSaveModal();
       }
       return true;
     };
@@ -593,13 +593,12 @@ const Styles = StyleSheet.create({
   },
   serviceResultContainerStyle: {
     flexDirection: 'row',
-    width: '90%',
-    height: pageHeight * 0.4,
+    width: '100%',
     justifyContent: 'space-between',
     marginBottom: 30,
   },
   resultContainerstyle: {
-    width: pageWidth * 0.37,
+    width: pageWidth * 0.45,
     height: '100%',
     borderWidth: 1,
     borderColor: '#000',
@@ -607,7 +606,7 @@ const Styles = StyleSheet.create({
     padding: 5,
   },
   servicetypeContainerStyle: {
-    width: pageWidth * 0.37,
+    width: pageWidth * 0.45,
     height: '100%',
     borderWidth: 1,
     borderColor: '#000',

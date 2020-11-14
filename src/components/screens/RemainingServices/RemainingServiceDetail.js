@@ -163,7 +163,7 @@ const RemainingServiceDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13}}>{text}</Text>
+        <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13, flexShrink: 1}}>{text}</Text>
         <Text
           style={{
             fontSize: 12,
@@ -186,7 +186,7 @@ const RemainingServiceDetail = ({navigation}) => {
         onContentSizeChange={() =>
           scrollViewRef.current.scrollToEnd({animated: true})
         }>
-        <Header headerText={'توضیحات'} />
+        <Header headerText={'جزئیات'} />
         {detailLoading ? (
           <View
             style={{
@@ -201,7 +201,8 @@ const RemainingServiceDetail = ({navigation}) => {
           <View
             style={{
               flex: 1,
-              padding: 10,
+              paddingVertical: 10,
+              // paddingHorizontal: 30,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
@@ -466,7 +467,6 @@ const Styles = StyleSheet.create({
   contentContainerStyle: {
     backgroundColor: '#fff',
     width: '93%',
-    height: pageHeight * 0.75,
     justifyContent: 'center',
     alignItems: 'flex-end',
     padding: 10,

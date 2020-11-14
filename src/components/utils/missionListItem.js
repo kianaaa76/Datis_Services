@@ -16,7 +16,6 @@ const MissionListItem = ({item, navigation}) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        console.log('ITEM', Item);
         navigation.navigate('MissionDetail', {mission: Item});
       }}>
       <View
@@ -33,7 +32,7 @@ const MissionListItem = ({item, navigation}) => {
         }}>
         <View style={Styles.firstRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
-            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.ID)}</Text>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Id)}</Text>
             <Text style={Styles.titleTextStyle}>شماره‌‌ماموریت: </Text>
           </View>
           <View style={Styles.singleItemStyle}>

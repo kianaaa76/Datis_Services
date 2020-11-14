@@ -27,7 +27,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 
-const ServicePartsTab = ({setInfo, info, navigation}) => {
+const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
     const selector = useSelector((state) => state);
     const [fieldsObject, setFieldsObject] = useState({
         objectType:"",
@@ -75,7 +75,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
             if(screenMode){
                 setScreenMode(false);
             } else {
-                navigation.goBack();
+               renderSaveModal();
             }
             return true;
         };
@@ -307,7 +307,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                     dropRef.current.setList(value.value.Versions);
                                 }}
                                 placeholder={!!Item.partType
-                                    ? Item.partType.label
+                                    ? `${Item.partType.label.substr(0,25)}...`
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
                                 listHeight={150}
                             />
@@ -526,7 +526,7 @@ const ServicePartsTab = ({setInfo, info, navigation}) => {
                                             dropRef.current.setList(value.value.Versions);
                                         }}
                                         placeholder={!!fieldsObject.partTypeSelected.label
-                                            ? fieldsObject.partTypeSelected.label
+                                            ? `${fieldsObject.partTypeSelected.label.substr(0, 25)}...`
                                             :"قطعه مورد نظر خود را انتخاب کنید."}
                                         listHeight={150}/>
                                     <Text style={[Styles.labelStyle,{width:"20%"}]}>نوع قطعه:</Text>
@@ -880,10 +880,10 @@ const Styles = StyleSheet.create({
         width:"100%"
     },
     prePriceInputStyle:{
+        flex: 1,
         borderBottomWidth:2,
         borderBottomColor:"#000",
         padding:10,
-        width:pageWidth*0.45,
         marginHorizontal:5
     },
     labelStyle:{

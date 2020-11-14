@@ -20,7 +20,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 let cameraRef = {};
 let EndObject = '';
-const ServiceMissionTab = ({info, setInfo, navigation}) => {
+const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
   const [startLocation, setStartLocation] = useState({
     startLatitude: info.startLatitude,
     startLongitude: info.startLongitude,
@@ -60,7 +60,7 @@ const ServiceMissionTab = ({info, setInfo, navigation}) => {
           startCity: '',
         });
       } else {
-        navigation.goBack();
+        renderSaveModal();
       }
       return true;
     };
@@ -418,7 +418,7 @@ const Styles = StyleSheet.create({
   },
   cityDataContainerStyle: {
     width: '100%',
-    height: pageHeight * 0.06,
+    height: "20%",
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -441,16 +441,17 @@ const Styles = StyleSheet.create({
   },
   descriptionContainerStyle: {
     width: '100%',
-    height: '60%',
+    height: '50%',
+    justifyContent: 'flex-end',
   },
   descriptionTitleTextStyle: {
     fontSize: 14,
     fontFamily:"IRANSansMobile_Medium",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   descriptionTextInputStyle: {
     width: '100%',
-    height: pageHeight * 0.14,
+    height: "80%",
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 10,
@@ -476,14 +477,13 @@ const Styles = StyleSheet.create({
     width: '50%',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    marginTop: 8,
   },
   distanceRowStyle: {
     flexDirection: 'row',
     width: '100%',
+    height:"18%",
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 8,
   },
   titleStyle: {
     fontSize: 14,
@@ -499,7 +499,6 @@ const Styles = StyleSheet.create({
   myLocationContainerStyle: {
     position: 'absolute',
     right: 20,
-    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',

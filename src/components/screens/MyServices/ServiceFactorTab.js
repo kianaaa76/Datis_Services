@@ -6,7 +6,7 @@ import {
   TextInput,
   Dimensions,
   ScrollView,
-  Image,
+  BackHandler,
   TouchableOpacity,
   TouchableHighlight,
 } from 'react-native';
@@ -17,8 +17,21 @@ import ImagePicker from 'react-native-image-crop-picker';
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
+const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
   const [deletingImage, setDeletingImage] = useState(0);
+
+  useEffect(() => {
+    const backAction = () => {
+      renderSaveModal();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+    );
+    return () => backHandler.remove();
+  });
+
   return (
     <>
       <ScrollView
@@ -37,7 +50,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
             value={info.factorReceivedPrice}
             keyboardType="numeric"
           />
-          <View style={{width: 70}}>
+          <View>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
             serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -58,7 +71,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
             value={info.factorTotalPrice}
             keyboardType="numeric"
           />
-          <View style={{width: 70}}>
+          <View>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
             serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -107,7 +120,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
               />
             )}
           </View>
-          <View style={{width: 70}}>
+          <View>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
@@ -162,7 +175,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo}) => {
               />
             )}
           </View>
-          <View style={{width: 120}}>
+          <View>
             <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
           </View>
         </View>
@@ -259,7 +272,7 @@ const Styles = StyleSheet.create({
     fontFamily:"IRANSansMobile_Light"
   },
   labelStyle: {
-    width: '100%',
+    // width: '100%',
     fontSize:13, 
     fontFamily:'IRANSansMobile_Light'
   },

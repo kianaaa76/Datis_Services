@@ -28,7 +28,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 
-const ServicePartsTab = ({setInfo, info}) => {
+const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
     const dropRef = useRef();
     const selector = useSelector((state) => state);
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -39,7 +39,7 @@ const ServicePartsTab = ({setInfo, info}) => {
         partVersionSelected:{},
         failureDescription:"",
         hasGarantee:null,
-        Price:""
+        Price:"0"
     });
     const [newHasStarted, setNewHasStarted] = useState(Boolean);
     const [isNewPartFormExpanded,setIsNewPartFormExpanded] = useState(false);
@@ -76,7 +76,7 @@ const ServicePartsTab = ({setInfo, info}) => {
             if(screenMode){
                 setScreenMode(false);
             } else {
-                navigation.goBack();
+                renderSaveModal();
             }
             return true;
         };
@@ -307,7 +307,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                                     dropRef.current.setList(value.value.Versions);
                                 }}
                                 placeholder={!!Item.partType
-                                    ? Item.partType.label
+                                    ? `${Item.partType.label.substr(0,25)}...`
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
                                 listHeight={150}/>
                             <Text style={[Styles.labelStyle,{width:"20%"}]}>نوع قطعه:</Text>
@@ -518,12 +518,12 @@ const ServicePartsTab = ({setInfo, info}) => {
                             <DropdownPicker
                                 list={partsListName}
                                 onSelect={value=> {
-                                    setFieldsObject({...fieldsObject, partTypeSelected: value, serial: "", partVersionSelected: {}})
+                                    setFieldsObject({...fieldsObject, partTypeSelected: value, serial: "", partVersionSelected: null})
                                     setSelectedPartVersionsList(value.value.Versions);
                                     dropRef.current.setList(value.value.Versions);
                                 }}
                                 placeholder={!!fieldsObject.partTypeSelected
-                                    ? fieldsObject.partTypeSelected.label
+                                    ? `${fieldsObject.partTypeSelected.label.substr(0, 25)}...`
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
                                 listHeight={150}/>
                             <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:13}}>نوع قطعه:</Text>
@@ -561,7 +561,7 @@ const ServicePartsTab = ({setInfo, info}) => {
                                 onSelect={item=>setFieldsObject({...fieldsObject, partVersionSelected: item})}
                                 listHeight={150}
                             />
-                            <Text style={{width:65, fontFamily:"IRANSansMobile_Light", fontSize:13}}>نسخه:  </Text>
+                            <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:13}}>نسخه:  </Text>
                         </View>
                     </View>
                 )}
@@ -874,10 +874,10 @@ const Styles = StyleSheet.create({
         width:"100%"
     },
     prePriceInputStyle:{
+        flex: 1,
         borderBottomWidth:2,
         borderBottomColor:"#000",
         padding:10,
-        width:pageWidth*0.45,
         marginHorizontal:5
     },
     labelStyle:{
