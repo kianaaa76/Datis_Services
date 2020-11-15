@@ -11,6 +11,7 @@ const INITIAL_STATE = {
   token: '',
   userId: '',
   constantUserId:'',
+  constantToken:"",
   unfinishedMissionId: null,
   selectedService:null,
     objectsList:[],
@@ -49,6 +50,7 @@ export default (state = INITIAL_STATE, action) => {
     case LOGIN:
       return {
         ...state,
+        constantToken: action.constantToken,
         token: action.token,
         userId: action.userId,
         constantUserId: action.constantUserId
@@ -56,7 +58,7 @@ export default (state = INITIAL_STATE, action) => {
     case GET_SERVICE_DETAIL:
       return {...state, selectedService: action.selectedService};
     case LOGOUT:
-      return {...state, token:'', userId: '', constantUserId: ''}
+      return {...state, token:'', userId: '', constantUserId: '', constantToken:''}
     case RESTORE_SERVICE_DATA:
       return {...state, savedServiceInfo: {
           projectId: action.savedServiceInfo.projectId,

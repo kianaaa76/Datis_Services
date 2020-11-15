@@ -1,6 +1,7 @@
 import React,{useState, forwardRef, useImperativeHandle} from "react";
 import {View, TextInput, StyleSheet, Dimensions, Text, TouchableOpacity, ScrollView, FlatList} from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+// import FontAwesome from "react-native-vector-icons/FontAwesome";
+import {normalize} from "../utils/utilities";
 
 
 const pageWidth = Dimensions.get("screen").width;
@@ -68,7 +69,7 @@ const DropdownPicker = forwardRef(({placeholder, list, onSelect, listHeight},ref
                 <Text style={{color: !!selectedItemName ? "#000" : "gray"}}>
                     {!!selectedItemName ? selectedItemName.length>25 ? `${selectedItemName.substr(0,25)}...`: selectedItemName : placeholder}
                 </Text>
-                {listIsShown?(
+                {/* {listIsShown?(
                     <FontAwesome name={"chevron-up"} style={Styles.upDownIconStyle} onPress={()=> {
                         setShowingList(list);
                         setSearchText("");
@@ -76,7 +77,7 @@ const DropdownPicker = forwardRef(({placeholder, list, onSelect, listHeight},ref
                     }}/>
                 ):(
                     <FontAwesome name={"chevron-down"} style={Styles.upDownIconStyle}/>
-                )}
+                )} */}
             </TouchableOpacity>
             {listIsShown && (
                 <View style={[Styles.listContainerStyle, {height: listHeight}]}>
@@ -89,7 +90,7 @@ const DropdownPicker = forwardRef(({placeholder, list, onSelect, listHeight},ref
                                 setSearchText(text);
                                 searchInList(text)
                             }}/>
-                        <FontAwesome name={"search"} style={Styles.searchIconStyle}/>
+                        {/* <FontAwesome name={"search"} style={Styles.searchIconStyle}/> */}
                     </View>
                     <ScrollView nestedScrollEnabled={true} scrollEnabled={!!showingList.length}>
                         <FlatList
@@ -144,7 +145,7 @@ const Styles= StyleSheet.create({
         height:50
     },
     upDownIconStyle:{
-        fontSize:15,
+        fontSize:normalize(15),
         color:"#000",
         marginHorizontal:8
     },
@@ -158,7 +159,7 @@ const Styles= StyleSheet.create({
         marginBottom:10
     },
     searchIconStyle:{
-        fontSize:15,
+        fontSize:normalize(15),
         color:"gray",
         marginHorizontal:8
     }

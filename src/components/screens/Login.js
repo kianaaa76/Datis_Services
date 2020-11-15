@@ -15,7 +15,7 @@ import {
 import {LOGIN, LOGOUT} from '../../actions/types';
 import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
-import {toFaDigit} from '../utils/utilities';
+import {toFaDigit, normalize} from '../utils/utilities';
 import {loginUser, loginVerification, getUsers} from '../../actions/api';
 
 const pageWidth = Dimensions.get('screen').width;
@@ -97,6 +97,7 @@ const Login = ({navigation}) => {
             dispatch({
               type: LOGIN,
               token: data.result.Token,
+              constantToken:data.result.Token,
               userId: data.result.ID,
               constantUserId: data.result.ID,
             });
@@ -251,7 +252,7 @@ const Styles = StyleSheet.create({
     marginTop: 30,
   },
   buttonTextStyle: {
-    fontSize: 13,
+    fontSize: normalize(13),
     textAlign: 'center',
     color: '#660000',
     fontFamily:"IRANSansMobile_Bold"
@@ -261,7 +262,7 @@ const Styles = StyleSheet.create({
     height: pageWidth * 0.2,
     backgroundColor: 'transparent',
     margin: 10,
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily: 'IRANSansMobile',
   },
   textInputContainerStyle: {

@@ -23,6 +23,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import {GET_OBJECTS_LIST, LOGIN, LOGOUT} from '../../actions/types';
 import {call, getObjects} from '../../actions/api';
+import {normalize} from "../utils/utilities";
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -156,7 +157,7 @@ const Home = ({navigation}) => {
               name={'menu'}
               onPress={() => navigation.openDrawer()}
               style={{
-                fontSize: 23,
+                fontSize: normalize(23),
                 color: '#fff',
                 marginLeft: 10,
               }}
@@ -176,7 +177,7 @@ const Home = ({navigation}) => {
                 <Text
                   style={{
                     color: '#fff',
-                    fontSize: 16,
+                    fontSize: normalize(16),
                     fontFamily: 'IRANSansMobile_Light',
                   }}>
                   {user.Name}
@@ -201,13 +202,13 @@ const Home = ({navigation}) => {
                 onChangeText={text => search(text)}
                 style={{
                   fontFamily: 'IRANSansMobile_Light',
-                  fontSize: 12,
+                  fontSize: normalize(12),
                   width: '100%',
                 }}
               />
               <Icon
                 name={'search'}
-                style={{fontSize: 20, color: 'gray', marginLeft: 5}}
+                style={{fontSize: normalize(20), color: 'gray', marginLeft: 5}}
               />
             </View>
             <FlatList
@@ -219,6 +220,7 @@ const Home = ({navigation}) => {
                     dispatch({
                       type: LOGIN,
                       token: item.item.Token,
+                      constantToken: selector.constantToken,
                       userId: item.item.ID,
                       constantUserId: selector.constantUserId,
                     });
@@ -229,7 +231,7 @@ const Home = ({navigation}) => {
                   <Text
                     style={{
                       color: '#000',
-                      fontSize: 13,
+                      fontSize: normalize(13),
                       fontFamily: 'IRANSansMobile_Light',
                     }}>
                     {item.item.Name}
@@ -375,7 +377,7 @@ const Styles = StyleSheet.create({
   },
   itemTitleStyle: {
     color: 'gray',
-    fontSize: 13,
+    fontSize: normalize(13),
     textAlign: 'center',
     fontFamily: 'IRANSansMobile(FaNum)_Light',
   },
@@ -432,7 +434,7 @@ const Styles = StyleSheet.create({
   },
   modalHeaderTextStyle: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: normalize(17),
     fontFamily: 'IRANSansMobile_Light',
   },
   modalBodyContainerStyle: {
@@ -445,7 +447,7 @@ const Styles = StyleSheet.create({
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: normalize(15),
     fontFamily: 'IRANSansMobile_Light',
   },
   modalFooterContainerStyle: {
@@ -465,7 +467,7 @@ const Styles = StyleSheet.create({
   },
   modalButtonTextStyle: {
     color: 'gray',
-    fontSize: 16,
+    fontSize: normalize(16),
     fontFamily: 'IRANSansMobile_Medium',
   },
 });

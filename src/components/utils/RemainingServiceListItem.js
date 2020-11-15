@@ -6,7 +6,7 @@ import {
   Text,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {toFaDigit} from '../utils/utilities';
+import {toFaDigit, normalize} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -32,18 +32,18 @@ const RemainingServiceListItem = ({item, navigation}) => {
         }}>
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
-            <Text style={{fontSize:13, fontFamily: 'IRANSansMobile(FaNum)_Light'}}>{toFaDigit(Item.projectID)}</Text>
-            <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>پروژه: </Text>
+            <Text style={{fontSize:normalize(13), fontFamily: 'IRANSansMobile(FaNum)_Light'}}>{toFaDigit(Item.projectID)}</Text>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>پروژه: </Text>
           </View>
         </View>
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
-            <Text style={{color: '#CB3434', fontSize:13, fontFamily: 'IRANSansMobile_Light'}}>
+            <Text style={{color: '#CB3434', fontSize:normalize(13), fontFamily: 'IRANSansMobile_Light'}}>
               {Item.remaind == 0
                 ? `${toFaDigit(0)} ریال`
                 : ` ${toFaDigit(Item.remaind.toString().substr(1,Item.remaind.length))}-  ریال`}
             </Text>
-            <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium', color: '#CB3434'}}>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium', color: '#CB3434'}}>
               مانده:{' '}
             </Text>
           </View>

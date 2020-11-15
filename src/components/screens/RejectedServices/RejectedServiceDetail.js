@@ -23,6 +23,8 @@ import ServicePartsTab from './RejectedServicePartsTab';
 import ServiceMissionTab from './RejectedServiceMissionTab';
 import {sendServiceData} from '../../../actions/api';
 import {LOGOUT, SET_EDITING_SERVICE} from '../../../actions/types';
+import {normalize} from "../../utils/utilities";
+
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -524,7 +526,7 @@ const MyServiceDetails = ({navigation}) => {
             <Icon
               name="check"
               style={{
-                fontSize: 33,
+                fontSize: normalize(33),
                 color: '#dadfe1',
               }}
               onPress={() => {
@@ -534,7 +536,7 @@ const MyServiceDetails = ({navigation}) => {
             <Icon
               name="save"
               style={{
-                fontSize: 33,
+                fontSize: normalize(33),
                 color: '#dadfe1',
               }}
               onPress={() => onSavePress('self')}
@@ -568,7 +570,7 @@ const MyServiceDetails = ({navigation}) => {
           onPress={() => setRenderConfirmModal(false)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: 14, fontFamily: 'IRANSansMobile_Medium'}}>
+              <Text style={{fontSize: normalize(14), fontFamily: 'IRANSansMobile_Medium'}}>
                 آیا از ارسال اطلاعات اطمینان دارید؟
               </Text>
             </View>
@@ -599,7 +601,7 @@ const MyServiceDetails = ({navigation}) => {
             <View style={Styles.modalBodyContainerStyle2}>
               <Text
                 style={{
-                  fontSize: 14,
+                  fontSize: normalize(14),
                   fontFamily: 'IRANSansMobile_Medium',
                   textAlign: 'center',
                 }}>
@@ -712,7 +714,7 @@ const Styles = StyleSheet.create({
   },
   modalHeaderTextStyle: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: normalize(16),
     fontFamily: 'IRANSansMobile_Medium',
   },
   modalBodyContainerStyle: {
@@ -732,7 +734,7 @@ const Styles = StyleSheet.create({
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily: 'IRANSansMobile_Light',
   },
   modalFooterContainerStyle: {
@@ -763,7 +765,7 @@ const Styles = StyleSheet.create({
   },
   modalButtonTextStyle: {
     color: 'gray',
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily: 'IRANSansMobile_Medium',
   },
   onScreenLoadingContainerStyle: {

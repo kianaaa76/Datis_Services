@@ -15,7 +15,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {serviceArchiveListWithSerial, serviceArchiveListWithoutSerial} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
-import {toFaDigit} from "../../utils/utilities";
+import {toFaDigit, normalize} from "../../utils/utilities";
 import ServiceArchiveListItem from "../../utils/ServiceArchiveListItem";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -81,7 +81,7 @@ const ServiceArchiveList = ({navigation}) => {
     const renderEmptyList = () => {
         return (
             <View style={{height:pageHeight*0.8, width:pageWidth, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontSize: 15, fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
+                <Text style={{fontSize: normalize(15), fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
                     سرویس مورد نظر یافت نشد.
                 </Text>
             </View>
@@ -96,7 +96,7 @@ const ServiceArchiveList = ({navigation}) => {
                     <Icon
                         name="refresh"
                         style={{
-                            fontSize: 30,
+                            fontSize: normalize(30),
                             color: '#dadfe1',
                         }}
                         onPress={() => {
@@ -229,7 +229,7 @@ const Styles = StyleSheet.create({
     },
     modalHeaderTextStyle:{
         color:"#fff",
-        fontSize:16,
+        fontSize:normalize(16),
         fontFamily:"IRANSansMobile_Light"
     },
     modalBodyContainerStyle:{
@@ -242,7 +242,7 @@ const Styles = StyleSheet.create({
     modalBodyTextStyle:{
         color: "#5B5B5B",
         textAlign:"center",
-        fontSize: 13,
+        fontSize: normalize(13),
         fontFamily:"IRANSansMobile_Light"
     },
     modalFooterContainerStyle:{
@@ -263,7 +263,7 @@ const Styles = StyleSheet.create({
     },
     modalButtonTextStyle:{
         color:"#fff",
-        fontSize:14,
+        fontSize:normalize(14),
         fontFamily:'IRANSansMobile_Medium'
     },
     modalBodyInputContainerStyle:{
@@ -277,7 +277,7 @@ const Styles = StyleSheet.create({
     modalTextInputStyle:{
         borderBottomWidth:2,
         borderBottomColor:"#660000",
-        fontSize:11,
+        fontSize:normalize(11),
         width:"60%",
         height:"100%",
         paddingHorizontal: 8,
@@ -286,7 +286,7 @@ const Styles = StyleSheet.create({
         fontFamily:"IRANSansMobile_Light"
     },
     inputLabelStyle:{
-        fontSize:13,
+        fontSize:normalize(13),
         color:"#5B5B5B",
         textAlign: "center",
         fontFamily:"IRANSansMobile_Light",

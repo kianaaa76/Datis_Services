@@ -13,15 +13,19 @@ import {
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import VersionInfo from 'react-native-version-info';
+import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
 import splashImage from '../../../assets/images/image_splash_screen.png';
 import {checkUpdate, getUsers} from '../../actions/api';
+import { LOGIN } from '../../actions/types';
+import {normalize} from "../utils/utilities";
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
 
 const Splash = ({navigation}) => {
   const selector = useSelector(state => state);
+  const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [usersList, setUsersList] = useState([]);
 
@@ -51,6 +55,13 @@ const Splash = ({navigation}) => {
           setShowUpdateModal(true);
         } else {
           if (!!selector.token) {
+            dispatch({
+              type:LOGIN,
+              token: selector.constantToken,
+              constantToken:selector.constantToken,
+              userId: selector.constantUserId,
+              constantUserId: selector.constantUserId
+            });
             navigation.navigate('Home', {users: usersList});
           } else {
             navigation.navigate('SignedOut');
@@ -140,7 +151,7 @@ const Styles = StyleSheet.create({
   },
   modalHeaderTextStyle: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: normalize(16),
     fontFamily:"IRANSansMobile_Medium"
   },
   modalBodyContainerStyle: {
@@ -153,7 +164,7 @@ const Styles = StyleSheet.create({
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: normalize(15),
     fontFamily: "IRANSansMobile_Light"
   },
   modalFooterContainerStyle: {
@@ -173,7 +184,7 @@ const Styles = StyleSheet.create({
   },
   modalButtonTextStyle: {
     color: 'gray',
-    fontSize: 16,
+    fontSize: normalize(16),
     fontFamily:"IRANSansMobile_Medium"
   },
 });

@@ -19,7 +19,7 @@ import {
 } from '../../../actions/api';
 import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from '../../../actions/types';
-import {toFaDigit} from '../../utils/utilities';
+import {toFaDigit, normalize} from '../../utils/utilities';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../../common/ImageViwer';
@@ -163,10 +163,10 @@ const RemainingServiceDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13, flexShrink: 1}}>{text}</Text>
+        <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13), flexShrink: 1}}>{text}</Text>
         <Text
           style={{
-            fontSize: 12,
+            fontSize: normalize(12),
             fontFamily:"IRANSansMobile_Medium",
             marginLeft: 10,
             color: titleColor,
@@ -255,7 +255,7 @@ const RemainingServiceDetail = ({navigation}) => {
                     toFaDigit(serviceDetail.DocumentDetails.Date),
                   )}
                   <View style={{width: '100%'}}>
-                    <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13}}>
+                    <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>
                       {toFaDigit(
                         serviceDetail.DocumentDetails.Msg.substr(
                           serviceDetail.DocumentDetails.Msg.length - 12,
@@ -327,7 +327,7 @@ const RemainingServiceDetail = ({navigation}) => {
             <View style={Styles.imageIconContainerStyle}>
               <Icon
                 name={'camera-alt'}
-                style={{color: '#000', fontSize: 35, marginHorizontal: 7}}
+                style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
                 onPress={() =>
                   ImagePicker.openCamera({
                     width: pageWidth - 20,
@@ -341,7 +341,7 @@ const RemainingServiceDetail = ({navigation}) => {
               />
               <Icon
                 name={'file-upload'}
-                style={{color: '#000', fontSize: 35, marginHorizontal: 7}}
+                style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
                 onPress={() =>
                   ImagePicker.openPicker({
                     width: pageWidth - 20,
@@ -356,7 +356,7 @@ const RemainingServiceDetail = ({navigation}) => {
               {!!factorImage && (
                 <Icon
                   name={'delete'}
-                  style={{color: '#000', fontSize: 30}}
+                  style={{color: '#000', fontSize: normalize(30)}}
                   onPress={() => {
                     setDeletingImage(1);
                   }}
@@ -433,7 +433,7 @@ const RemainingServiceDetail = ({navigation}) => {
           <View
             style={[Styles.modalContainerStyle, {height: pageHeight * 0.28}]}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: 15, fontWeight: 'bold'}}>
+              <Text style={{fontSize: normalize(15), fontWeight: 'bold'}}>
                 آیا از پاک کردن عکس اطمینان دارید؟
               </Text>
             </View>
@@ -479,12 +479,12 @@ const Styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   itemLabelStyle: {
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily:"IRANSansMobile_Medium",
     marginLeft: 10,
   },
   itemLabelStyle2: {
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily:"IRANSansMobile_Medium",
     marginLeft: 10,
     color: '#CB3434',
@@ -504,7 +504,7 @@ const Styles = StyleSheet.create({
     backgroundColor: '#660000',
   },
   buttonTextStyle: {
-    fontSize: 13,
+    fontSize: normalize(13),
     color: '#fff',
     textAlign: 'center',
     fontFamily:"IRANSansMobile_Medium",
@@ -553,7 +553,7 @@ const Styles = StyleSheet.create({
   },
   modalHeaderTextStyle: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: normalize(18),
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -565,7 +565,7 @@ const Styles = StyleSheet.create({
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 17,
+    fontSize: normalize(17),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -594,7 +594,7 @@ const Styles = StyleSheet.create({
   },
   modalButtonTextStyle: {
     color: 'gray',
-    fontSize: 16,
+    fontSize: normalize(16),
     fontWeight: 'bold',
   },
 });

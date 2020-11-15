@@ -21,6 +21,8 @@ import {rejectedServiceDetail, rejectedServiceList} from '../../../actions/api';
 import {
     LOGOUT, RESTORE_SERVICE_DATA, SET_EDITING_SERVICE,
 } from '../../../actions/types';
+import {normalize} from "../../utils/utilities";
+
 
 let FACTOR_IMAGE="";
 let BILL_IMAGE="";
@@ -83,7 +85,7 @@ const MyService = ({navigation}) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
-                <Text style={{fontSize: 15, fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
+                <Text style={{fontSize: normalize(15), fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
                     درحال حاضر سرویسی وجود ندارد.
                 </Text>
             </View>
@@ -313,7 +315,7 @@ const MyService = ({navigation}) => {
                     <Icon
                         name="refresh"
                         style={{
-                            fontSize: 30,
+                            fontSize: normalize(30),
                             color: '#dadfe1',
                         }}
                         onPress={() => getRejectedServices(selector.userId, selector.token)}
@@ -488,7 +490,7 @@ const Styles = StyleSheet.create({
     },
     modalHeaderTextStyle:{
         color:"#fff",
-        fontSize:17,
+        fontSize:normalize(17),
         fontFamily:"IRANSansMobile_Light"
     },
     modalBodyContainerStyle:{
@@ -501,7 +503,7 @@ const Styles = StyleSheet.create({
     modalBodyTextStyle:{
         color: "#660000",
         textAlign:"center",
-        fontSize: 15,
+        fontSize: normalize(15),
         fontFamily:'IRANSansMobile_Light'
     },
     modalFooterContainerStyle:{
@@ -521,7 +523,7 @@ const Styles = StyleSheet.create({
     },
     modalButtonTextStyle:{
         color:"gray",
-        fontSize:16,
+        fontSize:normalize(16),
         fontFamily:"IRANSansMobile_Medium"
     },
     onScreenLoadingContainerStyle:{

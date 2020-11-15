@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/Foundation';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import {API_KEY, MAPBOX_API_KEY} from '../../../actions/types';
-import {toFaDigit} from '../../utils/utilities';
+import {toFaDigit, normalize} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -86,7 +86,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
                 backgroundColor: 'transparent',
                 height: 100,
               }}>
-              <Icon name="marker" color={color} size={size} />
+              {/* <Icon name="marker" color={color} size={size} /> */}
               <Text style={Styles.markerLabelStyle}>
                 {type == 'start' ? 'مبدا' : 'مقصد'}
               </Text>
@@ -280,7 +280,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
         ]}>
         <MaterialIcons
           name={'my-location'}
-          style={{fontSize: 30, color: '#000'}}
+          style={{fontSize: normalize(30), color: '#000'}}
           onPress={() => {
             LocationServicesDialogBox.checkLocationServicesIsEnabled({
               message:
@@ -342,8 +342,8 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
           </View>
           <View style={Styles.distanceRowStyle}>
             <View style={Styles.distanceContainerStyle}>
-              <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:13}}>کیلومتر</Text>
-              <Text style={{marginHorizontal: 5, fontFamily:"IRANSansMobile(FaNum)_Light", fontSize:13}}>
+              <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>کیلومتر</Text>
+              <Text style={{marginHorizontal: 5, fontFamily:"IRANSansMobile(FaNum)_Light", fontSize:normalize(13)}}>
                 {toFaDigit(distance).substr(0, 10)}
               </Text>
               <Text style={Styles.titleStyle}>فاصله: </Text>
@@ -388,7 +388,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTextStyle: {
-    fontSize: 15,
+    fontSize: normalize(15),
     fontFamily:"IRANSansMobile_Medium",
     textAlign: 'center',
   },
@@ -437,7 +437,7 @@ const Styles = StyleSheet.create({
   cityDataTextStyle: {
     borderBottomWidth: 1,
     borderBottomColor: '#000',
-    fontSize: 14,
+    fontSize: normalize(14),
     marginLeft: 10,
     width: '35%',
     textAlign: 'center',
@@ -457,7 +457,7 @@ const Styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   descriptionTitleTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(14),
     marginBottom: 5,
     fontFamily:"IRANSansMobile_Medium"
   },
@@ -470,7 +470,7 @@ const Styles = StyleSheet.create({
     textAlignVertical: 'top',
     paddingHorizontal: 15,
     paddingVertical:8,
-    fontSize:13,
+    fontSize:normalize(13),
     fontFamily:"IRANSansMobile_Light"
   },
   markerLabelStyle: {
@@ -483,7 +483,7 @@ const Styles = StyleSheet.create({
     backgroundColor: '#A8A7A7',
     color: '#000',
     fontFamily:"IRANSansMobile_Medium",
-    fontSize:12
+    fontSize:normalize(12)
   },
   switchContainerStyle: {
     flexDirection: 'row',
@@ -499,7 +499,7 @@ const Styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   titleStyle: {
-    fontSize: 14,
+    fontSize: normalize(14),
     textAlign: 'center',
     fontFamily:"IRANSansMobile_Medium"
   },

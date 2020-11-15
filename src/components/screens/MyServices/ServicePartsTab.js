@@ -23,6 +23,8 @@ import DropdownPicker from "../../common/DropdownPicker";
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from "../../../actions/api";
 import {RNCamera} from "react-native-camera";
+import {normalize} from "../../utils/utilities";
+
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -276,21 +278,21 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                         style={{width: 37, height: 37, justifyContent:"center", alignItems:"center", backgroundColor: "#660000", borderRadius:5}}
                         onPress={()=>refactorObjectListItems("isExpanded", !Item.isExpanded, Item.index)}>
                         {Item.isExpanded?(
-                            <Feather name={"minus"} style={{color:"#fff", fontSize:17}}/>
+                            <Feather name={"minus"} style={{color:"#fff", fontSize:normalize(17)}}/>
                         ):(
-                            <Feather name={"plus"} style={{color:"#fff", fontSize:17}}/>
+                            <Feather name={"plus"} style={{color:"#fff", fontSize:normalize(17)}}/>
                         )}
                     </TouchableOpacity>
-                    <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                    <Text style={{color:"#660000", fontSize:normalize(12), textAlign:"center"}}>
                         {!!Item.serial? Item.serial : "سریال"}
                     </Text>
-                    <Text style={{color:"#660000", fontSize:12, textAlign:"center"}}>
+                    <Text style={{color:"#660000", fontSize:normalize(12), textAlign:"center"}}>
                         {!!Item.partType? Item.partType.label : "نام"}
                     </Text>
                     {Item.objectType == "new" ? (
-                        <FontAwesome5 name={"arrow-right"} style={{color:"green", fontSize:20}}/>
+                        <FontAwesome5 name={"arrow-right"} style={{color:"green", fontSize:normalize(20)}}/>
                     ):(
-                        <FontAwesome5 name={"arrow-left"} style={{color:"red", fontSize:20}}/>
+                        <FontAwesome5 name={"arrow-left"} style={{color:"red", fontSize:normalize(20)}}/>
                     )}
                     </>
                 </TouchableHighlight>
@@ -315,7 +317,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                         <View style={Styles.serialContainerStyle}>
                             <Icon
                                 name={"search"}
-                                style={{color: "#000", fontSize: 30}}
+                                style={{color: "#000", fontSize: normalize(30)}}
                                 onPress={()=>{
                                     setSelectedItemList(Item);
                                     searchBarcode();
@@ -323,7 +325,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             />
                             <Icon
                                 name={"qr-code-2"}
-                                style={{color:"#000", fontSize:30, marginHorizontal:5}}
+                                style={{color:"#000", fontSize:normalize(30), marginHorizontal:5}}
                                 onPress={()=> {
                                     setSelectedItemList(Item);
                                     setScreenMode(true)
@@ -409,7 +411,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             await setInfo(c=>c.filter((_, i) => i !== index));
                             await setObjectsList(c=>c.filter((_, i) => i !== index));
                         }}>
-                            <Octicons name={"trashcan"} style={{fontSize:17, color:"#fff"}}/>
+                            <Octicons name={"trashcan"} style={{fontSize:normalize(17), color:"#fff"}}/>
                         </TouchableOpacity>
                         <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=>{
                             if(!Item.partType.label){
@@ -441,7 +443,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                                 refactorObjectListItems("isExpanded", false, Item.index);
                             }
                         }}>
-                            <Octicons name={"check"} style={{fontSize:17, color:"#fff"}}/>
+                            <Octicons name={"check"} style={{fontSize:normalize(17), color:"#fff"}}/>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -467,15 +469,15 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                         style={{width: 37, height: 37, justifyContent:"center", alignItems:"center", backgroundColor: "#660000", borderRadius:5}}
                         onPress={()=>setIsNewPartFormExpanded(!isNewPartFormExpanded)}>
                         {isNewPartFormExpanded?(
-                            <Feather name={"minus"} style={{color:"#fff", fontSize:17}}/>
+                            <Feather name={"minus"} style={{color:"#fff", fontSize:normalize(17)}}/>
                         ):(
-                            <Feather name={"plus"} style={{color:"#fff", fontSize:17}}/>
+                            <Feather name={"plus"} style={{color:"#fff", fontSize:normalize(17)}}/>
                         )}
                     </TouchableOpacity>
-                    <Text style={{color:"#660000", fontSize:12, textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
+                    <Text style={{color:"#660000", fontSize:normalize(12), textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
                         {!!fieldsObject.serial? fieldsObject.serial : "سریال"}
                     </Text>
-                    <Text style={{color:"#660000", fontSize:12, textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
+                    <Text style={{color:"#660000", fontSize:normalize(12), textAlign:"center", fontFamily:"IRANSansMobile_Light"}}>
                         {!!fieldsObject.partTypeSelected? fieldsObject.partTypeSelected.label : "نام"}
                     </Text>
                 </View>
@@ -493,7 +495,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             value={fieldsObject.objectType === "failed" ? true : false}
                             tintColors={{ true: 'red', false: 'red' }}
                         />
-                        <Text style={{color:"#000", fontSize:12, fontFamily:"IRANSansMobile_Medium"}}>قطعه معیوب</Text>
+                        <Text style={{color:"#000", fontSize:normalize(12), fontFamily:"IRANSansMobile_Medium"}}>قطعه معیوب</Text>
                     </View>
                     <View style={{flexDirection:"row", alignItems:"center"}}>
                         <CheckBox
@@ -509,7 +511,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             tintColors={{ true: 'green', false: 'green' }}
                             style={{marginLeft:20}}
                         />
-                        <Text style={{color:"#000", fontSize:12, fontFamily:"IRANSansMobile_Medium"}}>قطعه جدید</Text>
+                        <Text style={{color:"#000", fontSize:normalize(12), fontFamily:"IRANSansMobile_Medium"}}>قطعه جدید</Text>
                     </View>
                 </View>
                 {!!fieldsObject.objectType && isNewPartFormExpanded && (
@@ -526,7 +528,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                                     ? `${fieldsObject.partTypeSelected.label.substr(0, 25)}...`
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
                                 listHeight={150}/>
-                            <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:13}}>نوع قطعه:</Text>
+                            <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>نوع قطعه:</Text>
                         </View>
                         <View style={Styles.serialContainerStyle}>
                             {searchBarcodeLoading ? (
@@ -534,12 +536,12 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             ) : (
                                 <Icon
                                 name={"search"}
-                                style={{color: "#000", fontSize: 30, marginHorizontal: 5}}
+                                style={{color: "#000", fontSize: normalize(30), marginHorizontal: 5}}
                                 onPress={searchBarcode}
                             />)}
                             <Icon
                                 name={"qr-code-2"}
-                                style={{color:"#000", fontSize:30, marginHorizontal:5}}
+                                style={{color:"#000", fontSize:normalize(30), marginHorizontal:5}}
                                 onPress={()=>setScreenMode(true)}/>
                             <TextInput
                                 style={Styles.serialInputStyle}
@@ -561,7 +563,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                                 onSelect={item=>setFieldsObject({...fieldsObject, partVersionSelected: item})}
                                 listHeight={150}
                             />
-                            <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:13}}>نسخه:  </Text>
+                            <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>نسخه:  </Text>
                         </View>
                     </View>
                 )}
@@ -584,7 +586,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                     <View style={{marginTop:15, width:"100%"}}>
                         <Text style={Styles.labelStyle}>شرح نوع خرابی و علت احتمالی آن: </Text>
                         <View style={Styles.failureDescriptionContainerStyle}>
-                            <Text style={{marginBottom:5, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>توضیحات: </Text>
+                            <Text style={{marginBottom:5, fontSize:normalize(13), fontFamily:"IRANSansMobile_Light"}}>توضیحات: </Text>
                             <TextInput
                                 style={Styles.descriptionInputStyle}
                                 onChangeText={text=>setFieldsObject({...fieldsObject, failureDescription: text})}
@@ -628,7 +630,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             hasGarantee: null,
                             Price: ""});
                     }}>
-                        <Octicons name={"trashcan"} style={{fontSize:17, color:"#fff"}}/>
+                        <Octicons name={"trashcan"} style={{fontSize:normalize(17), color:"#fff"}}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=>{
                         if(!fieldsObject.partTypeSelected.label){
@@ -686,7 +688,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             setInfo(INFO);
                         }
                     }}>
-                        <Octicons name={"check"} style={{fontSize:17, color:"#fff"}}/>
+                        <Octicons name={"check"} style={{fontSize:normalize(17), color:"#fff"}}/>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -711,7 +713,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                     <Octicons
                         name="plus"
                         style={{
-                            fontSize: 33,
+                            fontSize: normalize(33),
                             color: '#dadfe1',
                         }}
                     />
@@ -882,7 +884,7 @@ const Styles = StyleSheet.create({
     },
     labelStyle:{
         fontFamily:"IRANSansMobile_Light",
-        fontSize: 13
+        fontSize: normalize(13)
     }
 })
 

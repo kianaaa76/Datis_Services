@@ -1,6 +1,6 @@
 import React,{useEffect} from "react";
 import {View, StyleSheet, Text, ScrollView, Linking, Dimensions, BackHandler} from "react-native";
-import {toFaDigit} from "../../utils/utilities";
+import {toFaDigit, normalize} from "../../utils/utilities";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -26,7 +26,7 @@ const ServiceInfoTab = ({serviceData,renderSaveModal}) => {
             <View style={Styles.singleRowStyle}>
                 <View>
                     {title === "شماره تماس" ? (
-                        <Icon name={"phone-square"} style={{fontSize:30, color:"gray", marginLeft:10}} onPress={()=>Linking.openURL(`tel:${text}`)}/>
+                        <Icon name={"phone-square"} style={{fontSize:normalize(30), color:"gray", marginLeft:10}} onPress={()=>Linking.openURL(`tel:${text}`)}/>
                     ):null}
                 </View>
                 <View style={Styles.rightSideContainerStyle}>
@@ -75,12 +75,12 @@ const Styles = StyleSheet.create({
         marginBottom:15,
     },
     titleTextStyle: {
-        fontSize:14,
+        fontSize:normalize(14),
         fontFamily:"IRANSansMobile_Medium",
         width:110,
     },
     textStyle: {
-        fontSize: 14,
+        fontSize: normalize(14),
         textAlign:"right",
         width: pageWidth-160,
         height:38,

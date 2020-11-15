@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import RNFetchBlob from 'rn-fetch-blob';
 import {useSelector, useDispatch} from 'react-redux';
 import Header from '../../common/Header';
+import {normalize} from "../../utils/utilities";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ServiceListItem from '../../utils/MyServiceListItem';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -44,7 +45,7 @@ const MyService = ({navigation}) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text style={{fontSize: 15, fontFamily:'IRANSansMobile_Medium', color: '#000'}}>
+        <Text style={{fontSize: normalize(15), fontFamily:'IRANSansMobile_Medium', color: '#000'}}>
           درحال حاضر سرویسی وجود ندارد.
         </Text>
       </View>
@@ -166,7 +167,7 @@ const MyService = ({navigation}) => {
           <Icon
             name="refresh"
             style={{
-              fontSize: 30,
+              fontSize: normalize(30),
               color: '#dadfe1',
             }}
             onPress={() => getMyServices(selector.userId, selector.token)}
@@ -203,7 +204,7 @@ const MyService = ({navigation}) => {
             <Octicons
               name="plus"
               style={{
-                fontSize: 33,
+                fontSize: normalize(33),
                 color: '#dadfe1',
               }}
             />
@@ -347,7 +348,7 @@ const Styles = StyleSheet.create({
     },
     modalHeaderTextStyle:{
       color:"#fff",
-        fontSize:17,
+        fontSize:normalize(17),
         fontFamily:"IRANSansMobile_Light"
     },
     modalBodyContainerStyle:{
@@ -360,7 +361,7 @@ const Styles = StyleSheet.create({
     modalBodyTextStyle:{
         color: "#660000",
         textAlign:"center",
-        fontSize: 15,
+        fontSize: normalize(15),
         fontFamily:"IRANSansMobile_Light"
     },
     modalFooterContainerStyle:{
@@ -380,7 +381,7 @@ const Styles = StyleSheet.create({
     },
     modalButtonTextStyle:{
       color:"gray",
-        fontSize:16,
+        fontSize:normalize(16),
         fontFamily:"IRANSansMobile_Medium"
     }
 });

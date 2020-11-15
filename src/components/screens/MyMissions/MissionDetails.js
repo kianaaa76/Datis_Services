@@ -2,7 +2,7 @@ import React from 'react';
 import {View, StyleSheet, Dimensions, Text} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Header from '../../common/Header';
-import {toFaDigit} from '../../utils/utilities';
+import {toFaDigit, normalize} from '../../utils/utilities';
 import Icon from "react-native-vector-icons/Foundation";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -95,7 +95,7 @@ const MissionDetails = ({navigation}) => {
             </View>
           </View>
           <View style={Styles.singleRowContainerStyle}>
-            <View style={Styles.secondSingleItemContainerStyle}>
+            <View style={Styles.firstSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>{mission.Description}</Text>
               <Text style={Styles.itemTitleStyle}>توضیحات: </Text>
             </View>
@@ -136,10 +136,10 @@ const Styles = StyleSheet.create({
   },
   itemTitleStyle: {
     fontFamily:"IRANSansMobile_Medium",
-    fontSize: 14,
+    fontSize: normalize(14),
   },
   itemTextStyle: {
-    fontSize: 13,
+    fontSize: normalize(13),
     fontFamily:"IRANSansMobile_Light"
   },
   markerLabelStyle:{
@@ -152,7 +152,7 @@ const Styles = StyleSheet.create({
     backgroundColor: '#A8A7A7',
     color: '#000',
     fontFamily:"IRANSansMobile_Medium",
-    fontSize:12
+    fontSize:normalize(12)
   }
 });
 

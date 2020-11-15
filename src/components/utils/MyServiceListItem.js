@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
-import {toFaDigit} from './utilities';
+import {toFaDigit, normalize} from './utilities';
 import AsyncStorage from '@react-native-community/async-storage';
 import {RESTORE_SERVICE_DATA} from '../../actions/types';
 
@@ -131,12 +131,12 @@ const MyServiceListItem = ({
         }}>
         {isNetworkSaved ? (
           <View style={Styles.secondRowContainerStyle}>
-            <Text style={{fontSize: 12, fontFamily: 'IRANSansMobile_Light'}}>
+            <Text style={{fontSize: normalize(12), fontFamily: 'IRANSansMobile_Light'}}>
               درحال ارسال
             </Text>
             <View style={Styles.singleItemStyle}>
               <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-              <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>
+              <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
                 نام:{' '}
               </Text>
             </View>
@@ -145,7 +145,7 @@ const MyServiceListItem = ({
           <View style={Styles.firstRowContainerStyle}>
             <View style={Styles.singleItemStyle}>
               <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-              <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>
+              <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
                 نام:{' '}
               </Text>
             </View>
@@ -156,7 +156,7 @@ const MyServiceListItem = ({
             <Text style={Styles.valueTextStyle}>
               {toFaDigit(Item.projectID)}
             </Text>
-            <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
               شماره‌‌ماموریت:{' '}
             </Text>
           </View>
@@ -164,7 +164,7 @@ const MyServiceListItem = ({
             <Text style={[Styles.valueTextStyle,{textAlign: 'center'}]}>{toFaDigit(Item.cell)}</Text>
             <Text
               style={{
-                fontSize: 13,
+                fontSize: normalize(13),
                 fontFamily: 'IRANSansMobile_Medium',
                 textAlign: 'center',
               }}>
@@ -198,7 +198,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
   },
   valueTextStyle: {
-    fontSize: 13,
+    fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
   },
 });

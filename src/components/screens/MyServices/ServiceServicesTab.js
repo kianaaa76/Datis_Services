@@ -22,7 +22,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment-jalaali';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import {API_KEY} from '../../../actions/types';
-import {toFaDigit} from '../../utils/utilities';
+import {toFaDigit, normalize} from '../../utils/utilities';
 import ImageViewer from '../../common/ImageViwer';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 
@@ -124,7 +124,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         <View style={Styles.addressRowStyle}>
           <Icon
             name={'location-searching'}
-            style={{color: '#000', fontSize: 20}}
+            style={{color: '#000', fontSize: normalize(20)}}
             onPress={() => {
               setSelectedLongitude('');
               setSelectedLatitude('');
@@ -144,7 +144,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           <View style={Styles.getImageContainerViewStyle}>
             <Icon
               name={'camera-alt'}
-              style={{color: '#000', fontSize: 35}}
+              style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
                 ImagePicker.openCamera({
                   width: pageWidth - 20,
@@ -158,7 +158,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             />
             <Icon
               name={'file-upload'}
-              style={{color: '#000', fontSize: 35}}
+              style={{color: '#000', fontSize: normalize(35)}}
               onPress={() =>
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
@@ -173,7 +173,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             {!!info.image && (
               <Icon
                 name={'delete'}
-                style={{color: '#000', fontSize: 30}}
+                style={{color: '#000', fontSize: normalize(30)}}
                 onPress={() => {
                   setDeletingImage(3);
                 }}
@@ -194,7 +194,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         <View style={Styles.datePickerRowStyle}>
           <FontAwesomeIcon
             name={'calendar'}
-            style={{color: '#000', fontSize: 30}}
+            style={{color: '#000', fontSize: normalize(30)}}
             onPress={() => {
               setDateIsSelected(false);
               setShowDatePicke(true);
@@ -208,7 +208,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               justifyContent: 'flex-end',
             }}>
             {!!info.finalDate && (
-              <Text style={{fontSize: 15, marginRight: 10}}>
+              <Text style={{fontSize: normalize(15), marginRight: 10}}>
                 {`${toFaDigit(
                   new moment(info.finalDate).format('jYYYY/jM/jD  HH:mm'),
                 )}`}
@@ -216,7 +216,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             )}
             {info.serviceResult !== 'لغو موفق' &&
               info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
               )}
             <Text style={Styles.labelStyle}>تاریخ انجام پروژه:</Text>
           </View>
@@ -317,7 +317,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           onPress={() => setDeletingImage(0)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: 14, fontFamily:"IRANSansMobile_Medium"}}>
+              <Text style={{fontSize: normalize(14), fontFamily:"IRANSansMobile_Medium"}}>
                 آیا از پاک کردن عکس اطمینان دارید؟
               </Text>
             </View>
@@ -399,7 +399,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         style={Styles.myLocationContainerStye}>
         <Icon
           name={'my-location'}
-          style={{fontSize: 30, color: '#000'}}
+          style={{fontSize: normalize(30), color: '#000'}}
           onPress={async () => {
             LocationServicesDialogBox.checkLocationServicesIsEnabled({
               message:
@@ -484,7 +484,7 @@ const Styles = StyleSheet.create({
     padding: 15,
   },
   serviceTypeTextStyle: {
-    fontSize: 12,
+    fontSize: normalize(12),
     color: '#660000',
     fontFamily: 'IRANSansMobile_Light',
   },
@@ -547,7 +547,7 @@ const Styles = StyleSheet.create({
     backgroundColor: 'gray',
   },
   buttonTextStyle: {
-    fontSize: 16,
+    fontSize: normalize(16),
     fontFamily: 'IRANSansMobile_Medium',
     textAlign: 'center',
   },
@@ -560,7 +560,7 @@ const Styles = StyleSheet.create({
     opacity: 1,
   },
   selectTextStyle: {
-    fontSize: 16,
+    fontSize: normalize(16),
     textAlign: 'center',
     fontFamily: 'IRANSansMobile_Medium',
   },
@@ -582,7 +582,7 @@ const Styles = StyleSheet.create({
     backgroundColor: '#660000',
   },
   confirmdatePickerTextStyle: {
-    fontSize: 17,
+    fontSize: normalize(17),
     fontWeight: 'bold',
     color: '#fff',
   },
@@ -616,7 +616,7 @@ const Styles = StyleSheet.create({
     marginBottom: 5,
   },
   checkboxTextStyle: {
-    fontSize: 12,
+    fontSize: normalize(12),
     width: '75%',
     fontFamily: 'IRANSansMobile_Light',
   },
@@ -657,7 +657,7 @@ const Styles = StyleSheet.create({
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: normalize(16),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -677,11 +677,11 @@ const Styles = StyleSheet.create({
   },
   modalButtonTextStyle: {
     color: 'gray',
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily:"IRANSansMobile_Medium"
   },
   labelStyle: {
-    fontSize: 13,
+    fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
   },
   myLocationContainerStye: {

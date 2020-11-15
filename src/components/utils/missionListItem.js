@@ -6,7 +6,7 @@ import {
   Text,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {toFaDigit} from '../utils/utilities';
+import {toFaDigit, normalize} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -70,11 +70,11 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
   },
   titleTextStyle:{
-    fontSize: 13, 
+    fontSize: normalize(13), 
     fontFamily:"IRANSansMobile_Medium"
   },
   valueTextStyle:{
-    fontSize: 13, 
+    fontSize: normalize(13), 
     fontFamily:"IRANSansMobile_Light"
   }
 });

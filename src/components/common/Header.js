@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View, StyleSheet, Text, Dimensions } from "react-native";
+import {normalize} from "../utils/utilities";
 
 const pageWidth = Dimensions.get("screen").width;
 const pageHeight = Dimensions.get("screen").height;
@@ -58,7 +59,7 @@ const Styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   headerTitleStyle: {
-    fontSize: 15,
+    fontSize: normalize(15),
     color: "#dadfe1",
     fontFamily:"IRANSansMobile"
   },

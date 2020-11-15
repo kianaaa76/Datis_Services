@@ -6,7 +6,7 @@ import {
   Text,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {toFaDigit} from '../utils/utilities';
+import {toFaDigit, normalize} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -98,24 +98,24 @@ const MissionListItem = ({item, navigation}) => {
         }}>
         <View style={Styles.firstRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
-            <Text style={{color: getStateColor(Item.State), fontSize: 12, fontFamily:"IRANSansMobile_Medium"}}>
+            <Text style={{color: getStateColor(Item.State), fontSize: normalize(12), fontFamily:"IRANSansMobile_Medium"}}>
               {getState(Item.State)}
             </Text>
-            <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Medium"}}>وضعیت: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Medium"}}>وضعیت: </Text>
           </View>
           <View style={Styles.singleItemStyle}>
-            <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Light"}}>{Item.Name}</Text>
-            <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Medium"}}>نام: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Light"}}>{Item.Name}</Text>
+            <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Medium"}}>نام: </Text>
           </View>
         </View>
         <View style={Styles.firstRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
-            <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Light"}}>{toFaDigit(Item.projectID)}</Text>
-            <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Medium"}}>پروژه: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Light"}}>{toFaDigit(Item.projectID)}</Text>
+            <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Medium"}}>پروژه: </Text>
           </View>
           <View style={Styles.singleItemStyle}>
-            <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Light"}}>{toFaDigit(Item.cell)}</Text>
-            <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Medium"}}>همراه: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Light"}}>{toFaDigit(Item.cell)}</Text>
+            <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Medium"}}>همراه: </Text>
           </View>
         </View>
       </View>

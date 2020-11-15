@@ -13,6 +13,7 @@ import {
 import ImageViewer from '../../common/ImageViwer';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
+import {normalize} from "../../utils/utilities";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -53,7 +54,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
           <View>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
             serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
             )}
             <Text style={Styles.labelStyle}>مبلغ دریافتی:</Text>
           </View>
@@ -74,7 +75,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
           <View>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
             serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
             )}
             <Text style={Styles.labelStyle}>جمع فاکتور:</Text>
           </View>
@@ -83,7 +84,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
           <View style={Styles.getImageContainerViewStyle}>
             <Icon
               name={'camera-alt'}
-              style={{color: '#000', fontSize: 35}}
+              style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
                 ImagePicker.openCamera({
                   width: pageWidth - 20,
@@ -98,7 +99,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
             />
             <Icon
               name={'file-upload'}
-              style={{color: '#000', fontSize: 35}}
+              style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
@@ -113,7 +114,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
             {!!info.factorImage && (
               <Icon
                 name={'delete'}
-                style={{color: '#000', fontSize: 30}}
+                style={{color: '#000', fontSize: normalize(30)}}
                 onPress={() => {
                   setDeletingImage(1);
                 }}
@@ -123,7 +124,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
           <View>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: 10}} />
+                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
               )}
             <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
           </View>
@@ -139,7 +140,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
           <View style={Styles.getImageContainerViewStyle}>
             <Icon
               name={'camera-alt'}
-              style={{color: '#000', fontSize: 35}}
+              style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
                 ImagePicker.openCamera({
                   width: pageWidth - 20,
@@ -153,7 +154,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
             />
             <Icon
               name={'file-upload'}
-              style={{color: '#000', fontSize: 35}}
+              style={{color: '#000', fontSize: normalize(35)}}
               onPress={() =>
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
@@ -168,7 +169,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
             {!!info.billImage && (
               <Icon
                 name={'delete'}
-                style={{color: '#000', fontSize: 30}}
+                style={{color: '#000', fontSize: normalize(30)}}
                 onPress={() => {
                   setDeletingImage(2);
                 }}
@@ -193,7 +194,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
           onPress={() => setDeletingImage(0)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize:14, fontFamily:"IRANSansMobile_Medium"}}>آیا از پاک کردن عکس اطمینان دارید؟</Text>
+              <Text style={{fontSize:normalize(14), fontFamily:"IRANSansMobile_Medium"}}>آیا از پاک کردن عکس اطمینان دارید؟</Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
                 <TouchableOpacity
@@ -268,12 +269,12 @@ const Styles = StyleSheet.create({
   },
   rialTextStyle: {
     width: pageWidth * 0.1,
-    fontSize:13,
+    fontSize:normalize(13),
     fontFamily:"IRANSansMobile_Light"
   },
   labelStyle: {
     // width: '100%',
-    fontSize:13, 
+    fontSize:normalize(13), 
     fontFamily:'IRANSansMobile_Light'
   },
   modalBackgroundStyle: {
@@ -313,7 +314,7 @@ const Styles = StyleSheet.create({
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: normalize(16),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -333,7 +334,7 @@ const Styles = StyleSheet.create({
   },
   modalButtonTextStyle: {
     color: 'gray',
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily:"IRANSansMobile_Medium"
   },
 });

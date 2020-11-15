@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {toFaDigit} from './utilities';
+import {toFaDigit, normalize} from './utilities';
 import AsyncStorage from '@react-native-community/async-storage';
 import {LOGOUT, RESTORE_SERVICE_DATA} from '../../actions/types';
 import {rejectedServiceDetail} from '../../actions/api';
@@ -340,17 +340,17 @@ const RejectedServiceListItem = ({
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.projectID)}</Text>
-            <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>پروژه: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>پروژه: </Text>
           </View>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-            <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>نام: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>نام: </Text>
           </View>
         </View>
         <View style={[Styles.firstRowContainerStyle, {marginBottom: 2}]}>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.cell)}</Text>
-            <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>همراه: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>همراه: </Text>
           </View>
         </View>
         <View style={Styles.firstRowContainerStyle}>
@@ -362,7 +362,7 @@ const RejectedServiceListItem = ({
                 ? `${Item.Resone.substr(0, 20)}...`
                 : Item.Resone}
             </Text>
-            <Text style={{fontSize: 13, fontFamily: 'IRANSansMobile_Medium'}}>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
               دلیل ردشدن پروژه:{' '}
             </Text>
           </View>
@@ -393,7 +393,7 @@ const Styles = StyleSheet.create({
     alignItems:"center"
   },
   valueTextStyle: {
-    fontSize: 13,
+    fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
   },
 });

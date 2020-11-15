@@ -14,6 +14,8 @@ import {unsettledServiceList} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
 import RemainingServiceListItem from '../../utils/RemainingServiceListItem';
+import {normalize} from "../../utils/utilities";
+
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -54,7 +56,7 @@ const RemainingServiceList = ({navigation}) => {
     const renderEmptyList = () => {
         return (
             <View style={{width:pageWidth, height: pageHeight*0.8, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontSize: 15, fontWeight: 'bold', color: '#000'}}>
+                <Text style={{fontSize: normalize(15), fontWeight: 'bold', color: '#000'}}>
                     شما سرویس مانده دار ندارید.
                 </Text>
             </View>
@@ -69,7 +71,7 @@ const RemainingServiceList = ({navigation}) => {
                     <Icon
                         name="refresh"
                         style={{
-                            fontSize: 30,
+                            fontSize: normalize(30),
                             color: '#dadfe1',
                         }}
                         onPress={() => getServices()}

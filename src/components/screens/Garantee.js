@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {RNCamera} from 'react-native-camera';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
-import {toFaDigit} from '../utils/utilities';
+import {toFaDigit, normalize} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -97,7 +97,7 @@ const Garantee = ({navigation}) => {
                 name={'barcode-scan'}
                 style={{
                   color: '#000',
-                  fontSize: 27,
+                  fontSize: normalize(27),
                   width: 50,
                 }}
                 onPress={() => {
@@ -200,7 +200,7 @@ const Styles = StyleSheet.create({
     marginTop: 50,
   },
   buttonTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily: 'IRANSansMobile_Light',
   },
   singleItemContainerStyle: {
@@ -213,11 +213,11 @@ const Styles = StyleSheet.create({
     marginTop:15
   },
   titleTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(14),
     fontFamily: 'IRANSansMobile_Medium',
   },
   valueTextStyle: {
-    fontSize: 13,
+    fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
   },
 });

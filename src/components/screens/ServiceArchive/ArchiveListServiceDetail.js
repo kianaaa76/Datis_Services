@@ -16,7 +16,7 @@ import Header from '../../common/Header';
 import {updateService, unsettledServiceDetail} from '../../../actions/api';
 import {useSelector, useDispatch} from 'react-redux';
 import {API_KEY, LOGOUT} from '../../../actions/types';
-import {toFaDigit} from '../../utils/utilities';
+import {toFaDigit, normalize} from '../../utils/utilities';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from "../../common/ImageViwer";
@@ -159,10 +159,10 @@ const ServiceArchiveDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text style={{fontSize: 13, fontFamily:"IRANSansMobile_Light", flexShrink:1}}>{text}</Text>
+        <Text style={{fontSize: normalize(13), fontFamily:"IRANSansMobile_Light", flexShrink:1}}>{text}</Text>
         <Text
           style={{
-            fontSize: 13,
+            fontSize: normalize(13),
             fontFamily:"IRANSansMobile_Medium",
             marginLeft: 10,
             color: titleColor,
@@ -220,7 +220,7 @@ const ServiceArchiveDetail = ({navigation}) => {
               style={Styles.myLocationContainerStye}>
             <Icon
                 name={'my-location'}
-                style={{fontSize: 30, color: '#000'}}
+                style={{fontSize: normalize(30), color: '#000'}}
                 onPress={async () => {
                   LocationServicesDialogBox.checkLocationServicesIsEnabled({
                     message:
@@ -361,7 +361,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                             toFaDigit(serviceDetail.DocumentDetails.Date),
                           )}
                           <View style={{width: '100%'}}>
-                            <Text style={{fontSize:13, fontFamily:"IRANSansMobile(FaNum)_Light"}}>
+                            <Text style={{fontSize:normalize(13), fontFamily:"IRANSansMobile(FaNum)_Light"}}>
                               {toFaDigit(
                                 serviceDetail.DocumentDetails.Msg.substr(
                                   serviceDetail.DocumentDetails.Msg.length - 12,
@@ -395,7 +395,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                         </View>
                         <View style={Styles.contentContainerStyle2}>
                           <View style={Styles.descriptionRowStyle}>
-                            <Text style={{ marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
+                            <Text style={{ marginBottom: 10, fontSize:normalize(13), fontFamily:"IRANSansMobile_Light"}}>
                               توضیحات:
                             </Text>
                             <TextInput
@@ -409,14 +409,14 @@ const ServiceArchiveDetail = ({navigation}) => {
                             <View style={Styles.addressTitleContainerStyle}>
                               <Icon
                                 name={'location-searching'}
-                                style={{color: '#000', fontSize: 20}}
+                                style={{color: '#000', fontSize: normalize(20)}}
                                 onPress={() => {
                                   setSelectedLatitude(null);
                                   setSelectedLongitude(null);
                                   setIsMapModeOn(true);
                                 }}
                               />
-                              <Text style={{marginBottom: 10, fontSize:13, fontFamily:"IRANSansMobile_Light"}}>
+                              <Text style={{marginBottom: 10, fontSize:normalize(13), fontFamily:"IRANSansMobile_Light"}}>
                                 آدرس:
                               </Text>
                             </View>
@@ -496,7 +496,7 @@ const ServiceArchiveDetail = ({navigation}) => {
           onPress={() => setDeletingImage(0)}>
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: 14, fontFamily:"IRANSansMobile_Medium"}}>
+              <Text style={{fontSize: normalize(14), fontFamily:"IRANSansMobile_Medium"}}>
                 آیا از پاک کردن عکس اطمینان دارید؟
               </Text>
             </View>
@@ -555,12 +555,12 @@ const Styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   itemLabelStyle: {
-    fontSize: 14,
+    fontSize: normalize(14),
     fontWeight: 'bold',
     marginLeft: 10,
   },
   itemLabelStyle2: {
-    fontSize: 14,
+    fontSize: normalize(14),
     fontWeight: 'bold',
     marginLeft: 10,
     color: '#CB3434',
@@ -581,7 +581,7 @@ const Styles = StyleSheet.create({
     backgroundColor: '#660000',
   },
   buttonTextStyle: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: '#fff',
     textAlign: 'center',
     fontFamily:"IRANSansMobile_Medium"
@@ -631,7 +631,7 @@ const Styles = StyleSheet.create({
   modalBodyTextStyle: {
     color: '#660000',
     textAlign: 'center',
-    fontSize: 17,
+    fontSize: normalize(17),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -651,7 +651,7 @@ const Styles = StyleSheet.create({
   },
   modalButtonTextStyle: {
     color: 'gray',
-    fontSize: 16,
+    fontSize: normalize(16),
     fontFamily:"IRANSansMobile_Medium"
   },
   descriptionContainerStyle: {
@@ -676,7 +676,7 @@ const Styles = StyleSheet.create({
     textAlignVertical: 'top',
     paddingHorizontal: 15,
     paddingVertical:5,
-    fontSize:13, 
+    fontSize:normalize(13), 
     fontFamily:"IRANSansMobile_Light"
   },
   addressTitleContainerStyle: {
@@ -694,7 +694,7 @@ const Styles = StyleSheet.create({
     textAlignVertical: 'top',
     paddingHorizontal: 15,
     paddingVertical:5,
-    fontSize:13, 
+    fontSize:normalize(13), 
     fontFamily:"IRANSansMobile_Light"
   },
 
@@ -733,7 +733,7 @@ const Styles = StyleSheet.create({
     backgroundColor: 'gray',
   },
   mapButtonTextStyle: {
-    fontSize: 16,
+    fontSize: normalize(16),
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -746,12 +746,12 @@ const Styles = StyleSheet.create({
     opacity: 1,
   },
   selectTextStyle: {
-    fontSize: 16,
+    fontSize: normalize(16),
     textAlign: 'center',
     fontWeight: 'bold',
   },
   labelStyle:{
-    fontSize:13,
+    fontSize:normalize(13),
     fontFamily:"IRANSansMobile_Light"
   },
   myLocationContainerStye: {
