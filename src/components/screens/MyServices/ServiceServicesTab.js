@@ -414,12 +414,10 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
             })
               .then(async success => {
-                console.log(success);
                 await cameraRef.moveTo([userLongitude, userLatitude]);
                 await cameraRef.zoomTo(11);
               })
               .catch(error => {
-                console.log(error);
                 ToastAndroid.showWithGravity(
                   'موقعیت در دسترس نیست.',
                   ToastAndroid.SHORT,

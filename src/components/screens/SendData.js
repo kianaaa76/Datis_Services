@@ -50,9 +50,6 @@ const SendData =()=>{
                     JSON.parse(list).map(item=>{
                         if(item.saveType === "network" && selector.editingService !== item.projectId){
                             if (!!item.startLatitude){
-                                RNFetchBlob.fs.exists(`${dirs.DownloadDir}/${item.projectId}/1.png`).then(exist=>{
-                                    console.log("exist", exist);
-                                })
                                 RNFetchBlob.fs.readFile(`${dirs.DownloadDir}/${item.projectId}/1.png`, 'base64').then(async data=>{
                                     if (!!data){
                                         FACTOR_IMAGE =await data;

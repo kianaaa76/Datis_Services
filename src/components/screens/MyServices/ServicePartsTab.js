@@ -660,7 +660,6 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                         }
                         else {
                             let INFO = !!objectsList ? objectsList : [];
-                            console.log("fieldsObject", fieldsObject);
                             INFO.push({
                                 index: INFO.length + 1,
                                 serial: fieldsObject.serial,

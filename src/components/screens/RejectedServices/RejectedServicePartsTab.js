@@ -142,7 +142,6 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                 if (sserial.length === object.value.SerialFormat.length){
                     if (serialFormatHeader === sserial.substr(0,serialFormatHeader.length)) {
                         getObjBySerial(selector.token, sserial, object.value.Id).then(data => {
-                            console.log("######", data);
                             if (data.errorCode == 0) {
                                 let selectedVersion = object.value.Versions.filter(item => item.Key == data.result.VersionId);
                                 if (!!selectedItemList.id) {

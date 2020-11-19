@@ -92,7 +92,6 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
-                  console.log('response', response);
                   setInfo({...info, factorImage: response.data});
                 });
               }}

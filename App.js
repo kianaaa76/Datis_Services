@@ -13,7 +13,6 @@ const ReactNative = require('react-native');
 try {
   ReactNative.I18nManager.allowRTL(false);
 } catch (e) {
-  console.log(e);
 }
 
 const App = () => {

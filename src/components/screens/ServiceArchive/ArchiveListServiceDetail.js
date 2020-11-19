@@ -239,7 +239,6 @@ const ServiceArchiveDetail = ({navigation}) => {
                         await cameraRef.zoomTo(11);
                       })
                       .catch(error => {
-                        console.log(error);
                         ToastAndroid.showWithGravity(
                             'موقعیت در دسترس نیست.',
                             ToastAndroid.SHORT,

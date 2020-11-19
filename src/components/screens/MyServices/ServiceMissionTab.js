@@ -40,7 +40,6 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
 
   useEffect(() => {
     const backAction = () => {
-      console.log(endLocation.endLongitude, "///////", startLocation.startLatitude)
       if (!!endLocation.endLongitude) {
         setEndLocation({endLongitude: '', endLatitude: ''});
         setEndCity('');
@@ -53,7 +52,6 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
           distance: '',
         });
       } else if (!!startLocation.startLatitude) {
-        console.log("mamattttt");
         setStartLocation({startLatitude: '', startLongitude: ''});
         setStartCity('');
         setInfo({
