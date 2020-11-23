@@ -232,47 +232,41 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
 const Styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
-    paddingHorizontal: 15,
-    paddingTop: 10,
+    padding:15
   },
   rowDataStyle: {
     flexDirection: 'row',
     width: '100%',
-    height: 65,
-    marginBottom: 15,
+    marginVertical: 15,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   textInputStyle: {
-    width: pageWidth * 0.5,
-    height: 55,
-    marginHorizontal: 10,
+    width: "55%",
+    marginHorizontal: "2%",
     borderBottomWidth: 1,
     borderBottomColor: '#660000',
     paddingHorizontal: 10,
   },
   imageRowStyle: {
     flexDirection: 'row',
-    width: pageWidth * 0.8,
-    height: 65,
+    width: "100%",
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginVertical: 15,
   },
   getImageContainerViewStyle: {
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    width: pageWidth * 0.3,
-    height: '100%',
+    width: "30%",
   },
   rialTextStyle: {
-    width: pageWidth * 0.1,
     fontSize:normalize(13),
-    fontFamily:"IRANSansMobile_Light"
+    fontFamily:"IRANSansMobile_Light",
+    alignSelf:"center",
   },
   labelStyle: {
-    // width: '100%',
     fontSize:normalize(13), 
     fontFamily:'IRANSansMobile_Light'
   },

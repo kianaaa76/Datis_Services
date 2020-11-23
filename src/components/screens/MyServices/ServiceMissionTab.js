@@ -19,7 +19,7 @@ import {toFaDigit, normalize} from '../../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 let EndObject = {};
-let cameraRef = {};
+let cameraRef = null;
 
 const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
   const [startLocation, setStartLocation] = useState({
@@ -84,7 +84,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
                 backgroundColor: 'transparent',
                 height: 100,
               }}>
-              {/* <Icon name="marker" color={color} size={size} /> */}
+              <Icon name="marker" color={color} size={size} />
               <Text style={Styles.markerLabelStyle}>
                 {type == 'start' ? 'مبدا' : 'مقصد'}
               </Text>
@@ -168,7 +168,10 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
       )
         .then(response => response.json())
         .then(data => {
-          setDistance(parseFloat(data.routes[0].legs[0].distance) / 1000);
+          let dist = (
+            parseFloat(data.routes[0].legs[0].distance) / 1000
+          ).toString();
+          setDistance(dist.substr(0, dist.indexOf('.') + 3));
           setInfo({
             ...info,
             distance: data.routes[0].legs[0].distance,
@@ -197,43 +200,45 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
         onLongPress={feature => mapOnLongPress(feature)}
         onRegionDidChange={() => setAreaHasChanged(true)}>
         <MapboxGL.Camera ref={ref => (cameraRef = ref)} />
-        <MapboxGL.UserLocation
-          onUpdate={location => {
-            setUserLatitude(location.coords.latitude);
-            setUserLongitude(location.coords.longitude);
-            if (
-              !startLocation.startLatitude &&
-              !endLocation.endLongitude &&
-              !areaHasChanged
-            ) {
-              cameraRef.moveTo(
-                [location.coords.longitude, location.coords.latitude],
-                500,
-              );
-              cameraRef.zoomTo(11, 500);
-            } else if (
-              !!startLocation.startLatitude &&
-              !!endLocation.endLongitude
-            ) {
-              cameraRef.fitBounds(
-                [startLocation.startLongitude, startLocation.startLatitude],
-                [endLocation.endLongitude, endLocation.endLatitude],
-                [pageHeight * 0.1, 100, pageHeight * 0.4, 100],
-                100,
-              );
-            } else if (
-              !!startLocation.startLatitude &&
-              !endLocation.endLatitude &&
-              !areaHasChanged
-            ) {
-              cameraRef.moveTo([
-                startLocation.startLongitude,
-                startLocation.startLatitude,
-              ]);
-              cameraRef.zoomTo(11);
-            }
-          }}
-        />
+        {!!cameraRef && (
+          <MapboxGL.UserLocation
+            onUpdate={location => {
+              setUserLatitude(location.coords.latitude);
+              setUserLongitude(location.coords.longitude);
+              if (
+                !startLocation.startLatitude &&
+                !endLocation.endLongitude &&
+                !areaHasChanged
+              ) {
+                cameraRef.moveTo(
+                  [location.coords.longitude, location.coords.latitude],
+                  500,
+                );
+                cameraRef.zoomTo(11, 500);
+              } else if (
+                !!startLocation.startLatitude &&
+                !!endLocation.endLongitude
+              ) {
+                cameraRef.fitBounds(
+                  [startLocation.startLongitude, startLocation.startLatitude],
+                  [endLocation.endLongitude, endLocation.endLatitude],
+                  [pageHeight * 0.1, 100, pageHeight * 0.4, 100],
+                  100,
+                );
+              } else if (
+                !!startLocation.startLatitude &&
+                !endLocation.endLatitude &&
+                !areaHasChanged
+              ) {
+                cameraRef.moveTo([
+                  startLocation.startLongitude,
+                  startLocation.startLatitude,
+                ]);
+                cameraRef.zoomTo(11);
+              }
+            }}
+          />
+        )}
         {!!startLocation.startLongitude &&
           !!startLocation.startLatitude &&
           renderMarker(
@@ -292,9 +297,11 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
               preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
               providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
             })
-              .then(async () => {
-                await cameraRef.moveTo([userLongitude, userLatitude], 500);
-                await cameraRef.zoomTo(11, 500);
+              .then(() => {
+                if (!!cameraRef && !!userLatitude && !!userLongitude) {
+                  cameraRef.moveTo([userLongitude, userLatitude], 500);
+                  cameraRef.zoomTo(11, 500);
+                }
               })
               .catch(() => {
                 ToastAndroid.showWithGravity(
@@ -340,9 +347,20 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
           </View>
           <View style={Styles.distanceRowStyle}>
             <View style={Styles.distanceContainerStyle}>
-              <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>کیلومتر</Text>
-              <Text style={{marginHorizontal: 5, fontFamily:"IRANSansMobile(FaNum)_Light", fontSize:normalize(13)}}>
-                {toFaDigit(distance).substr(0, 10)}
+              <Text
+                style={{
+                  fontFamily: 'IRANSansMobile_Light',
+                  fontSize: normalize(13),
+                }}>
+                کیلومتر
+              </Text>
+              <Text
+                style={{
+                  marginHorizontal: 5,
+                  fontFamily: 'IRANSansMobile(FaNum)_Light',
+                  fontSize: normalize(13),
+                }}>
+                {!!distance ? toFaDigit(distance) : '0'}
               </Text>
               <Text style={Styles.titleStyle}>فاصله: </Text>
             </View>
@@ -387,7 +405,7 @@ const Styles = StyleSheet.create({
   },
   headerTextStyle: {
     fontSize: normalize(15),
-    fontFamily:"IRANSansMobile_Medium",
+    fontFamily: 'IRANSansMobile_Medium',
     textAlign: 'center',
   },
   headerTextContainerStyle: {
@@ -427,7 +445,7 @@ const Styles = StyleSheet.create({
   },
   cityDataContainerStyle: {
     width: '100%',
-    height: "20%",
+    height: '20%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -439,8 +457,8 @@ const Styles = StyleSheet.create({
     marginLeft: 10,
     width: '35%',
     textAlign: 'center',
-    height:"100%",
-    fontFamily:"IRANSansMobile_Light"
+    height: '100%',
+    fontFamily: 'IRANSansMobile_Light',
   },
   cityDataContentContainerStyle: {
     flexDirection: 'row',
@@ -457,31 +475,31 @@ const Styles = StyleSheet.create({
   descriptionTitleTextStyle: {
     fontSize: normalize(14),
     marginBottom: 5,
-    fontFamily:"IRANSansMobile_Medium"
+    fontFamily: 'IRANSansMobile_Medium',
   },
   descriptionTextInputStyle: {
     width: '100%',
-    height: "80%",
+    height: '80%',
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 10,
     textAlignVertical: 'top',
     paddingHorizontal: 15,
-    paddingVertical:8,
-    fontSize:normalize(13),
-    fontFamily:"IRANSansMobile_Light"
+    paddingVertical: 8,
+    fontSize: normalize(13),
+    fontFamily: 'IRANSansMobile_Light',
   },
   markerLabelStyle: {
     width: 50,
     height: 20,
     justifyContent: 'center',
-    alignSelf:"center",
+    alignSelf: 'center',
     textAlign: 'center',
     borderRadius: 10,
     backgroundColor: '#A8A7A7',
     color: '#000',
-    fontFamily:"IRANSansMobile_Medium",
-    fontSize:normalize(12)
+    fontFamily: 'IRANSansMobile_Medium',
+    fontSize: normalize(12),
   },
   switchContainerStyle: {
     flexDirection: 'row',
@@ -492,14 +510,14 @@ const Styles = StyleSheet.create({
   distanceRowStyle: {
     flexDirection: 'row',
     width: '100%',
-    height:"18%",
+    height: '18%',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   titleStyle: {
     fontSize: normalize(14),
     textAlign: 'center',
-    fontFamily:"IRANSansMobile_Medium"
+    fontFamily: 'IRANSansMobile_Medium',
   },
   distanceContainerStyle: {
     flexDirection: 'row',

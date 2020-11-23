@@ -143,32 +143,27 @@ const NewService = ({navigation}) => {
 
 const Styles = StyleSheet.create({
   containerStyle:{
-    width:pageWidth,
-    height:pageHeight,
+    flex:1,
     backgroundColor:"#fff"
   },
   contentContainerStyle:{
-    flexGrow:1,
-    justifyContent:"center",
     alignItems:"center"
   },
   contentStyle:{
-    flex: 1,
-    justifyContent: "space-around",
+    flex:1,
+    justifyContent: "space-between",
     alignItems: "center",
   },
   nameRowInputStyle:{
     flexDirection: "row",
     alignItems:"center",
-    justifyContent:"space-around"
   },
   textInputStyle:{
     width:pageWidth*0.6,
-    height:pageHeight*0.07,
     borderBottomWidth:2,
     borderBottomColor:"#660000",
     textAlign: "center",
-    fontFamily:"IRANSansMobile_Light"
+    fontFamily:"IRANSansMobile_Light",
   },
   buttonStyle:{
     backgroundColor: "#660000",
@@ -186,9 +181,10 @@ const Styles = StyleSheet.create({
   },
   singleItemContainerStyle:{
     width:"100%",
-    height:pageHeight*0.1,
-    justifyContent:"space-between",
-    alignItems:"center"
+    height:pageHeight*0.14,
+    justifyContent:"space-around",
+    alignItems:"center",
+    marginBottom:pageHeight*0.05
   },
   iconContainerStyle: {
     width:pageWidth*0.12,

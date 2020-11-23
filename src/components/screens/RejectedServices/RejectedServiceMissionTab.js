@@ -39,30 +39,30 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
 
   useEffect(() => {
     const backAction = () => {
-      if (!!endLocation.endLongitude) {
-        setEndLocation({endLongitude: '', endLatitude: ''});
-        setEndCity('');
-        setDistance('0');
-        setInfo({
-          ...info,
-          endLatitude: '',
-          endLongitude: '',
-          endCity: '',
-          distance: '0',
-        });
-      } else if (!!startLocation.startLatitude) {
-        setStartLocation({startLatitude: '', startLongitude: ''});
-        setStartCity('');
-        setInfo({
-          ...info,
-          startLatitude: '',
-          startLongitude: '',
-          startCity: '',
-        });
-      } else {
-        renderSaveModal();
-      }
-      return true;
+      // if (!!endLocation.endLongitude) {
+      //   setEndLocation({endLongitude: '', endLatitude: ''});
+      //   setEndCity('');
+      //   setDistance('0');
+      //   setInfo({
+      //     ...info,
+      //     endLatitude: '',
+      //     endLongitude: '',
+      //     endCity: '',
+      //     distance: '0',
+      //   });
+      // } else if (!!startLocation.startLatitude) {
+      //   setStartLocation({startLatitude: '', startLongitude: ''});
+      //   setStartCity('');
+      //   setInfo({
+      //     ...info,
+      //     startLatitude: '',
+      //     startLongitude: '',
+      //     startCity: '',
+      //   });
+      // } else {
+      renderSaveModal();
+      // }
+      // return true;
     };
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -192,7 +192,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
     <View style={Styles.containerStyle}>
       <MapboxGL.MapView
         style={{width: pageWidth, height: pageHeight}}
-        onLongPress={feature => mapOnLongPress(feature)}
+        // onLongPress={feature => mapOnLongPress(feature)}
         onRegionDidChange={() => setAreaHasChanged(true)}>
         <MapboxGL.UserLocation
           onUpdate={location => {
@@ -253,7 +253,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
             'end',
           )}
       </MapboxGL.MapView>
-      {(!startLocation.startLongitude || !endLocation.endLongitude) && (
+      {/* {(!startLocation.startLongitude || !endLocation.endLongitude) && (
         <View style={Styles.headerTextContainerStyle}>
           <Text style={Styles.headerTextStyle}>
             {!!startLocation.startLatitude
@@ -263,47 +263,58 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
               : 'لطفا مبدا ماموریت را انتخاب کنید.'}
           </Text>
         </View>
-      )}
-      <View
-        style={[
-          Styles.myLocationContainerStyle,
-          {
-            bottom:
-              !!startLocation.startLatitude && !!endLocation.endLatitude
-                ? pageHeight * 0.35 + 25
-                : 20,
-          },
-        ]}>
-        <MaterialIcons
-          name={'my-location'}
-          style={{fontSize: normalize(30), color: '#000'}}
-          onPress={async () => {
-            LocationServicesDialogBox.checkLocationServicesIsEnabled({
-              message:
-                "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
-              ok: 'YES',
-              cancel: 'NO',
-              enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
-              showDialog: true, // false => Opens the Location access page directly
-              openLocationServices: true, // false => Directly catch method is called if location services are turned off
-              preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
-              preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
-              providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
-            })
-              .then(async () => {
-                await cameraRef.moveTo([userLongitude, userLatitude], 500);
-                await cameraRef.zoomTo(11, 500);
+      )} */}
+      {!startLocation.startLongitude ? (
+        <View style={Styles.notHaveMissionTextContainerStyle}>
+          <Text style={Styles.headerTextStyle}>
+            این سرویس بدون ماموریت بسته شده است.
+          </Text>
+        </View>
+      ) : null}
+      {!!startLocation.startLatitude && (
+        <View
+          style={[
+            Styles.myLocationContainerStyle,
+            {
+              bottom:
+                !!startLocation.startLatitude && !!endLocation.endLatitude
+                  ? pageHeight * 0.35 + 25
+                  : 20,
+            },
+          ]}>
+          <MaterialIcons
+            name={'my-location'}
+            style={{fontSize: normalize(30), color: '#000'}}
+            onPress={async () => {
+              LocationServicesDialogBox.checkLocationServicesIsEnabled({
+                message:
+                  "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+                ok: 'YES',
+                cancel: 'NO',
+                enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+                showDialog: true, // false => Opens the Location access page directly
+                openLocationServices: true, // false => Directly catch method is called if location services are turned off
+                preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
+                preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
+                providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
               })
-              .catch(() => {
-                ToastAndroid.showWithGravity(
-                  'موقعیت در دسترس نیست.',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
-              });
-          }}
-        />
-      </View>
+                .then(async () => {
+                  if (!!cameraRef && !!userLatitude && !!userLongitude) {
+                    await cameraRef.moveTo([userLongitude, userLatitude], 500);
+                    await cameraRef.zoomTo(11, 500);
+                  }
+                })
+                .catch(() => {
+                  ToastAndroid.showWithGravity(
+                    'موقعیت در دسترس نیست.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                });
+            }}
+          />
+        </View>
+      )}
       {!!startLocation.startLongitude && !!endLocation.endLongitude && (
         <View style={Styles.cardContentContainerStyle}>
           <View style={Styles.cityDataContainerStyle}>
@@ -320,9 +331,20 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
           </View>
           <View style={Styles.distanceRowStyle}>
             <View style={Styles.distanceContainerStyle}>
-              <Text style={{fontSize:normalize(13), fontFamily:"IRANSansMobile_Light"}}>کیلومتر</Text>
-              <Text style={{marginHorizontal: 5, fontSize:normalize(12), fontFamily:"IRANSansMobile_Light"}}>
-                {!!distance ? toFaDigit(distance).substr(0, 10):toFaDigit("0")}
+              <Text
+                style={{
+                  fontSize: normalize(13),
+                  fontFamily: 'IRANSansMobile_Light',
+                }}>
+                کیلومتر
+              </Text>
+              <Text
+                style={{
+                  marginHorizontal: 5,
+                  fontSize: normalize(12),
+                  fontFamily: 'IRANSansMobile_Light',
+                }}>
+                {!!distance ? toFaDigit(distance) : toFaDigit('0')}
               </Text>
               <Text style={Styles.titleStyle}>فاصله: </Text>
             </View>
@@ -383,6 +405,17 @@ const Styles = StyleSheet.create({
     bottom: pageHeight * 0.68,
     left: pageWidth * 0.2,
   },
+  notHaveMissionTextContainerStyle: {
+    width: pageWidth,
+    height: pageHeight,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+  },
   markerLabelContainerStyle: {
     backgroundColor: 'red',
   },
@@ -418,7 +451,7 @@ const Styles = StyleSheet.create({
   },
   cityDataContainerStyle: {
     width: '100%',
-    height: "20%",
+    height: '20%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -446,20 +479,20 @@ const Styles = StyleSheet.create({
   },
   descriptionTitleTextStyle: {
     fontSize: normalize(14),
-    fontFamily:"IRANSansMobile_Medium",
+    fontFamily: 'IRANSansMobile_Medium',
     marginBottom: 5,
   },
   descriptionTextInputStyle: {
     width: '100%',
-    height: "80%",
+    height: '80%',
     borderWidth: 1,
     borderColor: '#000',
     borderRadius: 10,
     textAlignVertical: 'top',
     paddingHorizontal: 15,
-    paddingVertical:8,
-    fontFamily:'IRANSansMobile_Light',
-    fontSize:normalize(13)
+    paddingVertical: 8,
+    fontFamily: 'IRANSansMobile_Light',
+    fontSize: normalize(13),
   },
   markerLabelStyle: {
     width: 50,
@@ -481,7 +514,7 @@ const Styles = StyleSheet.create({
   distanceRowStyle: {
     flexDirection: 'row',
     width: '100%',
-    height:"18%",
+    height: '18%',
     alignItems: 'center',
     justifyContent: 'space-between',
   },

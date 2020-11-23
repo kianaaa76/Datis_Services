@@ -101,8 +101,8 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           alignItems: 'center',
         }}>
         <View style={Styles.descriptionRowStyle}>
-          <View style={{width: 70, marginBottom: 10, flexDirection: 'row'}}>
-            {/* <Icon name={'star'} style={{color: 'red'}} /> */}
+          <View style={{width: "100%", marginBottom: 10, flexDirection: 'row', justifyContent:"flex-end"}}>
+            <Icon name={'star'} style={{color: 'red'}} />
             <Text style={Styles.labelStyle}>توضیحات:</Text>
           </View>
           <TextInput
@@ -497,7 +497,7 @@ const Styles = StyleSheet.create({
     height: pageHeight * 0.1,
     marginBottom: 15,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   textInputStyle: {
     width: pageWidth * 0.65,

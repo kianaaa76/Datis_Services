@@ -116,7 +116,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo,renderSaveModal}) => {
             {!!info.factorImage && (
                 <ImageViewer width={pageWidth - 30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${info.factorImage}`}/>
             )}
-            <View style={Styles.imageRowStyle}>
+            <View style={[Styles.imageRowStyle,{marginBottom:!!info.billImage?10:30}]}>
                 <View style={Styles.getImageContainerViewStyle}>
                     <Icon name={"camera-alt"} style={{color:"#000", fontSize:normalize(35)}} onPress={
                         () => {
@@ -151,9 +151,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo,renderSaveModal}) => {
                         }}/>
                     )}
                 </View>
-                <View>
-                    <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
-                </View>
+                <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
             </View>
             {!!info.billImage && (
                 <ImageViewer width={pageWidth - 30} height={pageHeight*0.4} imageUrl={`data:image/jpeg;base64,${info.billImage}`}/>
@@ -211,11 +209,11 @@ const Styles = StyleSheet.create({
         height:65,
         marginBottom:15,
         alignItems:"center",
-        justifyContent:"flex-end"
+        justifyContent:"space-between",
     },
     textInputStyle: {
-        width: pageWidth*0.5,
-        height: 55,
+        width: "55%",
+        height: "100%",
         marginHorizontal:10,
         borderBottomWidth:1,
         borderBottomColor:"#660000",
@@ -224,9 +222,9 @@ const Styles = StyleSheet.create({
     imageRowStyle:{
         flexDirection: "row",
         width:"100%",
-        height:65,
         alignItems:"center",
         justifyContent:"space-between",
+        marginVertical:10
     },
     getImageContainerViewStyle:{
         justifyContent:"space-between",

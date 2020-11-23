@@ -142,7 +142,8 @@ const Styles= StyleSheet.create({
         borderRadius:10,
         backgroundColor:"#fff",
         width:"100%",
-        height:50
+        height:50,
+        paddingHorizontal:6
     },
     upDownIconStyle:{
         fontSize:normalize(15),

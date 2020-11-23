@@ -104,10 +104,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         <View style={Styles.descriptionRowStyle}>
           <View
             style={{
-              width: 70,
-              marginBottom: 10,
-              justifyContent: 'center',
-              flexDirection: 'row',
+              width: "100%", marginBottom: 10, flexDirection: 'row', justifyContent:"flex-end"
             }}>
             <Icon name={'star'} style={{color: 'red'}} />
             <Text style={Styles.labelStyle}>توضیحات:</Text>

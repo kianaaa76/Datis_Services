@@ -312,7 +312,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                                     ? `${Item.partType.label.substr(0,25)}...`
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
                                 listHeight={150}/>
-                            <Text style={[Styles.labelStyle,{width:"20%"}]}>نوع قطعه:</Text>
+                            <Text style={Styles.labelStyle}>نوع قطعه:</Text>
                         </View>
                         <View style={Styles.serialContainerStyle}>
                             <Icon
@@ -352,7 +352,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                                 onSelect={item=>refactorObjectListItems("version", item, Item.index)}
                                 listHeight={150}
                             />
-                            <Text style={[Styles.labelStyle,{width:"20%"}]}>نسخه:  </Text>
+                            <Text style={Styles.labelStyle}>نسخه:  </Text>
                         </View>
                     </View>
                 )}
@@ -408,8 +408,8 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 {Item.isExpanded && (
                     <View style={Styles.formFooterContainerstyle}>
                         <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={async ()=> {
-                            await setInfo(c=>c.filter((_, i) => i !== index));
-                            await setObjectsList(c=>c.filter((_, i) => i !== index));
+                            await setInfo(info.filter((_) => _.index !== Item.index));
+                            await setObjectsList(objectsList.filter((_) => _.index !== Item.index));
                         }}>
                             <Octicons name={"trashcan"} style={{fontSize:normalize(17), color:"#fff"}}/>
                         </TouchableOpacity>
@@ -484,12 +484,17 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 <View style={Styles.partTypeSelectionContainerStyle}>
                     <View style={{flexDirection:"row", alignItems:"center"}}>
                         <CheckBox
-                            onValueChange={()=>{
-                                if (fieldsObject.objectType !== "failed"){
+                            onValueChange={(value)=>{
+                                if (value){
                                     setFieldsObject({
                                         ...fieldsObject, objectType: "failed"
                                     });
                                     setIsNewPartFormExpanded(true);
+                                } else {
+                                    setFieldsObject({
+                                        ...fieldsObject, objectType: ""
+                                    });
+                                    setIsNewPartFormExpanded(false);
                                 }
                             }}
                             value={fieldsObject.objectType === "failed" ? true : false}
@@ -499,12 +504,17 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                     </View>
                     <View style={{flexDirection:"row", alignItems:"center"}}>
                         <CheckBox
-                            onValueChange={()=>{
-                                if (fieldsObject.objectType !== "new"){
+                            onValueChange={(value)=>{
+                                if (value){
                                     setFieldsObject({
                                         ...fieldsObject, objectType: "new"
                                     });
                                     setIsNewPartFormExpanded(true);
+                                } else {
+                                    setFieldsObject({
+                                        ...fieldsObject, objectType: ""
+                                    });
+                                    setIsNewPartFormExpanded(false);
                                 }
                             }}
                             value={fieldsObject.objectType == "new" ? true : false}
@@ -528,7 +538,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                                     ? `${fieldsObject.partTypeSelected.label.substr(0, 25)}...`
                                     :"قطعه مورد نظر خود را انتخاب کنید."}
                                 listHeight={150}/>
-                            <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>نوع قطعه:</Text>
+                            <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>نوع قطعه:</Text>
                         </View>
                         <View style={Styles.serialContainerStyle}>
                             {searchBarcodeLoading ? (
@@ -536,12 +546,12 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                             ) : (
                                 <Icon
                                 name={"search"}
-                                style={{color: "#000", fontSize: normalize(30), marginHorizontal: 5}}
+                                style={{color: "#000", fontSize: normalize(30)}}
                                 onPress={searchBarcode}
                             />)}
                             <Icon
                                 name={"qr-code-2"}
-                                style={{color:"#000", fontSize:normalize(30), marginHorizontal:5}}
+                                style={{color:"#000", fontSize:normalize(30)}}
                                 onPress={()=>setScreenMode(true)}/>
                             <TextInput
                                 style={Styles.serialInputStyle}
@@ -563,7 +573,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                                 onSelect={item=>setFieldsObject({...fieldsObject, partVersionSelected: item})}
                                 listHeight={150}
                             />
-                            <Text style={{width:"20%", fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>نسخه:  </Text>
+                            <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>نسخه:  </Text>
                         </View>
                     </View>
                 )}
@@ -633,7 +643,15 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                         <Octicons name={"trashcan"} style={{fontSize:normalize(17), color:"#fff"}}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={Styles.footerIconContainerStyle} onPress={()=>{
-                        if(!fieldsObject.partTypeSelected.label){
+                        if (fieldsObject.objectType !== "new" && fieldsObject.objectType !== "failed"){
+                            Alert.alert(
+                                "",
+                                "لطفا جدید یا معیوب بودن قطعه را مشخص کنید.",
+                                [
+                                    { text: 'OK', onPress: () => {} }
+                                ]
+                            )
+                        }else if(!fieldsObject.partTypeSelected.label){
                             Alert.alert(
                                 "",
                                 "لطفا نوع قطعه را مشخص کنید.",
@@ -660,13 +678,21 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                         }
                         else {
                             let INFO = !!objectsList ? objectsList : [];
+                            let maxIndex = 0;
+                            if (INFO.length>0){
+                                INFO.map(item=>{
+                                    if (item.index > maxIndex){
+                                        maxIndex = item.index;
+                                    }
+                                });
+                            }
                             INFO.push({
-                                index: INFO.length + 1,
-                                serial: fieldsObject.serial,
+                                index: maxIndex + 1,
+                                serial: !!fieldsObject.serial ? fieldsObject.serial : "",
                                 isExpanded: false,
-                                failureDescription: fieldsObject.failureDescription,
+                                failureDescription: !!fieldsObject.failureDescription? fieldsObject.failureDescription: "",
                                 hasGarantee: fieldsObject.hasGarantee,
-                                Price: fieldsObject.Price,
+                                Price: !!fieldsObject.Price?fieldsObject.Price:"0",
                                 objectType: fieldsObject.objectType,
                                 partType: fieldsObject.partTypeSelected,
                                 availableVersions: [],
@@ -765,7 +791,7 @@ const Styles = StyleSheet.create({
         borderColor:"#000",
         borderRadius: 10,
         padding:8,
-        marginBottom:30
+        marginBottom:30,
     },
     formContainerStyle:{
         borderWidth:1,
@@ -810,10 +836,10 @@ const Styles = StyleSheet.create({
     partTypeContainerStyle:{
         flexDirection:"row",
         width:"100%",
-        justifyContent:"flex-end",
+        justifyContent:"space-between",
         alignItems:"center",
         marginTop:15,
-        zIndex: 9999
+        zIndex: 9999,
     },
     bothOptionsContainerStyle:{
         marginTop: 10
@@ -823,7 +849,7 @@ const Styles = StyleSheet.create({
         width:"100%",
         marginVertical:10,
         alignItems:"center",
-        justifyContent:"flex-end"
+        justifyContent:"space-between",
     },
     serialInputStyle:{
         width:"55%",
@@ -835,9 +861,9 @@ const Styles = StyleSheet.create({
     priceContainerStyle: {
         flexDirection:"row",
         alignItems:"center",
-        justifyContent:"flex-end",
+        justifyContent:"space-between",
         width:"100%",
-        marginVertical:10
+        marginVertical:10,
     },
     priceInputStyle:{
         width:"70%",

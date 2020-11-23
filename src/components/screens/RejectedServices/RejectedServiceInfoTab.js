@@ -71,21 +71,19 @@ const Styles = StyleSheet.create({
         flexDirection:"row",
         justifyContent:"space-between",
         width: "100%",
-        height: 35,
-        marginBottom:15,
+        marginBottom:5,
     },
     titleTextStyle: {
         fontSize:normalize(14),
         fontFamily:"IRANSansMobile_Medium",
-        width:110,
+        width:"39%",
     },
     textStyle: {
         fontSize: normalize(14),
         textAlign:"right",
         width: pageWidth-160,
-        height:38,
         fontFamily:"IRANSansMobile_Light",
-        flexShrink:1
+        flexShrink:1,
     },
     rightSideContainerStyle:{
         flexDirection:"row",

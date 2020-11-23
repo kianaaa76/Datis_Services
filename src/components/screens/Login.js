@@ -11,6 +11,7 @@ import {
   ScrollView,
   ToastAndroid,
   ActivityIndicator,
+  StatusBar
 } from 'react-native';
 import {LOGIN, LOGOUT} from '../../actions/types';
 import {useDispatch} from 'react-redux';
@@ -124,6 +125,7 @@ const Login = ({navigation}) => {
       style={{flex: 1}}
       scrollEnabled={false}
       keyboardShouldPersistTaps="handled">
+      <StatusBar hidden/>
       <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
         <View style={{marginTop: '30%', alignItems: 'center'}}>
           <View style={Styles.textInputContainerStyle}>
