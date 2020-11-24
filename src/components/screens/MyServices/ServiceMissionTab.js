@@ -8,10 +8,12 @@ import {
   TextInput,
   BackHandler,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from 'react-native-vector-icons/Foundation';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import {API_KEY, MAPBOX_API_KEY} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
@@ -21,7 +23,7 @@ const pageHeight = Dimensions.get('screen').height;
 let EndObject = {};
 let cameraRef = null;
 
-const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
+const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
   const [startLocation, setStartLocation] = useState({
     startLatitude: info.startLatitude,
     startLongitude: info.startLongitude,
@@ -40,29 +42,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
 
   useEffect(() => {
     const backAction = () => {
-      if (!!endLocation.endLongitude) {
-        setEndLocation({endLongitude: '', endLatitude: ''});
-        setEndCity('');
-        setDistance('0');
-        setInfo({
-          ...info,
-          endLatitude: '',
-          endLongitude: '',
-          endCity: '',
-          distance: '',
-        });
-      } else if (!!startLocation.startLatitude) {
-        setStartLocation({startLatitude: '', startLongitude: ''});
-        setStartCity('');
-        setInfo({
-          ...info,
-          startLatitude: '',
-          startLongitude: '',
-          startCity: '',
-        });
-      } else {
-        renderSaveModal();
-      }
+      renderSaveModal();
       return true;
     };
     const backHandler = BackHandler.addEventListener(
@@ -313,6 +293,89 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
           }}
         />
       </View>
+      {!!startLocation.startLatitude && (
+        <View
+          style={[
+            Styles.removeMarkerContainerStyle,
+            {
+              bottom:
+                !!startLocation.startLatitude && !!endLocation.endLatitude
+                  ? pageHeight * 0.35 + 25
+                  : 20,
+            },
+          ]}>
+          <MaterialCommunityIcons
+            name="map-marker-remove-variant"
+            style={{fontSize: normalize(30), color: '#000'}}
+            onPress={() => {
+              if (!!endLocation.endLatitude) {
+                Alert.alert('', 'کدام موقعیت را میخواهید حذف کنید؟', [
+                  {
+                    text: 'هیچکدام',
+                    onPress: () => {},
+                  },
+                  {
+                    text: 'مقصد',
+                    onPress: () => {
+                      setEndLocation({});
+                      setEndCity('');
+                      setDistance('');
+                      setInfo({
+                        ...info,
+                        endCity: '',
+                        endLatitude: '',
+                        startLongitude: '',
+                      });
+                    },
+                  },
+                  {
+                    text: 'مبدا و مقصد',
+                    onPress: () => {
+                      setStartLocation({});
+                      setEndLocation({});
+                      setStartCity('');
+                      setEndCity('');
+                      setDistance('');
+                      setInfo({
+                        ...info,
+                        startCity: '',
+                        startLatitude: '',
+                        startLongitude: '',
+                        endCity: '',
+                        endLatitude: '',
+                        startLongitude: '',
+                        distance: '',
+                      });
+                    },
+                    style: 'cancel',
+                  },
+                ]);
+              } else {
+                Alert.alert('', 'آیا از حذف کردن مبدا اطمینان دارید؟', [
+                  {
+                    text: 'خیر',
+                    onPress: () => {},
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'بله',
+                    onPress: () => {
+                      setStartCity('');
+                      setStartLocation({});
+                      setInfo({
+                        ...info,
+                        startCity: '',
+                        startLatitude: '',
+                        startLongitude: '',
+                      });
+                    },
+                  },
+                ]);
+              }
+            }}
+          />
+        </View>
+      )}
       {!!startLocation.startLongitude && !!endLocation.endLongitude && (
         <View style={Styles.cardContentContainerStyle}>
           <View style={Styles.cityDataContainerStyle}>
@@ -393,6 +456,38 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal}) => {
           </View>
         </View>
       )}
+
+      {/* {!!renderRemoveMarkerModal && (
+        <TouchableHighlight
+          style={Styles.modalBackgroundStyle}
+          onPress={() => setRenderRemoveMarkerModal(false)}>
+          <View style={Styles.modalContainerStyle}>
+            <View style={Styles.modalBodyContainerStyle}>
+              <Text style={Styles.modalBodyTextStyle}>
+                آیا از حذف کردن مکان های انتخاب شده اطمینان دارید؟
+              </Text>
+            </View>
+            <View style={Styles.modalFooterContainerStyle}>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => setRenderRemoveMarkerModal(false)}>
+                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  setStartLocation({});
+                  setEndLocation({});
+                  setStartCity('');
+                  setEndCity('');
+                  setRenderRemoveMarkerModal(false)
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>بله</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableHighlight>
+      )} */}
     </View>
   );
 };
@@ -535,6 +630,67 @@ const Styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     elevation: 5,
+  },
+  removeMarkerContainerStyle: {
+    position: 'absolute',
+    left: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    elevation: 5,
+  },
+  modalBackgroundStyle: {
+    width: pageWidth,
+    height: pageHeight,
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+  },
+  modalContainerStyle: {
+    width: pageWidth * 0.7,
+    height: pageHeight * 0.25,
+    backgroundColor: '#E8E8E8',
+    marginBottom: pageHeight * 0.2,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  modalBodyContainerStyle: {
+    width: '100%',
+    height: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  modalBodyTextStyle: {
+    color: '#660000',
+    textAlign: 'center',
+    fontSize: normalize(15),
+    fontFamily: 'IRANSansMobile_Light',
+  },
+  modalFooterContainerStyle: {
+    flexDirection: 'row',
+    width: '100%',
+    height: '30%',
+    justifyContent: 'space-around',
+  },
+  modalButtonStyle: {
+    backgroundColor: '#fff',
+    width: pageWidth * 0.2,
+    height: pageWidth * 0.13,
+    borderRadius: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  modalButtonTextStyle: {
+    color: 'gray',
+    fontSize: normalize(16),
+    fontFamily: 'IRANSansMobile_Medium',
   },
 });
 

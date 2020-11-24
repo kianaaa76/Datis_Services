@@ -171,8 +171,8 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
     const sserial =
       !!selectedItemList && !!selectedItemList.id
         ? selectedItemList.serial.toUpperCase()
-        : fieldsObject.serial.toUpperCase();
-    if (!!object) {
+        : !!fieldsObject.serial ? fieldsObject.serial.toUpperCase(): null;
+    if (!!object && !!sserial) {
       if (!!object.value.SerialFormat.length > 0) {
         let serialFormatHeader = object.value.SerialFormat.substr(
           0,
