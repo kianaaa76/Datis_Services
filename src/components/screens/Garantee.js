@@ -58,17 +58,10 @@ const Garantee = ({navigation}) => {
         });
         navigation.navigate('SignedOut');
         setLoader(false);
-      } else if (data.errorCode === 5) {
-        setLoader(false);
-        ToastAndroid.showWithGravity(
-          'سریال وارد شده معتبر نیست.',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
       } else {
         setLoader(false);
         ToastAndroid.showWithGravity(
-          data.message,
+          'سریال وارد شده معتبر نیست.',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
