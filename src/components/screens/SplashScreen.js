@@ -17,8 +17,8 @@ import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
 import splashImage from '../../../assets/images/image_splash_screen.png';
 import {checkUpdate, getUsers} from '../../actions/api';
-import { LOGIN } from '../../actions/types';
-import {normalize} from "../utils/utilities";
+import {LOGIN} from '../../actions/types';
+import {normalize} from '../utils/utilities';
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -30,7 +30,15 @@ const Splash = ({navigation}) => {
   const [usersList, setUsersList] = useState([]);
 
   useEffect(() => {
-    if (usersList.length === 0) {
+    if (!selector.token) {
+      navigation.navigate('SignedOut');
+    } else if (
+      usersList.length === 0 &&
+      (selector.constantUserId === 40 ||
+      selector.constantUserId === 41 ||
+      selector.constantUserId === 43 ||
+      selector.constantUserId === 51)
+    ) {
       getUsers()
         .then(data => {
           if (data.errorCode === 0) {
@@ -41,14 +49,35 @@ const Splash = ({navigation}) => {
           Alert.alert(
             'عدم دسترسی به اینترنت',
             'برای وارد شدن نیاز به اینترنت دارید. لطفا برنامه را ببندید و پس از فعالسازی اینترنت دستگاه خود دوباره وارد شوید.',
-            [{text: 'OK', onPress: () => {}}],
+            [{text: 'OK', onPress: () => {
+              BackHandler.exitApp();
+            }}],
           );
         });
+    } else if (
+      selector.constantUserId !== 40 &&
+      selector.constantUserId !== 41 &&
+      selector.constantUserId !== 43 &&
+      selector.constantUserId !== 51
+    ) {
     }
   });
 
   useEffect(() => {
-    if (usersList.length > 0) {
+    if (
+      (!!selector.token &&
+        (selector.constantUserId === 40 ||
+        selector.constantUserId === 41 ||
+        selector.constantUserId === 43 ||
+        selector.constantUserId === 51) &&
+        usersList.length > 0) ||
+      (usersList.length == 0 &&
+        (!!selector.constantUserId &&
+          selector.constantUserId !== 40 &&
+          selector.constantUserId !== 41 &&
+          selector.constantUserId !== 43 &&
+          selector.constantUserId !== 51))
+    ) {
       let version = VersionInfo.appVersion;
       checkUpdate(version).then(data => {
         if (data.errorCode === 5) {
@@ -56,11 +85,11 @@ const Splash = ({navigation}) => {
         } else {
           if (!!selector.token) {
             dispatch({
-              type:LOGIN,
+              type: LOGIN,
               token: selector.constantToken,
-              constantToken:selector.constantToken,
+              constantToken: selector.constantToken,
               userId: selector.constantUserId,
-              constantUserId: selector.constantUserId
+              constantUserId: selector.constantUserId,
             });
             navigation.navigate('Home', {users: usersList});
           } else {
@@ -152,7 +181,7 @@ const Styles = StyleSheet.create({
   modalHeaderTextStyle: {
     color: '#fff',
     fontSize: normalize(16),
-    fontFamily:"IRANSansMobile_Medium"
+    fontFamily: 'IRANSansMobile_Medium',
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -165,7 +194,7 @@ const Styles = StyleSheet.create({
     color: '#660000',
     textAlign: 'center',
     fontSize: normalize(15),
-    fontFamily: "IRANSansMobile_Light"
+    fontFamily: 'IRANSansMobile_Light',
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -185,7 +214,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(16),
-    fontFamily:"IRANSansMobile_Medium"
+    fontFamily: 'IRANSansMobile_Medium',
   },
 });
 

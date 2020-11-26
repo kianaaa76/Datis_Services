@@ -301,7 +301,8 @@ const Home = ({navigation}) => {
       {showCallModal && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setShowCallModal(false)}>
+          onPress={() => setShowCallModal(false)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalHeaderContainerStyle}>
               <Text style={Styles.modalHeaderTextStyle}>داتیس سرویس</Text>

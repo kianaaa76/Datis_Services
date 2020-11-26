@@ -492,7 +492,8 @@ const ServiceArchiveDetail = ({navigation}) => {
       {!!deletingImage && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setDeletingImage(0)}>
+          onPress={() => setDeletingImage(0)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
               <Text style={{fontSize: normalize(14), fontFamily:"IRANSansMobile_Medium"}}>

@@ -58,28 +58,30 @@ const MissionDetails = ({navigation}) => {
       <View style={Styles.contentContainerStyle}>
         <View>
           <MapboxGL.MapView style={{width: '100%', height: pageHeight * 0.57}}>
-                <MapboxGL.Camera
-                  ref={cameraRef => {
-                    if (!!cameraRef) {
-                      if (!!StartLatitude &&
-                        !!StartLongitude &&
-                        !!EndLatitude &&
-                        !!EndLongitude){
-                      cameraRef.fitBounds(
-                        [StartLongitude, StartLatitude],
-                        [EndLongitude, EndLatitude],
-                        50,
-                      );
-                        } else if (!!StartLatitude && !!StartLongitude) {
-                          cameraRef.moveTo([StartLongitude, StartLatitude],500);
-                          // cameraRef.zoomTo(10,500);
-                        } else if (!!EndLatitude && !!EndLongitude){
-                          cameraRef.moveTo([EndLongitude, EndLatitude],500);
-                          // cameraRef.zoomTo(10,500);
-                        }
-                    }
-                  }}
-                />
+            <MapboxGL.Camera
+              ref={cameraRef => {
+                if (!!cameraRef) {
+                  if (
+                    !!StartLatitude &&
+                    !!StartLongitude &&
+                    !!EndLatitude &&
+                    !!EndLongitude
+                  ) {
+                    cameraRef.fitBounds(
+                      [StartLongitude, StartLatitude],
+                      [EndLongitude, EndLatitude],
+                      50,
+                    );
+                  } else if (!!StartLatitude && !!StartLongitude) {
+                    cameraRef.moveTo([StartLongitude, StartLatitude], 500);
+                    // cameraRef.zoomTo(10,500);
+                  } else if (!!EndLatitude && !!EndLongitude) {
+                    cameraRef.moveTo([EndLongitude, EndLatitude], 500);
+                    // cameraRef.zoomTo(10,500);
+                  }
+                }
+              }}
+            />
             {!!StartLatitude &&
               !!StartLongitude &&
               renderMarker(
@@ -129,8 +131,10 @@ const MissionDetails = ({navigation}) => {
             </View>
             <View style={Styles.firstSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>{`${toFaDigit(
-                mission.Distance,
-              )} متر`}</Text>
+                parseInt(mission.Distance) > 1000
+                  ? parseFloat(mission.Distance) / 1000
+                  : mission.Distance,
+              )} ${mission.Distance > 1000 ? 'کیلومتر' : 'متر'}`}</Text>
               <Text style={Styles.itemTitleStyle}>طول ماموریت: </Text>
             </View>
           </View>

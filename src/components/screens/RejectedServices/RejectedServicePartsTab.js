@@ -171,7 +171,9 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
     const sserial =
       !!selectedItemList && !!selectedItemList.id
         ? selectedItemList.serial.toUpperCase()
-        : !!fieldsObject.serial ? fieldsObject.serial.toUpperCase(): null;
+        : !!fieldsObject.serial
+        ? fieldsObject.serial.toUpperCase()
+        : null;
     if (!!object && !!sserial) {
       if (!!object.value.SerialFormat.length > 0) {
         let serialFormatHeader = object.value.SerialFormat.substr(
@@ -347,7 +349,8 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
           style={Styles.formHeaderStyle}
           onPress={() =>
             refactorObjectListItems('isExpanded', !Item.isExpanded, Item.index)
-          }>
+          }
+          underlayColor="none">
           <>
             <TouchableOpacity
               style={{
@@ -426,7 +429,9 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                 }}
                 placeholder={
                   !!Item.partType
-                    ? `${Item.partType.label.substr(0, 25)}...`
+                    ? Item.partType.label.length > 30
+                      ? `${Item.partType.label.substr(0, 30)}...`
+                      : `${Item.partType.label}`
                     : 'قطعه مورد نظر خود را انتخاب کنید.'
                 }
                 listHeight={150}
@@ -660,7 +665,7 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
             <View style={Styles.partTypeSelectionContainerStyle}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox
-                  onValueChange={(value) => {
+                  onValueChange={value => {
                     if (value) {
                       setFieldsObject({
                         ...fieldsObject,
@@ -668,11 +673,11 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                       });
                       setIsNewPartFormExpanded(true);
                     } else {
-                        setFieldsObject({
-                            ...fieldsObject,
-                            objectType: "",
-                          });
-                          setIsNewPartFormExpanded(false);
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: '',
+                      });
+                      setIsNewPartFormExpanded(false);
                     }
                   }}
                   value={fieldsObject.objectType === 'failed' ? true : false}
@@ -689,7 +694,7 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
               </View>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox
-                  onValueChange={(value) => {
+                  onValueChange={value => {
                     if (value) {
                       setFieldsObject({
                         ...fieldsObject,
@@ -697,11 +702,11 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                       });
                       setIsNewPartFormExpanded(true);
                     } else {
-                        setFieldsObject({
-                            ...fieldsObject,
-                            objectType: "",
-                          });
-                          setIsNewPartFormExpanded(false);
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: '',
+                      });
+                      setIsNewPartFormExpanded(false);
                     }
                   }}
                   value={fieldsObject.objectType == 'new' ? true : false}
@@ -735,10 +740,12 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                     }}
                     placeholder={
                       !!fieldsObject.partTypeSelected.label
-                        ? `${fieldsObject.partTypeSelected.label.substr(
-                            0,
-                            25,
-                          )}...`
+                        ? fieldsObject.partTypeSelected.label.length > 30
+                          ? `${fieldsObject.partTypeSelected.label.substr(
+                              0,
+                              30,
+                            )}...`
+                          : `${fieldsObject.partTypeSelected.label}`
                         : 'قطعه مورد نظر خود را انتخاب کنید.'
                     }
                     listHeight={150}
@@ -926,11 +933,13 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                     }
                     INFO.push({
                       index: maxIndex + 1,
-                      serial: !!fieldsObject.serial ? fieldsObject.serial : "",
+                      serial: !!fieldsObject.serial ? fieldsObject.serial : '',
                       isExpanded: false,
-                      failureDescription: !!fieldsObject.failureDescription ? fieldsObject.failureDescription : "",
+                      failureDescription: !!fieldsObject.failureDescription
+                        ? fieldsObject.failureDescription
+                        : '',
                       hasGarantee: fieldsObject.hasGarantee,
-                      Price: !!fieldsObject.Price ? fieldsObject.Price : "0",
+                      Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
                       objectType: fieldsObject.objectType,
                       partType: fieldsObject.partTypeSelected,
                       availableVersions: [],

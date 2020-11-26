@@ -327,7 +327,7 @@ const RejectedServiceListItem = ({
       <View
         style={{
           width: pageWidth * 0.9,
-          height: pageHeight * 0.13,
+          // height: pageHeight * 0.13,
           backgroundColor: isNetworkSaved ? '#3399FF' : '#fff',
           paddingHorizontal: 6,
           paddingVertical: 2,
@@ -356,11 +356,7 @@ const RejectedServiceListItem = ({
         <View style={Styles.firstRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>
-              {Item.Resone.split(/\r\n|\r|\n/).length>1?
-                `${Item.Resone.split(/\r\n|\r|\n/)[0].substr(0,20)}...`:
-                  Item.Resone.length > 20
-                ? `${Item.Resone.substr(0, 20)}...`
-                : Item.Resone}
+            {Item.Resone}
             </Text>
             <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
               دلیل ردشدن پروژه:{' '}
@@ -375,14 +371,12 @@ const RejectedServiceListItem = ({
 const Styles = StyleSheet.create({
   firstRowContainerStyle: {
     width: '100%',
-    height: '33%',
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
   secondRowContainerStyle: {
     width: '100%',
-    height: '33%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -390,11 +384,13 @@ const Styles = StyleSheet.create({
   singleItemStyle: {
     flexDirection: 'row',
     justifyContent:"center",
-    alignItems:"center"
+    alignItems:"flex-start"
   },
   valueTextStyle: {
     fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
+    flexShrink:1,
+    textAlign:"right"
   },
 });
 

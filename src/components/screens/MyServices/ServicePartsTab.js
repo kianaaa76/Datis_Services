@@ -348,7 +348,8 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
           style={Styles.formHeaderStyle}
           onPress={() =>
             refactorObjectListItems('isExpanded', !Item.isExpanded, Item.index)
-          }>
+          }
+          underlayColor="none">
           <>
             <TouchableOpacity
               style={{
@@ -425,7 +426,9 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 }}
                 placeholder={
                   !!Item.partType
-                    ? `${Item.partType.label.substr(0, 25)}...`
+                    ? Item.partType.label.length > 30
+                      ? `${Item.partType.label.substr(0, 30)}...`
+                      : `${Item.partType.label}`
                     : 'قطعه مورد نظر خود را انتخاب کنید.'
                 }
                 listHeight={150}
@@ -729,10 +732,12 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                       }}
                       placeholder={
                         !!fieldsObject.partTypeSelected
-                          ? `${fieldsObject.partTypeSelected.label.substr(
-                              0,
-                              25,
-                            )}...`
+                          ? fieldsObject.partTypeSelected.label.length > 30
+                            ? `${fieldsObject.partTypeSelected.label.substr(
+                                0,
+                                30,
+                              )}...`
+                            : `${fieldsObject.partTypeSelected.label}`
                           : 'قطعه مورد نظر خود را انتخاب کنید.'
                       }
                       listHeight={150}

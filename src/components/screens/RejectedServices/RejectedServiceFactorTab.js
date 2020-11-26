@@ -158,7 +158,10 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo,renderSaveModal}) => {
             )}
         </ScrollView>
         {!!deletingImage && (
-            <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setDeletingImage(0)}>
+            <TouchableHighlight 
+            style={Styles.modalBackgroundStyle} 
+            onPress={()=>setDeletingImage(0)}
+            underlayColor="none">
                 <View style={Styles.modalContainerStyle}>
                     <View style={Styles.modalBodyContainerStyle2}>
                         <Text>

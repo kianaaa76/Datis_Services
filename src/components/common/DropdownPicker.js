@@ -66,8 +66,8 @@ const DropdownPicker = forwardRef(({placeholder, list, onSelect, listHeight},ref
             onPress={()=> {
                 setListIsShown(!listIsShown)
             }}>
-                <Text style={{color: !!selectedItemName ? "#000" : "gray"}}>
-                    {!!selectedItemName ? selectedItemName.length>25 ? `${selectedItemName.substr(0,25)}...`: selectedItemName : placeholder}
+                <Text style={{color:"#000"}}>
+                    {!!selectedItemName ? selectedItemName.length>30 ? `${selectedItemName.substr(0,30)}...`: selectedItemName : placeholder}
                 </Text>
                 {/* {listIsShown?(
                     <FontAwesome name={"chevron-up"} style={Styles.upDownIconStyle} onPress={()=> {

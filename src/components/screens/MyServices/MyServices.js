@@ -210,7 +210,10 @@ const MyService = ({navigation}) => {
             />
           </TouchableOpacity>
             {renderRestoreModal && (
-                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderRestoreModal(false)}>
+                <TouchableHighlight 
+                style={Styles.modalBackgroundStyle} 
+                onPress={()=>setRenderRestoreModal(false)}
+                underlayColor="none">
                     <View style={Styles.modalContainerStyle}>
                         <View style={Styles.modalHeaderContainerStyle}>
                             <Text style={Styles.modalHeaderTextStyle}>
@@ -242,7 +245,10 @@ const MyService = ({navigation}) => {
                 </TouchableHighlight>
             )}
             {renderSendDataModal && (
-                <TouchableHighlight style={Styles.modalBackgroundStyle} onPress={()=>setRenderSendDataModal(false)}>
+                <TouchableHighlight 
+                style={Styles.modalBackgroundStyle} 
+                onPress={()=>setRenderSendDataModal(false)}
+                underlayColor="none">
                     <View style={Styles.modalContainerStyle}>
                         <View style={Styles.modalHeaderContainerStyle}>
                             <Text style={Styles.modalHeaderTextStyle}>

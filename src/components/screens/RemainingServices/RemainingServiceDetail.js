@@ -376,7 +376,8 @@ const RemainingServiceDetail = ({navigation}) => {
       {renderConfirmModal && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setRenderConfirmModal(false)}>
+          onPress={() => setRenderConfirmModal(false)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalHeaderContainerStyle}>
               <Text style={Styles.modalHeaderTextStyle}>داتیس سرویس</Text>
@@ -404,7 +405,8 @@ const RemainingServiceDetail = ({navigation}) => {
       {renderToastModal && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setRenderConfirmModal(false)}>
+          onPress={() => setRenderConfirmModal(false)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle}>
               <Text style={{marginBottom: 10}}>با تشکر</Text>
@@ -429,7 +431,8 @@ const RemainingServiceDetail = ({navigation}) => {
       {!!deletingImage && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setDeletingImage(0)}>
+          onPress={() => setDeletingImage(0)}
+          underlayColor="none">
           <View
             style={[Styles.modalContainerStyle, {height: pageHeight * 0.28}]}>
             <View style={Styles.modalBodyContainerStyle2}>

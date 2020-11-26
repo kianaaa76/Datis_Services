@@ -21,7 +21,7 @@ import {toFaDigit, normalize} from '../../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 let EndObject = {};
-let cameraRef = null;
+let cameraRef = {};
 
 const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
   const [startLocation, setStartLocation] = useState({
@@ -178,9 +178,8 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
       <MapboxGL.MapView
         style={{width: pageWidth, height: pageHeight}}
         onLongPress={feature => mapOnLongPress(feature)}
-        onRegionDidChange={() => setAreaHasChanged(true)}>
+        onRegionDidChange={()=>setAreaHasChanged(true)}>
         <MapboxGL.Camera ref={ref => (cameraRef = ref)} />
-        {!!cameraRef && (
           <MapboxGL.UserLocation
             onUpdate={location => {
               setUserLatitude(location.coords.latitude);
@@ -191,10 +190,8 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
                 !areaHasChanged
               ) {
                 cameraRef.moveTo(
-                  [location.coords.longitude, location.coords.latitude],
-                  500,
-                );
-                cameraRef.zoomTo(11, 500);
+                  [location.coords.longitude, location.coords.latitude]);
+                cameraRef.zoomTo(11);
               } else if (
                 !!startLocation.startLatitude &&
                 !!endLocation.endLongitude
@@ -218,7 +215,6 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
               }
             }}
           />
-        )}
         {!!startLocation.startLongitude &&
           !!startLocation.startLatitude &&
           renderMarker(

@@ -567,7 +567,8 @@ const MyServiceDetails = ({navigation}) => {
       {renderConfirmModal && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setRenderConfirmModal(false)}>
+          onPress={() => setRenderConfirmModal(false)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
               <Text style={{fontSize: normalize(14), fontFamily: 'IRANSansMobile_Medium'}}>
@@ -596,7 +597,8 @@ const MyServiceDetails = ({navigation}) => {
       {renderSaveModal && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setRenderSaveModal(false)}>
+          onPress={() => setRenderSaveModal(false)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
               <Text
@@ -631,7 +633,8 @@ const MyServiceDetails = ({navigation}) => {
       {renderNetworkModal && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setRenderNetworkModal(false)}>
+          onPress={() => setRenderNetworkModal(false)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle2}>
             <View style={Styles.modalHeaderContainerStyle}>
               <Text style={Styles.modalHeaderTextStyle}>خطا در ارتباط</Text>

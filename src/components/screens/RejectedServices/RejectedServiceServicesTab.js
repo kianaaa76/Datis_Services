@@ -47,6 +47,9 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
     const backAction = () => {
       if (screenMode === 'map') {
         setScreenMode('tab');
+      }else if (!!renderTimePicker || !!showDatePicker) {
+        setShowDatePicke(false);
+        setRenderTimePicker(false);
       } else {
         renderSaveModal();
       }
@@ -309,7 +312,8 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
       {!!deletingImage && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}
-          onPress={() => setDeletingImage(0)}>
+          onPress={() => setDeletingImage(0)}
+          underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
               <Text
