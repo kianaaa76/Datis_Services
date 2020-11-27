@@ -418,7 +418,6 @@ const MyServiceDetails = ({navigation}) => {
         factorTabInfo.billImage,
       )
         .then(data => {
-          console.log("KKKKK", data);
           if (data.errorCode === 0) {
             AsyncStorage.getItem('savedServicesList').then(list => {
               let tempList = !!list
