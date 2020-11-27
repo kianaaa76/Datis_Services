@@ -176,7 +176,7 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    width: '55%',
+    width: '60%',
   },
   itemTitleStyle: {
     fontFamily: 'IRANSansMobile_Medium',

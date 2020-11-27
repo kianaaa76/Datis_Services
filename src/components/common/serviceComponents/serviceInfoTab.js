@@ -1,5 +1,5 @@
 import React,{useEffect} from "react";
-import {View, ActivityIndicator, Text, ScrollView, Linking, Dimensions, StyleSheet, BackHandler} from "react-native";
+import {View, StyleSheet, Text, ScrollView, Linking, Dimensions, BackHandler} from "react-native";
 import {toFaDigit, normalize} from "../../utils/utilities";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -8,6 +8,7 @@ const pageHeight = Dimensions.get('screen').height;
 
 const ServiceInfoTab = ({serviceData,renderSaveModal}) => {
     const data = serviceData;
+    // console.log("dataaaa", data);
 
     useEffect(() => {
         const backAction = () => {
@@ -46,23 +47,19 @@ const ServiceInfoTab = ({serviceData,renderSaveModal}) => {
             </View>
         )
     }
-    return !!data?(
+    return (
         <ScrollView style={{flex:1, padding:10}}>
-            {renderSingleRow("شماره پرونده",toFaDigit(data.ID))}
-            {renderSingleRow("نام", data.PhoneName)}
-            {renderSingleRow("شماره تماس", toFaDigit(data.Phone))}
-            {renderSingleRow("سریال", data.Serial)}
-            {renderSingleRow("گارانتی برد", data.WarS)}
-            {renderSingleRow("تاریخ تولید", toFaDigit(data.DOM))}
-            {renderSingleRow("آدرس", data.Address)}
-            {renderSingleRow("علت خرابی", data.DetectedFailure)}
-            {renderSingleRow("قطعات مورد نیاز", data.parts)}
-            {renderSingleRow("زمان اعلام", toFaDigit(data.Date))}
+            {renderSingleRow("شماره پرونده",toFaDigit(data.projectID))}
+            {renderSingleRow("نام", data.DocText.PhoneName)}
+            {renderSingleRow("شماره تماس", toFaDigit(data.DocText.Phone))}
+            {renderSingleRow("سریال", data.DocText.Serial)}
+            {renderSingleRow("گارانتی برد", data.DocText.WarS)}
+            {renderSingleRow("تاریخ تولید", toFaDigit(data.DocText.DOM))}
+            {renderSingleRow("آدرس", data.DocText.Address)}
+            {renderSingleRow("علت خرابی", data.DocText.DetectedFailure)}
+            {renderSingleRow("قطعات مورد نیاز", data.DocText.parts)}
+            {renderSingleRow("زمان اعلام", toFaDigit(data.DocText.Date))}
         </ScrollView>
-    ):(
-        <View style={{width:pageWidth, height:pageHeight, justifyContent:"center", alignItems:"center"}}>
-            <ActivityIndicator size={"large"} color={"#660000"}/>
-        </View>
     )
 }
 
@@ -87,12 +84,13 @@ const Styles = StyleSheet.create({
         textAlign:"right",
         width: pageWidth-160,
         fontFamily:"IRANSansMobile_Light",
-        flexShrink:1
+        flexShrink:1,
     },
     rightSideContainerStyle:{
         flexDirection:"row",
         justifyContent:"flex-end",
         width: "88%",
+        height: "100%",
         marginBottom:15,
     }
 })

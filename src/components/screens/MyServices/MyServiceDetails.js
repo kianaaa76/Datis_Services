@@ -23,11 +23,11 @@ import {
   SET_EDITING_SERVICE,
 } from '../../../actions/types';
 import {normalize} from "../../utils/utilities";
-import ServiceInfoTab from './ServiceInfoTab';
-import ServiceFactorTab from './ServiceFactorTab';
-import ServiceServicesTab from './ServiceServicesTab';
-import ServicePartsTab from './ServicePartsTab';
-import ServiceMissionTab from './ServiceMissionTab';
+import ServiceInfoTab from '../../common/serviceComponents/serviceInfoTab';
+import ServiceFactorTab from '../../common/serviceComponents/serviceFactorTab';
+import ServiceServicesTab from '../../common/serviceComponents/serviceServiceTab';
+import ServicePartsTab from '../../common/serviceComponents/servicePartsTab';
+import ServiceMissionTab from '../../common/serviceComponents/serviceMissionTab';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -359,6 +359,11 @@ const MyServiceDetails = ({navigation}) => {
               editingService: '',
             });
             navigation.replace('MyServices');
+            ToastAndroid.showWithGravity(
+              "سرویس شما با موفقیت بسته شد.",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
           } else if (data.errorCode === 3) {
             setRequestLoading(false);
             dispatch({
@@ -413,6 +418,7 @@ const MyServiceDetails = ({navigation}) => {
         factorTabInfo.billImage,
       )
         .then(data => {
+          console.log("KKKKK", data);
           if (data.errorCode === 0) {
             AsyncStorage.getItem('savedServicesList').then(list => {
               let tempList = !!list
@@ -432,6 +438,11 @@ const MyServiceDetails = ({navigation}) => {
               editingService: '',
             });
             navigation.replace('MyServices');
+            ToastAndroid.showWithGravity(
+              "سرویس شما با موفقیت بسته شد.",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
           } else if (data.errorCode === 3) {
             setRequestLoading(false);
             dispatch({
@@ -459,14 +470,27 @@ const MyServiceDetails = ({navigation}) => {
   };
 
   useEffect(() => {
+    setDetailsLoading(true);
     getServiceDetails(serviceID, selector.token).then(data => {
-      setDetailsLoading(true);
       if (data.errorCode == 0) {
         dispatch({
           type: GET_SERVICE_DETAIL,
-          selectedService: data.result,
-          selectServiceError: '',
+          selectedService: {
+            projectID: data.result.ID,
+            DocText:{
+              PhoneName: data.result.PhoneName,
+              Phone: data.result.Phone,
+              Serial: data.result.Serial,
+              WarS: data.result.WarS,
+              DOM: data.result.DOM,
+              Address: data.result.Address,
+              DetectedFailure: data.result.DetectedFailure,
+              parts: data.result.parts,
+              Date: data.result.Date
+            }
+          },
         });
+        setDetailsLoading(false);
       } else {
         if (data.errorCode === 3) {
           dispatch({
@@ -481,7 +505,6 @@ const MyServiceDetails = ({navigation}) => {
           dispatch({
             type: GET_SERVICE_DETAIL,
             selectedService: null,
-            selectServiceError: data.message,
           });
           ToastAndroid.showWithGravity(
             data.message,
@@ -489,8 +512,9 @@ const MyServiceDetails = ({navigation}) => {
             ToastAndroid.CENTER,
           );
         }
+        setDetailsLoading(false);
       }
-      setDetailsLoading(false);
+      
     });
   }, []);
   const [index, setIndex] = React.useState(4);
@@ -519,6 +543,7 @@ const MyServiceDetails = ({navigation}) => {
             info={factorTabInfo}
             serviceInfo={serviceTabInfo}
             renderSaveModal={setRenderSaveModalInTabs}
+            isRejected={false}
           />
         );
       case 'parts':
@@ -527,6 +552,7 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={e => setPartsTabInfo(e)}
             info={partsTabInfo}
             renderSaveModal={setRenderSaveModalInTabs}
+            navigation={navigation}
           />
         );
       case 'mission':
@@ -535,6 +561,8 @@ const MyServiceDetails = ({navigation}) => {
             setInfo={e => setMissionInfo(e)}
             info={missionTabInfo}
             renderSaveModal={setRenderSaveModalInTabs}
+            isRejected={false}
+            navigation={navigation}
           />
         );
       case 'info':

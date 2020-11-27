@@ -1,29 +1,28 @@
 import React, {useState, useEffect} from 'react';
 import {
   View,
-  Switch,
   Dimensions,
   Text,
   StyleSheet,
   TextInput,
+  Switch,
   BackHandler,
   ToastAndroid,
-  Alert,
+  Alert
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from 'react-native-vector-icons/Foundation';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import {API_KEY, MAPBOX_API_KEY} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
+import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-let EndObject = {};
 let cameraRef = {};
-
-const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
+let EndObject = '';
+const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation, isRejected}) => {
   const [startLocation, setStartLocation] = useState({
     startLatitude: info.startLatitude,
     startLongitude: info.startLongitude,
@@ -38,7 +37,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
   const [startCity, setStartCity] = useState(info.startCity);
   const [endCity, setEndCity] = useState(info.endCity);
   const [travel, setTravel] = useState(info.travel);
-  const [distance, setDistance] = useState(info.distance);
+  const [distance, setDistance] = useState(parseFloat(info.distance) / 1000);
 
   useEffect(() => {
     const backAction = () => {
@@ -66,7 +65,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
               }}>
               <Icon name="marker" color={color} size={size} />
               <Text style={Styles.markerLabelStyle}>
-                {type == 'start' ? 'مبدا' : 'مقصد'}
+                {type === 'start' ? 'مبدا' : 'مقصد'}
               </Text>
             </View>
           </View>
@@ -173,48 +172,51 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
       );
     }
   };
+
   return (
     <View style={Styles.containerStyle}>
       <MapboxGL.MapView
         style={{width: pageWidth, height: pageHeight}}
-        onLongPress={feature => mapOnLongPress(feature)}
-        onRegionDidChange={()=>setAreaHasChanged(true)}>
+        onLongPress={feature => isRejected ? {} : mapOnLongPress(feature)}
+        onRegionDidChange={() => setAreaHasChanged(true)}>
+        <MapboxGL.UserLocation
+          onUpdate={location => {
+            setUserLatitude(location.coords.latitude);
+            setUserLongitude(location.coords.longitude);
+            if (
+              !startLocation.startLatitude &&
+              !endLocation.endLongitude &&
+              !areaHasChanged
+            ) {
+              cameraRef.moveTo([
+                location.coords.longitude,
+                location.coords.latitude,
+              ]);
+              cameraRef.zoomTo(11);
+            } else if (
+              !!startLocation.startLatitude &&
+              !!endLocation.endLongitude
+            ) {
+              cameraRef.fitBounds(
+                [startLocation.startLongitude, startLocation.startLatitude],
+                [endLocation.endLongitude, endLocation.endLatitude],
+                [pageHeight * 0.1, 100, pageHeight * 0.4, 100],
+                100,
+              );
+            } else if (
+              !!startLocation.startLatitude &&
+              !endLocation.endLatitude &&
+              !areaHasChanged
+            ) {
+              cameraRef.moveTo([
+                startLocation.startLongitude,
+                startLocation.startLatitude,
+              ]);
+              cameraRef.zoomTo(11);
+            }
+          }}
+        />
         <MapboxGL.Camera ref={ref => (cameraRef = ref)} />
-          <MapboxGL.UserLocation
-            onUpdate={location => {
-              setUserLatitude(location.coords.latitude);
-              setUserLongitude(location.coords.longitude);
-              if (
-                !startLocation.startLatitude &&
-                !endLocation.endLongitude &&
-                !areaHasChanged
-              ) {
-                cameraRef.moveTo(
-                  [location.coords.longitude, location.coords.latitude]);
-                cameraRef.zoomTo(11);
-              } else if (
-                !!startLocation.startLatitude &&
-                !!endLocation.endLongitude
-              ) {
-                cameraRef.fitBounds(
-                  [startLocation.startLongitude, startLocation.startLatitude],
-                  [endLocation.endLongitude, endLocation.endLatitude],
-                  [pageHeight * 0.1, 100, pageHeight * 0.4, 100],
-                  100,
-                );
-              } else if (
-                !!startLocation.startLatitude &&
-                !endLocation.endLatitude &&
-                !areaHasChanged
-              ) {
-                cameraRef.moveTo([
-                  startLocation.startLongitude,
-                  startLocation.startLatitude,
-                ]);
-                cameraRef.zoomTo(11);
-              }
-            }}
-          />
         {!!startLocation.startLongitude &&
           !!startLocation.startLatitude &&
           renderMarker(
@@ -236,7 +238,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
             'end',
           )}
       </MapboxGL.MapView>
-      {(!startLocation.startLongitude || !endLocation.endLongitude) && (
+      {!isRejected && (!startLocation.startLongitude || !endLocation.endLongitude) && (
         <View style={Styles.headerTextContainerStyle}>
           <Text style={Styles.headerTextStyle}>
             {!!startLocation.startLatitude
@@ -247,49 +249,58 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
           </Text>
         </View>
       )}
-      <View
-        style={[
-          Styles.myLocationContainerStyle,
-          {
-            bottom:
-              !!startLocation.startLatitude && !!endLocation.endLatitude
-                ? pageHeight * 0.35 + 25
-                : 20,
-          },
-        ]}>
-        <MaterialIcons
-          name={'my-location'}
-          style={{fontSize: normalize(30), color: '#000'}}
-          onPress={() => {
-            LocationServicesDialogBox.checkLocationServicesIsEnabled({
-              message:
-                "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
-              ok: 'YES',
-              cancel: 'NO',
-              enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
-              showDialog: true, // false => Opens the Location access page directly
-              openLocationServices: true, // false => Directly catch method is called if location services are turned off
-              preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
-              preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
-              providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
-            })
-              .then(() => {
-                if (!!cameraRef && !!userLatitude && !!userLongitude) {
-                  cameraRef.moveTo([userLongitude, userLatitude], 500);
-                  cameraRef.zoomTo(11, 500);
-                }
+      {isRejected && !startLocation.startLongitude ? (
+        <View style={Styles.notHaveMissionTextContainerStyle}>
+          <Text style={Styles.headerTextStyle}>
+            این سرویس بدون ماموریت بسته شده است.
+          </Text>
+        </View>
+      ) : null}
+      {(!isRejected || (isRejected && !!startLocation.startLatitude)) && (
+        <View
+          style={[
+            Styles.myLocationContainerStyle,
+            {
+              bottom:
+                !!startLocation.startLatitude && !!endLocation.endLatitude
+                  ? pageHeight * 0.35 + 25
+                  : 20,
+            },
+          ]}>
+          <MaterialIcons
+            name={'my-location'}
+            style={{fontSize: normalize(30), color: '#000'}}
+            onPress={async () => {
+              LocationServicesDialogBox.checkLocationServicesIsEnabled({
+                message:
+                  "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+                ok: 'YES',
+                cancel: 'NO',
+                enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+                showDialog: true, // false => Opens the Location access page directly
+                openLocationServices: true, // false => Directly catch method is called if location services are turned off
+                preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
+                preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
+                providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
               })
-              .catch(() => {
-                ToastAndroid.showWithGravity(
-                  'موقعیت در دسترس نیست.',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
-              });
-          }}
-        />
-      </View>
-      {!!startLocation.startLatitude && (
+                .then(async () => {
+                  if (!!cameraRef && !!userLatitude && !!userLongitude) {
+                    await cameraRef.moveTo([userLongitude, userLatitude], 500);
+                    await cameraRef.zoomTo(11, 500);
+                  }
+                })
+                .catch(() => {
+                  ToastAndroid.showWithGravity(
+                    'موقعیت در دسترس نیست.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                });
+            }}
+          />
+        </View>
+      )}
+      {!isRejected && !!startLocation.startLatitude && (
         <View
           style={[
             Styles.removeMarkerContainerStyle,
@@ -376,31 +387,13 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
         <View style={Styles.cardContentContainerStyle}>
           <View style={Styles.cityDataContainerStyle}>
             <View style={Styles.cityDataContentContainerStyle}>
-              <TextInput
-                style={Styles.cityDataTextStyle}
-                onChangeText={text => {
-                  setInfo({
-                    ...info,
-                    endCity: text,
-                  });
-                  setEndCity(text);
-                }}
-                value={endCity}
-              />
+              <TextInput style={Styles.cityDataTextStyle}>{endCity}</TextInput>
               <Text style={Styles.titleStyle}>شهر مقصد: </Text>
             </View>
             <View style={Styles.cityDataContentContainerStyle}>
-              <TextInput
-                style={Styles.cityDataTextStyle}
-                onChangeText={text => {
-                  setInfo({
-                    ...info,
-                    start: text,
-                  });
-                  setStartCity(text);
-                }}
-                value={startCity}
-              />
+              <TextInput style={Styles.cityDataTextStyle}>
+                {startCity}
+              </TextInput>
               <Text style={Styles.titleStyle}>شهر مبدا: </Text>
             </View>
           </View>
@@ -408,18 +401,18 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
             <View style={Styles.distanceContainerStyle}>
               <Text
                 style={{
-                  fontFamily: 'IRANSansMobile_Light',
                   fontSize: normalize(13),
+                  fontFamily: 'IRANSansMobile_Light',
                 }}>
                 کیلومتر
               </Text>
               <Text
                 style={{
                   marginHorizontal: 5,
-                  fontFamily: 'IRANSansMobile(FaNum)_Light',
-                  fontSize: normalize(13),
+                  fontSize: normalize(12),
+                  fontFamily: 'IRANSansMobile_Light',
                 }}>
-                {!!distance ? toFaDigit(distance) : '0'}
+                {!!distance ? toFaDigit(distance) : toFaDigit('0')}
               </Text>
               <Text style={Styles.titleStyle}>فاصله: </Text>
             </View>
@@ -452,38 +445,6 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation}) => {
           </View>
         </View>
       )}
-
-      {/* {!!renderRemoveMarkerModal && (
-        <TouchableHighlight
-          style={Styles.modalBackgroundStyle}
-          onPress={() => setRenderRemoveMarkerModal(false)}>
-          <View style={Styles.modalContainerStyle}>
-            <View style={Styles.modalBodyContainerStyle}>
-              <Text style={Styles.modalBodyTextStyle}>
-                آیا از حذف کردن مکان های انتخاب شده اطمینان دارید؟
-              </Text>
-            </View>
-            <View style={Styles.modalFooterContainerStyle}>
-              <TouchableOpacity
-                style={Styles.modalButtonStyle}
-                onPress={() => setRenderRemoveMarkerModal(false)}>
-                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={Styles.modalButtonStyle}
-                onPress={() => {
-                  setStartLocation({});
-                  setEndLocation({});
-                  setStartCity('');
-                  setEndCity('');
-                  setRenderRemoveMarkerModal(false)
-                }}>
-                <Text style={Styles.modalButtonTextStyle}>بله</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableHighlight>
-      )} */}
     </View>
   );
 };
@@ -512,8 +473,30 @@ const Styles = StyleSheet.create({
     bottom: pageHeight * 0.68,
     left: pageWidth * 0.2,
   },
+  notHaveMissionTextContainerStyle: {
+    width: pageWidth,
+    height: pageHeight,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+  },
   markerLabelContainerStyle: {
     backgroundColor: 'red',
+  },
+  cardContainerStyle: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#505050',
+    borderRadius: 5,
+    padding: 6,
+    width: pageWidth * 0.9,
+    height: pageHeight * 0.35,
+    position: 'absolute',
+    bottom: 15,
   },
   cardContentContainerStyle: {
     width: pageWidth * 0.9,
@@ -548,7 +531,6 @@ const Styles = StyleSheet.create({
     marginLeft: 10,
     width: '35%',
     textAlign: 'center',
-    height: '100%',
     fontFamily: 'IRANSansMobile_Light',
   },
   cityDataContentContainerStyle: {
@@ -565,8 +547,8 @@ const Styles = StyleSheet.create({
   },
   descriptionTitleTextStyle: {
     fontSize: normalize(14),
-    marginBottom: 5,
     fontFamily: 'IRANSansMobile_Medium',
+    marginBottom: 5,
   },
   descriptionTextInputStyle: {
     width: '100%',
@@ -577,20 +559,19 @@ const Styles = StyleSheet.create({
     textAlignVertical: 'top',
     paddingHorizontal: 15,
     paddingVertical: 8,
-    fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
+    fontSize: normalize(13),
   },
   markerLabelStyle: {
     width: 50,
     height: 20,
     justifyContent: 'center',
-    alignSelf: 'center',
     textAlign: 'center',
     borderRadius: 10,
     backgroundColor: '#A8A7A7',
     color: '#000',
-    fontFamily: 'IRANSansMobile_Medium',
     fontSize: normalize(12),
+    fontFamily: 'IRANSansMobile_Medium',
   },
   switchContainerStyle: {
     flexDirection: 'row',
@@ -607,8 +588,8 @@ const Styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: normalize(14),
-    textAlign: 'center',
     fontFamily: 'IRANSansMobile_Medium',
+    textAlign: 'center',
   },
   distanceContainerStyle: {
     flexDirection: 'row',
@@ -637,56 +618,6 @@ const Styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     elevation: 5,
-  },
-  modalBackgroundStyle: {
-    width: pageWidth,
-    height: pageHeight,
-    position: 'absolute',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-  },
-  modalContainerStyle: {
-    width: pageWidth * 0.7,
-    height: pageHeight * 0.25,
-    backgroundColor: '#E8E8E8',
-    marginBottom: pageHeight * 0.2,
-    borderRadius: 15,
-    overflow: 'hidden',
-  },
-  modalBodyContainerStyle: {
-    width: '100%',
-    height: '50%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-  },
-  modalBodyTextStyle: {
-    color: '#660000',
-    textAlign: 'center',
-    fontSize: normalize(15),
-    fontFamily: 'IRANSansMobile_Light',
-  },
-  modalFooterContainerStyle: {
-    flexDirection: 'row',
-    width: '100%',
-    height: '30%',
-    justifyContent: 'space-around',
-  },
-  modalButtonStyle: {
-    backgroundColor: '#fff',
-    width: pageWidth * 0.2,
-    height: pageWidth * 0.13,
-    borderRadius: 7,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-  },
-  modalButtonTextStyle: {
-    color: 'gray',
-    fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
   },
 });
 

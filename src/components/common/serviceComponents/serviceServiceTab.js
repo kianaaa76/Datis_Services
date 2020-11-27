@@ -6,7 +6,6 @@ import {
   Text,
   Dimensions,
   ScrollView,
-  Image,
   TouchableOpacity,
   TouchableHighlight,
   BackHandler,
@@ -17,13 +16,13 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Foundation from 'react-native-vector-icons/Foundation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import ImagePicker from 'react-native-image-crop-picker';
+import ImageViewer from '../ImageViwer';
 import PersianCalendarPicker from 'react-native-persian-calendar-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment-jalaali';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import {API_KEY} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
-import ImageViewer from '../../common/ImageViwer';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 
 const pageWidth = Dimensions.get('screen').width;
@@ -36,10 +35,10 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
   const [screenMode, setScreenMode] = useState('tab');
   const [selectedLatitude, setSelectedLatitude] = useState(null);
   const [selectedLongitude, setSelectedLongitude] = useState(null);
+  const [deletingImage, setDeletingImage] = useState(0);
   const [renderTimePicker, setRenderTimePicker] = useState(false);
   const [date, setDate] = useState('');
   const [dateIsSelected, setDateIsSelected] = useState(false);
-  const [deletingImage, setDeletingImage] = useState(0);
   const [userLatitude, setUserLatitude] = useState('');
   const [userLongitude, setUserLongitude] = useState('');
   const [areaHasChanged, setAreaHasChanged] = useState(false);
@@ -48,10 +47,10 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
     const backAction = () => {
       if (screenMode === 'map') {
         setScreenMode('tab');
-      } else if (!!renderTimePicker || !!showDatePicker) {
+      }else if (!!renderTimePicker || !!showDatePicker) {
         setShowDatePicke(false);
         setRenderTimePicker(false);
-      }else{
+      } else {
         renderSaveModal();
       }
       return true;
@@ -105,10 +104,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           alignItems: 'center',
         }}>
         <View style={Styles.descriptionRowStyle}>
-          <View
-            style={{
-              width: "100%", marginBottom: 10, flexDirection: 'row', justifyContent:"flex-end"
-            }}>
+          <View style={{width: "100%", marginBottom: 10, flexDirection: 'row', justifyContent:"flex-end"}}>
             <Icon name={'star'} style={{color: 'red'}} />
             <Text style={Styles.labelStyle}>توضیحات:</Text>
           </View>
@@ -208,10 +204,13 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               justifyContent: 'flex-end',
             }}>
             {!!info.finalDate && (
-              <Text style={{fontSize: normalize(15), marginRight: 10}}>
-                {`${toFaDigit(
-                  new moment(info.finalDate).format('jYYYY/jM/jD  HH:mm'),
-                )}`}
+              <Text
+                style={{
+                  fontSize: normalize(14),
+                  marginRight: 10,
+                  fontFamily: 'IRANSansMobile(FaNum)_Light',
+                }}>
+                {`${toFaDigit(info.finalDate)}`}
               </Text>
             )}
             {info.serviceResult !== 'لغو موفق' &&
@@ -259,7 +258,6 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             <PersianCalendarPicker
               onDateChange={date => {
                 setDate(Date.parse(date));
-                setDateIsSelected(true);
               }}
               width={pageWidth * 0.95}
               selectedDayColor={'red'}
@@ -279,7 +277,6 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         )}
         {renderTimePicker && (
           <DateTimePickerModal
-            isDarkModeEnabled={true}
             isVisible={renderTimePicker}
             mode="time"
             onConfirm={value => {
@@ -303,7 +300,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                   1000;
               setInfo({
                 ...info,
-                finalDate: finalTime,
+                finalDate: new moment(finalTime).format('jYYYY/jM/jD HH:mm'),
               });
               setRenderTimePicker(false);
             }}
@@ -319,7 +316,12 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: normalize(14), fontFamily:"IRANSansMobile_Medium"}}>
+              <Text
+                style={{
+                  fontFamily: 'IRANSansMobile_Medium',
+                  fontSize: normalize(14),
+                  textAlign: 'center',
+                }}>
                 آیا از پاک کردن عکس اطمینان دارید؟
               </Text>
             </View>
@@ -354,11 +356,6 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
       <MapboxGL.MapView
         style={{flex: 1}}
         onLongPress={feature => {
-          cameraRef.moveTo([
-            feature.geometry.coordinates[0],
-            feature.geometry.coordinates[1],
-          ]);
-          cameraRef.zoomTo(11);
           setSelectedLatitude(feature.geometry.coordinates[1]);
           setSelectedLongitude(feature.geometry.coordinates[0]);
         }}
@@ -398,7 +395,14 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         )}
       </MapboxGL.MapView>
       <View
-        style={Styles.myLocationContainerStye}>
+        style={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          borderRadius: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <Icon
           name={'my-location'}
           style={{fontSize: normalize(30), color: '#000'}}
@@ -415,11 +419,11 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
               providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
             })
-              .then(async success => {
-                await cameraRef.moveTo([userLongitude, userLatitude]);
-                await cameraRef.zoomTo(11);
+              .then(async () => {
+                await cameraRef.moveTo([userLongitude, userLatitude], 500);
+                await cameraRef.zoomTo(11, 500);
               })
-              .catch(error => {
+              .catch(() => {
                 ToastAndroid.showWithGravity(
                   'موقعیت در دسترس نیست.',
                   ToastAndroid.SHORT,
@@ -481,10 +485,13 @@ const Styles = StyleSheet.create({
     borderColor: '#000',
     borderRadius: 10,
     textAlignVertical: 'top',
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 0,
+    fontSize: normalize(13),
+    fontFamily: 'IRANSansMobile_Light',
   },
   serviceTypeTextStyle: {
-    fontSize: normalize(12),
+    fontSize: normalize(13),
     color: '#660000',
     fontFamily: 'IRANSansMobile_Light',
   },
@@ -494,7 +501,7 @@ const Styles = StyleSheet.create({
     height: pageHeight * 0.1,
     marginBottom: 15,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   textInputStyle: {
     width: pageWidth * 0.65,
@@ -503,6 +510,9 @@ const Styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#660000',
     paddingHorizontal: 10,
+    fontSize: normalize(13),
+    fontFamily: 'IRANSansMobile_Light',
+    color: '#000',
   },
   imageRowStyle: {
     flexDirection: 'row',
@@ -537,7 +547,6 @@ const Styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation:10
   },
   confirmButtonStyle: {
     width: pageWidth * 0.7,
@@ -548,7 +557,7 @@ const Styles = StyleSheet.create({
   },
   buttonTextStyle: {
     fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontWeight: 'bold',
     textAlign: 'center',
   },
   selectTextContainerStyle: {
@@ -562,7 +571,7 @@ const Styles = StyleSheet.create({
   selectTextStyle: {
     fontSize: normalize(16),
     textAlign: 'center',
-    fontFamily: 'IRANSansMobile_Medium',
+    fontWeight: 'bold',
   },
   datePickerContainerStyle: {
     flex: 1,
@@ -653,6 +662,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     justifyContent: 'flex-end',
+    marginTop:"4%"
   },
   modalBodyTextStyle: {
     color: '#660000',
@@ -681,20 +691,8 @@ const Styles = StyleSheet.create({
     fontFamily:"IRANSansMobile_Medium"
   },
   labelStyle: {
-    fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
-  },
-  myLocationContainerStye: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    elevation: 10,
+    fontSize: normalize(14),
   },
 });
 

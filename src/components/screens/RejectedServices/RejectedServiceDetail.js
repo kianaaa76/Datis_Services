@@ -16,11 +16,11 @@ import Header from '../../common/Header';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useSelector, useDispatch} from 'react-redux';
-import ServiceInfoTab from './RejectedServiceInfoTab';
-import ServiceFactorTab from './RejectedServiceFactorTab';
-import ServiceServicesTab from './RejectedServiceServicesTab';
-import ServicePartsTab from './RejectedServicePartsTab';
-import ServiceMissionTab from './RejectedServiceMissionTab';
+import ServiceInfoTab from '../../common/serviceComponents/serviceInfoTab';
+import ServiceFactorTab from '../../common/serviceComponents/serviceFactorTab';
+import ServiceServicesTab from '../../common/serviceComponents/serviceServiceTab';
+import ServicePartsTab from '../../common/serviceComponents/servicePartsTab';
+import ServiceMissionTab from '../../common/serviceComponents/serviceMissionTab';
 import {sendServiceData} from '../../../actions/api';
 import {LOGOUT, SET_EDITING_SERVICE} from '../../../actions/types';
 import {normalize} from "../../utils/utilities";
@@ -357,6 +357,11 @@ const MyServiceDetails = ({navigation}) => {
               editingService: '',
             });
             navigation.replace('RejectedServices');
+            ToastAndroid.showWithGravity(
+              "سرویس شما با موفقیت بسته شد.",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
           } else if (data.errorCode === 3) {
             setRequestLoading(false);
             dispatch({
@@ -432,6 +437,11 @@ const MyServiceDetails = ({navigation}) => {
               editingService: '',
             });
             navigation.replace('RejectedServices');
+            ToastAndroid.showWithGravity(
+              "سرویس شما با موفقیت بسته شد.",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
           } else if (data.errorCode === 3) {
             setRequestLoading(false);
             dispatch({
@@ -484,6 +494,7 @@ const MyServiceDetails = ({navigation}) => {
             info={factorTabInfo}
             serviceInfo={serviceTabInfo}
             renderSaveModal={setRenderSaveModalInTabs}
+            isRejected={true}
           />
         );
       case 'parts':
@@ -502,6 +513,7 @@ const MyServiceDetails = ({navigation}) => {
             info={missionTabInfo}
             navigation={navigation}
             renderSaveModal={setRenderSaveModalInTabs}
+            isRejected={true}
           />
         );
       case 'info':
@@ -510,6 +522,7 @@ const MyServiceDetails = ({navigation}) => {
         return null;
     }
   };
+  
   return (
     <View style={Styles.containerStyle}>
       <Header

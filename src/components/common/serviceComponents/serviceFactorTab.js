@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,19 +6,25 @@ import {
   TextInput,
   Dimensions,
   ScrollView,
-  BackHandler,
   TouchableOpacity,
   TouchableHighlight,
+  BackHandler,
 } from 'react-native';
-import ImageViewer from '../../common/ImageViwer';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
-import {normalize} from "../../utils/utilities";
+import ImageViewer from '../ImageViwer';
+import {normalize} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
+const ServiceFactorTab = ({
+  setInfo,
+  info,
+  serviceInfo,
+  renderSaveModal,
+  isRejected,
+}) => {
   const [deletingImage, setDeletingImage] = useState(0);
 
   useEffect(() => {
@@ -27,8 +33,8 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
       return true;
     };
     const backHandler = BackHandler.addEventListener(
-        'hardwareBackPress',
-        backAction,
+      'hardwareBackPress',
+      backAction,
     );
     return () => backHandler.remove();
   });
@@ -48,14 +54,17 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
             onChangeText={text => {
               setInfo({...info, factorReceivedPrice: text});
             }}
-            value={info.factorReceivedPrice}
+            value={info.factorReceivedPrice.toString()}
             keyboardType="numeric"
           />
-          <View>
+          <View style={{flexDirection: 'row'}}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
-            serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
-            )}
+              serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                <Icon
+                  name={'star'}
+                  style={{color: 'red', fontSize: normalize(10)}}
+                />
+              )}
             <Text style={Styles.labelStyle}>مبلغ دریافتی:</Text>
           </View>
         </View>
@@ -69,14 +78,17 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
                 factorTotalPrice: text,
               });
             }}
-            value={info.factorTotalPrice}
+            value={info.factorTotalPrice.toString()}
             keyboardType="numeric"
           />
-          <View>
+          <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
-            serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
-            )}
+              serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+                <Icon
+                  name={'star'}
+                  style={{color: 'red', fontSize: normalize(10)}}
+                />
+              )}
             <Text style={Styles.labelStyle}>جمع فاکتور:</Text>
           </View>
         </View>
@@ -92,7 +104,10 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
-                  setInfo({...info, factorImage: response.data});
+                  setInfo({
+                    ...info,
+                    factorImage: response.data,
+                  });
                 });
               }}
             />
@@ -106,11 +121,14 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
-                  setInfo({...info, factorImage: response.data});
+                  setInfo({
+                    ...info,
+                    factorImage: response.data,
+                  });
                 });
               }}
             />
-            {!!info.factorImage && (
+            {!isRejected && !!info.factorImage && (
               <Icon
                 name={'delete'}
                 style={{color: '#000', fontSize: normalize(30)}}
@@ -120,10 +138,13 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
               />
             )}
           </View>
-          <View>
+          <View style={{flexDirection: 'row'}}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
+                <Icon
+                  name={'star'}
+                  style={{color: 'red', fontSize: normalize(10)}}
+                />
               )}
             <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
           </View>
@@ -135,7 +156,11 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
             imageUrl={`data:image/jpeg;base64,${info.factorImage}`}
           />
         )}
-        <View style={Styles.imageRowStyle}>
+        <View
+          style={[
+            Styles.imageRowStyle,
+            {marginBottom: !!info.billImage ? 10 : 30},
+          ]}>
           <View style={Styles.getImageContainerViewStyle}>
             <Icon
               name={'camera-alt'}
@@ -147,7 +172,10 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
-                  setInfo({...info, billImage: response.data});
+                  setInfo({
+                    ...info,
+                    billImage: response.data,
+                  });
                 });
               }}
             />
@@ -161,7 +189,10 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
-                  setInfo({...info, billImage: response.data});
+                  setInfo({
+                    ...info,
+                    billImage: response.data,
+                  });
                 })
               }
             />
@@ -175,9 +206,7 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
               />
             )}
           </View>
-          <View>
-            <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
-          </View>
+          <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
         </View>
         {!!info.billImage && (
           <ImageViewer
@@ -194,34 +223,35 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
           underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize:normalize(14), fontFamily:"IRANSansMobile_Medium"}}>آیا از پاک کردن عکس اطمینان دارید؟</Text>
+              <Text>آیا از پاک کردن عکس اطمینان دارید؟</Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle}
-                  onPress={() => {
-                    setDeletingImage(0);
-                  }}>
-                  <Text style={Styles.modalButtonTextStyle}>خیر</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle}
-                  onPress={() => {
-                    if (deletingImage === 1) {
-                      setInfo({
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  setDeletingImage(0);
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle}
+                onPress={() => {
+                  if (deletingImage === 2) {
+                    setInfo({
+                      ...info,
+                      billImage: '',
+                    });
+                  }
+                  else if (deletingImage === 1){
+                    setInfo({
                         ...info,
                         factorImage: '',
                       });
-                    } else if (deletingImage === 2) {
-                      setInfo({
-                        ...info,
-                        billImage: '',
-                      });
-                    }
-                    setDeletingImage(0);
-                  }}>
-                  <Text style={Styles.modalButtonTextStyle}>بله</Text>
-                </TouchableOpacity>
+                  }
+                  setDeletingImage(0);
+                }}>
+                <Text style={Styles.modalButtonTextStyle}>بله</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableHighlight>
@@ -233,43 +263,45 @@ const ServiceFactorTab = ({setInfo, info, serviceInfo, renderSaveModal}) => {
 const Styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
-    padding:15
+    paddingHorizontal: 15,
+    paddingTop: 10,
   },
   rowDataStyle: {
     flexDirection: 'row',
     width: '100%',
-    marginVertical: 15,
+    height: 65,
+    marginBottom: 15,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   textInputStyle: {
-    width: "55%",
-    marginHorizontal: "2%",
+    width: '55%',
+    height: '100%',
+    marginHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#660000',
     paddingHorizontal: 10,
   },
   imageRowStyle: {
     flexDirection: 'row',
-    width: "100%",
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginVertical: 15,
+    marginVertical: 10,
   },
   getImageContainerViewStyle: {
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    width: "30%",
+    width: pageWidth * 0.3,
+    height: '100%',
   },
   rialTextStyle: {
-    fontSize:normalize(13),
-    fontFamily:"IRANSansMobile_Light",
-    alignSelf:"center",
+    fontSize: normalize(13),
+    fontFamily: 'IRANSansMobile_Light',
   },
   labelStyle: {
-    fontSize:normalize(13), 
-    fontFamily:'IRANSansMobile_Light'
+    fontFamily: 'IRANSansMobile_Light',
   },
   modalBackgroundStyle: {
     flex: 1,
@@ -324,12 +356,12 @@ const Styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: pageHeight * 0.03,
-    elevation:5
+    elevation: 5,
   },
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(14),
-    fontFamily:"IRANSansMobile_Medium"
+    fontWeight: 'bold',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -19,7 +19,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import Feather from 'react-native-vector-icons/Feather';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import DropdownPicker from '../../common/DropdownPicker';
+import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
 import {RNCamera} from 'react-native-camera';
@@ -28,20 +28,20 @@ import {normalize} from '../../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
-  const dropRef = useRef();
+const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
   const selector = useSelector(state => state);
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [fieldsObject, setFieldsObject] = useState({
     objectType: '',
     serial: '',
     partTypeSelected: {},
     partVersionSelected: {},
+    Price: '0',
     failureDescription: '',
     hasGarantee: null,
-    Price: '0',
   });
+  const dropRef = useRef();
   const [newHasStarted, setNewHasStarted] = useState(Boolean);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isNewPartFormExpanded, setIsNewPartFormExpanded] = useState(false);
   const [partsListName, setPartsListName] = useState(selector.objectsList);
   const [selectedPartVersionsList, setSelectedPartVersionsList] = useState([]);
@@ -127,7 +127,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 0,
                 serialHeaderIndex,
               )}${leftOfCode}`,
-              selectedItemList.id,
+              selectedItemList.index,
             );
             setSelectedItemList({});
           } else {
@@ -158,17 +158,18 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
     }
   };
 
-  const searchBarcode = () => {
+  const searchBarcode = selectedItemList => {
     setSearchBarcodeLoading(true);
-    const object = !!selectedItemList
-      ? !!selectedItemList.partType
-        ? selectedItemList.partType
-        : null
-      : !!fieldsObject.partTypeSelected
-      ? fieldsObject.partTypeSelected
-      : null;
+    const object =
+      !!selectedItemList && !!selectedItemList.id
+        ? !!selectedItemList.partType
+          ? selectedItemList.partType
+          : null
+        : !!fieldsObject.partTypeSelected
+        ? fieldsObject.partTypeSelected
+        : null;
     const sserial =
-      !!selectedItemList && !!selectedItemList.serial
+      !!selectedItemList && !!selectedItemList.id
         ? selectedItemList.serial.toUpperCase()
         : !!fieldsObject.serial
         ? fieldsObject.serial.toUpperCase()
@@ -321,7 +322,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
           case 'partType':
             selectedObject = {...selectedObject, partType: newValue};
             break;
-          case 'Price':
+          case 'price':
             selectedObject = {...selectedObject, Price: newValue};
             break;
           case 'serial':
@@ -340,7 +341,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
     setRefresh(!refresh);
   };
 
-  const renderServicePartItem = item => {
+  const renderServicePartItem = (item, index) => {
     let Item = item;
     return (
       <View style={[Styles.newformContainerStyle, {marginBottom: 10}]}>
@@ -384,6 +385,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 color: '#660000',
                 fontSize: normalize(12),
                 textAlign: 'center',
+                fontFamily: 'IRANSansMobile_Light',
               }}>
               {!!Item.serial ? Item.serial : 'سریال'}
             </Text>
@@ -392,6 +394,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 color: '#660000',
                 fontSize: normalize(12),
                 textAlign: 'center',
+                fontFamily: 'IRANSansMobile_Light',
               }}>
               {!!Item.partType ? Item.partType.label : 'نام'}
             </Text>
@@ -414,9 +417,9 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
               <DropdownPicker
                 list={partsListName}
                 onSelect={value => {
-                  refactorObjectListItems('partType', value.label, Item.index);
-                  refactorObjectListItems('version', {}, Item.index);
+                  refactorObjectListItems('partType', value, Item.index);
                   refactorObjectListItems('serial', '', Item.index);
+                  refactorObjectListItems('version', {}, Item.index);
                   refactorObjectListItems(
                     'availableVersions',
                     value.value.Versions,
@@ -433,17 +436,27 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 }
                 listHeight={150}
               />
-              <Text style={Styles.labelStyle}>نوع قطعه:</Text>
+              <Text
+                style={{
+                  fontSize: normalize(13),
+                  fontFamily: 'IRANSansMobile_Light',
+                }}>
+                نوع قطعه:
+              </Text>
             </View>
             <View style={Styles.serialContainerStyle}>
-              <Icon
-                name={'search'}
-                style={{color: '#000', fontSize: normalize(30)}}
-                onPress={() => {
-                  setSelectedItemList(Item);
-                  searchBarcode();
-                }}
-              />
+              {searchBarcodeLoading ? (
+                <ActivityIndicator size={'small'} color={'#000'} />
+              ) : (
+                <Icon
+                  name={'search'}
+                  style={{color: '#000', fontSize: normalize(30)}}
+                  onPress={async () => {
+                    await setSelectedItemList(Item);
+                    searchBarcode(Item);
+                  }}
+                />
+              )}
               <Icon
                 name={'qr-code-2'}
                 style={{
@@ -464,7 +477,8 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 value={Item.serial}
               />
               <View style={{flexDirection: 'row'}}>
-                {Item.partType.value.SerialFormat.length > 0 ? (
+                {!!Item.partType.label &&
+                Item.partType.value.SerialFormat.length > 0 ? (
                   <Icon name={'star'} style={{color: 'red'}} />
                 ) : null}
                 <Text style={Styles.labelStyle}>سریال:</Text>
@@ -475,7 +489,7 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                 ref={dropRef}
                 list={Item.availableVersions}
                 placeholder={
-                  !!Item.version.Key
+                  !!Item.version
                     ? Item.version.Value
                     : 'نسخه مورد نظر خود را انتخاب کنید.'
                 }
@@ -548,9 +562,9 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
             <TouchableOpacity
               style={Styles.footerIconContainerStyle}
               onPress={async () => {
-                await setInfo(info.filter(_ => _.index !== Item.index));
-                await setObjectsList(
-                  objectsList.filter(_ => _.index !== Item.index),
+                await setInfo(c => c.filter(_ => _.index !== Item.index));
+                await setObjectsList(c =>
+                  c.filter(_ => _.index !== Item.index),
                 );
               }}>
               <Octicons
@@ -590,91 +604,108 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
       </View>
     );
   };
-
   return !screenMode ? (
     <>
-      <ScrollView style={{flex: 1}}>
-        <View
-          style={{
-            flex: 0.8,
-            paddingLeft: 15,
-            paddingRight: 15,
-            paddingTop: 10,
-          }}>
-          {!!objectsList && objectsList.length > 0 && (
-            <View style={{flex: 1}}>
-              {objectsList.map(item => renderServicePartItem(item))}
-            </View>
-          )}
-          {newHasStarted && (
-            <View style={Styles.newformContainerStyle}>
-              <View style={Styles.formHeaderStyle}>
-                <TouchableOpacity
-                  style={{
-                    width: 37,
-                    height: 37,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#660000',
-                    borderRadius: 5,
-                  }}
-                  onPress={() =>
-                    setIsNewPartFormExpanded(!isNewPartFormExpanded)
-                  }>
-                  {isNewPartFormExpanded ? (
-                    <Feather
-                      name={'minus'}
-                      style={{color: '#fff', fontSize: normalize(17)}}
-                    />
-                  ) : (
-                    <Feather
-                      name={'plus'}
-                      style={{color: '#fff', fontSize: normalize(17)}}
-                    />
-                  )}
-                </TouchableOpacity>
-                <Text
-                  style={{
-                    color: '#660000',
-                    fontSize: normalize(12),
-                    textAlign: 'center',
-                    fontFamily: 'IRANSansMobile_Light',
-                  }}>
-                  {!!fieldsObject.serial ? fieldsObject.serial : 'سریال'}
-                </Text>
-                <Text
-                  style={{
-                    color: '#660000',
-                    fontSize: normalize(12),
-                    textAlign: 'center',
-                    fontFamily: 'IRANSansMobile_Light',
-                  }}>
-                  {!!fieldsObject.partTypeSelected
-                    ? fieldsObject.partTypeSelected.label
-                    : 'نام'}
-                </Text>
-              </View>
-              <View style={Styles.partTypeSelectionContainerStyle}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <CheckBox
-                    onValueChange={value => {
-                      if (value) {
-                        setFieldsObject({
-                          ...fieldsObject,
-                          objectType: 'failed',
-                        });
-                        setIsNewPartFormExpanded(true);
-                      } else {
-                        setFieldsObject({
-                          ...fieldsObject,
-                          objectType: '',
-                        });
-                        setIsNewPartFormExpanded(false);
-                      }
-                    }}
-                    value={fieldsObject.objectType === 'failed' ? true : false}
-                    tintColors={{true: 'red', false: 'red'}}
+      <ScrollView style={{flex: 0.8, padding: 15}}>
+        {!!objectsList && objectsList.length > 0 && (
+          <View style={{flex: 1, marginBottom: 10}}>
+            {objectsList.map((item, index) =>
+              renderServicePartItem(item, index),
+            )}
+          </View>
+        )}
+        {newHasStarted && (
+          <View style={Styles.newformContainerStyle}>
+            <View style={Styles.formHeaderStyle}>
+              <TouchableOpacity
+                style={{
+                  width: 37,
+                  height: 37,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#660000',
+                  borderRadius: 5,
+                }}
+                onPress={() =>
+                  setIsNewPartFormExpanded(!isNewPartFormExpanded)
+                }>
+                {isNewPartFormExpanded ? (
+                  <Feather
+                    name={'minus'}
+                    style={{color: '#fff', fontSize: normalize(17)}}
                   />
+                ) : (
+                  <Feather
+                    name={'plus'}
+                    style={{color: '#fff', fontSize: normalize(17)}}
+                  />
+                )}
+              </TouchableOpacity>
+              <Text
+                style={{
+                  color: '#660000',
+                  fontSize: normalize(12),
+                  textAlign: 'center',
+                  fontFamily: 'IRANSansMobile_Light',
+                }}>
+                {!!fieldsObject.serial ? fieldsObject.serial : 'سریال'}
+              </Text>
+              <Text
+                style={{
+                  color: '#660000',
+                  fontSize: normalize(12),
+                  textAlign: 'center',
+                  fontFamily: 'IRANSansMobile_Light',
+                }}>
+                {!!fieldsObject.partTypeSelected.label
+                  ? fieldsObject.partTypeSelected.label
+                  : 'نام'}
+              </Text>
+            </View>
+            <View style={Styles.partTypeSelectionContainerStyle}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <CheckBox
+                  onValueChange={value => {
+                    if (value) {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: 'failed',
+                      });
+                      setIsNewPartFormExpanded(true);
+                    } else {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: '',
+                      });
+                      setIsNewPartFormExpanded(false);
+                    }
+                  }}
+                  value={fieldsObject.objectType === 'failed' ? true : false}
+                  tintColors={{true: 'red', false: 'red'}}
+                />
+                <TouchableHighlight
+                  onPress={() => {
+                    if (fieldsObject.objectType == 'new') {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: 'failed',
+                      });
+                      setIsNewPartFormExpanded(true);
+                    } else if (fieldsObject.objectType == 'failed') {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: '',
+                      });
+                      setIsNewPartFormExpanded(false);
+                    } else {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: 'failed',
+                      });
+                      setIsNewPartFormExpanded(true);
+                    }
+                  }}
+                  underlayColor="none">
                   <Text
                     style={{
                       color: '#000',
@@ -683,28 +714,52 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                     }}>
                     قطعه معیوب
                   </Text>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <CheckBox
-                    onValueChange={value => {
-                      if (value) {
-                        setFieldsObject({
-                          ...fieldsObject,
-                          objectType: 'new',
-                        });
-                        setIsNewPartFormExpanded(true);
-                      } else {
-                        setFieldsObject({
-                          ...fieldsObject,
-                          objectType: '',
-                        });
-                        setIsNewPartFormExpanded(false);
-                      }
-                    }}
-                    value={fieldsObject.objectType == 'new' ? true : false}
-                    tintColors={{true: 'green', false: 'green'}}
-                    style={{marginLeft: 20}}
-                  />
+                </TouchableHighlight>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <CheckBox
+                  onValueChange={value => {
+                    if (value) {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: 'new',
+                      });
+                      setIsNewPartFormExpanded(true);
+                    } else {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: '',
+                      });
+                      setIsNewPartFormExpanded(false);
+                    }
+                  }}
+                  value={fieldsObject.objectType == 'new' ? true : false}
+                  tintColors={{true: 'green', false: 'green'}}
+                  style={{marginLeft: 20}}
+                />
+                <TouchableHighlight
+                  onPress={() => {
+                    if (fieldsObject.objectType == 'failed') {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: 'new',
+                      });
+                      setIsNewPartFormExpanded(true);
+                    } else if (fieldsObject.objectType == 'new') {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: '',
+                      });
+                      setIsNewPartFormExpanded(false);
+                    } else {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: 'new',
+                      });
+                      setIsNewPartFormExpanded(true);
+                    }
+                  }}
+                  underlayColor="none">
                   <Text
                     style={{
                       color: '#000',
@@ -713,172 +768,231 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                     }}>
                     قطعه جدید
                   </Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+            {!!fieldsObject.objectType && isNewPartFormExpanded && (
+              <View style={Styles.bothOptionsContainerStyle}>
+                <View style={Styles.partTypeContainerStyle}>
+                  <DropdownPicker
+                    list={partsListName}
+                    onSelect={async value => {
+                      await setFieldsObject({
+                        ...fieldsObject,
+                        partTypeSelected: value,
+                        serial: '',
+                        partVersionSelected: {},
+                      });
+                      setSelectedPartVersionsList(value.value.Versions);
+                      dropRef.current.setList(value.value.Versions);
+                    }}
+                    placeholder={
+                      !!fieldsObject.partTypeSelected.label
+                        ? fieldsObject.partTypeSelected.label.length > 30
+                          ? `${fieldsObject.partTypeSelected.label.substr(
+                              0,
+                              30,
+                            )}...`
+                          : `${fieldsObject.partTypeSelected.label}`
+                        : 'قطعه مورد نظر خود را انتخاب کنید.'
+                    }
+                    listHeight={150}
+                  />
+                  <Text style={Styles.labelStyle}>نوع قطعه:</Text>
+                </View>
+                <View style={Styles.serialContainerStyle}>
+                  {searchBarcodeLoading ? (
+                    <ActivityIndicator size={'small'} color={'#000'} />
+                  ) : (
+                    <Icon
+                      name={'search'}
+                      style={{
+                        color: '#000',
+                        fontSize: normalize(30),
+                        marginHorizontal: 5,
+                      }}
+                      onPress={() => searchBarcode({})}
+                    />
+                  )}
+                  <Icon
+                    name={'qr-code-2'}
+                    style={{
+                      color: '#000',
+                      fontSize: normalize(30),
+                      marginHorizontal: 5,
+                    }}
+                    onPress={() => setScreenMode(true)}
+                  />
+                  <TextInput
+                    style={Styles.serialInputStyle}
+                    onChangeText={text => {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        serial: text,
+                      });
+                      setSelectedPartVersionsList([]);
+                    }}
+                    value={fieldsObject.serial}
+                  />
+                  <View style={{flexDirection: 'row'}}>
+                    {!!fieldsObject.partTypeSelected.label &&
+                    !!fieldsObject.partTypeSelected.value.SerialFormat ? (
+                      <Icon name={'star'} style={{color: 'red'}} />
+                    ) : null}
+                    <Text style={Styles.labelStyle}>سریال:</Text>
+                  </View>
+                </View>
+                <View style={Styles.partTypeContainerStyle}>
+                  <DropdownPicker
+                    ref={dropRef}
+                    list={selectedPartVersionsList}
+                    placeholder={
+                      !!fieldsObject.partVersionSelected.Key
+                        ? fieldsObject.partVersionSelected.Value
+                        : 'نسخه مورد نظر خود را انتخاب کنید.'
+                    }
+                    onSelect={item =>
+                      setFieldsObject({
+                        ...fieldsObject,
+                        partVersionSelected: item,
+                      })
+                    }
+                    listHeight={150}
+                  />
+                  <Text style={Styles.labelStyle}>نسخه: </Text>
                 </View>
               </View>
-              {!!fieldsObject.objectType && isNewPartFormExpanded && (
-                <View style={Styles.bothOptionsContainerStyle}>
-                  <View style={Styles.partTypeContainerStyle}>
-                    <DropdownPicker
-                      list={partsListName}
-                      onSelect={value => {
-                        setFieldsObject({
-                          ...fieldsObject,
-                          partTypeSelected: value,
-                          serial: '',
-                          partVersionSelected: null,
-                        });
-                        setSelectedPartVersionsList(value.value.Versions);
-                        dropRef.current.setList(value.value.Versions);
-                      }}
-                      placeholder={
-                        !!fieldsObject.partTypeSelected
-                          ? fieldsObject.partTypeSelected.label.length > 30
-                            ? `${fieldsObject.partTypeSelected.label.substr(
-                                0,
-                                30,
-                              )}...`
-                            : `${fieldsObject.partTypeSelected.label}`
-                          : 'قطعه مورد نظر خود را انتخاب کنید.'
-                      }
-                      listHeight={150}
-                    />
-                    <Text
-                      style={{
-                        fontFamily: 'IRANSansMobile_Light',
-                        fontSize: normalize(13),
-                      }}>
-                      نوع قطعه:
-                    </Text>
-                  </View>
-                  <View style={Styles.serialContainerStyle}>
-                    {searchBarcodeLoading ? (
-                      <ActivityIndicator size={'small'} color={'#000'} />
-                    ) : (
-                      <Icon
-                        name={'search'}
-                        style={{color: '#000', fontSize: normalize(30)}}
-                        onPress={searchBarcode}
-                      />
-                    )}
-                    <Icon
-                      name={'qr-code-2'}
-                      style={{color: '#000', fontSize: normalize(30)}}
-                      onPress={() => setScreenMode(true)}
-                    />
-                    <TextInput
-                      style={Styles.serialInputStyle}
-                      onChangeText={text =>
-                        setFieldsObject({...fieldsObject, serial: text})
-                      }
-                      value={fieldsObject.serial}
-                    />
-                    <View style={{flexDirection: 'row'}}>
-                      {(!!fieldsObject.partTypeSelected &&
-                        fieldsObject.partTypeSelected.value.SerialFormat
-                          .length > 0) ||
-                      !fieldsObject.partTypeSelected ? (
-                        <Icon name={'star'} style={{color: 'red'}} />
-                      ) : null}
-                      <Text style={Styles.labelStyle}>سریال:</Text>
-                    </View>
-                  </View>
-                  <View style={Styles.partTypeContainerStyle}>
-                    <DropdownPicker
-                      ref={dropRef}
-                      list={selectedPartVersionsList}
-                      placeholder={
-                        !!fieldsObject.partVersionSelected
-                          ? fieldsObject.partVersionSelected.Value
-                          : 'نسخه مورد نظر خود را انتخاب کنید.'
-                      }
-                      onSelect={item =>
-                        setFieldsObject({
-                          ...fieldsObject,
-                          partVersionSelected: item,
-                        })
-                      }
-                      listHeight={150}
-                    />
-                    <Text
-                      style={{
-                        fontFamily: 'IRANSansMobile_Light',
-                        fontSize: normalize(13),
-                      }}>
-                      نسخه:{' '}
-                    </Text>
-                  </View>
+            )}
+            {isNewPartFormExpanded && fieldsObject.objectType === 'new' ? (
+              <View style={Styles.priceContainerStyle}>
+                <Text style={Styles.labelStyle}>ریال</Text>
+                <TextInput
+                  style={Styles.priceInputStyle}
+                  onChangeText={text =>
+                    setFieldsObject({...fieldsObject, Price: text})
+                  }
+                  value={fieldsObject.Price}
+                  keyboardType="numeric"
+                />
+                <Text style={Styles.labelStyle}>قیمت:</Text>
+              </View>
+            ) : isNewPartFormExpanded &&
+              fieldsObject.objectType === 'failed' ? (
+              <View style={{marginTop: 15, width: '100%'}}>
+                <Text style={Styles.labelStyle}>
+                  شرح نوع خرابی و علت احتمالی آن:{' '}
+                </Text>
+                <View style={Styles.failureDescriptionContainerStyle}>
+                  <Text style={[Styles.labelStyle, {marginBottom: 5}]}>
+                    توضیحات:{' '}
+                  </Text>
+                  <TextInput
+                    style={Styles.descriptionInputStyle}
+                    onChangeText={text =>
+                      setFieldsObject({
+                        ...fieldsObject,
+                        failureDescription: text,
+                      })
+                    }
+                    value={fieldsObject.failureDescription}
+                    multiline
+                  />
                 </View>
-              )}
-              {isNewPartFormExpanded && fieldsObject.objectType === 'new' ? (
-                <View style={Styles.priceContainerStyle}>
+                <View style={Styles.garanteeContainerStyle}>
+                  <Text style={{marginRight: 10}}>
+                    {!!fieldsObject.hasGarantee
+                      ? fieldsObject.hasGarantee
+                      : '-'}
+                  </Text>
+                  <Text style={Styles.labelStyle}>گارانتی:</Text>
+                </View>
+                <View style={Styles.prePriceContainerStyle}>
                   <Text style={Styles.labelStyle}>ریال</Text>
                   <TextInput
-                    style={Styles.priceInputStyle}
+                    style={Styles.prePriceInputStyle}
                     onChangeText={text =>
-                      setFieldsObject({...fieldsObject, Price: text.toString()})
+                      setFieldsObject({...fieldsObject, Price: text})
                     }
                     value={fieldsObject.Price}
                     keyboardType="numeric"
                   />
-                  <Text style={Styles.labelStyle}>قیمت:</Text>
+                  <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
                 </View>
-              ) : isNewPartFormExpanded &&
-                fieldsObject.objectType === 'failed' ? (
-                <View style={{marginTop: 15, width: '100%'}}>
-                  <Text style={Styles.labelStyle}>
-                    شرح نوع خرابی و علت احتمالی آن:{' '}
-                  </Text>
-                  <View style={Styles.failureDescriptionContainerStyle}>
-                    <Text
-                      style={{
-                        marginBottom: 5,
-                        fontSize: normalize(13),
-                        fontFamily: 'IRANSansMobile_Light',
-                      }}>
-                      توضیحات:{' '}
-                    </Text>
-                    <TextInput
-                      style={Styles.descriptionInputStyle}
-                      onChangeText={text =>
-                        setFieldsObject({
-                          ...fieldsObject,
-                          failureDescription: text,
-                        })
-                      }
-                      value={fieldsObject.failureDescription}
-                      multiline
-                    />
-                  </View>
-                  <View style={Styles.garanteeContainerStyle}>
-                    <Text style={{marginRight: 10}}>
-                      {!!fieldsObject.hasGarantee
-                        ? fieldsObject.hasGarantee
-                        : '-'}
-                    </Text>
-                    <Text style={Styles.labelStyle}>گارانتی:</Text>
-                  </View>
-                  <View style={Styles.prePriceContainerStyle}>
-                    <Text style={Styles.labelStyle}>ریال</Text>
-                    <TextInput
-                      style={Styles.prePriceInputStyle}
-                      onChangeText={text =>
-                        setFieldsObject({
-                          ...fieldsObject,
-                          Price: text.toString(),
-                        })
-                      }
-                      value={fieldsObject.Price}
-                      keyboardType="numeric"
-                    />
-                    <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
-                  </View>
-                </View>
-              ) : null}
-              <View style={Styles.formFooterContainerstyle}>
-                <TouchableOpacity
-                  style={Styles.footerIconContainerStyle}
-                  onPress={() => {
-                    setIsNewPartFormExpanded(false);
+              </View>
+            ) : null}
+            <View style={Styles.formFooterContainerstyle}>
+              <TouchableOpacity
+                style={Styles.footerIconContainerStyle}
+                onPress={() => {
+                  setIsNewPartFormExpanded(false);
+                  setNewHasStarted(false);
+                  setFieldsObject({
+                    ...fieldsObject,
+                    objectType: '',
+                    serial: '',
+                    partTypeSelected: {},
+                    partVersionSelected: {},
+                    failureDescription: '',
+                    hasGarantee: null,
+                    Price: '',
+                  });
+                }}>
+                <Octicons
+                  name={'trashcan'}
+                  style={{fontSize: normalize(17), color: '#fff'}}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.footerIconContainerStyle}
+                onPress={() => {
+                  if (
+                    fieldsObject.objectType !== 'new' &&
+                    fieldsObject.objectType !== 'failed'
+                  ) {
+                    Alert.alert(
+                      '',
+                      'لطفا جدید یا معیوب بودن قطعه را مشخص کنید.',
+                      [{text: 'OK', onPress: () => {}}],
+                    );
+                  } else if (!fieldsObject.partTypeSelected.label) {
+                    Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
+                      {text: 'OK', onPress: () => {}},
+                    ]);
+                  } else if (!fieldsObject.partVersionSelected.Key) {
+                    Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
+                      {text: 'OK', onPress: () => {}},
+                    ]);
+                  } else if (
+                    !!fieldsObject.partTypeSelected.value.SerialFormat &&
+                    fieldsObject.serial === ''
+                  ) {
+                    Alert.alert('', 'لطفا سریال را مشخص کنید.', [
+                      {text: 'OK', onPress: () => {}},
+                    ]);
+                  } else {
+                    let INFO = !!objectsList ? objectsList : [];
+                    let maxIndex = 0;
+                    if (INFO.length > 0) {
+                      INFO.map(item => {
+                        if (item.index > maxIndex) {
+                          maxIndex = item.index;
+                        }
+                      });
+                    }
+                    INFO.push({
+                      index: maxIndex + 1,
+                      serial: !!fieldsObject.serial ? fieldsObject.serial : '',
+                      isExpanded: false,
+                      failureDescription: !!fieldsObject.failureDescription
+                        ? fieldsObject.failureDescription
+                        : '',
+                      hasGarantee: fieldsObject.hasGarantee,
+                      Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
+                      objectType: fieldsObject.objectType,
+                      partType: fieldsObject.partTypeSelected,
+                      availableVersions: [],
+                      version: fieldsObject.partVersionSelected,
+                    });
                     setNewHasStarted(false);
                     setFieldsObject({
                       ...fieldsObject,
@@ -886,97 +1000,25 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                       serial: '',
                       partTypeSelected: {},
                       partVersionSelected: {},
+                      Price: '',
                       failureDescription: '',
                       hasGarantee: null,
-                      Price: '',
                     });
-                  }}>
-                  <Octicons
-                    name={'trashcan'}
-                    style={{fontSize: normalize(17), color: '#fff'}}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={Styles.footerIconContainerStyle}
-                  onPress={() => {
-                    if (
-                      fieldsObject.objectType !== 'new' &&
-                      fieldsObject.objectType !== 'failed'
-                    ) {
-                      Alert.alert(
-                        '',
-                        'لطفا جدید یا معیوب بودن قطعه را مشخص کنید.',
-                        [{text: 'OK', onPress: () => {}}],
-                      );
-                    } else if (!fieldsObject.partTypeSelected.label) {
-                      Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
-                        {text: 'OK', onPress: () => {}},
-                      ]);
-                    } else if (!fieldsObject.partVersionSelected.Key) {
-                      Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
-                        {text: 'OK', onPress: () => {}},
-                      ]);
-                    } else if (
-                      !!fieldsObject.partTypeSelected.value.SerialFormat &&
-                      fieldsObject.serial === ''
-                    ) {
-                      Alert.alert('', 'لطفا سریال را مشخص کنید.', [
-                        {text: 'OK', onPress: () => {}},
-                      ]);
-                    } else {
-                      let INFO = !!objectsList ? objectsList : [];
-                      let maxIndex = 0;
-                      if (INFO.length > 0) {
-                        INFO.map(item => {
-                          if (item.index > maxIndex) {
-                            maxIndex = item.index;
-                          }
-                        });
-                      }
-                      INFO.push({
-                        index: maxIndex + 1,
-                        serial: !!fieldsObject.serial
-                          ? fieldsObject.serial
-                          : '',
-                        isExpanded: false,
-                        failureDescription: !!fieldsObject.failureDescription
-                          ? fieldsObject.failureDescription
-                          : '',
-                        hasGarantee: fieldsObject.hasGarantee,
-                        Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
-                        objectType: fieldsObject.objectType,
-                        partType: fieldsObject.partTypeSelected,
-                        availableVersions: [],
-                        version: fieldsObject.partVersionSelected,
-                      });
-                      setNewHasStarted(false);
-                      setFieldsObject({
-                        ...fieldsObject,
-                        objectType: '',
-                        serial: '',
-                        partTypeSelected: {},
-                        partVersionSelected: {},
-                        failureDescription: '',
-                        hasGarantee: null,
-                        Price: '',
-                      });
-                      setObjectsList(INFO);
-                      setInfo(INFO);
-                    }
-                  }}>
-                  <Octicons
-                    name={'check'}
-                    style={{fontSize: normalize(17), color: '#fff'}}
-                  />
-                </TouchableOpacity>
-              </View>
+                    setObjectsList(INFO);
+                    setInfo(INFO);
+                  }
+                }}>
+                <Octicons
+                  name={'check'}
+                  style={{fontSize: normalize(17), color: '#fff'}}
+                />
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
+          </View>
+        )}
       </ScrollView>
       {!isKeyboardVisible && (
-        <View
-          style={{flex: 0.2, paddingHorizontal: 10, justifyContent: 'center'}}>
+        <View style={{flex: 0.2, paddingHorizontal: 10}}>
           <TouchableOpacity
             style={Styles.newPartbuttonStyle}
             onPress={() => {
@@ -987,7 +1029,6 @@ const ServicePartsTab = ({setInfo, info, renderSaveModal}) => {
                   ToastAndroid.CENTER,
                 );
               } else {
-                setFieldsObject({});
                 setNewHasStarted(true);
               }
             }}>
@@ -1096,7 +1137,6 @@ const Styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 15,
-    zIndex: 9999,
   },
   bothOptionsContainerStyle: {
     marginTop: 10,
@@ -1165,8 +1205,8 @@ const Styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   labelStyle: {
-    fontFamily: 'IRANSansMobile_Light',
     fontSize: normalize(13),
+    fontFamily: 'IRANSansMobile_Light',
   },
 });
 
