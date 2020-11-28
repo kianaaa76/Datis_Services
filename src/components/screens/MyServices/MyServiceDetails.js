@@ -38,7 +38,7 @@ const MyServiceDetails = ({navigation}) => {
   let dirs = RNFetchBlob.fs.dirs;
   const dispatch = useDispatch();
   const selector = useSelector(state => state);
-  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(true);
   const [requestLoading, setRequestLoading] = useState(false);
   const [renderNetworkModal, setRenderNetworkModal] = useState(false);
   const [renderConfirmModal, setRenderConfirmModal] = useState(false);
@@ -307,7 +307,7 @@ const MyServiceDetails = ({navigation}) => {
           Object_Id: item.partType.value.Id,
           Direction: item.objectType === 'new' ? '0' : '1',
           Description: item.failureDescription,
-          Price: !item.Price ? parseInt(item.Price) : 0,
+          Price: item.Price,
           Serial: item.serial,
           VersionId: item.version.Key,
         });
@@ -394,7 +394,7 @@ const MyServiceDetails = ({navigation}) => {
           Object_Id: item.partType.value.Id,
           Direction: item.objectType === 'new' ? '0' : '1',
           Description: item.failureDescription,
-          Price: !item.Price ? parseInt(item.Price) : 0,
+          Price: item.Price,
           Serial: item.serial,
           VersionId: item.version.Key,
         });
@@ -469,7 +469,6 @@ const MyServiceDetails = ({navigation}) => {
   };
 
   useEffect(() => {
-    setDetailsLoading(true);
     getServiceDetails(serviceID, selector.token).then(data => {
       if (data.errorCode == 0) {
         dispatch({
