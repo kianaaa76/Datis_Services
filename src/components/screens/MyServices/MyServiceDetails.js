@@ -22,7 +22,7 @@ import {
   LOGOUT,
   SET_EDITING_SERVICE,
 } from '../../../actions/types';
-import {normalize} from "../../utils/utilities";
+import {normalize} from '../../utils/utilities';
 import ServiceInfoTab from '../../common/serviceComponents/serviceInfoTab';
 import ServiceFactorTab from '../../common/serviceComponents/serviceFactorTab';
 import ServiceServicesTab from '../../common/serviceComponents/serviceServiceTab';
@@ -43,6 +43,7 @@ const MyServiceDetails = ({navigation}) => {
   const [renderNetworkModal, setRenderNetworkModal] = useState(false);
   const [renderConfirmModal, setRenderConfirmModal] = useState(false);
   const [renderSaveModal, setRenderSaveModal] = useState(false);
+  const [hasServiceNewPart, setHasServiceNewPart] = useState(false);
   const serviceID = navigation.getParam('serviceID');
   const [factorTabInfo, setFactorTabInfo] = useState({
     factorReceivedPrice: selector.savedServiceInfo.factorReceivedPrice,
@@ -75,7 +76,7 @@ const MyServiceDetails = ({navigation}) => {
 
   const setRenderSaveModalInTabs = () => {
     setRenderSaveModal(true);
-  }
+  };
 
   useEffect(() => {
     RNFetchBlob.fs
@@ -242,6 +243,7 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
       setRequestLoading(false);
+      setIndex(1);
       Alert.alert('اخطار', 'لطفا عکس فاکتور را بارگذاری کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -252,6 +254,7 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
       setRequestLoading(false);
+      setIndex(1);
       Alert.alert('اخطار', 'لطفا مبلغ دریافتی فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -262,11 +265,13 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
       setRequestLoading(false);
+      setIndex(1);
       Alert.alert('اخطار', 'لطفا جمع فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (!serviceTabInfo.description) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا قسمت توضیحات خدمات را پر کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -276,17 +281,26 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4
     ) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا تاریخ انجام پروژه را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (!serviceTabInfo.serviceResult) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا نتیجه سرویس را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (!serviceTabInfo.serviceType) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا نوع سرویس را مشخص کنید.', [
+        {text: 'OK', onPress: () => {}},
+      ]);
+    }else if (hasServiceNewPart){
+      setRequestLoading(false);
+      setIndex(2);
+      Alert.alert('اخطار', 'لطفا وضعیت قطعه جدید را در قسمت قطعات مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (
@@ -294,6 +308,7 @@ const MyServiceDetails = ({navigation}) => {
       !missionTabInfo.endLongitude
     ) {
       setRequestLoading(false);
+      setIndex(3);
       Alert.alert('اخطار', 'لطفا مبدا ماموریت را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -301,17 +316,23 @@ const MyServiceDetails = ({navigation}) => {
       !!missionTabInfo.startLongitude &&
       !!missionTabInfo.endLongitude
     ) {
-      partsTabInfo.map(item => {
-        requestObjectList.push({
-          ServiceId: serviceID,
-          Object_Id: item.partType.value.Id,
-          Direction: item.objectType === 'new' ? '0' : '1',
-          Description: item.failureDescription,
-          Price: item.Price,
-          Serial: item.serial,
-          VersionId: item.version.Key,
-        });
+      let openParts = [];
+      partsTabInfo.map((item,index) => {
+        if (item.isConfirmed) {
+          requestObjectList.push({
+            ServiceId: serviceID,
+            Object_Id: item.partType.value.Id,
+            Direction: item.objectType === 'new' ? '0' : '1',
+            Description: item.failureDescription,
+            Price: item.Price,
+            Serial: item.serial,
+            VersionId: item.version.Key,
+          });
+        } else {
+          openParts.push(index+1);
+        }
       });
+      if (openParts.length == 0){
       sendServiceData(
         selector.token,
         serviceID,
@@ -360,7 +381,7 @@ const MyServiceDetails = ({navigation}) => {
             });
             navigation.replace('MyServices');
             ToastAndroid.showWithGravity(
-              "سرویس شما با موفقیت بسته شد.",
+              'سرویس شما با موفقیت بسته شد.',
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
@@ -387,18 +408,32 @@ const MyServiceDetails = ({navigation}) => {
           setRequestLoading(false);
           setRenderNetworkModal(true);
         });
+      }else {
+        setRequestLoading(false);
+        setIndex(2);
+        Alert.alert('اخطار', `لطفا قطعات تایید نشده را تایید کنید..`, [
+          {text: 'OK', onPress: () => {}},
+        ]);
+      }
     } else if (!missionTabInfo.startLongitude && !missionTabInfo.endLongitude) {
-      partsTabInfo.map(item => {
-        requestObjectList.push({
-          ServiceId: serviceID,
-          Object_Id: item.partType.value.Id,
-          Direction: item.objectType === 'new' ? '0' : '1',
-          Description: item.failureDescription,
-          Price: item.Price,
-          Serial: item.serial,
-          VersionId: item.version.Key,
-        });
+      let openParts = [];
+      partsTabInfo.map((item, index) => {
+        console.log(index, item);
+        if (item.isConfirmed) {
+          requestObjectList.push({
+            ServiceId: serviceID,
+            Object_Id: item.partType.value.Id,
+            Direction: item.objectType === 'new' ? '0' : '1',
+            Description: item.failureDescription,
+            Price: item.Price,
+            Serial: item.serial,
+            VersionId: item.version.Key,
+          });
+        } else {
+          openParts.push(index+1);
+        }
       });
+      if (openParts.length == 0){
       sendServiceData(
         selector.token,
         serviceID,
@@ -438,7 +473,7 @@ const MyServiceDetails = ({navigation}) => {
             });
             navigation.replace('MyServices');
             ToastAndroid.showWithGravity(
-              "سرویس شما با موفقیت بسته شد.",
+              'سرویس شما با موفقیت بسته شد.',
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
@@ -465,6 +500,13 @@ const MyServiceDetails = ({navigation}) => {
           setRequestLoading(false);
           setRenderNetworkModal(true);
         });
+      } else {
+        setRequestLoading(false);
+        setIndex(2);
+        Alert.alert('اخطار', `لطفا قطعات تایید نشده را تایید کنید..`, [
+          {text: 'OK', onPress: () => {}},
+        ]);
+      }
     }
   };
 
@@ -475,7 +517,7 @@ const MyServiceDetails = ({navigation}) => {
           type: GET_SERVICE_DETAIL,
           selectedService: {
             projectID: data.result.ID,
-            DocText:{
+            DocText: {
               PhoneName: data.result.PhoneName,
               Phone: data.result.Phone,
               Serial: data.result.Serial,
@@ -484,8 +526,8 @@ const MyServiceDetails = ({navigation}) => {
               Address: data.result.Address,
               DetectedFailure: data.result.DetectedFailure,
               parts: data.result.parts,
-              Date: data.result.Date
-            }
+              Date: data.result.Date,
+            },
           },
         });
         setDetailsLoading(false);
@@ -512,7 +554,6 @@ const MyServiceDetails = ({navigation}) => {
         }
         setDetailsLoading(false);
       }
-      
     });
   }, []);
   const [index, setIndex] = React.useState(4);
@@ -547,10 +588,14 @@ const MyServiceDetails = ({navigation}) => {
       case 'parts':
         return (
           <ServicePartsTab
-            setInfo={e => setPartsTabInfo(e)}
+            setInfo={e => {
+              setPartsTabInfo(e)
+            }}
             info={partsTabInfo}
             renderSaveModal={setRenderSaveModalInTabs}
             navigation={navigation}
+            hasNew={hasServiceNewPart}
+            setHasNew={e=>setHasServiceNewPart(e)}
           />
         );
       case 'mission':
@@ -564,7 +609,12 @@ const MyServiceDetails = ({navigation}) => {
           />
         );
       case 'info':
-        return <ServiceInfoTab serviceData={selector.selectedService} renderSaveModal={setRenderSaveModalInTabs}/>;
+        return (
+          <ServiceInfoTab
+            serviceData={selector.selectedService}
+            renderSaveModal={setRenderSaveModalInTabs}
+          />
+        );
       default:
         return null;
     }
@@ -615,7 +665,7 @@ const MyServiceDetails = ({navigation}) => {
                 color: '#000',
                 textAlign: 'center',
                 fontSize: pageHeight * 0.016,
-                fontFamily:"IRANSansMobile_Light",
+                fontFamily: 'IRANSansMobile_Light',
               }}
               indicatorStyle={{backgroundColor: '#660000'}}
             />
@@ -634,7 +684,11 @@ const MyServiceDetails = ({navigation}) => {
           underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: normalize(15), fontFamily:"IRANSansMobile_Medium"}}>
+              <Text
+                style={{
+                  fontSize: normalize(15),
+                  fontFamily: 'IRANSansMobile_Medium',
+                }}>
                 آیا از ارسال اطلاعات اطمینان دارید؟
               </Text>
             </View>
@@ -664,7 +718,14 @@ const MyServiceDetails = ({navigation}) => {
           underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: normalize(14), fontFamily:"IRANSansMobile_Medium", textAlign:"center"}}>آیا مایل به ذخیره اطلاعات وارد شده هستید؟</Text>
+              <Text
+                style={{
+                  fontSize: normalize(14),
+                  fontFamily: 'IRANSansMobile_Medium',
+                  textAlign: 'center',
+                }}>
+                آیا مایل به ذخیره اطلاعات وارد شده هستید؟
+              </Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
               <TouchableOpacity
@@ -702,16 +763,16 @@ const MyServiceDetails = ({navigation}) => {
               </Text>
             </View>
             <View style={Styles.modalFooterContainerStyle}>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle2}
-                  onPress={() => onSavePress('network')}>
-                  <Text style={Styles.modalButtonTextStyle}>ذخیره</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={Styles.modalButtonStyle2}
-                  onPress={() => onFinishServicePress()}>
-                  <Text style={Styles.modalButtonTextStyle}>تلاش مجدد</Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle2}
+                onPress={() => onSavePress('network')}>
+                <Text style={Styles.modalButtonTextStyle}>ذخیره</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={Styles.modalButtonStyle2}
+                onPress={() => onFinishServicePress()}>
+                <Text style={Styles.modalButtonTextStyle}>تلاش مجدد</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </TouchableHighlight>
@@ -774,7 +835,7 @@ const Styles = StyleSheet.create({
   modalHeaderTextStyle: {
     color: '#fff',
     fontSize: normalize(15),
-    fontFamily:"IRANSansMobile_Medium"
+    fontFamily: 'IRANSansMobile_Medium',
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -785,7 +846,7 @@ const Styles = StyleSheet.create({
   modalBodyContainerStyle2: {
     width: '100%',
     height: '40%',
-    marginTop:"5%",
+    marginTop: '5%',
     alignItems: 'center',
     padding: 10,
     justifyContent: 'center',
@@ -794,7 +855,7 @@ const Styles = StyleSheet.create({
     color: '#660000',
     textAlign: 'center',
     fontSize: normalize(14),
-    fontFamily:"IRANSansMobile_Light"
+    fontFamily: 'IRANSansMobile_Light',
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -825,7 +886,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(14),
-    fontFamily:"IRANSansMobile_Medium"
+    fontFamily: 'IRANSansMobile_Medium',
   },
   onScreenLoadingContainerStyle: {
     width: pageWidth,

@@ -33,7 +33,7 @@ const RemainingServiceListItem = ({item, navigation}) => {
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
             <Text style={{fontSize:normalize(13), fontFamily: 'IRANSansMobile(FaNum)_Light'}}>{toFaDigit(Item.projectID)}</Text>
-            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>پروژه: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>پرونده: </Text>
           </View>
         </View>
         <View style={Styles.secondRowContainerStyle}>

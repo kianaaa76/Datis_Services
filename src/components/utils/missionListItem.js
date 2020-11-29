@@ -15,7 +15,6 @@ class MissionListItem extends PureComponent {
   render() {
     const Item = this.props.item.item;
     const navigation = this.props.navigation;
-    // const Item = item.item;
     return (
       <TouchableWithoutFeedback
         onPress={() => {
@@ -25,7 +24,7 @@ class MissionListItem extends PureComponent {
           style={{
             width: pageWidth * 0.9,
             height: pageHeight * 0.1,
-            backgroundColor: !!Item.EndDate ? '#fff' : 'red',
+            backgroundColor: '#fff',
             padding: 10,
             marginVertical: 4,
             marginHorizontal: 3,
@@ -35,7 +34,7 @@ class MissionListItem extends PureComponent {
           }}>
           <View style={Styles.firstRowContainerStyle}>
             <View style={Styles.singleItemStyle}>
-              <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Id)}</Text>
+              <Text style={Styles.valueTextStyle}>{toFaDigit(Item.ID)}</Text>
               <Text style={Styles.titleTextStyle}>شماره‌‌ماموریت: </Text>
             </View>
             <View style={Styles.singleItemStyle}>

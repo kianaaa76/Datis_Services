@@ -23,8 +23,7 @@ import ServicePartsTab from '../../common/serviceComponents/servicePartsTab';
 import ServiceMissionTab from '../../common/serviceComponents/serviceMissionTab';
 import {sendServiceData} from '../../../actions/api';
 import {LOGOUT, SET_EDITING_SERVICE} from '../../../actions/types';
-import {normalize} from "../../utils/utilities";
-
+import {normalize} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -72,10 +71,11 @@ const MyServiceDetails = ({navigation}) => {
   const [renderConfirmModal, setRenderConfirmModal] = useState(false);
   const [renderNetworkModal, setRenderNetworkModal] = useState(false);
   const [renderSaveModal, setRenderSaveModal] = useState(false);
+  const [hasServiceNewPart, setHasServiceNewPart] = useState(false);
 
   const setRenderSaveModalInTabs = () => {
     setRenderSaveModal(true);
-  }
+  };
 
   useEffect(() => {
     if (partsTabInfo.length > 0 && !partsTabInfo[0].availableVersions) {
@@ -90,19 +90,24 @@ const MyServiceDetails = ({navigation}) => {
           Id: item.Id,
           isExpanded: false,
           failureDescription: item.Description,
+          tempFilureDescription: item.Description,
           hasGarantee: '',
           objectType: item.Direction == 0 ? 'new' : 'failed',
           availableVersions: !!object.length ? object[0].value.Versions : [],
           partType: !!object.length ? object[0] : {},
+          tempPart: !!object.length ? object[0] : {},
           Price: item.Price,
+          tempPrice: item.Price,
           serial: item.Serial,
+          tempSerial: item.Serial,
           version: !!ver.length ? ver[0] : {},
+          tempVersion: !!ver.length ? ver[0] : {},
+          isConfirmed: true,
         });
       });
       setPartsTabInfo(temp);
     }
   }, []);
-
 
   const setFactorInfo = e => {
     setFactorTabInfo({
@@ -237,6 +242,7 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
     ) {
       setRequestLoading(false);
+      setIndex(1);
       Alert.alert('اخطار', 'لطفا عکس فاکتور را بارگذاری کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -247,6 +253,7 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
     ) {
       setRequestLoading(false);
+      setIndex(1);
       Alert.alert('اخطار', 'لطفا مبلغ دریافتی فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -257,11 +264,13 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
     ) {
       setRequestLoading(false);
+      setIndex(1);
       Alert.alert('اخطار', 'لطفا جمع فاکتور را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (!serviceTabInfo.description) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا قسمت توضیحات خدمات را پر کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -271,16 +280,19 @@ const MyServiceDetails = ({navigation}) => {
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
     ) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا تاریخ انجام پروژه را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (!serviceTabInfo.serviceResult) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا نتیجه سرویس را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (!serviceTabInfo.serviceType) {
       setRequestLoading(false);
+      setIndex(0);
       Alert.alert('اخطار', 'لطفا نوع سرویس را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
@@ -289,7 +301,14 @@ const MyServiceDetails = ({navigation}) => {
       !missionTabInfo.endLongitude
     ) {
       setRequestLoading(false);
+      setIndex(3);
       Alert.alert('اخطار', 'لطفا مبدا ماموریت را مشخص کنید.', [
+        {text: 'OK', onPress: () => {}},
+      ]);
+    } else if (hasServiceNewPart) {
+      setRequestLoading(false);
+      setIndex(2);
+      Alert.alert('اخطار', 'لطفا وضعیت قطعه جدید را در قسمت قطعات مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (
@@ -297,174 +316,200 @@ const MyServiceDetails = ({navigation}) => {
       !!missionTabInfo.endLongitude
     ) {
       requestObjectList = [];
-      partsTabInfo.map(item => {
-        requestObjectList.push({
-          Id: !!item.Id ? item.Id : 0,
-          ServiceId: serviceID,
-          Object_Id: !!item.partType ? item.partType.value.Id : '',
-          Direction: item.objectType === 'new' ? '0' : '1',
-          Description: item.failureDescription,
-          Price: item.Price,
-          Serial: item.serial,
-          VersionId: !!item.version ? item.version.Key : '',
-        });
+      let openParts = [];
+      partsTabInfo.map((item,index) => {
+        if (item.isConfirmed) {
+          requestObjectList.push({
+            Id: !!item.Id ? item.Id : 0,
+            ServiceId: serviceID,
+            Object_Id: !!item.partType ? item.partType.value.Id : '',
+            Direction: item.objectType === 'new' ? '0' : '1',
+            Description: item.failureDescription,
+            Price: item.Price,
+            Serial: item.serial,
+            VersionId: !!item.version ? item.version.Key : '',
+          });
+        } else {
+          openParts.push(index+1);
+        }
       });
-      sendServiceData(
-        selector.token,
-        serviceID,
-        convertResultTitleToNum(serviceTabInfo.serviceResult),
-        convertTypeTitleToNum(serviceTabInfo.serviceType),
-        parseInt(factorTabInfo.factorReceivedPrice),
-        parseInt(factorTabInfo.factorTotalPrice),
-        serviceTabInfo.address,
-        serviceTabInfo.description,
-        serviceTabInfo.image,
-        factorTabInfo.factorImage,
-        requestObjectList,
-        serviceTabInfo.finalDate,
-        true,
-        {
-          Id: missionTabInfo.missionId,
-          ServiceManId: selector.userId,
-          StartCity: missionTabInfo.startCity,
-          StartLocation: `${missionTabInfo.startLatitude},${missionTabInfo.startLongitude}`,
-          EndCity: missionTabInfo.endCity,
-          EndLocation: `${missionTabInfo.endLatitude},${missionTabInfo.endLongitude}`,
-          Distance: missionTabInfo.distance,
-          Description: missionTabInfo.missionDescription,
-          Travel: missionTabInfo.travel,
-        },
-        selector.userId,
-        factorTabInfo.billImage,
-      )
-        .then(data => {
-          if (data.errorCode === 0) {
-            AsyncStorage.getItem('savedServicesList').then(list => {
-              let tempList = !!list
-                ? JSON.parse(list).filter(
-                    service => service.projectId !== serviceID,
-                  )
-                : [];
-              AsyncStorage.setItem(
-                'savedServicesList',
-                JSON.stringify(tempList),
+      if (openParts.length == 0) {
+        sendServiceData(
+          selector.token,
+          serviceID,
+          convertResultTitleToNum(serviceTabInfo.serviceResult),
+          convertTypeTitleToNum(serviceTabInfo.serviceType),
+          parseInt(factorTabInfo.factorReceivedPrice),
+          parseInt(factorTabInfo.factorTotalPrice),
+          serviceTabInfo.address,
+          serviceTabInfo.description,
+          serviceTabInfo.image,
+          factorTabInfo.factorImage,
+          requestObjectList,
+          serviceTabInfo.finalDate,
+          true,
+          {
+            Id: missionTabInfo.missionId,
+            ServiceManId: selector.userId,
+            StartCity: missionTabInfo.startCity,
+            StartLocation: `${missionTabInfo.startLatitude},${missionTabInfo.startLongitude}`,
+            EndCity: missionTabInfo.endCity,
+            EndLocation: `${missionTabInfo.endLatitude},${missionTabInfo.endLongitude}`,
+            Distance: missionTabInfo.distance,
+            Description: missionTabInfo.missionDescription,
+            Travel: missionTabInfo.travel,
+          },
+          selector.userId,
+          factorTabInfo.billImage,
+        )
+          .then(data => {
+            if (data.errorCode === 0) {
+              AsyncStorage.getItem('savedServicesList').then(list => {
+                let tempList = !!list
+                  ? JSON.parse(list).filter(
+                      service => service.projectId !== serviceID,
+                    )
+                  : [];
+                AsyncStorage.setItem(
+                  'savedServicesList',
+                  JSON.stringify(tempList),
+                );
+              });
+              RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+              setRequestLoading(false);
+              dispatch({
+                type: SET_EDITING_SERVICE,
+                editingService: '',
+              });
+              navigation.replace('RejectedServices');
+              ToastAndroid.showWithGravity(
+                'سرویس شما با موفقیت بسته شد.',
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
               );
-            });
-            RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+            } else if (data.errorCode === 3) {
+              setRequestLoading(false);
+              dispatch({
+                type: LOGOUT,
+              });
+              dispatch({
+                type: SET_EDITING_SERVICE,
+                editingService: '',
+              });
+              navigation.navigate('SignedOut');
+            } else {
+              setRequestLoading(false);
+              ToastAndroid.showWithGravity(
+                data.message,
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+            }
+          })
+          .catch(err => {
             setRequestLoading(false);
-            dispatch({
-              type: SET_EDITING_SERVICE,
-              editingService: '',
-            });
-            navigation.replace('RejectedServices');
-            ToastAndroid.showWithGravity(
-              "سرویس شما با موفقیت بسته شد.",
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
-          } else if (data.errorCode === 3) {
-            setRequestLoading(false);
-            dispatch({
-              type: LOGOUT,
-            });
-            dispatch({
-              type: SET_EDITING_SERVICE,
-              editingService: '',
-            });
-            navigation.navigate('SignedOut');
-          } else {
-            setRequestLoading(false);
-            ToastAndroid.showWithGravity(
-              data.message,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
-          }
-        })
-        .catch(err => {
-          setRequestLoading(false);
-          setRenderNetworkModal(true);
-        });
+            setRenderNetworkModal(true);
+          });
+      } else {
+        setRequestLoading(false);
+        setIndex(2);
+        Alert.alert('اخطار', 'لطفا قطعات تایید نشده خود را تایید کنید.', [
+          {text: 'OK', onPress: () => {}},
+        ]);
+      }
     } else if (!missionTabInfo.startLongitude && !missionTabInfo.endLongitude) {
       requestObjectList = [];
-      partsTabInfo.map(item => {
-        requestObjectList.push({
-          Id: !!item.Id ? item.Id : 0,
-          ServiceId: serviceID,
-          Object_Id: !!item.partType ? item.partType.value.Id : '',
-          Direction: item.objectType === 'new' ? '0' : '1',
-          Description: item.failureDescription,
-          Price: item.Price,
-          Serial: item.serial,
-          VersionId: !!item.version ? item.version.Key : '',
-        });
+      let openParts = [];
+      partsTabInfo.map((item,index) => {
+        if (item.isConfirmed) {
+          requestObjectList.push({
+            Id: !!item.Id ? item.Id : 0,
+            ServiceId: serviceID,
+            Object_Id: !!item.partType ? item.partType.value.Id : '',
+            Direction: item.objectType === 'new' ? '0' : '1',
+            Description: item.failureDescription,
+            Price: item.Price,
+            Serial: item.serial,
+            VersionId: !!item.version ? item.version.Key : '',
+          });
+        } else {
+          openParts.push(index+1);
+        }
       });
-      sendServiceData(
-        selector.token,
-        serviceID,
-        convertResultTitleToNum(serviceTabInfo.serviceResult),
-        convertTypeTitleToNum(serviceTabInfo.serviceType),
-        parseInt(factorTabInfo.factorReceivedPrice),
-        parseInt(factorTabInfo.factorTotalPrice),
-        serviceTabInfo.address,
-        serviceTabInfo.description,
-        serviceTabInfo.image,
-        factorTabInfo.factorImage,
-        requestObjectList,
-        serviceTabInfo.finalDate,
-        true,
-        null,
-        selector.userId,
-        factorTabInfo.billImage,
-      )
-        .then(data => {
-          if (data.errorCode === 0) {
-            AsyncStorage.getItem('savedServicesList').then(list => {
-              let tempList = !!list
-                ? JSON.parse(list).filter(
-                    service => service.projectId !== serviceID,
-                  )
-                : [];
-              AsyncStorage.setItem(
-                'savedServicesList',
-                JSON.stringify(tempList),
+      if (openParts.length == 0) {
+        sendServiceData(
+          selector.token,
+          serviceID,
+          convertResultTitleToNum(serviceTabInfo.serviceResult),
+          convertTypeTitleToNum(serviceTabInfo.serviceType),
+          parseInt(factorTabInfo.factorReceivedPrice),
+          parseInt(factorTabInfo.factorTotalPrice),
+          serviceTabInfo.address,
+          serviceTabInfo.description,
+          serviceTabInfo.image,
+          factorTabInfo.factorImage,
+          requestObjectList,
+          serviceTabInfo.finalDate,
+          true,
+          null,
+          selector.userId,
+          factorTabInfo.billImage,
+        )
+          .then(data => {
+            if (data.errorCode === 0) {
+              AsyncStorage.getItem('savedServicesList').then(list => {
+                let tempList = !!list
+                  ? JSON.parse(list).filter(
+                      service => service.projectId !== serviceID,
+                    )
+                  : [];
+                AsyncStorage.setItem(
+                  'savedServicesList',
+                  JSON.stringify(tempList),
+                );
+              });
+              RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+              setRequestLoading(false);
+              dispatch({
+                type: SET_EDITING_SERVICE,
+                editingService: '',
+              });
+              navigation.replace('RejectedServices');
+              ToastAndroid.showWithGravity(
+                'سرویس شما با موفقیت بسته شد.',
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
               );
-            });
-            RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+            } else if (data.errorCode === 3) {
+              setRequestLoading(false);
+              dispatch({
+                type: LOGOUT,
+              });
+              dispatch({
+                type: SET_EDITING_SERVICE,
+                editingService: '',
+              });
+              navigation.navigate('SignedOut');
+            } else {
+              setRequestLoading(false);
+              ToastAndroid.showWithGravity(
+                data.message,
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+            }
+          })
+          .catch(err => {
             setRequestLoading(false);
-            dispatch({
-              type: SET_EDITING_SERVICE,
-              editingService: '',
-            });
-            navigation.replace('RejectedServices');
-            ToastAndroid.showWithGravity(
-              "سرویس شما با موفقیت بسته شد.",
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
-          } else if (data.errorCode === 3) {
-            setRequestLoading(false);
-            dispatch({
-              type: LOGOUT,
-            });
-            dispatch({
-              type: SET_EDITING_SERVICE,
-              editingService: '',
-            });
-            navigation.navigate('SignedOut');
-          } else {
-            setRequestLoading(false);
-            ToastAndroid.showWithGravity(
-              data.message,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
-          }
-        })
-        .catch(err => {
-          setRequestLoading(false);
-          setRenderNetworkModal(true);
-        });
+            setRenderNetworkModal(true);
+          });
+      } else {
+        setRequestLoading(false);
+        setIndex(2);
+        Alert.alert('اخطار', 'لطفا قطعات تایید نشده را تایید کنید.', [
+          {text: 'OK', onPress: () => {}},
+        ]);
+      }
     }
   };
 
@@ -504,6 +549,8 @@ const MyServiceDetails = ({navigation}) => {
             info={partsTabInfo}
             navigation={navigation}
             renderSaveModal={setRenderSaveModalInTabs}
+            hasNew={hasServiceNewPart}
+            setHasNew={e => setHasServiceNewPart(e)}
           />
         );
       case 'mission':
@@ -517,12 +564,17 @@ const MyServiceDetails = ({navigation}) => {
           />
         );
       case 'info':
-        return <ServiceInfoTab serviceData={service} renderSaveModal={setRenderSaveModalInTabs}/>;
+        return (
+          <ServiceInfoTab
+            serviceData={service}
+            renderSaveModal={setRenderSaveModalInTabs}
+          />
+        );
       default:
         return null;
     }
   };
-  
+
   return (
     <View style={Styles.containerStyle}>
       <Header
@@ -584,7 +636,11 @@ const MyServiceDetails = ({navigation}) => {
           underlayColor="none">
           <View style={Styles.modalContainerStyle}>
             <View style={Styles.modalBodyContainerStyle2}>
-              <Text style={{fontSize: normalize(14), fontFamily: 'IRANSansMobile_Medium'}}>
+              <Text
+                style={{
+                  fontSize: normalize(14),
+                  fontFamily: 'IRANSansMobile_Medium',
+                }}>
                 آیا از ارسال اطلاعات اطمینان دارید؟
               </Text>
             </View>

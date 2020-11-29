@@ -123,7 +123,7 @@ const MyServiceListItem = ({
           height: pageHeight * 0.1,
           backgroundColor: isNetworkSaved ? '#3399FF' : '#fff',
           padding: 10,
-          marginVertical: 10,
+          marginVertical: 5,
           marginHorizontal: 5,
           justifyContent: 'center',
           alignItems: 'center',

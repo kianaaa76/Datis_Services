@@ -237,7 +237,7 @@ const MyService = ({navigation}) => {
                                     style={Styles.modalButtonStyle}
                                     onPress={()=>onConfirmDataPress(selectedProjectId)}>
                                     <Text style={Styles.modalButtonTextStyle}>
-                                        تایید
+                                        بله
                                     </Text>
                                 </TouchableOpacity>
                         </View>

@@ -334,13 +334,13 @@ const RejectedServiceListItem = ({
           justifyContent: 'center',
           alignItems: 'center',
           elevation: 3,
-          marginVertical: 4,
+          marginVertical: 5,
           marginHorizontal: 3,
         }}>
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.projectID)}</Text>
-            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>پروژه: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>پرونده: </Text>
           </View>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>

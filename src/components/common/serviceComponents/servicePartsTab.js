@@ -28,7 +28,7 @@ import {normalize} from '../../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
+const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal, hasNew, setHasNew}) => {
   const selector = useSelector(state => state);
   const [fieldsObject, setFieldsObject] = useState({
     objectType: '',
@@ -40,7 +40,7 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
     hasGarantee: null,
   });
   const dropRef = useRef();
-  const [newHasStarted, setNewHasStarted] = useState(Boolean);
+  // const [newHasStarted, setNewHasStarted] = useState(hasNew);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isNewPartFormExpanded, setIsNewPartFormExpanded] = useState(false);
   const [partsListName, setPartsListName] = useState(selector.objectsList);
@@ -48,8 +48,8 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
   const [screenMode, setScreenMode] = useState(false);
   const [searchBarcodeLoading, setSearchBarcodeLoading] = useState(false);
   const [objectsList, setObjectsList] = useState(info);
-  const [refresh, setRefresh] = useState(false);
   const [selectedItemList, setSelectedItemList] = useState({});
+  const [rerender, setRerender] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -112,17 +112,17 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
           );
           if (!!selectedItemList.Id) {
             refactorObjectListItems(
-              'partType',
+              'tempPart',
               selectedObject[0],
               selectedItemList.index,
             );
             refactorObjectListItems(
-              'version',
+              'tempVersion',
               selectedVersion[0],
               selectedItemList.index,
             );
             refactorObjectListItems(
-              'serial',
+              'tempSerial',
               `${selectedObject[0].value.SerialFormat.substr(
                 0,
                 serialHeaderIndex,
@@ -198,12 +198,12 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                   );
                   if (!!selectedItemList.id) {
                     refactorObjectListItems(
-                      'partType',
+                      'tempPart',
                       object,
                       selectedItemList.index,
                     );
                     refactorObjectListItems(
-                      'version',
+                      'tempVersion',
                       selectedVersion[0],
                       selectedItemList.index,
                     );
@@ -246,12 +246,12 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
               );
               if (!!selectedItemList.id) {
                 refactorObjectListItems(
-                  'partType',
+                  'tempPart',
                   object,
                   selectedItemList.index,
                 );
                 refactorObjectListItems(
-                  'version',
+                  'tempVersion',
                   selectedVersion[0],
                   selectedItemList.index,
                 );
@@ -300,7 +300,7 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
   };
 
   const refactorObjectListItems = (refactorFeild, newValue, objectIndex) => {
-    let currentList = !!info.length ? info : [];
+    let currentList = !!objectsList.length ? objectsList : [];
     let selectedObject = {};
     let Index = 0;
     currentList.map((item, index) => {
@@ -310,46 +310,85 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
           case 'isExpanded':
             selectedObject = {...selectedObject, isExpanded: newValue};
             break;
-          case 'failureDescription':
-            selectedObject = {...selectedObject, failureDescription: newValue};
-            break;
           case 'availableVersions':
             selectedObject = {...selectedObject, availableVersions: newValue};
             break;
           case 'hasGarantee':
             selectedObject = {...selectedObject, hasGarantee: newValue};
             break;
-          case 'partType':
-            selectedObject = {...selectedObject, partType: newValue};
+          case 'tempSerial':
+            selectedObject = {
+              ...selectedObject,
+              tempSerial: newValue,
+              isConfirmed: false,
+            };
             break;
-          case 'price':
-            selectedObject = {...selectedObject, Price: newValue};
+          case 'tempPart':
+            selectedObject = {
+              ...selectedObject,
+              tempPart: newValue,
+              isConfirmed: false,
+            };
             break;
-          case 'serial':
-            selectedObject = {...selectedObject, serial: newValue};
+          case 'tempVersion':
+            selectedObject = {
+              ...selectedObject,
+              tempVersion: newValue,
+              isConfirmed: false,
+            };
             break;
-          case 'version':
-            selectedObject = {...selectedObject, version: newValue};
+          case 'tempPrice':
+            selectedObject = {
+              ...selectedObject,
+              tempPrice: newValue,
+              isConfirmed: false,
+            };
+            break;
+          case 'tempFailureDescription':
+            selectedObject = {
+              ...selectedObject,
+              tempFailureDescription: newValue,
+              isConfirmed: false,
+            };
+            break;
+          case 'setDirect':
+            selectedObject = {
+              ...selectedObject,
+              serial: selectedObject.tempSerial,
+              version: selectedObject.tempVersion,
+              partType: selectedObject.tempPart,
+              Price: selectedObject.tempPrice,
+              failureDescription: selectedObject.tempFailureDescription,
+              isExpanded: false,
+              isConfirmed: true,
+            };
             break;
         }
         Index = index;
       }
     });
     currentList.splice(Index, 1, selectedObject);
-    setInfo(currentList);
     setObjectsList(currentList);
-    setRefresh(!refresh);
+    setInfo(currentList);
+    setRerender(!rerender);
   };
 
-  const renderServicePartItem = (item, index) => {
+  const renderServicePartItem = item => {
     let Item = item;
     return (
-      <View style={[Styles.newformContainerStyle, {marginBottom: 10}]}>
+      <View
+        style={[
+          Styles.newformContainerStyle,
+          {
+            marginBottom: 10,
+            backgroundColor: !Item.isConfirmed ? '#FF9090' : null,
+          },
+        ]}>
         <TouchableHighlight
           style={Styles.formHeaderStyle}
-          onPress={() =>
-            refactorObjectListItems('isExpanded', !Item.isExpanded, Item.index)
-          }
+          onPress={() => {
+            refactorObjectListItems('isExpanded', !Item.isExpanded, Item.index);
+          }}
           underlayColor="none">
           <>
             <TouchableOpacity
@@ -362,11 +401,7 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                 borderRadius: 5,
               }}
               onPress={() =>
-                refactorObjectListItems(
-                  'isExpanded',
-                  !Item.isExpanded,
-                  Item.index,
-                )
+                refactorObjectListItems('isExpanded', !Item.isExpanded, Item.index)
               }>
               {Item.isExpanded ? (
                 <Feather
@@ -417,9 +452,9 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
               <DropdownPicker
                 list={partsListName}
                 onSelect={value => {
-                  refactorObjectListItems('partType', value, Item.index);
-                  refactorObjectListItems('serial', '', Item.index);
-                  refactorObjectListItems('version', {}, Item.index);
+                  refactorObjectListItems('tempPart', value, Item.index);
+                  refactorObjectListItems('tempSerial', '', Item.index);
+                  refactorObjectListItems('tempVersion', {}, Item.index);
                   refactorObjectListItems(
                     'availableVersions',
                     value.value.Versions,
@@ -428,10 +463,10 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                   dropRef.current.setList(value.value.Versions);
                 }}
                 placeholder={
-                  !!Item.partType
-                    ? Item.partType.label.length > 30
-                      ? `${Item.partType.label.substr(0, 30)}...`
-                      : `${Item.partType.label}`
+                  !!Item.tempPart
+                    ? Item.tempPart.label.length > 30
+                      ? `${Item.tempPart.label.substr(0, 30)}...`
+                      : `${Item.tempPart.label}`
                     : 'قطعه مورد نظر خود را انتخاب کنید.'
                 }
                 listHeight={150}
@@ -472,9 +507,9 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
               <TextInput
                 style={Styles.serialInputStyle}
                 onChangeText={text => {
-                  refactorObjectListItems('serial', text, Item.index);
+                  refactorObjectListItems('tempSerial', text, Item.index);
                 }}
-                value={Item.serial}
+                value={Item.tempSerial}
               />
               <View style={{flexDirection: 'row'}}>
                 {!!Item.partType.label &&
@@ -489,12 +524,12 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                 ref={dropRef}
                 list={Item.availableVersions}
                 placeholder={
-                  !!Item.version
-                    ? Item.version.Value
+                  !!Item.tempVersion
+                    ? Item.tempVersion.Value
                     : 'نسخه مورد نظر خود را انتخاب کنید.'
                 }
                 onSelect={item =>
-                  refactorObjectListItems('version', item, Item.index)
+                  refactorObjectListItems('tempVersion', item, Item.index)
                 }
                 listHeight={150}
               />
@@ -508,9 +543,9 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
             <TextInput
               style={Styles.priceInputStyle}
               onChangeText={text =>
-                refactorObjectListItems('price', text, Item.index)
+                refactorObjectListItems('tempPrice', text, Item.index)
               }
-              value={Item.Price}
+              value={Item.tempPrice}
               keyboardType="numeric"
             />
             <Text style={Styles.labelStyle}>قیمت:</Text>
@@ -528,12 +563,12 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                 style={Styles.descriptionInputStyle}
                 onChangeText={text =>
                   refactorObjectListItems(
-                    'failureDescription',
+                    'tempFailureDescription',
                     text,
                     Item.index,
                   )
                 }
-                value={Item.failureDescription}
+                value={Item.tempFailureDescription}
                 multiline
               />
             </View>
@@ -548,9 +583,9 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
               <TextInput
                 style={Styles.prePriceInputStyle}
                 onChangeText={text =>
-                  refactorObjectListItems('price', text, Item.index)
+                  refactorObjectListItems('tempPrice', text, Item.index)
                 }
-                value={Item.Price}
+                value={Item.tempPrice}
                 keyboardType="numeric"
               />
               <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
@@ -575,23 +610,67 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
             <TouchableOpacity
               style={Styles.footerIconContainerStyle}
               onPress={() => {
-                if (!Item.partType.label) {
+                if (!Item.tempPart.label) {
                   Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
                     {text: 'OK', onPress: () => {}},
                   ]);
-                } else if (!Item.version.Key) {
+                } else if (!Item.tempVersion.Key) {
                   Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
                     {text: 'OK', onPress: () => {}},
                   ]);
                 } else if (
-                  !!Item.partType.value.SerialFormat &&
-                  Item.serial === ''
+                  !!Item.tempPart.value.SerialFormat &&
+                  Item.tempSerial === ''
                 ) {
                   Alert.alert('', 'لطفا سریال را مشخص کنید.', [
                     {text: 'OK', onPress: () => {}},
                   ]);
                 } else {
-                  refactorObjectListItems('isExpanded', false, Item.index);
+                  const serialFormat = Item.tempPart.value.SerialFormat;
+                  if (!!serialFormat) {
+                    if (serialFormat.length === Item.tempSerial.length) {
+                      let i = 0;
+                      let faults = 0;
+                      while (serialFormat[i] !== '#') {
+                        if (
+                          serialFormat[i].toUpperCase() !==
+                          Item.tempSerial[i].toUpperCase()
+                        ) {
+                          faults = faults + 1;
+                        }
+                        i = i + 1;
+                      }
+                      if (faults > 0) {
+                        Alert.alert(
+                          '',
+                          'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                          [{text: 'OK', onPress: () => {}}],
+                        );
+                      } else {
+                        refactorObjectListItems('setDirect', '', Item.index);
+                      }
+                    } else {
+                      let hashtagIndex = 0;
+                      while (serialFormat[hashtagIndex] !== '#') {
+                        hashtagIndex = hashtagIndex + 1;
+                      }
+                      let rest = serialFormat.length - hashtagIndex;
+                      if (rest == Item.tempSerial.length) {
+                        const actualSerial = serialFormat
+                          .substr(0, hashtagIndex)
+                          .concat(Item.tempSerial);
+                        refactorObjectListItems('setDirect', '', Item.index);
+                      } else {
+                        Alert.alert(
+                          '',
+                          'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                          [{text: 'OK', onPress: () => {}}],
+                        );
+                      }
+                    }
+                  } else {
+                    refactorObjectListItems('setDirect', '', Item.index);
+                  }
                 }
               }}>
               <Octicons
@@ -607,14 +686,12 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
   return !screenMode ? (
     <>
       <ScrollView style={{flex: 0.8, padding: 15}}>
-        {!!objectsList && objectsList.length > 0 && (
+        {!!info && info.length > 0 && (
           <View style={{flex: 1, marginBottom: 10}}>
-            {objectsList.map((item, index) =>
-              renderServicePartItem(item, index),
-            )}
+            {info.map(item => renderServicePartItem(item))}
           </View>
         )}
-        {newHasStarted && (
+        {hasNew && (
           <View style={Styles.newformContainerStyle}>
             <View style={Styles.formHeaderStyle}>
               <TouchableOpacity
@@ -925,7 +1002,7 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                 style={Styles.footerIconContainerStyle}
                 onPress={() => {
                   setIsNewPartFormExpanded(false);
-                  setNewHasStarted(false);
+                  setHasNew(false);
                   setFieldsObject({
                     ...fieldsObject,
                     objectType: '',
@@ -970,42 +1047,202 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
                       {text: 'OK', onPress: () => {}},
                     ]);
                   } else {
-                    let INFO = !!objectsList ? objectsList : [];
-                    let maxIndex = 0;
-                    if (INFO.length > 0) {
-                      INFO.map(item => {
-                        if (item.index > maxIndex) {
-                          maxIndex = item.index;
+                    const serialFormat =
+                      fieldsObject.partTypeSelected.value.SerialFormat;
+                    if (!!serialFormat) {
+                      if (serialFormat.length === fieldsObject.serial.length) {
+                        let i = 0;
+                        let faults = 0;
+                        while (serialFormat[i] !== '#') {
+                          if (
+                            serialFormat[i].toUpperCase() !==
+                            fieldsObject.serial[i].toUpperCase()
+                          ) {
+                            faults = faults + 1;
+                          }
+                          i = i + 1;
                         }
+                        if (faults > 0) {
+                          Alert.alert(
+                            '',
+                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                            [{text: 'OK', onPress: () => {}}],
+                          );
+                        } else {
+                          let INFO = !!objectsList ? objectsList : [];
+                          let maxIndex = 0;
+                          if (INFO.length > 0) {
+                            INFO.map(item => {
+                              if (item.index > maxIndex) {
+                                maxIndex = item.index;
+                              }
+                            });
+                          }
+                          INFO.push({
+                            index: maxIndex + 1,
+                            serial: !!fieldsObject.serial
+                              ? fieldsObject.serial.toUpperCase()
+                              : '',
+                            isExpanded: false,
+                            failureDescription: !!fieldsObject.failureDescription
+                              ? fieldsObject.failureDescription
+                              : '',
+                            hasGarantee: fieldsObject.hasGarantee,
+                            Price: !!fieldsObject.Price
+                              ? fieldsObject.Price
+                              : '0',
+                            objectType: fieldsObject.objectType,
+                            partType: fieldsObject.partTypeSelected,
+                            availableVersions: [],
+                            version: fieldsObject.partVersionSelected,
+                            tempPart: fieldsObject.partTypeSelected,
+                            tempVersion: fieldsObject.partVersionSelected,
+                            tempPrice: !!fieldsObject.Price
+                              ? fieldsObject.Price
+                              : '0',
+                            tempSerial: !!fieldsObject.serial
+                              ? fieldsObject.serial.toUpperCase()
+                              : '',
+                            isConfirmed: true,
+                            tempFailureDescription: !!fieldsObject.failureDescription
+                              ? fieldsObject.failureDescription
+                              : '',
+                          });
+                          setHasNew(false);
+                          setFieldsObject({
+                            ...fieldsObject,
+                            objectType: '',
+                            serial: '',
+                            partTypeSelected: {},
+                            partVersionSelected: {},
+                            Price: '',
+                            failureDescription: '',
+                            hasGarantee: null,
+                          });
+                          setObjectsList(INFO);
+                          setInfo(INFO);
+                        }
+                      } else {
+                        let hashtagIndex = 0;
+                        while (serialFormat[hashtagIndex] !== '#') {
+                          hashtagIndex = hashtagIndex + 1;
+                        }
+                        let rest = serialFormat.length - hashtagIndex;
+                        if (rest == fieldsObject.serial.length) {
+                          const actualSerial = serialFormat
+                            .substr(0, hashtagIndex)
+                            .concat(fieldsObject.serial);
+
+                          let INFO = !!objectsList ? objectsList : [];
+                          let maxIndex = 0;
+                          if (INFO.length > 0) {
+                            INFO.map(item => {
+                              if (item.index > maxIndex) {
+                                maxIndex = item.index;
+                              }
+                            });
+                          }
+                          INFO.push({
+                            index: maxIndex + 1,
+                            serial: actualSerial,
+                            isExpanded: false,
+                            failureDescription: !!fieldsObject.failureDescription
+                              ? fieldsObject.failureDescription
+                              : '',
+                            hasGarantee: fieldsObject.hasGarantee,
+                            Price: !!fieldsObject.Price
+                              ? fieldsObject.Price
+                              : '0',
+                            objectType: fieldsObject.objectType,
+                            partType: fieldsObject.partTypeSelected,
+                            availableVersions: [],
+                            version: fieldsObject.partVersionSelected,
+                            tempPart: fieldsObject.partTypeSelected,
+                            tempVersion: fieldsObject.partVersionSelected,
+                            tempPrice: !!fieldsObject.Price
+                              ? fieldsObject.Price
+                              : '0',
+                            tempSerial: !!fieldsObject.serial
+                              ? fieldsObject.serial.toUpperCase()
+                              : '',
+                            isConfirmed: true,
+                            tempFailureDescription: !!fieldsObject.failureDescription
+                              ? fieldsObject.failureDescription
+                              : '',
+                          });
+                          setHasNew(false);
+                          setFieldsObject({
+                            ...fieldsObject,
+                            objectType: '',
+                            serial: '',
+                            partTypeSelected: {},
+                            partVersionSelected: {},
+                            Price: '',
+                            failureDescription: '',
+                            hasGarantee: null,
+                          });
+                          setObjectsList(INFO);
+                          setInfo(INFO);
+                        } else {
+                          Alert.alert(
+                            '',
+                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                            [{text: 'OK', onPress: () => {}}],
+                          );
+                        }
+                      }
+                    } else {
+                      let INFO = !!objectsList ? objectsList : [];
+                      let maxIndex = 0;
+                      if (INFO.length > 0) {
+                        INFO.map(item => {
+                          if (item.index > maxIndex) {
+                            maxIndex = item.index;
+                          }
+                        });
+                      }
+                      INFO.push({
+                        index: maxIndex + 1,
+                        serial: !!fieldsObject.serial
+                          ? fieldsObject.serial
+                          : '',
+                        isExpanded: false,
+                        failureDescription: !!fieldsObject.failureDescription
+                          ? fieldsObject.failureDescription
+                          : '',
+                        hasGarantee: fieldsObject.hasGarantee,
+                        Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
+                        objectType: fieldsObject.objectType,
+                        partType: fieldsObject.partTypeSelected,
+                        availableVersions: [],
+                        version: fieldsObject.partVersionSelected,
+                        tempPart: fieldsObject.partTypeSelected,
+                        tempVersion: fieldsObject.partVersionSelected,
+                        tempPrice: !!fieldsObject.Price
+                          ? fieldsObject.Price
+                          : '0',
+                        tempSerial: !!fieldsObject.serial
+                          ? fieldsObject.serial.toUpperCase()
+                          : '',
+                        isConfirmed: true,
+                        tempFailureDescription: !!fieldsObject.failureDescription
+                          ? fieldsObject.failureDescription
+                          : '',
                       });
+                      setHasNew(false);
+                      setFieldsObject({
+                        ...fieldsObject,
+                        objectType: '',
+                        serial: '',
+                        partTypeSelected: {},
+                        partVersionSelected: {},
+                        Price: '',
+                        failureDescription: '',
+                        hasGarantee: null,
+                      });
+                      setObjectsList(INFO);
+                      setInfo(INFO);
                     }
-                    INFO.push({
-                      index: maxIndex + 1,
-                      serial: !!fieldsObject.serial ? fieldsObject.serial : '',
-                      isExpanded: false,
-                      failureDescription: !!fieldsObject.failureDescription
-                        ? fieldsObject.failureDescription
-                        : '',
-                      hasGarantee: fieldsObject.hasGarantee,
-                      Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
-                      objectType: fieldsObject.objectType,
-                      partType: fieldsObject.partTypeSelected,
-                      availableVersions: [],
-                      version: fieldsObject.partVersionSelected,
-                    });
-                    setNewHasStarted(false);
-                    setFieldsObject({
-                      ...fieldsObject,
-                      objectType: '',
-                      serial: '',
-                      partTypeSelected: {},
-                      partVersionSelected: {},
-                      Price: '',
-                      failureDescription: '',
-                      hasGarantee: null,
-                    });
-                    setObjectsList(INFO);
-                    setInfo(INFO);
                   }
                 }}>
                 <Octicons
@@ -1022,14 +1259,14 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal}) => {
           <TouchableOpacity
             style={Styles.newPartbuttonStyle}
             onPress={() => {
-              if (newHasStarted) {
+              if (hasNew) {
                 ToastAndroid.showWithGravity(
                   'لطفا ابتدا قطعه ی ناتمام را کامل کنید.',
                   ToastAndroid.SHORT,
                   ToastAndroid.CENTER,
                 );
               } else {
-                setNewHasStarted(true);
+                setHasNew(true);
               }
             }}>
             <Octicons

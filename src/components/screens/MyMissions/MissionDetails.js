@@ -132,7 +132,7 @@ const MissionDetails = ({navigation}) => {
             <View style={Styles.firstSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>{`${toFaDigit(
                 parseInt(mission.Distance) > 1000
-                  ? parseFloat(mission.Distance) / 1000
+                  ? ((parseFloat(mission.Distance) / 1000).toString()).substr(0,(parseFloat(mission.Distance) / 1000).toString().length-1)
                   : mission.Distance,
               )} ${mission.Distance > 1000 ? 'کیلومتر' : 'متر'}`}</Text>
               <Text style={Styles.itemTitleStyle}>طول ماموریت: </Text>
