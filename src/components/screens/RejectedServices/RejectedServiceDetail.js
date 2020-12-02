@@ -221,11 +221,11 @@ const MyServiceDetails = ({navigation}) => {
 
   const convertTypeTitleToNum = title => {
     switch (title) {
-      case 'خرابی یا تعویض موقت':
+      case 'خرابی یا تعویض قطعه':
         return 1;
       case 'ایراد نصب و تنظیم روتین':
         return 2;
-      case 'تنظیم و عیب غیر روتین':
+      case 'تنظیم و عیب غیرروتین':
         return 3;
       default:
         return 0;

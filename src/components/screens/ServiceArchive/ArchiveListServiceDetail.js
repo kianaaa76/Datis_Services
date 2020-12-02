@@ -84,11 +84,11 @@ const ServiceArchiveDetail = ({navigation}) => {
   const getServiceType = typeNum => {
     switch (typeNum) {
       case 1:
-        return 'خرابی یا تعویض موقت';
+        return 'خرابی یا تعویض قطعه';
       case 2:
         return 'ایراد نصب و تنظیم روتین';
       case 3:
-        return 'تنظیم و عیب غیر روتین';
+        return 'تنظیم و عیب غیرروتین';
       default:
         return '';
     }
