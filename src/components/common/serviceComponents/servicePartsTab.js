@@ -28,7 +28,14 @@ import {normalize} from '../../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal, hasNew, setHasNew}) => {
+const ServicePartsTab = ({
+  setInfo,
+  info,
+  navigation,
+  renderSaveModal,
+  hasNew,
+  setHasNew,
+}) => {
   const selector = useSelector(state => state);
   const [fieldsObject, setFieldsObject] = useState({
     objectType: '',
@@ -401,7 +408,11 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal, hasNew, se
                 borderRadius: 5,
               }}
               onPress={() =>
-                refactorObjectListItems('isExpanded', !Item.isExpanded, Item.index)
+                refactorObjectListItems(
+                  'isExpanded',
+                  !Item.isExpanded,
+                  Item.index,
+                )
               }>
               {Item.isExpanded ? (
                 <Feather
@@ -683,6 +694,70 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal, hasNew, se
       </View>
     );
   };
+
+  const addNewObject = (list, serial) => {
+    let maxIndex = 0;
+    if (list.length > 0) {
+      list.map(item => {
+        if (item.index > maxIndex) {
+          maxIndex = item.index;
+        }
+      });
+    }
+    list.push({
+      index: maxIndex + 1,
+      serial: serial,
+      isExpanded: false,
+      failureDescription: !!fieldsObject.failureDescription
+        ? fieldsObject.failureDescription
+        : '',
+      hasGarantee: fieldsObject.hasGarantee,
+      Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
+      objectType: fieldsObject.objectType,
+      partType: fieldsObject.partTypeSelected,
+      availableVersions: [],
+      version: fieldsObject.partVersionSelected,
+      tempPart: fieldsObject.partTypeSelected,
+      tempVersion: fieldsObject.partVersionSelected,
+      tempPrice: !!fieldsObject.Price ? fieldsObject.Price : '0',
+      tempSerial: !!fieldsObject.serial
+        ? fieldsObject.serial.toUpperCase()
+        : '',
+      isConfirmed: true,
+      tempFailureDescription: !!fieldsObject.failureDescription
+        ? fieldsObject.failureDescription
+        : '',
+    });
+    if (fieldsObject.objectType == 'new') {
+      setFieldsObject({
+        ...fieldsObject,
+        objectType: '',
+        serial: '',
+        partTypeSelected: {},
+        partVersionSelected: {},
+        Price: '',
+        failureDescription: '',
+        hasGarantee: null,
+      });
+      setHasNew(false);
+      setObjectsList(list);
+      setInfo(list);
+    } else {
+      setObjectsList(list);
+      setInfo(list);
+      let obj = {
+        objectType: 'new',
+        serial: '',
+        partTypeSelected: fieldsObject.partTypeSelected,
+        partVersionSelected: fieldsObject.partVersionSelected,
+        Price: '0',
+        failureDescription: '',
+        hasGarantee: null,
+      };
+      setFieldsObject(obj);
+    }
+  };
+
   return !screenMode ? (
     <>
       <ScrollView style={{flex: 0.8, padding: 15}}>
@@ -1070,57 +1145,10 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal, hasNew, se
                           );
                         } else {
                           let INFO = !!objectsList ? objectsList : [];
-                          let maxIndex = 0;
-                          if (INFO.length > 0) {
-                            INFO.map(item => {
-                              if (item.index > maxIndex) {
-                                maxIndex = item.index;
-                              }
-                            });
-                          }
-                          INFO.push({
-                            index: maxIndex + 1,
-                            serial: !!fieldsObject.serial
-                              ? fieldsObject.serial.toUpperCase()
-                              : '',
-                            isExpanded: false,
-                            failureDescription: !!fieldsObject.failureDescription
-                              ? fieldsObject.failureDescription
-                              : '',
-                            hasGarantee: fieldsObject.hasGarantee,
-                            Price: !!fieldsObject.Price
-                              ? fieldsObject.Price
-                              : '0',
-                            objectType: fieldsObject.objectType,
-                            partType: fieldsObject.partTypeSelected,
-                            availableVersions: [],
-                            version: fieldsObject.partVersionSelected,
-                            tempPart: fieldsObject.partTypeSelected,
-                            tempVersion: fieldsObject.partVersionSelected,
-                            tempPrice: !!fieldsObject.Price
-                              ? fieldsObject.Price
-                              : '0',
-                            tempSerial: !!fieldsObject.serial
-                              ? fieldsObject.serial.toUpperCase()
-                              : '',
-                            isConfirmed: true,
-                            tempFailureDescription: !!fieldsObject.failureDescription
-                              ? fieldsObject.failureDescription
-                              : '',
-                          });
-                          setHasNew(false);
-                          setFieldsObject({
-                            ...fieldsObject,
-                            objectType: '',
-                            serial: '',
-                            partTypeSelected: {},
-                            partVersionSelected: {},
-                            Price: '',
-                            failureDescription: '',
-                            hasGarantee: null,
-                          });
-                          setObjectsList(INFO);
-                          setInfo(INFO);
+                          let SERIAL = !!fieldsObject.serial
+                            ? fieldsObject.serial
+                            : '';
+                          addNewObject(INFO, SERIAL);
                         }
                       } else {
                         let hashtagIndex = 0;
@@ -1132,57 +1160,8 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal, hasNew, se
                           const actualSerial = serialFormat
                             .substr(0, hashtagIndex)
                             .concat(fieldsObject.serial);
-
                           let INFO = !!objectsList ? objectsList : [];
-                          let maxIndex = 0;
-                          if (INFO.length > 0) {
-                            INFO.map(item => {
-                              if (item.index > maxIndex) {
-                                maxIndex = item.index;
-                              }
-                            });
-                          }
-                          INFO.push({
-                            index: maxIndex + 1,
-                            serial: actualSerial,
-                            isExpanded: false,
-                            failureDescription: !!fieldsObject.failureDescription
-                              ? fieldsObject.failureDescription
-                              : '',
-                            hasGarantee: fieldsObject.hasGarantee,
-                            Price: !!fieldsObject.Price
-                              ? fieldsObject.Price
-                              : '0',
-                            objectType: fieldsObject.objectType,
-                            partType: fieldsObject.partTypeSelected,
-                            availableVersions: [],
-                            version: fieldsObject.partVersionSelected,
-                            tempPart: fieldsObject.partTypeSelected,
-                            tempVersion: fieldsObject.partVersionSelected,
-                            tempPrice: !!fieldsObject.Price
-                              ? fieldsObject.Price
-                              : '0',
-                            tempSerial: !!fieldsObject.serial
-                              ? fieldsObject.serial.toUpperCase()
-                              : '',
-                            isConfirmed: true,
-                            tempFailureDescription: !!fieldsObject.failureDescription
-                              ? fieldsObject.failureDescription
-                              : '',
-                          });
-                          setHasNew(false);
-                          setFieldsObject({
-                            ...fieldsObject,
-                            objectType: '',
-                            serial: '',
-                            partTypeSelected: {},
-                            partVersionSelected: {},
-                            Price: '',
-                            failureDescription: '',
-                            hasGarantee: null,
-                          });
-                          setObjectsList(INFO);
-                          setInfo(INFO);
+                          addNewObject(INFO, actualSerial);
                         } else {
                           Alert.alert(
                             '',
@@ -1193,55 +1172,10 @@ const ServicePartsTab = ({setInfo, info, navigation, renderSaveModal, hasNew, se
                       }
                     } else {
                       let INFO = !!objectsList ? objectsList : [];
-                      let maxIndex = 0;
-                      if (INFO.length > 0) {
-                        INFO.map(item => {
-                          if (item.index > maxIndex) {
-                            maxIndex = item.index;
-                          }
-                        });
-                      }
-                      INFO.push({
-                        index: maxIndex + 1,
-                        serial: !!fieldsObject.serial
-                          ? fieldsObject.serial
-                          : '',
-                        isExpanded: false,
-                        failureDescription: !!fieldsObject.failureDescription
-                          ? fieldsObject.failureDescription
-                          : '',
-                        hasGarantee: fieldsObject.hasGarantee,
-                        Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
-                        objectType: fieldsObject.objectType,
-                        partType: fieldsObject.partTypeSelected,
-                        availableVersions: [],
-                        version: fieldsObject.partVersionSelected,
-                        tempPart: fieldsObject.partTypeSelected,
-                        tempVersion: fieldsObject.partVersionSelected,
-                        tempPrice: !!fieldsObject.Price
-                          ? fieldsObject.Price
-                          : '0',
-                        tempSerial: !!fieldsObject.serial
-                          ? fieldsObject.serial.toUpperCase()
-                          : '',
-                        isConfirmed: true,
-                        tempFailureDescription: !!fieldsObject.failureDescription
-                          ? fieldsObject.failureDescription
-                          : '',
-                      });
-                      setHasNew(false);
-                      setFieldsObject({
-                        ...fieldsObject,
-                        objectType: '',
-                        serial: '',
-                        partTypeSelected: {},
-                        partVersionSelected: {},
-                        Price: '',
-                        failureDescription: '',
-                        hasGarantee: null,
-                      });
-                      setObjectsList(INFO);
-                      setInfo(INFO);
+                      let SERIAL = !!fieldsObject.serial
+                        ? fieldsObject.serial
+                        : '';
+                      addNewObject(INFO, SERIAL);
                     }
                   }
                 }}>
