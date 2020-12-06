@@ -44,7 +44,38 @@ class MissionListItem extends PureComponent {
               <Text style={Styles.titleTextStyle}>شروع: </Text>
             </View>
           </View>
-          <View style={Styles.secondRowContainerStyle}>
+          <View style={Styles.firstRowContainerStyle}>
+            {!!Item.StartCity && !!Item.EndCity ? (
+              <View style={Styles.singleItemStyle}>
+                <Text style={Styles.valueTextStyle}>
+                  {toFaDigit(Item.StartCity)}
+                </Text>
+                <Text style={Styles.valueTextStyle}>/</Text>
+                <Text style={Styles.valueTextStyle}>
+                  {toFaDigit(Item.EndCity)}
+                </Text>
+                <Text style={Styles.titleTextStyle}>شهر: </Text>
+              </View>
+            ) : !!Item.StartCity && !Item.EndCity ? (
+              <View style={Styles.singleItemStyle}>
+                <Text style={Styles.valueTextStyle}>
+                  {toFaDigit(Item.StartCity)}
+                </Text>
+                <Text style={Styles.titleTextStyle}>شهر مبدا: </Text>
+              </View>
+            ) : !!Item.EndCity && !Item.StartCity ? (
+              <View style={Styles.singleItemStyle}>
+                <Text style={Styles.valueTextStyle}>
+                  {toFaDigit(Item.EndCity)}
+                </Text>
+                <Text style={Styles.titleTextStyle}>شهر مقصد: </Text>
+              </View>
+            ) : (
+              <View style={Styles.singleItemStyle}>
+                <Text style={Styles.valueTextStyle}> - </Text>
+                <Text style={Styles.titleTextStyle}>شهر: </Text>
+              </View>
+            )}
             <View style={Styles.singleItemStyle}>
               <Text style={Styles.valueTextStyle}>
                 {toFaDigit(Item.EndDate)}
@@ -75,6 +106,8 @@ const Styles = StyleSheet.create({
   },
   singleItemStyle: {
     flexDirection: 'row',
+    width: '50%',
+    justifyContent: 'flex-end',
   },
   titleTextStyle: {
     fontSize: normalize(13),

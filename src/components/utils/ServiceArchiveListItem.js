@@ -64,7 +64,7 @@ const MissionListItem = ({item, navigation}) => {
       case 401:
         return '#21B767';
       case 402:
-        return '#21B767';
+        return '#FF9340';
       case 450:
         return '#339FDE';
       case 500:
