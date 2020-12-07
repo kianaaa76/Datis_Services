@@ -45,9 +45,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
 
   useEffect(() => {
     const backAction = () => {
-      if (screenMode === 'map') {
-        setScreenMode('tab');
-      }else if (!!renderTimePicker || !!showDatePicker) {
+      if (!!renderTimePicker || !!showDatePicker) {
         setShowDatePicke(false);
         setRenderTimePicker(false);
       } else {
@@ -104,7 +102,13 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           alignItems: 'center',
         }}>
         <View style={Styles.descriptionRowStyle}>
-          <View style={{width: "100%", marginBottom: 10, flexDirection: 'row', justifyContent:"flex-end"}}>
+          <View
+            style={{
+              width: '100%',
+              marginBottom: 10,
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+            }}>
             <Icon name={'star'} style={{color: 'red'}} />
             <Text style={Styles.labelStyle}>توضیحات:</Text>
           </View>
@@ -215,7 +219,10 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             )}
             {info.serviceResult !== 'لغو موفق' &&
               info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon name={'star'} style={{color: 'red', fontSize: normalize(10)}} />
+                <Icon
+                  name={'star'}
+                  style={{color: 'red', fontSize: normalize(10)}}
+                />
               )}
             <Text style={Styles.labelStyle}>تاریخ انجام پروژه:</Text>
           </View>
@@ -257,6 +264,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           <View style={Styles.datePickerContainerStyle}>
             <PersianCalendarPicker
               onDateChange={date => {
+                setDateIsSelected(true);
                 setDate(Date.parse(date));
               }}
               width={pageWidth * 0.95}
@@ -394,45 +402,66 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           </View>
         )}
       </MapboxGL.MapView>
-      <View
+      <TouchableOpacity
         style={{
+          backgroundColor: '#fff',
+          width: pageWidth * 0.12,
+          height: pageWidth * 0.12,
+          borderRadius: pageWidth * 0.06,
           position: 'absolute',
+          elevation: 5,
           top: 20,
           right: 20,
-          borderRadius: 10,
           justifyContent: 'center',
           alignItems: 'center',
+        }}
+        onPress={async () => {
+          LocationServicesDialogBox.checkLocationServicesIsEnabled({
+            message:
+              "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+            ok: 'YES',
+            cancel: 'NO',
+            enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+            showDialog: true, // false => Opens the Location access page directly
+            openLocationServices: true, // false => Directly catch method is called if location services are turned off
+            preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
+            preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
+            providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
+          })
+            .then(async () => {
+              await cameraRef.moveTo([userLongitude, userLatitude], 500);
+              await cameraRef.zoomTo(11, 500);
+            })
+            .catch(() => {
+              ToastAndroid.showWithGravity(
+                'موقعیت در دسترس نیست.',
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+            });
         }}>
         <Icon
           name={'my-location'}
           style={{fontSize: normalize(30), color: '#000'}}
-          onPress={async () => {
-            LocationServicesDialogBox.checkLocationServicesIsEnabled({
-              message:
-                "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
-              ok: 'YES',
-              cancel: 'NO',
-              enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
-              showDialog: true, // false => Opens the Location access page directly
-              openLocationServices: true, // false => Directly catch method is called if location services are turned off
-              preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
-              preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
-              providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
-            })
-              .then(async () => {
-                await cameraRef.moveTo([userLongitude, userLatitude], 500);
-                await cameraRef.zoomTo(11, 500);
-              })
-              .catch(() => {
-                ToastAndroid.showWithGravity(
-                  'موقعیت در دسترس نیست.',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
-              });
-          }}
         />
-      </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#fff',
+          width: pageWidth * 0.12,
+          height: pageWidth * 0.12,
+          borderRadius: pageWidth * 0.06,
+          position: 'absolute',
+          elevation: 5,
+          top: 20,
+          left: 20,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        onPress={() => setScreenMode('tab')}>
+        <Icon name="close" style={{fontSize: 30, color: '#000'}} />
+      </TouchableOpacity>
+
       <View style={Styles.bottomBoxContainerStyle}>
         {!!selectedLatitude && !!selectedLongitude ? (
           <TouchableOpacity
@@ -662,7 +691,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     justifyContent: 'flex-end',
-    marginTop:"4%"
+    marginTop: '4%',
   },
   modalBodyTextStyle: {
     color: '#660000',
@@ -688,7 +717,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(14),
-    fontFamily:"IRANSansMobile_Medium"
+    fontFamily: 'IRANSansMobile_Medium',
   },
   labelStyle: {
     fontFamily: 'IRANSansMobile_Light',

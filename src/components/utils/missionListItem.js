@@ -48,11 +48,15 @@ class MissionListItem extends PureComponent {
             {!!Item.StartCity && !!Item.EndCity ? (
               <View style={Styles.singleItemStyle}>
                 <Text style={Styles.valueTextStyle}>
-                  {toFaDigit(Item.StartCity)}
+                  {Item.StartCity.length > 8
+                    ? `${Item.StartCity.substr(0, 8)}...`
+                    : Item.StartCity}
                 </Text>
                 <Text style={Styles.valueTextStyle}>/</Text>
                 <Text style={Styles.valueTextStyle}>
-                  {toFaDigit(Item.EndCity)}
+                  {Item.EndCity.length > 8
+                    ? `${Item.EndCity.substr(0, 8)}...`
+                    : Item.EndCity}
                 </Text>
                 <Text style={Styles.titleTextStyle}>شهر: </Text>
               </View>

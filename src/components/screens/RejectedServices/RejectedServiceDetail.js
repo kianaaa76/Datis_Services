@@ -38,6 +38,7 @@ const MyServiceDetails = ({navigation}) => {
   const [factorTabInfo, setFactorTabInfo] = useState({
     factorReceivedPrice: selector.savedServiceInfo.factorReceivedPrice,
     factorTotalPrice: selector.savedServiceInfo.factorTotalPrice,
+    toCompanySettlement: selector.savedServiceInfo.toCompanySettlement,
     factorImage: service.factorImage,
     billImage: service.billImage,
   });
@@ -113,6 +114,7 @@ const MyServiceDetails = ({navigation}) => {
     setFactorTabInfo({
       factorReceivedPrice: e.factorReceivedPrice,
       factorTotalPrice: e.factorTotalPrice,
+      toCompanySettlement: e.toCompanySettlement,
       factorImage: e.factorImage,
       billImage: e.billImage,
     });
@@ -305,6 +307,15 @@ const MyServiceDetails = ({navigation}) => {
       Alert.alert('اخطار', 'لطفا مبدا ماموریت را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
+    } else if (
+      !!factorTabInfo.toCompanySettlement &&
+      !factorTabInfo.billImage
+    ) {
+      setRequestLoading(false);
+      setIndex(1);
+      Alert.alert('اخطار', 'لطفا عکس فیش واریزی را بارگذاری کنید.', [
+        {text: 'OK', onPress: () => {}},
+      ]);
     } else if (hasServiceNewPart) {
       setRequestLoading(false);
       setIndex(2);
@@ -317,7 +328,7 @@ const MyServiceDetails = ({navigation}) => {
     ) {
       requestObjectList = [];
       let openParts = [];
-      partsTabInfo.map((item,index) => {
+      partsTabInfo.map((item, index) => {
         if (item.isConfirmed) {
           requestObjectList.push({
             Id: !!item.Id ? item.Id : 0,
@@ -330,7 +341,7 @@ const MyServiceDetails = ({navigation}) => {
             VersionId: !!item.version ? item.version.Key : '',
           });
         } else {
-          openParts.push(index+1);
+          openParts.push(index + 1);
         }
       });
       if (openParts.length == 0) {
@@ -341,6 +352,7 @@ const MyServiceDetails = ({navigation}) => {
           convertTypeTitleToNum(serviceTabInfo.serviceType),
           parseInt(factorTabInfo.factorReceivedPrice),
           parseInt(factorTabInfo.factorTotalPrice),
+          parseInt(factorTabInfo.toCompanySettlement),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,
@@ -420,7 +432,7 @@ const MyServiceDetails = ({navigation}) => {
     } else if (!missionTabInfo.startLongitude && !missionTabInfo.endLongitude) {
       requestObjectList = [];
       let openParts = [];
-      partsTabInfo.map((item,index) => {
+      partsTabInfo.map((item, index) => {
         if (item.isConfirmed) {
           requestObjectList.push({
             Id: !!item.Id ? item.Id : 0,
@@ -433,7 +445,7 @@ const MyServiceDetails = ({navigation}) => {
             VersionId: !!item.version ? item.version.Key : '',
           });
         } else {
-          openParts.push(index+1);
+          openParts.push(index + 1);
         }
       });
       if (openParts.length == 0) {
@@ -444,6 +456,7 @@ const MyServiceDetails = ({navigation}) => {
           convertTypeTitleToNum(serviceTabInfo.serviceType),
           parseInt(factorTabInfo.factorReceivedPrice),
           parseInt(factorTabInfo.factorTotalPrice),
+          parseInt(factorTabInfo.toCompanySettlement),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,

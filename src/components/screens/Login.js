@@ -109,6 +109,12 @@ const Login = ({navigation}) => {
             dispatch({
               type: LOGOUT,
             });
+            setEnterSystemLoading(false);
+            ToastAndroid.showWithGravity(
+              "کد وارد شده صحیح نیست.",
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER
+            )
             setPersistLoading(false);
           }
         });

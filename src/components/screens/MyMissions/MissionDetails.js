@@ -13,22 +13,22 @@ const MissionDetails = ({navigation}) => {
   const StartLocation = mission.StartLocation;
   const EndLocation = mission.EndLocation;
   const StartLatitude =
-    StartLocation.length > 0
+  !!StartLocation && StartLocation.length > 0
       ? StartLocation.substr(0, StartLocation.indexOf(','))
       : 0;
   const StartLongitude =
-    StartLocation.length > 0
+  !!StartLocation && StartLocation.length > 0
       ? StartLocation.substr(
           StartLocation.indexOf(',') + 1,
           StartLocation.length,
         )
       : 0;
   const EndLatitude =
-    EndLocation.length > 0
+    !!EndLocation && EndLocation.length > 0
       ? EndLocation.substr(0, EndLocation.indexOf(','))
       : 0;
   const EndLongitude =
-    EndLocation.length > 0
+  !!EndLocation && EndLocation.length > 0
       ? EndLocation.substr(EndLocation.indexOf(',') + 1, EndLocation.length)
       : 0;
 
@@ -101,7 +101,7 @@ const MissionDetails = ({navigation}) => {
           <View style={Styles.singleRowContainerStyle}>
             <View style={Styles.secondSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>{mission.StartCity}</Text>
-              <Text style={Styles.itemTitleStyle}>شهر: </Text>
+              <Text style={Styles.itemTitleStyle}>شهر مبدا: </Text>
             </View>
             <View style={Styles.firstSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>
@@ -113,7 +113,7 @@ const MissionDetails = ({navigation}) => {
           <View style={Styles.singleRowContainerStyle}>
             <View style={Styles.secondSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>{mission.EndCity}</Text>
-              <Text style={Styles.itemTitleStyle}>شهر: </Text>
+              <Text style={Styles.itemTitleStyle}>شهر مقصد: </Text>
             </View>
             <View style={Styles.firstSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>
@@ -169,13 +169,13 @@ const Styles = StyleSheet.create({
   secondSingleItemContainerStyle: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    width:"30%"
+    
   },
   firstSingleItemContainerStyle: {
     marginHorizontal: 10,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
     width: '60%',
   },
   itemTitleStyle: {
@@ -185,6 +185,7 @@ const Styles = StyleSheet.create({
   itemTextStyle: {
     fontSize: normalize(13),
     fontFamily: 'IRANSansMobile_Light',
+    flexShrink:1
   },
   markerLabelStyle: {
     width: 50,

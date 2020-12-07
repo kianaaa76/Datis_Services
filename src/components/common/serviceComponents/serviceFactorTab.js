@@ -73,6 +73,20 @@ const ServiceFactorTab = ({
           <TextInput
             style={Styles.textInputStyle}
             onChangeText={text => {
+              setInfo({...info, toCompanySettlement: text});
+            }}
+            value={info.toCompanySettlement.toString()}
+            keyboardType="numeric"
+          />
+          <View style={{flexDirection: 'row', width: '26%'}}>
+            <Text style={Styles.labelStyle}> مبلغ واریزی به حساب شرکت:</Text>
+          </View>
+        </View>
+        <View style={Styles.rowDataStyle}>
+          <Text style={Styles.rialTextStyle}>ریال</Text>
+          <TextInput
+            style={Styles.textInputStyle}
+            onChangeText={text => {
               setInfo({
                 ...info,
                 factorTotalPrice: text,
@@ -206,7 +220,15 @@ const ServiceFactorTab = ({
               />
             )}
           </View>
-          <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
+          <View style={{flexDirection: 'row'}}>
+            {!!info.toCompanySettlement && (
+                <Icon
+                  name={'star'}
+                  style={{color: 'red', fontSize: normalize(10)}}
+                />
+              )}
+            <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
+          </View>
         </View>
         {!!info.billImage && (
           <ImageViewer
@@ -241,12 +263,11 @@ const ServiceFactorTab = ({
                       ...info,
                       billImage: '',
                     });
-                  }
-                  else if (deletingImage === 1){
+                  } else if (deletingImage === 1) {
                     setInfo({
-                        ...info,
-                        factorImage: '',
-                      });
+                      ...info,
+                      factorImage: '',
+                    });
                   }
                   setDeletingImage(0);
                 }}>
@@ -302,6 +323,7 @@ const Styles = StyleSheet.create({
   },
   labelStyle: {
     fontFamily: 'IRANSansMobile_Light',
+    flexShrink: 1,
   },
   modalBackgroundStyle: {
     flex: 1,

@@ -47,7 +47,6 @@ const ServicePartsTab = ({
     hasGarantee: null,
   });
   const dropRef = useRef();
-  // const [newHasStarted, setNewHasStarted] = useState(hasNew);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isNewPartFormExpanded, setIsNewPartFormExpanded] = useState(false);
   const [partsListName, setPartsListName] = useState(selector.objectsList);
@@ -80,12 +79,7 @@ const ServicePartsTab = ({
 
   useEffect(() => {
     const backAction = () => {
-      if (screenMode) {
-        setScreenMode(false);
-      } else {
-        renderSaveModal();
-      }
-      return true;
+      renderSaveModal();
     };
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -97,13 +91,24 @@ const ServicePartsTab = ({
   const onSuccess = async code => {
     await setScreenMode(false);
     let header = parseInt(code.data.toString().substr(0, 3));
+    numOfZeros = 0;
+    while (code.data[numOfZeros] == '0') {
+      numOfZeros = numOfZeros + 1;
+    }
+    let prefix = '';
+    while (numOfZeros > 0) {
+      prefix = '0'.concat(prefix);
+    }
     let selectedObject = partsListName.filter(
-      item => item.value.SerialBarcode == header,
+      item => prefix.concat(item.value.SerialBarcode) == header,
     );
     let serialHeaderIndex = selectedObject[0].value.SerialFormat.indexOf('#');
     let leftOfCode = code.data
       .toString()
-      .substr(serialHeaderIndex, code.data.length - 3);
+      .substr(
+        header.toString().length,
+        code.data.length - header.toString().length,
+      );
     if (selectedObject.length > 0) {
       getObjBySerial(
         selector.token,
@@ -1220,9 +1225,27 @@ const ServicePartsTab = ({
       onBarCodeRead={onSuccess}
       style={Styles.preview}
       type={RNCamera.Constants.Type.back}>
-      <View style={Styles.barcodeContainerStyle}>
-        <View style={Styles.barcodeLineStyle} />
-      </View>
+      <>
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            width: pageWidth * 0.12,
+            height: pageWidth * 0.12,
+            backgroundColor: '#fff',
+            borderRadius: pageWidth * 0.06,
+            justifyContent: 'center',
+            alignItems: 'center',
+            elevation: 5,
+          }}
+          onPress={() => setScreenMode(false)}>
+          <Icon name="close" style={{fontSize: 30, color: '#000'}} />
+        </TouchableOpacity>
+        <View style={Styles.barcodeContainerStyle}>
+          <View style={Styles.barcodeLineStyle} />
+        </View>
+      </>
     </RNCamera>
   );
 };

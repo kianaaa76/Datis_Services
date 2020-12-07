@@ -80,7 +80,9 @@ const MissionList = ({navigation}) => {
     if (city.length > 0) {
       setShowingMissionList(
         missionList.filter(
-          i => i.StartCity.includes(city) || i.EndCity.includes(city),
+          i =>
+            (!!i.StartCity && i.StartCity.includes(city)) ||
+            (!!i.EndCity && i.EndCity.includes(city)),
         ),
       );
     } else {

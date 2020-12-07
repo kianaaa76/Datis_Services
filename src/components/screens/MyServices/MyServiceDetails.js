@@ -48,6 +48,7 @@ const MyServiceDetails = ({navigation}) => {
   const [factorTabInfo, setFactorTabInfo] = useState({
     factorReceivedPrice: selector.savedServiceInfo.factorReceivedPrice,
     factorTotalPrice: selector.savedServiceInfo.factorTotalPrice,
+    toCompanySettlement: selector.savedServiceInfo.toCompanySettlement,
     factorImage: '',
     billImage: '',
   });
@@ -115,6 +116,7 @@ const MyServiceDetails = ({navigation}) => {
     setFactorTabInfo({
       factorReceivedPrice: e.factorReceivedPrice,
       factorTotalPrice: e.factorTotalPrice,
+      toCompanySettlement: e.toCompanySettlement,
       factorImage: e.factorImage,
       billImage: e.billImage,
     });
@@ -312,6 +314,13 @@ const MyServiceDetails = ({navigation}) => {
       Alert.alert('اخطار', 'لطفا مبدا ماموریت را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
+    } else if (!!factorTabInfo.toCompanySettlement && ! factorTabInfo.billImage) {
+      setRequestLoading(false);
+      setIndex(1);
+      Alert.alert('اخطار', 'لطفا عکس فیش واریزی را بارگذاری کنید.', [
+        {text: 'OK', onPress: () => {}},
+      ]);
+
     } else if (
       !!missionTabInfo.startLongitude &&
       !!missionTabInfo.endLongitude
@@ -338,8 +347,9 @@ const MyServiceDetails = ({navigation}) => {
         serviceID,
         convertResultTitleToNum(serviceTabInfo.serviceResult),
         convertTypeTitleToNum(serviceTabInfo.serviceType),
-        factorTabInfo.factorReceivedPrice,
-        factorTabInfo.factorTotalPrice,
+        parseInt(factorTabInfo.factorReceivedPrice),
+        parseInt(factorTabInfo.factorTotalPrice),
+        parseInt(factorTabInfo.toCompanySettlement),
         serviceTabInfo.address,
         serviceTabInfo.description,
         serviceTabInfo.image,
@@ -439,8 +449,9 @@ const MyServiceDetails = ({navigation}) => {
         serviceID,
         convertResultTitleToNum(serviceTabInfo.serviceResult),
         convertTypeTitleToNum(serviceTabInfo.serviceType),
-        factorTabInfo.factorReceivedPrice,
-        factorTabInfo.factorTotalPrice,
+        parseInt(factorTabInfo.factorReceivedPrice),
+        parseInt(factorTabInfo.factorTotalPrice),
+        parseInt(factorTabInfo.toCompanySettlement),
         serviceTabInfo.address,
         serviceTabInfo.description,
         serviceTabInfo.image,
