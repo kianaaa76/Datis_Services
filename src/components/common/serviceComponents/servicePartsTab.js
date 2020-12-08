@@ -23,7 +23,7 @@ import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
 import {RNCamera} from 'react-native-camera';
-import {normalize} from '../../utils/utilities';
+import {normalize, addDotsToPrice} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -561,7 +561,7 @@ const ServicePartsTab = ({
               onChangeText={text =>
                 refactorObjectListItems('tempPrice', text, Item.index)
               }
-              value={Item.tempPrice}
+              value={addDotsToPrice(Item.tempPrice)}
               keyboardType="numeric"
             />
             <Text style={Styles.labelStyle}>قیمت:</Text>
@@ -601,7 +601,7 @@ const ServicePartsTab = ({
                 onChangeText={text =>
                   refactorObjectListItems('tempPrice', text, Item.index)
                 }
-                value={Item.tempPrice}
+                value={addDotsToPrice(Item.tempPrice)}
                 keyboardType="numeric"
               />
               <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
@@ -1028,7 +1028,7 @@ const ServicePartsTab = ({
                   onChangeText={text =>
                     setFieldsObject({...fieldsObject, Price: text})
                   }
-                  value={fieldsObject.Price}
+                  value={addDotsToPrice(fieldsObject.Price)}
                   keyboardType="numeric"
                 />
                 <Text style={Styles.labelStyle}>قیمت:</Text>
@@ -1070,7 +1070,7 @@ const ServicePartsTab = ({
                     onChangeText={text =>
                       setFieldsObject({...fieldsObject, Price: text})
                     }
-                    value={fieldsObject.Price}
+                    value={addDotsToPrice(fieldsObject.Price)}
                     keyboardType="numeric"
                   />
                   <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
