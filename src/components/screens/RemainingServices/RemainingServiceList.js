@@ -7,6 +7,7 @@ import {
     ActivityIndicator,
     StyleSheet,
     Text,
+    BackHandler
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
@@ -25,6 +26,19 @@ const RemainingServiceList = ({navigation}) => {
     const selector = useSelector((state) => state);
     const [listLoading, setListLoading] = useState(false);
     const [serviceList, setServiceList] = useState([]);
+
+    useEffect(() => {
+        const backAction = () => {
+          navigation.goBack();
+          return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+          'hardwareBackPress',
+          backAction,
+        );
+        return () => backHandler.remove();
+      });
+
     const getServices = () => {
         setListLoading(true);
         unsettledServiceList(selector.userId, selector.token).then((data) => {

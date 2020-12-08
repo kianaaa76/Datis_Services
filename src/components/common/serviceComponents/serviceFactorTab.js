@@ -13,7 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../ImageViwer';
-import {normalize} from '../../utils/utilities';
+import {normalize, addDotsToPrice} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -39,6 +39,8 @@ const ServiceFactorTab = ({
     return () => backHandler.remove();
   });
 
+  
+
   return (
     <>
       <ScrollView
@@ -54,10 +56,15 @@ const ServiceFactorTab = ({
             onChangeText={text => {
               setInfo({...info, factorReceivedPrice: text});
             }}
-            value={info.factorReceivedPrice.toString()}
+            value={addDotsToPrice(info.factorReceivedPrice.toString())}
             keyboardType="numeric"
           />
-          <View style={{flexDirection: 'row'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '24%',
+              justifyContent: 'flex-end',
+            }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon
@@ -75,10 +82,15 @@ const ServiceFactorTab = ({
             onChangeText={text => {
               setInfo({...info, toCompanySettlement: text});
             }}
-            value={info.toCompanySettlement.toString()}
+            value={addDotsToPrice(info.toCompanySettlement.toString())}
             keyboardType="numeric"
           />
-          <View style={{flexDirection: 'row', width: '26%'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '24%',
+              justifyContent: 'flex-end',
+            }}>
             <Text style={Styles.labelStyle}> مبلغ واریزی به حساب شرکت:</Text>
           </View>
         </View>
@@ -92,10 +104,15 @@ const ServiceFactorTab = ({
                 factorTotalPrice: text,
               });
             }}
-            value={info.factorTotalPrice.toString()}
+            value={addDotsToPrice(info.factorTotalPrice.toString())}
             keyboardType="numeric"
           />
-          <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              width: '24%',
+            }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon
@@ -152,7 +169,12 @@ const ServiceFactorTab = ({
               />
             )}
           </View>
-          <View style={{flexDirection: 'row'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '24%',
+              justifyContent: 'flex-end',
+            }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
                 <Icon
@@ -220,13 +242,18 @@ const ServiceFactorTab = ({
               />
             )}
           </View>
-          <View style={{flexDirection: 'row'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '24%',
+              justifyContent: 'flex-end',
+            }}>
             {!!info.toCompanySettlement && (
-                <Icon
-                  name={'star'}
-                  style={{color: 'red', fontSize: normalize(10)}}
-                />
-              )}
+              <Icon
+                name={'star'}
+                style={{color: 'red', fontSize: normalize(10)}}
+              />
+            )}
             <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
           </View>
         </View>
@@ -324,6 +351,8 @@ const Styles = StyleSheet.create({
   labelStyle: {
     fontFamily: 'IRANSansMobile_Light',
     flexShrink: 1,
+    textAlign: 'right',
+    width: '90%',
   },
   modalBackgroundStyle: {
     flex: 1,

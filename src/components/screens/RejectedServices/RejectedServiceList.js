@@ -10,6 +10,7 @@ import {
   Text,
   TouchableHighlight,
   Alert,
+  BackHandler
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -43,6 +44,18 @@ const MyService = ({navigation}) => {
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [selectItemLoading, setSelectItemLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.goBack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  });
 
   const getServiceResult = resultNum => {
     switch (resultNum) {

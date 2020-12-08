@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
+  BackHandler
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -27,6 +28,19 @@ const MissionList = ({navigation}) => {
   const [missionListLoading, setMissionListLoading] = useState(false);
   const [missionList, setMissionList] = useState([]);
   const [showingMissionList, setShowingMissionList] = useState([]);
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.goBack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  });
+
   const getMissions = () => {
     setMissionListLoading(true);
     getMissionList(selector.userId, selector.token).then(data => {

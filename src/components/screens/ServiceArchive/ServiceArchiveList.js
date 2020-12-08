@@ -8,7 +8,8 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    TextInput
+    TextInput,
+    BackHandler
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
@@ -31,6 +32,17 @@ const ServiceArchiveList = ({navigation}) => {
     const [renderModal, setRenderModal] = useState(true);
     const [serial, setSerial] = useState("");
 
+    useEffect(() => {
+        const backAction = () => {
+          navigation.goBack();
+          return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+          'hardwareBackPress',
+          backAction,
+        );
+        return () => backHandler.remove();
+      });
 
     const getServices = () => {
         setServiceLoading(true);
