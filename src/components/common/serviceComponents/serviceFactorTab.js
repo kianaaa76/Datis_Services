@@ -39,8 +39,6 @@ const ServiceFactorTab = ({
     return () => backHandler.remove();
   });
 
-  
-
   return (
     <>
       <ScrollView
@@ -176,7 +174,8 @@ const ServiceFactorTab = ({
               justifyContent: 'flex-end',
             }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
-              serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+              serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' &&
+              serviceInfo.serviceResult !== 'سرویس جدید- کسری قطعات' && (
                 <Icon
                   name={'star'}
                   style={{color: 'red', fontSize: normalize(10)}}
@@ -248,7 +247,7 @@ const ServiceFactorTab = ({
               width: '24%',
               justifyContent: 'flex-end',
             }}>
-            {!!info.toCompanySettlement && (
+            {!!info.toCompanySettlement && info.toCompanySettlement != '0' && (
               <Icon
                 name={'star'}
                 style={{color: 'red', fontSize: normalize(10)}}

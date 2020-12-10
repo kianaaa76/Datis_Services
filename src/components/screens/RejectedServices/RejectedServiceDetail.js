@@ -241,7 +241,8 @@ const MyServiceDetails = ({navigation}) => {
     if (
       !factorTabInfo.factorImage &&
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
     ) {
       setRequestLoading(false);
       setIndex(1);
@@ -252,7 +253,8 @@ const MyServiceDetails = ({navigation}) => {
       !factorTabInfo.factorReceivedPrice &&
       factorTabInfo.factorReceivedPrice !== 0 &&
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
     ) {
       setRequestLoading(false);
       setIndex(1);
@@ -263,7 +265,8 @@ const MyServiceDetails = ({navigation}) => {
       !factorTabInfo.factorTotalPrice &&
       factorTabInfo.factorTotalPrice !== 0 &&
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
     ) {
       setRequestLoading(false);
       setIndex(1);
@@ -279,7 +282,8 @@ const MyServiceDetails = ({navigation}) => {
     } else if (
       !serviceTabInfo.finalDate &&
       convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
     ) {
       setRequestLoading(false);
       setIndex(0);
@@ -292,7 +296,12 @@ const MyServiceDetails = ({navigation}) => {
       Alert.alert('اخطار', 'لطفا نتیجه سرویس را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
-    } else if (!serviceTabInfo.serviceType) {
+    } else if (
+      !serviceTabInfo.serviceType &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
+      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
+    ) {
       setRequestLoading(false);
       setIndex(0);
       Alert.alert('اخطار', 'لطفا نوع سرویس را مشخص کنید.', [
@@ -309,6 +318,7 @@ const MyServiceDetails = ({navigation}) => {
       ]);
     } else if (
       !!factorTabInfo.toCompanySettlement &&
+      factorTabInfo.toCompanySettlement != '0' &&
       !factorTabInfo.billImage
     ) {
       setRequestLoading(false);

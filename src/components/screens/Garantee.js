@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import Header from '../common/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {RNCamera} from 'react-native-camera';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+// import {RNCamera} from 'react-native-camera';
+import {CameraKitCameraScreen} from 'react-native-camera-kit';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
 import {toFaDigit, normalize} from '../utils/utilities';
@@ -117,7 +119,7 @@ const Garantee = ({navigation}) => {
               )}
             </TouchableOpacity>
             {!!product ? (
-              <View style={{marginTop:30}}> 
+              <View style={{marginTop: 30}}>
                 {renderSingleItem(
                   'وضعیت',
                   product.RamzDate.length > 0
@@ -135,15 +137,26 @@ const Garantee = ({navigation}) => {
           </View>
         </>
       ) : (
-        <RNCamera
-          defaultTouchToFocus
-          onBarCodeRead={code => setSerial(code.data.toString())}
-          style={Styles.preview}
-          type={RNCamera.Constants.Type.back}>
-          <View style={Styles.barcodeContainerStyle}>
-            <View style={Styles.barcodeLineStyle} />
-          </View>
-        </RNCamera>
+        <CameraKitCameraScreen
+          scanBarcode={true}
+          laserColor={'#660000'}
+          frameColor={'yellow'}
+          onReadCode={event =>
+            setSerial(event.nativeEvent.codeStringValue.toString())
+          } 
+          hideControls={false} 
+          showFrame={true} 
+          colorForScannerFrame={'red'} 
+        />
+        // <RNCamera
+        //   defaultTouchToFocus
+        //   onBarCodeRead={code => setSerial(code.data.toString())}
+        //   style={Styles.preview}
+        //   type={RNCamera.Constants.Type.back}>
+        //   <View style={Styles.barcodeContainerStyle}>
+        //     <View style={Styles.barcodeLineStyle} />
+        //   </View>
+        // </RNCamera>
       )}
     </View>
   );
@@ -203,7 +216,7 @@ const Styles = StyleSheet.create({
     width: pageWidth * 0.5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop:15
+    marginTop: 15,
   },
   titleTextStyle: {
     fontSize: normalize(14),

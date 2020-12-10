@@ -22,7 +22,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
-import {RNCamera} from 'react-native-camera';
+// import {RNCamera} from 'react-native-camera';
+import {CameraKitCameraScreen} from 'react-native-camera-kit';
 import {normalize, addDotsToPrice} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
@@ -1220,33 +1221,61 @@ const ServicePartsTab = ({
       )}
     </>
   ) : (
-    <RNCamera
-      defaultTouchToFocus
-      onBarCodeRead={onSuccess}
-      style={Styles.preview}
-      type={RNCamera.Constants.Type.back}>
-      <>
-        <TouchableOpacity
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            width: pageWidth * 0.12,
-            height: pageWidth * 0.12,
-            backgroundColor: '#fff',
-            borderRadius: pageWidth * 0.06,
-            justifyContent: 'center',
-            alignItems: 'center',
-            elevation: 5,
-          }}
-          onPress={() => setScreenMode(false)}>
-          <Icon name="close" style={{fontSize: 30, color: '#000'}} />
-        </TouchableOpacity>
-        <View style={Styles.barcodeContainerStyle}>
-          <View style={Styles.barcodeLineStyle} />
-        </View>
-      </>
-    </RNCamera>
+    <>
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#fff',
+          width: pageWidth * 0.12,
+          height: pageWidth * 0.12,
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          zIndex: 9999,
+          borderRadius: pageWidth * 0.06,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onPress={() => setScreenMode(false)}>
+        <Icon name="close" style={{fontSize: 30, color: '#000'}} />
+      </TouchableOpacity>
+      <CameraKitCameraScreen
+        scanBarcode={true}
+        laserColor={'#660000'}
+        frameColor={'yellow'}
+        onReadCode={event => onSuccess(event.nativeEvent.codeStringValue)} //optional
+        hideControls={false} //(default false) optional, hide buttons and additional controls on top and bottom of screen
+        showFrame={true} //(default false) optional, show frame with transparent layer (qr code or barcode will be read on this area ONLY), start animation for scanner,that stoped when find any code. Frame always at center of the screen
+        colorForScannerFrame={'red'} //(default white) optional, change colot of the scanner frame
+      />
+    </>
+    // <RNCamera
+    //   defaultTouchToFocus
+    //   onBarCodeRead={onSuccess}
+    //   style={Styles.preview}
+    //   type={RNCamera.Constants.Type.back}
+    // >
+    //   <>
+    //     <TouchableOpacity
+    //       style={{
+    //         position: 'absolute',
+    //         top: 10,
+    //         right: 10,
+    //         width: pageWidth * 0.12,
+    //         height: pageWidth * 0.12,
+    //         backgroundColor: '#fff',
+    //         borderRadius: pageWidth * 0.06,
+    //         justifyContent: 'center',
+    //         alignItems: 'center',
+    //         elevation: 5,
+    //       }}
+    //       onPress={() => setScreenMode(false)}>
+    //       <Icon name="close" style={{fontSize: 30, color: '#000'}} />
+    //     </TouchableOpacity>
+    //     <View style={Styles.barcodeContainerStyle}>
+    //       <View style={Styles.barcodeLineStyle} />
+    //     </View>
+    //   </>
+    // </RNCamera>
   );
 };
 

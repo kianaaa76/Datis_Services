@@ -4868,7 +4868,7 @@ lodash.unset@^4.5.2:
   resolved "https://registry.yarnpkg.com/lodash.unset/-/lodash.unset-4.5.2.tgz#370d1d3e85b72a7e1b0cdf2d272121306f23e4ed"
   integrity sha1-Nw0dPoW3Kn4bDN8tJyEhMG8j5O0=
 
-lodash@^4.0.0, lodash@^4.17.10, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.3.0:
+lodash@^4.0.0, lodash@^4.14.2, lodash@^4.17.10, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.3.0:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
@@ -6160,12 +6160,12 @@ react-native-animatable@^1.1.0:
   dependencies:
     prop-types "^15.7.2"
 
-react-native-camera@^3.40.0:
-  version "3.40.0"
-  resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-3.40.0.tgz#69845991e46b0892cc2b50322d49b18f292c3202"
-  integrity sha512-Ur0hZqZcl3SntTVMB9GxuiLYpQxqwgzhQVb+7EGae4WjfDzQEwlGF0bJ7UpZyeUTb1oZmsiSib58xUckn11XMw==
+react-native-camera-kit@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-camera-kit/-/react-native-camera-kit-10.0.0.tgz#bac51f1955c77557e9e98020660904087f50ff3c"
+  integrity sha512-9Bhiin5KFwTT1XBk6n8FGcOV6MickTxZr7dI+2pxlThDiVDl9oLhAwVn6FmQABo/UpYMmYrA5siym4q7Feih7g==
   dependencies:
-    prop-types "^15.6.2"
+    lodash "^4.14.2"
 
 react-native-color@0.0.10:
   version "0.0.10"

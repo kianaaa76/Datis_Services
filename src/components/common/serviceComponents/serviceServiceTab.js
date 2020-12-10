@@ -218,7 +218,8 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               </Text>
             )}
             {info.serviceResult !== 'لغو موفق' &&
-              info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
+              info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' &&
+              info.serviceResult !== 'سرویس جدید- کسری قطعات' && (
                 <Icon
                   name={'star'}
                   style={{color: 'red', fontSize: normalize(10)}}
@@ -235,7 +236,14 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                 flexDirection: 'row',
                 justifyContent: 'flex-end',
               }}>
-              <Icon name={'star'} style={{color: 'red'}} />
+              {info.serviceResult !== 'لغو موفق' &&
+                info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' &&
+                info.serviceResult !== 'سرویس جدید- کسری قطعات' && (
+                  <Icon
+                    name={'star'}
+                    style={{color: 'red', fontSize: normalize(10)}}
+                  />
+                )}
               <Text style={Styles.serviceTypeTextStyle}>نوع سرویس:</Text>
             </View>
             {renderCheckbox('خرابی یا تعویض قطعه', 'type')}
