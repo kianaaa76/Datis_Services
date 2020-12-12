@@ -22,7 +22,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
-// import {RNCamera} from 'react-native-camera';
 import {CameraKitCameraScreen} from 'react-native-camera-kit';
 import {normalize, addDotsToPrice} from '../../utils/utilities';
 
@@ -57,6 +56,7 @@ const ServicePartsTab = ({
   const [objectsList, setObjectsList] = useState(info);
   const [selectedItemList, setSelectedItemList] = useState({});
   const [rerender, setRerender] = useState(false);
+  const [qrScannerLoading, setQrScannerLoading] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -90,10 +90,10 @@ const ServicePartsTab = ({
   });
 
   const onSuccess = async code => {
-    await setScreenMode(false);
-    let header = parseInt(code.data.toString().substr(0, 3));
+    setScreenMode(false);
+    let header = parseInt(code.toString().substr(0, 3));
     numOfZeros = 0;
-    while (code.data[numOfZeros] == '0') {
+    while (code.toString()[numOfZeros] == '0') {
       numOfZeros = numOfZeros + 1;
     }
     let prefix = '';
@@ -104,11 +104,11 @@ const ServicePartsTab = ({
       item => prefix.concat(item.value.SerialBarcode) == header,
     );
     let serialHeaderIndex = selectedObject[0].value.SerialFormat.indexOf('#');
-    let leftOfCode = code.data
+    let leftOfCode = code
       .toString()
       .substr(
         header.toString().length,
-        code.data.length - header.toString().length,
+        code.toString().length - header.toString().length,
       );
     if (selectedObject.length > 0) {
       getObjBySerial(
@@ -143,6 +143,7 @@ const ServicePartsTab = ({
               selectedItemList.index,
             );
             setSelectedItemList({});
+            setQrScannerLoading(false);
           } else {
             setFieldsObject({
               ...fieldsObject,
@@ -153,6 +154,7 @@ const ServicePartsTab = ({
                 serialHeaderIndex,
               )}${leftOfCode}`,
             });
+            setQrScannerLoading(false);
           }
         } else {
           ToastAndroid.showWithGravity(
@@ -160,6 +162,7 @@ const ServicePartsTab = ({
             ToastAndroid.SHORT,
             ToastAndroid.CENTER,
           );
+          setQrScannerLoading(false);
         }
       });
     } else {
@@ -766,6 +769,20 @@ const ServicePartsTab = ({
 
   return !screenMode ? (
     <>
+      {qrScannerLoading && (
+        <View
+          style={{
+            flex:1,
+            backgroundColor: '#000',
+            opacity: 0.5,
+            position: 'absolute',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex:9999
+          }}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      )}
       <ScrollView style={{flex: 0.8, padding: 15}}>
         {!!info && info.length > 0 && (
           <View style={{flex: 1, marginBottom: 10}}>
@@ -1242,40 +1259,16 @@ const ServicePartsTab = ({
         scanBarcode={true}
         laserColor={'#660000'}
         frameColor={'yellow'}
-        onReadCode={event => onSuccess(event.nativeEvent.codeStringValue)} //optional
-        hideControls={false} //(default false) optional, hide buttons and additional controls on top and bottom of screen
-        showFrame={true} //(default false) optional, show frame with transparent layer (qr code or barcode will be read on this area ONLY), start animation for scanner,that stoped when find any code. Frame always at center of the screen
-        colorForScannerFrame={'red'} //(default white) optional, change colot of the scanner frame
+        onReadCode={event => {
+          setQrScannerLoading(true);
+          setScreenMode(false);
+          onSuccess(event.nativeEvent.codeStringValue);
+        }} 
+        hideControls={false} 
+        showFrame={true}
+        colorForScannerFrame={'red'} 
       />
     </>
-    // <RNCamera
-    //   defaultTouchToFocus
-    //   onBarCodeRead={onSuccess}
-    //   style={Styles.preview}
-    //   type={RNCamera.Constants.Type.back}
-    // >
-    //   <>
-    //     <TouchableOpacity
-    //       style={{
-    //         position: 'absolute',
-    //         top: 10,
-    //         right: 10,
-    //         width: pageWidth * 0.12,
-    //         height: pageWidth * 0.12,
-    //         backgroundColor: '#fff',
-    //         borderRadius: pageWidth * 0.06,
-    //         justifyContent: 'center',
-    //         alignItems: 'center',
-    //         elevation: 5,
-    //       }}
-    //       onPress={() => setScreenMode(false)}>
-    //       <Icon name="close" style={{fontSize: 30, color: '#000'}} />
-    //     </TouchableOpacity>
-    //     <View style={Styles.barcodeContainerStyle}>
-    //       <View style={Styles.barcodeLineStyle} />
-    //     </View>
-    //   </>
-    // </RNCamera>
   );
 };
 

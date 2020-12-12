@@ -156,6 +156,7 @@ const MyServiceDetails = ({navigation}) => {
         projectId: serviceID,
         factorReceivedPrice: factorTabInfo.factorReceivedPrice,
         factorTotalPrice: factorTabInfo.factorTotalPrice,
+        toCompanySettlement:factorTabInfo.toCompanySettlement,
         serviceDescription: serviceTabInfo.description,
         address: serviceTabInfo.address,
         finalDate: serviceTabInfo.finalDate,
