@@ -99,7 +99,7 @@ const RejectedServiceListItem = ({
                         projectId: Item.projectID,
                         factorReceivedPrice: data.result.RecivedAmount,
                         factorTotalPrice: data.result.InvoiceAmount,
-                        toCompanySettlement: data.result.toCompanySettlement,
+                        toCompanySettlement: data.result.ToCompanySettlement,
                         serviceDescription: data.result.Details,
                         address: data.result.Location,
                         finalDate: data.result.DoneTime,
