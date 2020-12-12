@@ -25,7 +25,6 @@ const ServiceFactorTab = ({
   renderSaveModal,
   isRejected,
 }) => {
-  console.warn("info", info);
   const [deletingImage, setDeletingImage] = useState(0);
 
   useEffect(() => {

@@ -773,14 +773,18 @@ const ServicePartsTab = ({
         <View
           style={{
             flex:1,
+            width:pageWidth,
             backgroundColor: '#000',
             opacity: 0.5,
             position: 'absolute',
+            top:0,
+            bottom:0,
             justifyContent: 'center',
             alignItems: 'center',
+            alignSelf:"center",
             zIndex:9999
           }}>
-          <ActivityIndicator size="large" color="#fff" />
+          <ActivityIndicator size="large" color="#fff"/>
         </View>
       )}
       <ScrollView style={{flex: 0.8, padding: 15}}>
