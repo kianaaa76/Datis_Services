@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {
   PermissionsAndroid,
   Platform,
+  StatusBar
 } from 'react-native';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -40,6 +41,7 @@ const App = () => {
     <Provider store={myStore}>
         <SendData/>
       <PersistGate loading={null} persistor={myPersistor}>
+      <StatusBar backgroundColor="#520000"/>
         <RootNav/>
       </PersistGate>
     </Provider>

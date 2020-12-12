@@ -11,7 +11,7 @@ import {
   ScrollView,
   ToastAndroid,
   ActivityIndicator,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import {LOGIN, LOGOUT} from '../../actions/types';
 import {useDispatch} from 'react-redux';
@@ -23,6 +23,7 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 const inputActiveColor = '#660000';
 const inputDeactiveColor = 'gray';
+let secondTextInputRef = '';
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
   const [hasCode, setHasCode] = useState(false);
@@ -57,6 +58,9 @@ const Login = ({navigation}) => {
     loginUser(phoneNumber).then(data => {
       if (data.errorCode == 0) {
         setHasCode(true);
+        if (!!secondTextInputRef) {
+          secondTextInputRef.focus();
+        }
         const counterInterval = setInterval(() => {
           if (iteration > 0) {
             iteration = iteration - 1;
@@ -98,7 +102,7 @@ const Login = ({navigation}) => {
             dispatch({
               type: LOGIN,
               token: data.result.Token,
-              constantToken:data.result.Token,
+              constantToken: data.result.Token,
               userId: data.result.ID,
               constantUserId: data.result.ID,
             });
@@ -111,10 +115,10 @@ const Login = ({navigation}) => {
             });
             setEnterSystemLoading(false);
             ToastAndroid.showWithGravity(
-              "کد وارد شده صحیح نیست.",
+              'کد وارد شده صحیح نیست.',
               ToastAndroid.SHORT,
-              ToastAndroid.CENTER
-            )
+              ToastAndroid.CENTER,
+            );
             setPersistLoading(false);
           }
         });
@@ -131,7 +135,7 @@ const Login = ({navigation}) => {
       style={{flex: 1}}
       scrollEnabled={false}
       keyboardShouldPersistTaps="handled">
-      <StatusBar hidden/>
+      <StatusBar hidden />
       <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
         <View style={{marginTop: '30%', alignItems: 'center'}}>
           <View style={Styles.textInputContainerStyle}>
@@ -168,6 +172,9 @@ const Login = ({navigation}) => {
               style={Styles.iconStyle}
             />
             <TextInput
+              ref={input => {
+                secondTextInputRef = input;
+              }}
               style={Styles.textInputStyle}
               placeholder="کد فعالسازی"
               onChangeText={code => setCode(code)}
@@ -263,7 +270,7 @@ const Styles = StyleSheet.create({
     fontSize: normalize(13),
     textAlign: 'center',
     color: '#660000',
-    fontFamily:"IRANSansMobile_Bold"
+    fontFamily: 'IRANSansMobile_Bold',
   },
   textInputStyle: {
     width: pageWidth * 0.45,
