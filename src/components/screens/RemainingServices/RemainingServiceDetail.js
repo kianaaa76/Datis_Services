@@ -330,8 +330,9 @@ const RemainingServiceDetail = ({navigation}) => {
                 style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
                 onPress={() =>
                   ImagePicker.openCamera({
+                    cropping: true,
                     width: pageWidth - 20,
-                    height: pageHeight * 0.4,
+                    height: pageHeight * 0.7,
                     includeBase64: true,
                     compressImageQuality: 0.7,
                   }).then(response => {
@@ -344,8 +345,9 @@ const RemainingServiceDetail = ({navigation}) => {
                 style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
                 onPress={() =>
                   ImagePicker.openPicker({
+                    cropping: true,
                     width: pageWidth - 20,
-                    height: pageHeight * 0.4,
+                    height: pageHeight * 0.7,
                     includeBase64: true,
                     compressImageQuality: 0.7,
                   }).then(response => {
@@ -366,7 +368,7 @@ const RemainingServiceDetail = ({navigation}) => {
             {!!factorImage && (
               <ImageViewer
                 width={pageWidth - 30}
-                height={pageHeight * 0.4}
+                height={pageHeight * 0.7}
                 imageUrl={`data:image/jpeg;base64,${factorImage}`}
               />
             )}

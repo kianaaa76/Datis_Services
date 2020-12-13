@@ -129,7 +129,8 @@ const ServiceFactorTab = ({
               onPress={() => {
                 ImagePicker.openCamera({
                   width: pageWidth - 20,
-                  height: pageHeight * 0.4,
+                  height: pageHeight*0.7,
+                  cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
@@ -146,7 +147,8 @@ const ServiceFactorTab = ({
               onPress={() => {
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
-                  height: pageHeight * 0.4,
+                  height: pageHeight*0.7,
+                  cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
@@ -187,7 +189,7 @@ const ServiceFactorTab = ({
         {!!info.factorImage && (
           <ImageViewer
             width={pageWidth - 30}
-            height={pageHeight * 0.4}
+            height={pageHeight * 0.7}
             imageUrl={`data:image/jpeg;base64,${info.factorImage}`}
           />
         )}
@@ -203,7 +205,8 @@ const ServiceFactorTab = ({
               onPress={() => {
                 ImagePicker.openCamera({
                   width: pageWidth - 20,
-                  height: pageHeight * 0.4,
+                  height: pageHeight*0.7,
+                  cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
@@ -220,8 +223,9 @@ const ServiceFactorTab = ({
               onPress={() =>
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
-                  height: pageHeight * 0.4,
+                  height: pageHeight*0.7,
                   includeBase64: true,
+                  cropping: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
                   setInfo({
@@ -259,7 +263,7 @@ const ServiceFactorTab = ({
         {!!info.billImage && (
           <ImageViewer
             width={pageWidth - 30}
-            height={pageHeight * 0.4}
+            height={pageHeight * 0.7}
             imageUrl={`data:image/jpeg;base64,${info.billImage}`}
           />
         )}

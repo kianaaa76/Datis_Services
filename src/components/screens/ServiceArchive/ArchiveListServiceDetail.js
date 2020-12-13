@@ -13,17 +13,12 @@ import {
 import Header from '../../common/Header';
 import {unsettledServiceDetail} from '../../../actions/api';
 import {useSelector, useDispatch} from 'react-redux';
-import {API_KEY, LOGOUT} from '../../../actions/types';
+import { LOGOUT} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImageViewer from '../../common/ImageViwer';
-import MapboxGL from '@react-native-mapbox-gl/maps';
-import Foundation from 'react-native-vector-icons/Foundation';
-import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
-let cameraRef = {};
 
 const ServiceArchiveDetail = ({navigation}) => {
   const dispatch = useDispatch();
@@ -34,10 +29,6 @@ const ServiceArchiveDetail = ({navigation}) => {
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
-  const [selectedLatitude, setSelectedLatitude] = useState(null);
-  const [selectedLongitude, setSelectedLongitude] = useState(null);
-  const [userLatitude, setUserLatitude] = useState(null);
-  const [userLongitude, setUserLongitude] = useState(null);
   const SERVICE = navigation.getParam('service');
 
   const getServiceResult = resultNum => {
@@ -277,7 +268,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                       {!!factorImage && (
                         <ImageViewer
                           width={pageWidth * 0.9 - 20}
-                          height={pageHeight * 0.4}
+                          height={pageHeight * 0.7}
                           imageUrl={`data:image/jpeg;base64,${factorImage}`}
                         />
                       )}
@@ -288,7 +279,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                           </View>
                           <ImageViewer
                             width={pageWidth * 0.9 - 20}
-                            height={pageHeight * 0.4}
+                            height={pageHeight * 0.7}
                             imageUrl={`data:image/jpeg;base64,${image}`}
                           />
                         </>

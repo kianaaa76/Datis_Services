@@ -24,6 +24,7 @@ import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
 import {CameraKitCameraScreen} from 'react-native-camera-kit';
 import {normalize, addDotsToPrice} from '../../utils/utilities';
+import {atan} from "react-native-reanimated";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -99,6 +100,7 @@ const ServicePartsTab = ({
     let prefix = '';
     while (numOfZeros > 0) {
       prefix = '0'.concat(prefix);
+      numOfZeros = numOfZeros - 1;
     }
     let selectedObject = partsListName.filter(
       item => prefix.concat(item.value.SerialBarcode) == header,
@@ -107,7 +109,7 @@ const ServicePartsTab = ({
     let leftOfCode = code
       .toString()
       .substr(
-        header.toString().length,
+        header.toString().length+1,
         code.toString().length - header.toString().length,
       );
     if (selectedObject.length > 0) {
