@@ -130,7 +130,7 @@ const ServiceFactorTab = ({
                 ImagePicker.openCamera({
                   width: pageWidth - 20,
                   height: pageHeight*0.7,
-                  cropping: true,
+                  // cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
@@ -148,7 +148,7 @@ const ServiceFactorTab = ({
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
                   height: pageHeight*0.7,
-                  cropping: true,
+                  // cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
@@ -188,7 +188,7 @@ const ServiceFactorTab = ({
         </View>
         {!!info.factorImage && (
           <ImageViewer
-            width={pageWidth - 30}
+            width={pageWidth-20}
             height={pageHeight * 0.7}
             imageUrl={`data:image/jpeg;base64,${info.factorImage}`}
           />
@@ -204,9 +204,9 @@ const ServiceFactorTab = ({
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
                 ImagePicker.openCamera({
-                  width: pageWidth - 20,
+                  width: pageWidth-20,
                   height: pageHeight*0.7,
-                  cropping: true,
+                  // cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
@@ -225,7 +225,7 @@ const ServiceFactorTab = ({
                   width: pageWidth - 20,
                   height: pageHeight*0.7,
                   includeBase64: true,
-                  cropping: true,
+                  // cropping: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
                   setInfo({

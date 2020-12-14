@@ -330,7 +330,7 @@ const RemainingServiceDetail = ({navigation}) => {
                 style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
                 onPress={() =>
                   ImagePicker.openCamera({
-                    cropping: true,
+                    // cropping: true,
                     width: pageWidth - 20,
                     height: pageHeight * 0.7,
                     includeBase64: true,
@@ -345,7 +345,7 @@ const RemainingServiceDetail = ({navigation}) => {
                 style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
                 onPress={() =>
                   ImagePicker.openPicker({
-                    cropping: true,
+                    // cropping: true,
                     width: pageWidth - 20,
                     height: pageHeight * 0.7,
                     includeBase64: true,

@@ -10,7 +10,7 @@ export function normalize(size) {
   if (Platform.OS === 'ios') {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
   } else {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 3;
+    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 4;
   }
 }
 

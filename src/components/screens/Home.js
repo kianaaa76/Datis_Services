@@ -148,7 +148,7 @@ const Home = ({navigation}) => {
         style={Styles.containerStyle}
         imageStyle={{resizeMode: isKeyboardVisible ? 'cover' : 'stretch'}}
       />
-      <ScrollView
+      <View
         style={{flex: 1, backgroundColor: 'transparent'}}
         keyboardShouldPersistTaps="handled">
         <Header
@@ -238,7 +238,7 @@ const Home = ({navigation}) => {
                   </Text>
                 </TouchableOpacity>
               )}
-              // keyExtractor={(item) => item.index.toString()}
+              keyExtractor={(item) => item.ID.toString()}
               ListEmptyComponent={() => (
                 <Text style={{width: '100%', textAlign: 'center'}}>
                   کاربری یافت نشد.
@@ -278,7 +278,7 @@ const Home = ({navigation}) => {
             })}
           </View>
         </View>
-      </ScrollView>
+      </View>
       <TouchableOpacity
         style={[
           Styles.callIconContainerStyle,

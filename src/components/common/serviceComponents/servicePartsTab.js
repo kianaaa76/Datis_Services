@@ -109,7 +109,7 @@ const ServicePartsTab = ({
     let leftOfCode = code
       .toString()
       .substr(
-        header.toString().length+1,
+        header.toString().length+numOfZeros,
         code.toString().length - header.toString().length,
       );
     if (selectedObject.length > 0) {

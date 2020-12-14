@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {
   PermissionsAndroid,
   Platform,
-  StatusBar
+  StatusBar,
+  I18nManager
 } from 'react-native';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -10,11 +11,7 @@ import {RootNav} from './src/routes/routes';
 import {getStore, getPersistor} from './src/store/index';
 import SendData from "./src/components/screens/SendData";
 
-const ReactNative = require('react-native');
-try {
-  ReactNative.I18nManager.allowRTL(false);
-} catch (e) {
-}
+I18nManager.allowRTL(false);
 
 const App = () => {
   const myStore = getStore();

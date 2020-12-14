@@ -180,10 +180,10 @@ const Styles = StyleSheet.create({
   },
   itemTitleStyle: {
     fontFamily: 'IRANSansMobile_Medium',
-    fontSize: normalize(14),
+    fontSize: normalize(13),
   },
   itemTextStyle: {
-    fontSize: normalize(13),
+    fontSize: normalize(12),
     fontFamily: 'IRANSansMobile_Light',
     flexShrink:1
   },
