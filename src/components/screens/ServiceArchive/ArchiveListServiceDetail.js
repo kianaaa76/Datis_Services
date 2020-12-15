@@ -9,6 +9,7 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  BackHandler
 } from 'react-native';
 import Header from '../../common/Header';
 import {unsettledServiceDetail} from '../../../actions/api';
@@ -30,6 +31,18 @@ const ServiceArchiveDetail = ({navigation}) => {
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
   const SERVICE = navigation.getParam('service');
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.goBack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  });
 
   const getServiceResult = resultNum => {
     switch (resultNum) {

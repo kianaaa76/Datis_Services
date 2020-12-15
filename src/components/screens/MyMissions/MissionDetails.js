@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, StyleSheet, Dimensions, Text} from 'react-native';
+import React,{useEffect} from 'react';
+import {View, StyleSheet, Dimensions, Text, BackHandler} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Header from '../../common/Header';
 import {toFaDigit, normalize} from '../../utils/utilities';
@@ -13,11 +13,11 @@ const MissionDetails = ({navigation}) => {
   const StartLocation = mission.StartLocation;
   const EndLocation = mission.EndLocation;
   const StartLatitude =
-  !!StartLocation && StartLocation.length > 0
+    !!StartLocation && StartLocation.length > 0
       ? StartLocation.substr(0, StartLocation.indexOf(','))
       : 0;
   const StartLongitude =
-  !!StartLocation && StartLocation.length > 0
+    !!StartLocation && StartLocation.length > 0
       ? StartLocation.substr(
           StartLocation.indexOf(',') + 1,
           StartLocation.length,
@@ -28,9 +28,21 @@ const MissionDetails = ({navigation}) => {
       ? EndLocation.substr(0, EndLocation.indexOf(','))
       : 0;
   const EndLongitude =
-  !!EndLocation && EndLocation.length > 0
+    !!EndLocation && EndLocation.length > 0
       ? EndLocation.substr(EndLocation.indexOf(',') + 1, EndLocation.length)
       : 0;
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.goBack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  });
 
   const renderMarker = (latitude, longitude, color, size, id, type) => {
     return (
@@ -132,7 +144,13 @@ const MissionDetails = ({navigation}) => {
             <View style={Styles.firstSingleItemContainerStyle}>
               <Text style={Styles.itemTextStyle}>{`${toFaDigit(
                 parseInt(mission.Distance) > 1000
-                  ? ((parseFloat(mission.Distance) / 1000).toString()).substr(0,(parseFloat(mission.Distance) / 1000).toString().length-1)
+                  ? (parseFloat(mission.Distance) / 1000)
+                      .toString()
+                      .substr(
+                        0,
+                        (parseFloat(mission.Distance) / 1000).toString()
+                          .length - 1,
+                      )
                   : mission.Distance,
               )} ${mission.Distance > 1000 ? 'کیلومتر' : 'متر'}`}</Text>
               <Text style={Styles.itemTitleStyle}>طول ماموریت: </Text>
@@ -169,8 +187,7 @@ const Styles = StyleSheet.create({
   secondSingleItemContainerStyle: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    width:"30%"
-    
+    width: '30%',
   },
   firstSingleItemContainerStyle: {
     marginHorizontal: 10,
@@ -185,7 +202,7 @@ const Styles = StyleSheet.create({
   itemTextStyle: {
     fontSize: normalize(12),
     fontFamily: 'IRANSansMobile_Light',
-    flexShrink:1
+    flexShrink: 1,
   },
   markerLabelStyle: {
     width: 50,

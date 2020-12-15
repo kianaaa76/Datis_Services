@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Image,
   TouchableHighlight,
+  BackHandler
 } from 'react-native';
 import Header from '../../common/Header';
 import {
@@ -40,6 +41,19 @@ const RemainingServiceDetail = ({navigation}) => {
   const [equalizationLoading, setEqualizationLoading] = useState(false);
   const [renderToastModal, setRenderToastModal] = useState(false);
   const SERVICE = navigation.getParam('service');
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.goBack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  });
+
   useEffect(() => {
     unsettledServiceDetail(SERVICE.projectID, selector.token).then(data => {
       if (data.errorCode === 0) {

@@ -535,7 +535,7 @@ const ServicePartsTab = ({
               />
               <View style={{flexDirection: 'row'}}>
                 {!!Item.partType.label &&
-                Item.partType.value.SerialFormat.length > 0 ? (
+                Item.tempPart.value.SerialFormat.length > 0 ? (
                   <Icon name={'star'} style={{color: 'red'}} />
                 ) : null}
                 <Text style={Styles.labelStyle}>سریال:</Text>
@@ -754,6 +754,7 @@ const ServicePartsTab = ({
       setObjectsList(list);
       setInfo(list);
     } else {
+      setSelectedPartVersionsList(fieldsObject.partTypeSelected.value.Versions)
       setObjectsList(list);
       setInfo(list);
       let obj = {
