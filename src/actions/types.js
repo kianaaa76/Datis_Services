@@ -9,3 +9,4 @@ export const LOGOUT = 'logout';
 export const GET_OBJECTS_LIST = "get_objects_list";
 export const RESTORE_SERVICE_DATA = "restore_service_data";
 export const SET_EDITING_SERVICE = "set_editing_service";
+export const SET_USER_LIST = "set_user_list";

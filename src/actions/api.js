@@ -342,3 +342,13 @@ export const garanteeInquiry = (serial, token) => {
   }).then((response) => response.json());
 }
 
+export const setHomeLocationOfUser = (token,address)=>{
+  return fetch(`${LOCAL_HOST}/SetHomeLocation?address=${address}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+

@@ -17,7 +17,7 @@ import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
 import splashImage from '../../../assets/images/image_splash_screen.png';
 import {checkUpdate, getUsers} from '../../actions/api';
-import {LOGIN} from '../../actions/types';
+import {LOGIN, SET_USER_LIST} from '../../actions/types';
 import {normalize} from '../utils/utilities';
 
 const pageHeight = Dimensions.get('screen').height;
@@ -46,13 +46,17 @@ const Splash = ({navigation}) => {
               getUsers().then(data => {
                 if (data.errorCode === 0) {
                   dispatch({
+                    type:SET_USER_LIST,
+                    userList : JSON.stringify(data.result)
+                  })
+                  dispatch({
                     type: LOGIN,
                     token: selector.constantToken,
                     constantToken: selector.constantToken,
                     userId: selector.constantUserId,
                     constantUserId: selector.constantUserId,
                   });
-                  navigation.navigate('Home', {users: data.result});
+                  navigation.navigate('Home');
                 } else {
                   Alert.alert(
                     '',
@@ -63,13 +67,17 @@ const Splash = ({navigation}) => {
               });
             } else {
               dispatch({
+                type:SET_USER_LIST,
+                userList:[]
+              });
+              dispatch({
                 type: LOGIN,
                 token: selector.constantToken,
                 constantToken: selector.constantToken,
                 userId: selector.constantUserId,
                 constantUserId: selector.constantUserId,
               });
-              navigation.navigate('Home', {users: []});
+              navigation.navigate('Home');
             }
           } else {
             navigation.navigate('SignedOut');

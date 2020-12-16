@@ -1,8 +1,8 @@
 import React from 'react';
 import {createSwitchNavigator, createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import { createDrawerNavigator } from 'react-navigation-drawer';
-import DrawerContent from "./DrawerContent";
+import {createDrawerNavigator} from 'react-navigation-drawer';
+import DrawerContent from './DrawerContent';
 import Home from '../components/screens/Home';
 import Login from '../components/screens/Login';
 import Missions from '../components/screens/MyMissions/missionList';
@@ -17,20 +17,24 @@ import RemainingServiceDetail from '../components/screens/RemainingServices/Rema
 import ServiceArchiveList from '../components/screens/ServiceArchive/ServiceArchiveList';
 import ServiceArchiveDetail from '../components/screens/ServiceArchive/ArchiveListServiceDetail';
 import Splash from '../components/screens/SplashScreen';
-import Garantee from "../components/screens/Garantee";
+import Garantee from '../components/screens/Garantee';
+import UserAddress from "../components/screens/UserAddress";
 
-export const drawer = createDrawerNavigator({
-  Home:{
-    screen: Home,
+export const drawer = createDrawerNavigator(
+  {
+    Home: {
+      screen: Home,
+    },
+    Garantee: {
+      screen: Garantee,
+    },
   },
-  Garantee: {
-    screen: Garantee
+  {
+    drawerPosition: 'right',
+    initialRouteName: 'Home',
+    contentComponent: DrawerContent,
   },
-}, {
-  drawerPosition:'right',
-  initialRouteName: 'Home',
-  contentComponent: DrawerContent
-});
+);
 
 const SignedIn = createStackNavigator(
   {
@@ -79,11 +83,13 @@ const SignedIn = createStackNavigator(
   },
 );
 
-
 export const switcher = createSwitchNavigator(
   {
     Splash: {
       screen: Splash,
+    },
+    UserAddress: {
+      screen: UserAddress
     },
     SignedIn: {
       screen: SignedIn,

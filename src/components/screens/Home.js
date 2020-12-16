@@ -31,16 +31,15 @@ const pageWidth = Dimensions.get('screen').width;
 const Home = ({navigation}) => {
   const dispatch = useDispatch();
   const selector = useSelector(state => state);
-  const userList = JSON.stringify(navigation.getParam('users'));
   const [user, setUser] = useState('');
   const [showUserList, setShowUserList] = useState(false);
-  const [ShowinUserList, setShowingUserList] = useState(JSON.parse(userList));
+  const [ShowinUserList, setShowingUserList] = useState(JSON.parse(selector.userList));
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
 
   useEffect(() => {
-    if (!!userList) {
-      JSON.parse(userList).map(item => {
+    if (!!selector.userList) {
+      JSON.parse(selector.userList).map(item => {
         if (item.ID == selector.userId) {
           setUser(item);
         }
@@ -113,7 +112,7 @@ const Home = ({navigation}) => {
   };
 
   const search = text => {
-    let temp = JSON.parse(userList).filter(item => item.Name.includes(text));
+    let temp = JSON.parse(selector.userList).filter(item => item.Name.includes(text));
     setShowingUserList(temp);
   };
 
@@ -172,7 +171,7 @@ const Home = ({navigation}) => {
               <TouchableOpacity
                 onPress={() => {
                   setShowUserList(!showUserList);
-                  setShowingUserList(JSON.parse(userList));
+                  setShowingUserList(JSON.parse(selector.userList));
                 }}>
                 <Text
                   style={{
@@ -226,7 +225,7 @@ const Home = ({navigation}) => {
                     });
                     setUser(item.item);
                     setShowUserList(false);
-                    setShowingUserList(userList);
+                    setShowingUserList(JSON.parse(selector.userList));
                   }}>
                   <Text
                     style={{

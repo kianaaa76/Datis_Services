@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
   StatusBar,
 } from 'react-native';
-import {LOGIN, LOGOUT} from '../../actions/types';
+import {LOGIN, LOGOUT, SET_USER_LIST} from '../../actions/types';
 import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit, normalize} from '../utils/utilities';
@@ -40,6 +40,10 @@ const Login = ({navigation}) => {
       getUsers().then(data => {
         if (data.errorCode === 0) {
           setUsersList(data.result);
+          dispatch({
+            type:SET_USER_LIST,
+            userList: JSON.stringify(data.result)
+          })
         } else {
           dispatch({
             type: LOGOUT,
@@ -107,8 +111,12 @@ const Login = ({navigation}) => {
               constantUserId: data.result.ID,
             });
             setEnterSystemLoading(false);
-            navigation.navigate('Home', {users: usersList});
             setPersistLoading(false);
+            if (!!data.result.HomeLocation){
+              navigation.navigate('Home');
+            } else {
+              navigation.navigate('UserAddress');
+            }
           } else {
             dispatch({
               type: LOGOUT,

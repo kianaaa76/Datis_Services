@@ -24,7 +24,7 @@ import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
 import {CameraKitCameraScreen} from 'react-native-camera-kit';
 import {normalize, addDotsToPrice} from '../../utils/utilities';
-import {atan} from "react-native-reanimated";
+import {atan} from 'react-native-reanimated';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -79,6 +79,7 @@ const ServicePartsTab = ({
     };
   }, []);
 
+
   useEffect(() => {
     const backAction = () => {
       renderSaveModal();
@@ -109,7 +110,7 @@ const ServicePartsTab = ({
     let leftOfCode = code
       .toString()
       .substr(
-        header.toString().length+numOfZeros,
+        header.toString().length + numOfZeros,
         code.toString().length - header.toString().length,
       );
     if (selectedObject.length > 0) {
@@ -731,9 +732,7 @@ const ServicePartsTab = ({
       tempPart: fieldsObject.partTypeSelected,
       tempVersion: fieldsObject.partVersionSelected,
       tempPrice: !!fieldsObject.Price ? fieldsObject.Price : '0',
-      tempSerial: !!fieldsObject.serial
-        ? fieldsObject.serial.toUpperCase()
-        : '',
+      tempSerial: serial,
       isConfirmed: true,
       tempFailureDescription: !!fieldsObject.failureDescription
         ? fieldsObject.failureDescription
@@ -754,7 +753,7 @@ const ServicePartsTab = ({
       setObjectsList(list);
       setInfo(list);
     } else {
-      setSelectedPartVersionsList(fieldsObject.partTypeSelected.value.Versions)
+      setSelectedPartVersionsList(fieldsObject.partTypeSelected.value.Versions);
       setObjectsList(list);
       setInfo(list);
       let obj = {
@@ -775,19 +774,19 @@ const ServicePartsTab = ({
       {qrScannerLoading && (
         <View
           style={{
-            flex:1,
-            width:pageWidth,
+            flex: 1,
+            width: pageWidth,
             backgroundColor: '#000',
             opacity: 0.5,
             position: 'absolute',
-            top:0,
-            bottom:0,
+            top: 0,
+            bottom: 0,
             justifyContent: 'center',
             alignItems: 'center',
-            alignSelf:"center",
-            zIndex:9999
+            alignSelf: 'center',
+            zIndex: 9999,
           }}>
-          <ActivityIndicator size="large" color="#fff"/>
+          <ActivityIndicator size="large" color="#fff" />
         </View>
       )}
       <ScrollView style={{flex: 0.8, padding: 15}}>
@@ -1012,7 +1011,6 @@ const ServicePartsTab = ({
                         ...fieldsObject,
                         serial: text,
                       });
-                      setSelectedPartVersionsList([]);
                     }}
                     value={fieldsObject.serial}
                   />
@@ -1270,10 +1268,10 @@ const ServicePartsTab = ({
           setQrScannerLoading(true);
           setScreenMode(false);
           onSuccess(event.nativeEvent.codeStringValue);
-        }} 
-        hideControls={false} 
+        }}
+        hideControls={false}
         showFrame={true}
-        colorForScannerFrame={'red'} 
+        colorForScannerFrame={'red'}
       />
     </>
   );
