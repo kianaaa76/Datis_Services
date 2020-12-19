@@ -60,7 +60,7 @@ const ServiceFactorTab = ({
           <View
             style={{
               flexDirection: 'row',
-              width: '24%',
+              width: '35%',
               justifyContent: 'flex-end',
             }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
@@ -86,7 +86,7 @@ const ServiceFactorTab = ({
           <View
             style={{
               flexDirection: 'row',
-              width: '24%',
+              width: '35%',
               justifyContent: 'flex-end',
             }}>
             <Text style={Styles.labelStyle}> مبلغ واریزی به حساب شرکت:</Text>
@@ -109,7 +109,7 @@ const ServiceFactorTab = ({
             style={{
               flexDirection: 'row',
               justifyContent: 'flex-end',
-              width: '24%',
+              width: '35%',
             }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
@@ -172,7 +172,7 @@ const ServiceFactorTab = ({
           <View
             style={{
               flexDirection: 'row',
-              width: '24%',
+              width: '35%',
               justifyContent: 'flex-end',
             }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
@@ -248,7 +248,7 @@ const ServiceFactorTab = ({
           <View
             style={{
               flexDirection: 'row',
-              width: '24%',
+              width: '35%',
               justifyContent: 'flex-end',
             }}>
             {!!info.toCompanySettlement && info.toCompanySettlement != '0' && (
@@ -326,9 +326,8 @@ const Styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   textInputStyle: {
-    width: '55%',
+    width: '50%',
     height: '100%',
-    marginHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#660000',
     paddingHorizontal: 10,
@@ -353,9 +352,10 @@ const Styles = StyleSheet.create({
   },
   labelStyle: {
     fontFamily: 'IRANSansMobile_Light',
-    flexShrink: 1,
+    fontSize:normalize(15),
+    // flexShrink: 1,
     textAlign: 'right',
-    width: '90%',
+    // width: '90%',
   },
   modalBackgroundStyle: {
     flex: 1,
