@@ -147,12 +147,13 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
                 ImagePicker.openCamera({
-                  cropping: true,
+                  // cropping: true,
                   width: pageWidth - 20,
                   height: pageHeight * 0.7,
-                  // includeBase64: true,
+                  includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
+                  console.warn("data", response.data);
                   setInfo({...info, image: response.data});
                 });
               }}
@@ -162,10 +163,10 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() =>
                 ImagePicker.openPicker({
-                  cropping: true,
+                  // cropping: true,
                   width: pageWidth - 20,
                   height: pageHeight * 0.7,
-                  // includeBase64: true,
+                  includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
                   setInfo({...info, image: response.data});
@@ -188,7 +189,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         </View>
         {!!info.image && (
           <ImageViewer
-            width={pageWidth - 30}
+            width={pageWidth - 20}
             height={pageHeight * 0.7}
             imageUrl={`data:image/jpeg;base64,${info.image}`}
           />

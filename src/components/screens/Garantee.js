@@ -13,8 +13,7 @@ import {
 import Header from '../common/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-// import {RNCamera} from 'react-native-camera';
-import {CameraKitCameraScreen} from 'react-native-camera-kit';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
 import {toFaDigit, normalize} from '../utils/utilities';
@@ -137,26 +136,48 @@ const Garantee = ({navigation}) => {
           </View>
         </>
       ) : (
-        <CameraKitCameraScreen
-          scanBarcode={true}
-          laserColor={'#660000'}
-          frameColor={'yellow'}
-          onReadCode={event =>
-            setSerial(event.nativeEvent.codeStringValue.toString())
-          } 
-          hideControls={false} 
-          showFrame={true} 
-          colorForScannerFrame={'red'} 
+        <QRCodeScanner
+          onRead={code => setSerial(code.data)}
+          showMarker={true}
+          customMarker={
+            <>
+              <TouchableOpacity
+                onPress={() => setScreenMode(false)}
+                style={{
+                  backgroundColor: '#fff',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  elevation: 5,
+                  width: pageWidth * 0.12,
+                  height: pageWidth * 0.12,
+                  borderRadius: pageWidth * 0.06,
+                  position: 'absolute',
+                  top: 12,
+                  right: 12,
+                }}>
+                <Icon name="close" style={{fontSize: 25}} color="#000" />
+              </TouchableOpacity>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: 'green',
+                  width: pageWidth * 0.7,
+                  height: pageHeight * 0.3,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <View
+                  style={{
+                    height: 0,
+                    width: pageWidth * 0.55,
+                    borderWidth: 1,
+                    borderBottomColor: 'red',
+                  }}
+                />
+              </View>
+            </>
+          }
         />
-        // <RNCamera
-        //   defaultTouchToFocus
-        //   onBarCodeRead={code => setSerial(code.data.toString())}
-        //   style={Styles.preview}
-        //   type={RNCamera.Constants.Type.back}>
-        //   <View style={Styles.barcodeContainerStyle}>
-        //     <View style={Styles.barcodeLineStyle} />
-        //   </View>
-        // </RNCamera>
       )}
     </View>
   );

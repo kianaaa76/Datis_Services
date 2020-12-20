@@ -22,9 +22,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
-import {CameraKitCameraScreen} from 'react-native-camera-kit';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 import {normalize, addDotsToPrice} from '../../utils/utilities';
-import {atan} from 'react-native-reanimated';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -79,7 +78,6 @@ const ServicePartsTab = ({
     };
   }, []);
 
-
   useEffect(() => {
     const backAction = () => {
       renderSaveModal();
@@ -99,6 +97,12 @@ const ServicePartsTab = ({
       numOfZeros = numOfZeros + 1;
     }
     let prefix = '';
+    let leftOfCode = code
+      .toString()
+      .substr(
+        header.toString().length + numOfZeros,
+        code.toString().length - header.toString().length,
+      );
     while (numOfZeros > 0) {
       prefix = '0'.concat(prefix);
       numOfZeros = numOfZeros - 1;
@@ -107,12 +111,6 @@ const ServicePartsTab = ({
       item => prefix.concat(item.value.SerialBarcode) == header,
     );
     let serialHeaderIndex = selectedObject[0].value.SerialFormat.indexOf('#');
-    let leftOfCode = code
-      .toString()
-      .substr(
-        header.toString().length + numOfZeros,
-        code.toString().length - header.toString().length,
-      );
     if (selectedObject.length > 0) {
       getObjBySerial(
         selector.token,
@@ -1244,34 +1242,47 @@ const ServicePartsTab = ({
     </>
   ) : (
     <>
-      <TouchableOpacity
-        style={{
-          backgroundColor: '#fff',
-          width: pageWidth * 0.12,
-          height: pageWidth * 0.12,
-          position: 'absolute',
-          top: 20,
-          right: 20,
-          zIndex: 9999,
-          borderRadius: pageWidth * 0.06,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-        onPress={() => setScreenMode(false)}>
-        <Icon name="close" style={{fontSize: 30, color: '#000'}} />
-      </TouchableOpacity>
-      <CameraKitCameraScreen
-        scanBarcode={true}
-        laserColor={'#660000'}
-        frameColor={'yellow'}
-        onReadCode={event => {
-          setQrScannerLoading(true);
-          setScreenMode(false);
-          onSuccess(event.nativeEvent.codeStringValue);
-        }}
-        hideControls={false}
-        showFrame={true}
-        colorForScannerFrame={'red'}
+      <QRCodeScanner
+        onRead={code => onSuccess(code.data)}
+        showMarker={true}
+        customMarker={
+          <>
+            <TouchableOpacity
+              onPress={() => setScreenMode(false)}
+              style={{
+                backgroundColor: '#fff',
+                justifyContent: 'center',
+                alignItems: 'center',
+                elevation: 5,
+                width: pageWidth * 0.12,
+                height: pageWidth * 0.12,
+                borderRadius: pageWidth * 0.06,
+                position: 'absolute',
+                top: 12,
+                right: 12,
+              }}>
+              <Icon name="close" style={{fontSize: 25}} color="#000" />
+            </TouchableOpacity>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'green',
+                width: pageWidth * 0.7,
+                height: pageHeight * 0.3,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <View
+                style={{
+                  height: 0,
+                  width: pageWidth * 0.55,
+                  borderWidth: 1,
+                  borderBottomColor: 'red',
+                }}
+              />
+            </View>
+          </>
+        }
       />
     </>
   );
