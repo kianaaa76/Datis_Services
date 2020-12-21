@@ -16,7 +16,6 @@ const pageHeight = Dimensions.get('screen').height;
 
 const ServiceInfoTab = ({serviceData, renderSaveModal}) => {
   const data = serviceData;
-  // console.log("dataaaa", data);
 
   useEffect(() => {
     const backAction = () => {

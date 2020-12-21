@@ -21,8 +21,8 @@ import Header from '../common/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
-import {GET_OBJECTS_LIST, LOGIN, LOGOUT} from '../../actions/types';
-import {call, getObjects} from '../../actions/api';
+import {GET_OBJECTS_LIST, LOGIN, LOGOUT, SET_USER_LIST} from '../../actions/types';
+import {call, getObjects, getUsers} from '../../actions/api';
 import {normalize} from '../utils/utilities';
 
 const pageHeight = Dimensions.get('screen').height;
@@ -38,17 +38,36 @@ const Home = ({navigation}) => {
   );
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
-  const [changeUserLoading, setChangeUserLoading] = useState(false);
+  const [changeUserLoading, setChangeUserLoading] = useState(true);
 
   useEffect(() => {
-    if (!!selector.userList) {
-      JSON.parse(selector.userList).map(item => {
-        if (item.ID == selector.userId) {
-          setUser(item);
+    if (
+      !!selector.userList &&
+      (selector.constantUserId === 40 ||
+        selector.constantUserId === 41 ||
+        selector.constantUserId === 43 ||
+        selector.constantUserId === 51)
+    ) {
+      getUsers().then(data => {
+        if (data.errorCode === 0) {
+          dispatch({
+            type: SET_USER_LIST,
+            userList: JSON.stringify(data.result),
+          });
+          data.result.map(item => {
+            if (item.ID == selector.userId) {
+              setUser(item);
+            }
+          });
+          setChangeUserLoading(false);
+        } else {
+          setChangeUserLoading(false);
         }
       });
+    } else {
+      setChangeUserLoading(false);
     }
-  }, []);
+  },[]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(

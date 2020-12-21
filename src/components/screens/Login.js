@@ -29,30 +29,10 @@ const Login = ({navigation}) => {
   const [hasCode, setHasCode] = useState(false);
   const [counter, setCounter] = useState(120);
   const [phoneNumber, setPhoneNumber] = useState();
-  const [usersList, setUsersList] = useState([]);
   const [receiveCodeLoading, setReceiveCodeLoading] = useState(false);
   const [enterSystemLoading, setEnterSystemLoading] = useState(false);
-  const [persistLoading, setPersistLoading] = useState(true);
+  // const [persistLoading, setPersistLoading] = useState(f);
   const [code, setCode] = useState('');
-
-  useEffect(() => {
-    if (usersList.length === 0) {
-      getUsers().then(data => {
-        if (data.errorCode === 0) {
-          setUsersList(data.result);
-          dispatch({
-            type: SET_USER_LIST,
-            userList: JSON.stringify(data.result),
-          });
-        } else {
-          dispatch({
-            type: LOGOUT,
-          });
-        }
-      });
-      setPersistLoading(false);
-    }
-  });
 
   const onReceiveCodePress = () => {
     setReceiveCodeLoading(true);
@@ -111,7 +91,7 @@ const Login = ({navigation}) => {
               constantUserId: data.result.ID,
             });
             setEnterSystemLoading(false);
-            setPersistLoading(false);
+            // setPersistLoading(false);
             if (!!data.result.HomeLocation) {
               navigation.navigate('Home');
             } else {
@@ -127,18 +107,14 @@ const Login = ({navigation}) => {
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
-            setPersistLoading(false);
+            // setPersistLoading(false);
           }
         });
       }
     }
   };
 
-  return persistLoading ? (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <ActivityIndicator size="large" color="#660000" />
-    </View>
-  ) : (
+  return (
     <ScrollView
       style={{flex: 1}}
       scrollEnabled={false}

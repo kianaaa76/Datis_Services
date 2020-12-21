@@ -10,6 +10,10 @@ target 'Datis_Services' do
 
   pod 'RNImageCropPicker', :path => '../node_modules/react-native-image-crop-picker'
 
+  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
   target 'Datis_ServicesTests' do
     inherit! :complete
     # Pods for testing

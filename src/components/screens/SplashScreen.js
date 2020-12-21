@@ -13,11 +13,9 @@ import {
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import VersionInfo from 'react-native-version-info';
-import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
 import splashImage from '../../../assets/images/image_splash_screen.png';
-import {checkUpdate, getUsers} from '../../actions/api';
-import {LOGIN, SET_USER_LIST} from '../../actions/types';
+import {checkUpdate} from '../../actions/api';
 import {normalize} from '../utils/utilities';
 
 const pageHeight = Dimensions.get('screen').height;
@@ -25,7 +23,6 @@ const pageWidth = Dimensions.get('screen').width;
 
 const Splash = ({navigation}) => {
   const selector = useSelector(state => state);
-  const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   useEffect(() => {
@@ -35,54 +32,13 @@ const Splash = ({navigation}) => {
           setShowUpdateModal(true);
         } else {
           if (!!selector.token) {
-            if (
-              selector.constantUserId === 40 ||
-              selector.constantUserId === 41 ||
-              selector.constantUserId === 43 ||
-              selector.constantUserId === 51
-            ) {
-              getUsers().then(data => {
-                if (data.errorCode === 0) {
-                  dispatch({
-                    type:SET_USER_LIST,
-                    userList : JSON.stringify(data.result)
-                  })
-                  dispatch({
-                    type: LOGIN,
-                    token: selector.constantToken,
-                    constantToken: selector.constantToken,
-                    userId: selector.constantUserId,
-                    constantUserId: selector.constantUserId,
-                  });
-                  navigation.navigate('Home');
-                } else {
-                  Alert.alert(
-                    '',
-                    'مشکلی پیش آمد. لطفا برنامه را بسته و دوباره وارد شوید.',
-                    [{text: 'OK', onPress: () => {}}],
-                  );
-                }
-              });
-            } else {
-              dispatch({
-                type:SET_USER_LIST,
-                userList:[]
-              });
-              dispatch({
-                type: LOGIN,
-                token: selector.constantToken,
-                constantToken: selector.constantToken,
-                userId: selector.constantUserId,
-                constantUserId: selector.constantUserId,
-              });
-              navigation.navigate('Home');
-            }
+            navigation.navigate('Home');
           } else {
             navigation.navigate('SignedOut');
           }
         }
-      }).catch((err) => {
-        
+      })
+      .catch(err => {
         Alert.alert(
           `${err}`,
           'برای وارد شدن نیاز به اینترنت دارید. لطفا برنامه را ببندید و پس از فعالسازی اینترنت دستگاه خود دوباره وارد شوید.',
@@ -96,7 +52,7 @@ const Splash = ({navigation}) => {
           ],
         );
       });
-    })
+  });
 
   return (
     <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
