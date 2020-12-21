@@ -45,8 +45,10 @@ const ServicePartsTab = ({
     Price: '0',
     failureDescription: '',
     hasGarantee: null,
+    availableVersions:[]
   });
   const dropRef = useRef();
+  const new_dropRef =  useRef();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isNewPartFormExpanded, setIsNewPartFormExpanded] = useState(false);
   const [partsListName, setPartsListName] = useState(selector.objectsList);
@@ -159,8 +161,9 @@ const ServicePartsTab = ({
                 0,
                 serialHeaderIndex,
               )}${leftOfCode}`,
+              availableVersions:selectedObject[0].value.Versions
             });
-            setSelectedPartVersionsList(selectedObject[0].value.Versions);
+            new_dropRef.current.setList(selectedObject[0].value.Versions);
             setQrScannerLoading(false);
           }
         } else {
@@ -241,8 +244,9 @@ const ServicePartsTab = ({
                       ...fieldsObject,
                       partTypeSelected: object,
                       partVersionSelected: selectedVersion[0],
+                      availableVersions:object.value.Versions
                     });
-                    setSelectedPartVersionsList(object.value.Versions)
+                    // setSelectedPartVersionsList(object.value.Versions)
                   }
                   setSearchBarcodeLoading(false);
                 } else {
@@ -737,7 +741,7 @@ const ServicePartsTab = ({
       Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
       objectType: fieldsObject.objectType,
       partType: fieldsObject.partTypeSelected,
-      availableVersions: selectedPartVersionsList,
+      availableVersions: fieldsObject.availableVersions,
       version: fieldsObject.partVersionSelected,
       tempPart: fieldsObject.partTypeSelected,
       tempVersion: fieldsObject.partVersionSelected,
@@ -763,7 +767,7 @@ const ServicePartsTab = ({
       setObjectsList(list);
       setInfo(list);
     } else {
-      setSelectedPartVersionsList(fieldsObject.partTypeSelected.value.Versions);
+      // setSelectedPartVersionsList(fieldsObject.partTypeSelected.value.Versions);
       setObjectsList(list);
       setInfo(list);
       let obj = {
@@ -771,6 +775,7 @@ const ServicePartsTab = ({
         serial: '',
         partTypeSelected: fieldsObject.partTypeSelected,
         partVersionSelected: fieldsObject.partVersionSelected,
+        availableVersions:fieldsObject.availableVersions,
         Price: '0',
         failureDescription: '',
         hasGarantee: null,
@@ -976,9 +981,10 @@ const ServicePartsTab = ({
                         partTypeSelected: value,
                         serial: '',
                         partVersionSelected: {},
+                        availableVersions:value.value.Versions
                       });
-                      setSelectedPartVersionsList(value.value.Versions);
-                      dropRef.current.setList(value.value.Versions);
+                      // setSelectedPartVersionsList(value.value.Versions);
+                      new_dropRef.current.setList(value.value.Versions);
                     }}
                     placeholder={
                       !!fieldsObject.partTypeSelected.label
@@ -1037,8 +1043,8 @@ const ServicePartsTab = ({
                 </View>
                 <View style={Styles.partTypeContainerStyle}>
                   <DropdownPicker
-                    ref={dropRef}
-                    list={selectedPartVersionsList}
+                    ref={new_dropRef}
+                    list={fieldsObject.availableVersions}
                     placeholder={
                       !!fieldsObject.partVersionSelected.Key
                         ? fieldsObject.partVersionSelected.Value

@@ -17,7 +17,7 @@ import Foundation from 'react-native-vector-icons/Foundation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../ImageViwer';
-import PersianCalendarPicker from 'react-native-persian-calendar-picker';
+import JalaliCalendarPicker from 'react-native-jalali-calendar-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment-jalaali';
 import MapboxGL from '@react-native-mapbox-gl/maps';
@@ -274,12 +274,12 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         </View>
         {showDatePicker && (
           <View style={Styles.datePickerContainerStyle}>
-            <PersianCalendarPicker
+            <JalaliCalendarPicker
               onDateChange={date => {
                 setDateIsSelected(true);
                 setDate(Date.parse(date));
               }}
-              width={pageWidth * 0.95}
+              width={pageWidth * 0.9}
               selectedDayColor={'red'}
             />
             <TouchableOpacity

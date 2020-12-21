@@ -21,7 +21,12 @@ import Header from '../common/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
-import {GET_OBJECTS_LIST, LOGIN, LOGOUT, SET_USER_LIST} from '../../actions/types';
+import {
+  GET_OBJECTS_LIST,
+  LOGIN,
+  LOGOUT,
+  SET_USER_LIST,
+} from '../../actions/types';
 import {call, getObjects, getUsers} from '../../actions/api';
 import {normalize} from '../utils/utilities';
 
@@ -33,16 +38,14 @@ const Home = ({navigation}) => {
   const selector = useSelector(state => state);
   const [user, setUser] = useState('');
   const [showUserList, setShowUserList] = useState(false);
-  const [ShowinUserList, setShowingUserList] = useState(
-    JSON.parse(selector.userList),
-  );
+  const [ShowinUserList, setShowingUserList] = useState([]);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
   const [changeUserLoading, setChangeUserLoading] = useState(true);
 
   useEffect(() => {
     if (
-      !!selector.userList &&
+      !selector.userList &&
       (selector.constantUserId === 40 ||
         selector.constantUserId === 41 ||
         selector.constantUserId === 43 ||
@@ -54,6 +57,7 @@ const Home = ({navigation}) => {
             type: SET_USER_LIST,
             userList: JSON.stringify(data.result),
           });
+          setShowingUserList(data.result);
           data.result.map(item => {
             if (item.ID == selector.userId) {
               setUser(item);
@@ -65,9 +69,15 @@ const Home = ({navigation}) => {
         }
       });
     } else {
+      JSON.parse(selector.userList).map(item => {
+        if (item.ID == selector.userId) {
+          setUser(item);
+        }
+      });
+      setShowingUserList(selector.userList);
       setChangeUserLoading(false);
     }
-  },[]);
+  }, []);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
