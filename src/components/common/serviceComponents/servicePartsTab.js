@@ -787,7 +787,10 @@ const ServicePartsTab = ({
           <ActivityIndicator size="large" color="#fff" />
         </View>
       )}
-      <ScrollView style={{flex: 0.8, padding: 15}}>
+      <ScrollView
+        style={{flex: 0.8, padding: 15}}
+        keyboardShouldPersistTaps='always'
+        keyboardDismissMode="on-drag">
         {!!info && info.length > 0 && (
           <View style={{flex: 1, marginBottom: 10}}>
             {info.map(item => renderServicePartItem(item))}

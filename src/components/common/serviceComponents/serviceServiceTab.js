@@ -100,7 +100,9 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         contentContainerStyle={{
           justifyContent: 'center',
           alignItems: 'center',
-        }}>
+        }}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="on-drag">
         <View style={Styles.descriptionRowStyle}>
           <View
             style={{
@@ -153,7 +155,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                   includeBase64: true,
                   compressImageQuality: 0.7,
                 }).then(response => {
-                  console.warn("data", response.data);
+                  console.warn('data', response.data);
                   setInfo({...info, image: response.data});
                 });
               }}

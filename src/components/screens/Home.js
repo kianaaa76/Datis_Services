@@ -9,7 +9,6 @@ import {
   Image,
   FlatList,
   TextInput,
-  ScrollView,
   Keyboard,
   Linking,
   Alert,

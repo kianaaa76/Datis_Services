@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   Image,
   TouchableHighlight,
-  BackHandler
+  BackHandler,
 } from 'react-native';
 import Header from '../../common/Header';
 import {
@@ -177,11 +177,18 @@ const RemainingServiceDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13), flexShrink: 1}}>{text}</Text>
+        <Text
+          style={{
+            fontFamily: 'IRANSansMobile_Light',
+            fontSize: normalize(13),
+            flexShrink: 1,
+          }}>
+          {text}
+        </Text>
         <Text
           style={{
             fontSize: normalize(12),
-            fontFamily:"IRANSansMobile_Medium",
+            fontFamily: 'IRANSansMobile_Medium',
             marginLeft: 10,
             color: titleColor,
           }}>
@@ -199,7 +206,9 @@ const RemainingServiceDetail = ({navigation}) => {
         ref={scrollViewRef}
         onContentSizeChange={() =>
           scrollViewRef.current.scrollToEnd({animated: true})
-        }>
+        }
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="on-drag">
         <Header headerText={'جزئیات'} />
         {detailLoading ? (
           <View
@@ -269,7 +278,11 @@ const RemainingServiceDetail = ({navigation}) => {
                     toFaDigit(serviceDetail.DocumentDetails.Date),
                   )}
                   <View style={{width: '100%'}}>
-                    <Text style={{fontFamily:"IRANSansMobile_Light", fontSize:normalize(13)}}>
+                    <Text
+                      style={{
+                        fontFamily: 'IRANSansMobile_Light',
+                        fontSize: normalize(13),
+                      }}>
                       {toFaDigit(
                         serviceDetail.DocumentDetails.Msg.substr(
                           serviceDetail.DocumentDetails.Msg.length - 12,
@@ -341,7 +354,11 @@ const RemainingServiceDetail = ({navigation}) => {
             <View style={Styles.imageIconContainerStyle}>
               <Icon
                 name={'camera-alt'}
-                style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
+                style={{
+                  color: '#000',
+                  fontSize: normalize(35),
+                  marginHorizontal: 7,
+                }}
                 onPress={() =>
                   ImagePicker.openCamera({
                     // cropping: true,
@@ -356,7 +373,11 @@ const RemainingServiceDetail = ({navigation}) => {
               />
               <Icon
                 name={'file-upload'}
-                style={{color: '#000', fontSize: normalize(35), marginHorizontal: 7}}
+                style={{
+                  color: '#000',
+                  fontSize: normalize(35),
+                  marginHorizontal: 7,
+                }}
                 onPress={() =>
                   ImagePicker.openPicker({
                     // cropping: true,
@@ -499,12 +520,12 @@ const Styles = StyleSheet.create({
   },
   itemLabelStyle: {
     fontSize: normalize(14),
-    fontFamily:"IRANSansMobile_Medium",
+    fontFamily: 'IRANSansMobile_Medium',
     marginLeft: 10,
   },
   itemLabelStyle2: {
     fontSize: normalize(14),
-    fontFamily:"IRANSansMobile_Medium",
+    fontFamily: 'IRANSansMobile_Medium',
     marginLeft: 10,
     color: '#CB3434',
   },
@@ -526,7 +547,7 @@ const Styles = StyleSheet.create({
     fontSize: normalize(13),
     color: '#fff',
     textAlign: 'center',
-    fontFamily:"IRANSansMobile_Medium",
+    fontFamily: 'IRANSansMobile_Medium',
   },
   imageIconContainerStyle: {
     flexDirection: 'row',

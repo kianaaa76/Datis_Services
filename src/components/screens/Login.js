@@ -41,9 +41,9 @@ const Login = ({navigation}) => {
         if (data.errorCode === 0) {
           setUsersList(data.result);
           dispatch({
-            type:SET_USER_LIST,
-            userList: JSON.stringify(data.result)
-          })
+            type: SET_USER_LIST,
+            userList: JSON.stringify(data.result),
+          });
         } else {
           dispatch({
             type: LOGOUT,
@@ -112,7 +112,7 @@ const Login = ({navigation}) => {
             });
             setEnterSystemLoading(false);
             setPersistLoading(false);
-            if (!!data.result.HomeLocation){
+            if (!!data.result.HomeLocation) {
               navigation.navigate('Home');
             } else {
               navigation.navigate('UserAddress');
@@ -142,7 +142,8 @@ const Login = ({navigation}) => {
     <ScrollView
       style={{flex: 1}}
       scrollEnabled={false}
-      keyboardShouldPersistTaps="handled">
+      keyboardShouldPersistTaps="always"
+      keyboardDismissMode="on-drag">
       <StatusBar hidden />
       <ImageBackground source={backgroundImage} style={Styles.containerStyle}>
         <View style={{marginTop: '30%', alignItems: 'center'}}>

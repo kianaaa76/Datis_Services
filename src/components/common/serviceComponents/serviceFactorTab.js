@@ -46,7 +46,9 @@ const ServiceFactorTab = ({
         contentContainerStyle={{
           justifyContent: 'center',
           alignItems: 'center',
-        }}>
+        }}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="on-drag">
         <View style={Styles.rowDataStyle}>
           <Text style={Styles.rialTextStyle}>ریال</Text>
           <TextInput
@@ -129,7 +131,7 @@ const ServiceFactorTab = ({
               onPress={() => {
                 ImagePicker.openCamera({
                   width: pageWidth - 20,
-                  height: pageHeight*0.7,
+                  height: pageHeight * 0.7,
                   // cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
@@ -147,7 +149,7 @@ const ServiceFactorTab = ({
               onPress={() => {
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
-                  height: pageHeight*0.7,
+                  height: pageHeight * 0.7,
                   // cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
@@ -188,7 +190,7 @@ const ServiceFactorTab = ({
         </View>
         {!!info.factorImage && (
           <ImageViewer
-            width={pageWidth-20}
+            width={pageWidth - 20}
             height={pageHeight * 0.7}
             imageUrl={`data:image/jpeg;base64,${info.factorImage}`}
           />
@@ -204,8 +206,8 @@ const ServiceFactorTab = ({
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
                 ImagePicker.openCamera({
-                  width: pageWidth-20,
-                  height: pageHeight*0.7,
+                  width: pageWidth - 20,
+                  height: pageHeight * 0.7,
                   // cropping: true,
                   includeBase64: true,
                   compressImageQuality: 0.7,
@@ -223,7 +225,7 @@ const ServiceFactorTab = ({
               onPress={() =>
                 ImagePicker.openPicker({
                   width: pageWidth - 20,
-                  height: pageHeight*0.7,
+                  height: pageHeight * 0.7,
                   includeBase64: true,
                   // cropping: true,
                   compressImageQuality: 0.7,
@@ -352,7 +354,7 @@ const Styles = StyleSheet.create({
   },
   labelStyle: {
     fontFamily: 'IRANSansMobile_Light',
-    fontSize:normalize(15),
+    fontSize: normalize(15),
     // flexShrink: 1,
     textAlign: 'right',
     // width: '90%',

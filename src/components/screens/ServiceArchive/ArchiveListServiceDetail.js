@@ -9,12 +9,12 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
-  BackHandler
+  BackHandler,
 } from 'react-native';
 import Header from '../../common/Header';
 import {unsettledServiceDetail} from '../../../actions/api';
 import {useSelector, useDispatch} from 'react-redux';
-import { LOGOUT} from '../../../actions/types';
+import {LOGOUT} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
 import ImageViewer from '../../common/ImageViwer';
 
@@ -135,7 +135,9 @@ const ServiceArchiveDetail = ({navigation}) => {
           contentContainerstyle={{
             justifyContent: 'center',
             alignItems: 'center',
-          }}>
+          }}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="on-drag">
           {detailLoading ? (
             <View
               style={{
@@ -275,7 +277,11 @@ const ServiceArchiveDetail = ({navigation}) => {
                         />
                       </View>
                       <View style={Styles.imageRowStyle}>
-                      {!factorImage && (<Text style={[Styles.labelStyle,{marginRight:10}]}>یافت نشد.</Text>)}
+                        {!factorImage && (
+                          <Text style={[Styles.labelStyle, {marginRight: 10}]}>
+                            یافت نشد.
+                          </Text>
+                        )}
                         <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
                       </View>
                       {!!factorImage && (
