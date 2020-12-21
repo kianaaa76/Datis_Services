@@ -307,9 +307,12 @@ const MyService = ({navigation}) => {
   };
 
   const getRejectedServices = (id, token) => {
+    // console.warn('id',id);
+    // console.warn('token',token);
     setServiceListLoading(true);
     rejectedServiceList(id, token)
       .then(data => {
+        // console.warn("data",data);
         if (data.errorCode == 0) {
           serviceList = data.result;
         } else {

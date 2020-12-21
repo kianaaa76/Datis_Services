@@ -398,7 +398,7 @@ const ServicePartsTab = ({
           Styles.newformContainerStyle,
           {
             marginBottom: 10,
-            backgroundColor: !Item.isConfirmed ? '#FF9090' : null,
+            backgroundColor: !Item.isConfirmed ? 'rgba(66,00,00,0.4)' : null,
           },
         ]}>
         <TouchableHighlight

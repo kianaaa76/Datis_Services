@@ -15,6 +15,7 @@ import {
   Alert,
   ToastAndroid,
   TouchableHighlight,
+  ActivityIndicator,
 } from 'react-native';
 import backgroundImage from '../../../assets/images/background_main_activity.jpg';
 import Header from '../common/Header';
@@ -23,7 +24,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import {GET_OBJECTS_LIST, LOGIN, LOGOUT} from '../../actions/types';
 import {call, getObjects} from '../../actions/api';
-import {normalize} from "../utils/utilities";
+import {normalize} from '../utils/utilities';
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -33,9 +34,12 @@ const Home = ({navigation}) => {
   const selector = useSelector(state => state);
   const [user, setUser] = useState('');
   const [showUserList, setShowUserList] = useState(false);
-  const [ShowinUserList, setShowingUserList] = useState(JSON.parse(selector.userList));
+  const [ShowinUserList, setShowingUserList] = useState(
+    JSON.parse(selector.userList),
+  );
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
+  const [changeUserLoading, setChangeUserLoading] = useState(false);
 
   useEffect(() => {
     if (!!selector.userList) {
@@ -112,7 +116,9 @@ const Home = ({navigation}) => {
   };
 
   const search = text => {
-    let temp = JSON.parse(selector.userList).filter(item => item.Name.includes(text));
+    let temp = JSON.parse(selector.userList).filter(item =>
+      item.Name.includes(text),
+    );
     setShowingUserList(temp);
   };
 
@@ -141,192 +147,214 @@ const Home = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: 'transparent'}}>
-      <ImageBackground
-        source={backgroundImage}
-        style={Styles.containerStyle}
-        imageStyle={{resizeMode: isKeyboardVisible ? 'cover' : 'stretch'}}
-      />
-      <View
-        style={{flex: 1, backgroundColor: 'transparent'}}
-        keyboardShouldPersistTaps="handled">
-        <Header
-          rightIcon={
-            <MaterialIcons
-              name={'menu'}
-              onPress={() => navigation.openDrawer()}
-              style={{
-                fontSize: normalize(23),
-                color: '#fff',
-                marginLeft: 10,
-              }}
-            />
-          }
-          headerText="داتیس سرویس"
-          leftIcon={
-            selector.constantUserId == 40 ||
-            selector.constantUserId == 41 ||
-            selector.constantUserId == 43 ||
-            selector.constantUserId == 51 ? (
-              <TouchableOpacity
-                onPress={() => {
-                  setShowUserList(!showUserList);
-                  setShowingUserList(JSON.parse(selector.userList));
-                }}>
-                <Text
-                  style={{
-                    color: '#fff',
-                    fontSize: normalize(16),
-                    fontFamily: 'IRANSansMobile_Light',
-                  }}>
-                  {user.Name}
-                </Text>
-              </TouchableOpacity>
-            ) : null
-          }
+    <>
+      <View style={{flex: 1, backgroundColor: 'transparent'}}>
+        <ImageBackground
+          source={backgroundImage}
+          style={Styles.containerStyle}
+          imageStyle={{resizeMode: isKeyboardVisible ? 'cover' : 'stretch'}}
         />
-
-        {showUserList && (
-          <View style={Styles.userListContainerStyle}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                borderBottomWidth: 1,
-                borderBottomColor: 'gray',
-              }}>
-              <TextInput
-                placeholder={'جستجو کنید...'}
-                onChangeText={text => search(text)}
+        <View
+          style={{flex: 1, backgroundColor: 'transparent'}}
+          keyboardShouldPersistTaps="handled">
+          <Header
+            rightIcon={
+              <MaterialIcons
+                name={'menu'}
+                onPress={() => navigation.openDrawer()}
                 style={{
-                  fontFamily: 'IRANSansMobile_Light',
-                  fontSize: normalize(12),
-                  width: '100%',
+                  fontSize: normalize(23),
+                  color: '#fff',
+                  marginLeft: 10,
                 }}
               />
-              <Icon
-                name={'search'}
-                style={{fontSize: normalize(20), color: 'gray', marginLeft: 5}}
-              />
-            </View>
-            <FlatList
-              data={ShowinUserList}
-              renderItem={item => (
+            }
+            headerText="داتیس سرویس"
+            leftIcon={
+              selector.constantUserId == 40 ||
+              selector.constantUserId == 41 ||
+              selector.constantUserId == 43 ||
+              selector.constantUserId == 51 ? (
                 <TouchableOpacity
-                  style={{height: 30, marginVertical: 5}}
                   onPress={() => {
-                    dispatch({
-                      type: LOGIN,
-                      token: item.item.Token,
-                      constantToken: selector.constantToken,
-                      userId: item.item.ID,
-                      constantUserId: selector.constantUserId,
-                    });
-                    setUser(item.item);
-                    setShowUserList(false);
+                    setShowUserList(!showUserList);
                     setShowingUserList(JSON.parse(selector.userList));
                   }}>
                   <Text
                     style={{
-                      color: '#000',
-                      fontSize: normalize(13),
+                      color: '#fff',
+                      fontSize: normalize(16),
                       fontFamily: 'IRANSansMobile_Light',
                     }}>
-                    {item.item.Name}
+                    {user.Name}
                   </Text>
                 </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.ID.toString()}
-              ListEmptyComponent={() => (
-                <Text style={{width: '100%', textAlign: 'center'}}>
-                  کاربری یافت نشد.
-                </Text>
-              )}
-            />
-          </View>
-        )}
+              ) : null
+            }
+          />
 
-        <View style={Styles.contentStyle}>
-          <View style={Styles.SingleRowStyle}>
-            {renderHomeItems('سرویس‌های رد‌شده', images[0], () => {
-              navigation.navigate('RejectedServices');
-            })}
-            {renderHomeItems('سرویس‌های من', images[1], () => {
-              navigation.navigate('MyServices');
-            })}
-          </View>
-          <View style={Styles.SingleRowStyle}>
-            {renderHomeItems('سرویس‌های مانده‌دار', images[2], () => {
-              navigation.navigate('RemainingServices');
-            })}
-            {renderHomeItems('آرشیو سرویس‌ها', images[3], () => {
-              navigation.navigate('ServiceArchiveList');
-            })}
-          </View>
-          <View style={Styles.SingleRowStyle}>
-            {renderHomeItems('انبارداری', images[4], () => {
-              ToastAndroid.showWithGravity(
-                'این قسمت بعدا اضافه خواهد شد.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
-            })}
-            {renderHomeItems('ماموریت‌های من', images[5], () => {
-              navigation.navigate('Mission');
-            })}
+          {showUserList && (
+            <View style={Styles.userListContainerStyle}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'gray',
+                }}>
+                <TextInput
+                  placeholder={'جستجو کنید...'}
+                  onChangeText={text => search(text)}
+                  style={{
+                    fontFamily: 'IRANSansMobile_Light',
+                    fontSize: normalize(12),
+                    width: '100%',
+                  }}
+                />
+                <Icon
+                  name={'search'}
+                  style={{
+                    fontSize: normalize(20),
+                    color: 'gray',
+                    marginLeft: 5,
+                  }}
+                />
+              </View>
+              <FlatList
+                data={ShowinUserList}
+                renderItem={item => (
+                  <TouchableOpacity
+                    style={{height: 30, marginVertical: 5}}
+                    onPress={() => {
+                      setChangeUserLoading(true);
+                      dispatch({
+                        type: LOGIN,
+                        token: item.item.Token,
+                        constantToken: selector.constantToken,
+                        userId: item.item.ID,
+                        constantUserId: selector.constantUserId,
+                      });
+                      setUser(item.item);
+                      setShowUserList(false);
+                      setShowingUserList(JSON.parse(selector.userList));
+                      setChangeUserLoading(false);
+                    }}>
+                    <Text
+                      style={{
+                        color: '#000',
+                        fontSize: normalize(13),
+                        fontFamily: 'IRANSansMobile_Light',
+                      }}>
+                      {item.item.Name}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={item => item.ID.toString()}
+                ListEmptyComponent={() => (
+                  <Text style={{width: '100%', textAlign: 'center'}}>
+                    کاربری یافت نشد.
+                  </Text>
+                )}
+              />
+            </View>
+          )}
+
+          <View style={Styles.contentStyle}>
+            <View style={Styles.SingleRowStyle}>
+              {renderHomeItems('سرویس‌های رد‌شده', images[0], () => {
+                navigation.navigate('RejectedServices');
+              })}
+              {renderHomeItems('سرویس‌های من', images[1], () => {
+                navigation.navigate('MyServices');
+              })}
+            </View>
+            <View style={Styles.SingleRowStyle}>
+              {renderHomeItems('سرویس‌های مانده‌دار', images[2], () => {
+                navigation.navigate('RemainingServices');
+              })}
+              {renderHomeItems('آرشیو سرویس‌ها', images[3], () => {
+                navigation.navigate('ServiceArchiveList');
+              })}
+            </View>
+            <View style={Styles.SingleRowStyle}>
+              {renderHomeItems('انبارداری', images[4], () => {
+                ToastAndroid.showWithGravity(
+                  'این قسمت بعدا اضافه خواهد شد.',
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+                );
+              })}
+              {renderHomeItems('ماموریت‌های من', images[5], () => {
+                navigation.navigate('Mission');
+              })}
+            </View>
           </View>
         </View>
+        <TouchableOpacity
+          style={[
+            Styles.callIconContainerStyle,
+            {bottom: isKeyboardVisible ? -pageHeight * 0.3 : pageHeight * 0.01},
+          ]}
+          onPress={() => Linking.openURL(`tel:02188355621`)}>
+          <Image
+            source={require('../../../assets/images/icon_call.png')}
+            style={Styles.callIconStyle}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={Styles.missCallIconContainerStyle}
+          onPress={() => setShowCallModal(true)}>
+          <Image
+            source={require('../../../assets/images/icon_miss_call.png')}
+            style={Styles.callIconStyle}
+          />
+        </TouchableOpacity>
+        {showCallModal && (
+          <TouchableHighlight
+            style={Styles.modalBackgroundStyle}
+            onPress={() => setShowCallModal(false)}
+            underlayColor="none">
+            <View style={Styles.modalContainerStyle}>
+              <View style={Styles.modalHeaderContainerStyle}>
+                <Text style={Styles.modalHeaderTextStyle}>داتیس سرویس</Text>
+              </View>
+              <View style={Styles.modalBodyContainerStyle}>
+                <Text style={Styles.modalBodyTextStyle}>
+                  آیا از درخواست تماس خود اطمینان دارید؟
+                </Text>
+              </View>
+              <View style={Styles.modalFooterContainerStyle}>
+                <TouchableOpacity
+                  style={Styles.modalButtonStyle}
+                  onPress={() => setShowCallModal(false)}>
+                  <Text style={Styles.modalButtonTextStyle}>خیر</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={Styles.modalButtonStyle}
+                  onPress={() => callCenter()}>
+                  <Text style={Styles.modalButtonTextStyle}>بله</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableHighlight>
+        )}
       </View>
-      <TouchableOpacity
-        style={[
-          Styles.callIconContainerStyle,
-          {bottom: isKeyboardVisible ? -pageHeight * 0.3 : pageHeight * 0.01},
-        ]}
-        onPress={() => Linking.openURL(`tel:02188355621`)}>
-        <Image
-          source={require('../../../assets/images/icon_call.png')}
-          style={Styles.callIconStyle}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={Styles.missCallIconContainerStyle}
-        onPress={() => setShowCallModal(true)}>
-        <Image
-          source={require('../../../assets/images/icon_miss_call.png')}
-          style={Styles.callIconStyle}
-        />
-      </TouchableOpacity>
-      {showCallModal && (
-        <TouchableHighlight
-          style={Styles.modalBackgroundStyle}
-          onPress={() => setShowCallModal(false)}
-          underlayColor="none">
-          <View style={Styles.modalContainerStyle}>
-            <View style={Styles.modalHeaderContainerStyle}>
-              <Text style={Styles.modalHeaderTextStyle}>داتیس سرویس</Text>
-            </View>
-            <View style={Styles.modalBodyContainerStyle}>
-              <Text style={Styles.modalBodyTextStyle}>
-                آیا از درخواست تماس خود اطمینان دارید؟
-              </Text>
-            </View>
-            <View style={Styles.modalFooterContainerStyle}>
-              <TouchableOpacity
-                style={Styles.modalButtonStyle}
-                onPress={() => setShowCallModal(false)}>
-                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={Styles.modalButtonStyle}
-                onPress={() => callCenter()}>
-                <Text style={Styles.modalButtonTextStyle}>بله</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableHighlight>
+      {changeUserLoading && (
+        <View
+          style={{
+            width: pageWidth,
+            height: pageHeight,
+            position: 'absolute',
+            backgroundColor: '#000',
+            opacity: 0.5,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#660000" />
+        </View>
       )}
-    </View>
+    </>
   );
 };
 
