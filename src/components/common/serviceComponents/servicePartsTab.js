@@ -143,6 +143,11 @@ const ServicePartsTab = ({
               )}${leftOfCode}`,
               selectedItemList.index,
             );
+            refactorObjectListItems(
+              'availableVersions',
+              selectedObject[0].value.Versions,
+              selectedItemList.index,
+            );
             setSelectedItemList({});
             setQrScannerLoading(false);
           } else {
@@ -155,6 +160,7 @@ const ServicePartsTab = ({
                 serialHeaderIndex,
               )}${leftOfCode}`,
             });
+            setSelectedPartVersionsList(selectedObject[0].value.Versions);
             setQrScannerLoading(false);
           }
         } else {
@@ -224,6 +230,11 @@ const ServicePartsTab = ({
                       selectedVersion[0],
                       selectedItemList.index,
                     );
+                    refactorObjectListItems(
+                      'availableVersions',
+                      object.value.Versions,
+                      selectedItemList.index,
+                    );
                     setSelectedItemList({});
                   } else {
                     setFieldsObject({
@@ -231,6 +242,7 @@ const ServicePartsTab = ({
                       partTypeSelected: object,
                       partVersionSelected: selectedVersion[0],
                     });
+                    setSelectedPartVersionsList(object.value.Versions)
                   }
                   setSearchBarcodeLoading(false);
                 } else {
@@ -789,7 +801,7 @@ const ServicePartsTab = ({
       )}
       <ScrollView
         style={{flex: 0.8, padding: 15}}
-        keyboardShouldPersistTaps='always'
+        keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag">
         {!!info && info.length > 0 && (
           <View style={{flex: 1, marginBottom: 10}}>

@@ -348,7 +348,7 @@ const MyServiceDetails = ({navigation}) => {
             Object_Id: !!item.partType ? item.partType.value.Id : '',
             Direction: item.objectType === 'new' ? '0' : '1',
             Description: item.failureDescription,
-            Price: parseInt(parseInt(item.Price).toString().split('.').join('')),
+            Price: parseInt(item.Price.toString().split('.').join('')),
             Serial: item.serial,
             VersionId: !!item.version ? item.version.Key : '',
           });
@@ -362,9 +362,9 @@ const MyServiceDetails = ({navigation}) => {
           serviceID,
           convertResultTitleToNum(serviceTabInfo.serviceResult),
           convertTypeTitleToNum(serviceTabInfo.serviceType),
-          parseInt(parseInt(factorTabInfo.factorReceivedPrice).toString().split('.').join('')),
-          parseInt(parseInt(factorTabInfo.factorTotalPrice).toString().split('.').join('')),
-          parseInt(parseInt(factorTabInfo.toCompanySettlement).toString().split('.').join('')),
+          parseInt(factorTabInfo.factorReceivedPrice.toString().split('.').join('')),
+          parseInt(factorTabInfo.factorTotalPrice.toString().split('.').join('')),
+          parseInt(factorTabInfo.toCompanySettlement.toString().split('.').join('')),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,
@@ -453,7 +453,7 @@ const MyServiceDetails = ({navigation}) => {
             Direction: item.objectType === 'new' ? '0' : '1',
             Description: item.failureDescription,
             Price: parseInt(
-              parseInt(item.Price)
+              item.Price
                 .toString()
                 .split('.')
                 .join(''),
@@ -472,9 +472,9 @@ const MyServiceDetails = ({navigation}) => {
           serviceID,
           convertResultTitleToNum(serviceTabInfo.serviceResult),
           convertTypeTitleToNum(serviceTabInfo.serviceType),
-          parseInt(parseInt(factorTabInfo.factorReceivedPrice).toString().split('.').join('')),
-          parseInt(parseInt(factorTabInfo.factorTotalPrice).toString().split('.').join('')),
-          parseInt(parseInt(factorTabInfo.toCompanySettlement).toString().split('.').join('')),
+          parseInt(factorTabInfo.factorReceivedPrice.toString().split('.').join('')),
+          parseInt(factorTabInfo.factorTotalPrice.toString().split('.').join('')),
+          parseInt(factorTabInfo.toCompanySettlement.toString().split('.').join('')),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,
