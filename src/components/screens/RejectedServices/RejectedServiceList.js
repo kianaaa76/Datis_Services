@@ -486,7 +486,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
   },
   flatlistContainerStyle: {
-    width: pageWidth * 0.95,
+    flex:1,
     justifyContent: 'center',
     alignItems: 'center',
     height: pageHeight,

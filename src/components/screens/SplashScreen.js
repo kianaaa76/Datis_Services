@@ -27,11 +27,9 @@ const Splash = ({navigation}) => {
   const selector = useSelector(state => state);
   const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [usersList, setUsersList] = useState([]);
 
   useEffect(() => {
-    let version = VersionInfo.appVersion;
-    checkUpdate(version)
+    checkUpdate(VersionInfo.appVersion.toString())
       .then(data => {
         if (data.errorCode === 5) {
           setShowUpdateModal(true);
@@ -83,9 +81,10 @@ const Splash = ({navigation}) => {
             navigation.navigate('SignedOut');
           }
         }
-      }).catch(() => {
+      }).catch((err) => {
+        
         Alert.alert(
-          'عدم دسترسی به اینترنت',
+          `خطای دسترسی به اینترنت`,
           'برای وارد شدن نیاز به اینترنت دارید. لطفا برنامه را ببندید و پس از فعالسازی اینترنت دستگاه خود دوباره وارد شوید.',
           [
             {

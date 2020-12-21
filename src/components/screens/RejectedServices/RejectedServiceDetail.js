@@ -29,8 +29,8 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 let requestObjectList = [];
+let openParts = [];
 const MyServiceDetails = ({navigation}) => {
-  
   let dirs = RNFetchBlob.fs.dirs;
   const selector = useSelector(state => state);
   const dispatch = useDispatch();
@@ -156,7 +156,7 @@ const MyServiceDetails = ({navigation}) => {
         projectId: serviceID,
         factorReceivedPrice: factorTabInfo.factorReceivedPrice,
         factorTotalPrice: factorTabInfo.factorTotalPrice,
-        toCompanySettlement:factorTabInfo.toCompanySettlement,
+        toCompanySettlement: factorTabInfo.toCompanySettlement,
         serviceDescription: serviceTabInfo.description,
         address: serviceTabInfo.address,
         finalDate: serviceTabInfo.finalDate,
@@ -339,7 +339,7 @@ const MyServiceDetails = ({navigation}) => {
       !!missionTabInfo.endLongitude
     ) {
       requestObjectList = [];
-      let openParts = [];
+      openParts = [];
       partsTabInfo.map((item, index) => {
         if (item.isConfirmed) {
           requestObjectList.push({
@@ -348,7 +348,7 @@ const MyServiceDetails = ({navigation}) => {
             Object_Id: !!item.partType ? item.partType.value.Id : '',
             Direction: item.objectType === 'new' ? '0' : '1',
             Description: item.failureDescription,
-            Price: parseInt(item.Price.split('.').join("")),
+            Price: parseInt(parseInt(item.Price).toString().split('.').join('')),
             Serial: item.serial,
             VersionId: !!item.version ? item.version.Key : '',
           });
@@ -362,9 +362,9 @@ const MyServiceDetails = ({navigation}) => {
           serviceID,
           convertResultTitleToNum(serviceTabInfo.serviceResult),
           convertTypeTitleToNum(serviceTabInfo.serviceType),
-          parseInt(factorTabInfo.factorReceivedPrice.split('.').join("")),
-          parseInt(factorTabInfo.factorTotalPrice.split('.').join("")),
-          parseInt(factorTabInfo.toCompanySettlement.split('.').join("")),
+          parseInt(parseInt(factorTabInfo.factorReceivedPrice).toString().split('.').join('')),
+          parseInt(parseInt(factorTabInfo.factorTotalPrice).toString().split('.').join('')),
+          parseInt(parseInt(factorTabInfo.toCompanySettlement).toString().split('.').join('')),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,
@@ -443,7 +443,7 @@ const MyServiceDetails = ({navigation}) => {
       }
     } else if (!missionTabInfo.startLongitude && !missionTabInfo.endLongitude) {
       requestObjectList = [];
-      let openParts = [];
+      openParts = [];
       partsTabInfo.map((item, index) => {
         if (item.isConfirmed) {
           requestObjectList.push({
@@ -452,7 +452,12 @@ const MyServiceDetails = ({navigation}) => {
             Object_Id: !!item.partType ? item.partType.value.Id : '',
             Direction: item.objectType === 'new' ? '0' : '1',
             Description: item.failureDescription,
-            Price: parseInt(item.Price.split('.').join("")),
+            Price: parseInt(
+              parseInt(item.Price)
+                .toString()
+                .split('.')
+                .join(''),
+            ),
             Serial: item.serial,
             VersionId: !!item.version ? item.version.Key : '',
           });
@@ -460,15 +465,16 @@ const MyServiceDetails = ({navigation}) => {
           openParts.push(index + 1);
         }
       });
+  
       if (openParts.length == 0) {
         sendServiceData(
           selector.token,
           serviceID,
           convertResultTitleToNum(serviceTabInfo.serviceResult),
           convertTypeTitleToNum(serviceTabInfo.serviceType),
-          parseInt(factorTabInfo.factorReceivedPrice.split('.').join("")),
-          parseInt(factorTabInfo.factorTotalPrice.split('.').join("")),
-          parseInt(factorTabInfo.toCompanySettlement.split('.').join("")),
+          parseInt(parseInt(factorTabInfo.factorReceivedPrice).toString().split('.').join('')),
+          parseInt(parseInt(factorTabInfo.factorTotalPrice).toString().split('.').join('')),
+          parseInt(parseInt(factorTabInfo.toCompanySettlement).toString().split('.').join('')),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,

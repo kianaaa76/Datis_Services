@@ -725,7 +725,7 @@ const ServicePartsTab = ({
       Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
       objectType: fieldsObject.objectType,
       partType: fieldsObject.partTypeSelected,
-      availableVersions: [],
+      availableVersions: selectedPartVersionsList,
       version: fieldsObject.partVersionSelected,
       tempPart: fieldsObject.partTypeSelected,
       tempVersion: fieldsObject.partVersionSelected,

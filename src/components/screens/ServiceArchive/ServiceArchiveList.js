@@ -126,7 +126,6 @@ const ServiceArchiveList = ({navigation}) => {
                 <View style={Styles.contentContianerStyle}>
                     <View style={Styles.flatlistContainerStyle}>
                         <FlatList
-                            style={{marginBottom: 50}}
                             data={serviceList}
                             renderItem={(item) => (
                                 <ServiceArchiveListItem item={item} navigation={navigation} />
@@ -199,8 +198,7 @@ const Styles = StyleSheet.create({
         padding: 5,
     },
     flatlistContainerStyle: {
-        width: pageWidth * 0.95,
-        height: pageHeight * 0.95,
+        flex:1,
         justifyContent: 'center',
         alignItems: 'center',
     },
