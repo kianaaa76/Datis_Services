@@ -11,19 +11,32 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import VersionInfo from 'react-native-version-info';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
 import splashImage from '../../../assets/images/image_splash_screen.png';
 import {checkUpdate} from '../../actions/api';
 import {normalize} from '../utils/utilities';
+import { LOGIN } from '../../actions/types';
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
 
 const Splash = ({navigation}) => {
   const selector = useSelector(state => state);
+  const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  useEffect(()=>{
+    if (!!selector.token){
+      dispatch({
+        type:LOGIN,
+        token: selector.constantToken,
+        userId: selector.constantUserId,
+        constantToken: selector.constantToken,
+        constantUserId: selector.constantUserId
+      })
+    }
+  },[])
 
   useEffect(() => {
     checkUpdate(VersionInfo.appVersion.toString())

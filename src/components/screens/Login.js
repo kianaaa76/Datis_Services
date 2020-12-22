@@ -13,11 +13,12 @@ import {
   ActivityIndicator,
   StatusBar,
 } from 'react-native';
-import {LOGIN, LOGOUT, SET_USER_LIST} from '../../actions/types';
+import {LOGIN, LOGOUT} from '../../actions/types';
 import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit, normalize} from '../utils/utilities';
-import {loginUser, loginVerification, getUsers} from '../../actions/api';
+import {loginUser, loginVerification} from '../../actions/api';
+import {addDotsToPrice} from "../utils/utilities";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -31,7 +32,6 @@ const Login = ({navigation}) => {
   const [phoneNumber, setPhoneNumber] = useState();
   const [receiveCodeLoading, setReceiveCodeLoading] = useState(false);
   const [enterSystemLoading, setEnterSystemLoading] = useState(false);
-  // const [persistLoading, setPersistLoading] = useState(f);
   const [code, setCode] = useState('');
 
   const onReceiveCodePress = () => {
@@ -91,7 +91,6 @@ const Login = ({navigation}) => {
               constantUserId: data.result.ID,
             });
             setEnterSystemLoading(false);
-            // setPersistLoading(false);
             if (!!data.result.HomeLocation) {
               navigation.navigate('Home');
             } else {
@@ -107,7 +106,6 @@ const Login = ({navigation}) => {
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
-            // setPersistLoading(false);
           }
         });
       }

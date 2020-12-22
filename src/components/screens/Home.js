@@ -68,13 +68,21 @@ const Home = ({navigation}) => {
           setChangeUserLoading(false);
         }
       });
-    } else {
+    } else if (
+      !!selector.userList &&
+      (selector.constantUserId === 40 ||
+        selector.constantUserId === 41 ||
+        selector.constantUserId === 43 ||
+        selector.constantUserId === 51)
+    ) {
       JSON.parse(selector.userList).map(item => {
         if (item.ID == selector.userId) {
           setUser(item);
         }
       });
       setShowingUserList(selector.userList);
+      setChangeUserLoading(false);
+    } else{
       setChangeUserLoading(false);
     }
   }, []);
