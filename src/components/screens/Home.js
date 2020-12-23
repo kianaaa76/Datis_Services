@@ -45,7 +45,7 @@ const Home = ({navigation}) => {
 
   useEffect(() => {
     if (
-      !selector.userList &&
+      (!selector.userList || selector.userList.length == 0) &&
       (selector.constantUserId === 40 ||
         selector.constantUserId === 41 ||
         selector.constantUserId === 43 ||
@@ -70,6 +70,7 @@ const Home = ({navigation}) => {
       });
     } else if (
       !!selector.userList &&
+      selector.userList.length > 0 &&
       (selector.constantUserId === 40 ||
         selector.constantUserId === 41 ||
         selector.constantUserId === 43 ||
@@ -82,7 +83,7 @@ const Home = ({navigation}) => {
       });
       setShowingUserList(selector.userList);
       setChangeUserLoading(false);
-    } else{
+    } else {
       setChangeUserLoading(false);
     }
   }, []);

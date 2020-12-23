@@ -286,6 +286,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               style={Styles.datePickerConfirmButtonStyle}
               onPress={() => {
                 if (!dateIsSelected) {
+                  console.warn("yes");
                   setDate(Date.parse(new Date()));
                 }
                 setRenderTimePicker(true);
