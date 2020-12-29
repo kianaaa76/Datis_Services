@@ -22,7 +22,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial} from '../../../actions/api';
-import QRCodeScanner from 'react-native-qrcode-scanner';
+import RnZxing from 'react-native-rn-zxing';
 import {normalize, addDotsToPrice} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
@@ -31,7 +31,6 @@ const pageHeight = Dimensions.get('screen').height;
 const ServicePartsTab = ({
   setInfo,
   info,
-  navigation,
   renderSaveModal,
   hasNew,
   setHasNew,
@@ -45,15 +44,13 @@ const ServicePartsTab = ({
     Price: '0',
     failureDescription: '',
     hasGarantee: null,
-    availableVersions:[]
+    availableVersions: [],
   });
   const dropRef = useRef();
-  const new_dropRef =  useRef();
+  const new_dropRef = useRef();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isNewPartFormExpanded, setIsNewPartFormExpanded] = useState(false);
   const [partsListName, setPartsListName] = useState(selector.objectsList);
-  const [selectedPartVersionsList, setSelectedPartVersionsList] = useState([]);
-  const [screenMode, setScreenMode] = useState(false);
   const [searchBarcodeLoading, setSearchBarcodeLoading] = useState(false);
   const [objectsList, setObjectsList] = useState(info);
   const [selectedItemList, setSelectedItemList] = useState({});
@@ -92,179 +89,229 @@ const ServicePartsTab = ({
   });
 
   const onSuccess = async code => {
-    try{
-    setScreenMode(false);
-    let header = parseInt(code.toString().substr(0, 3));
-    numOfZeros = 0;
-    while (code.toString()[numOfZeros] == '0') {
-      numOfZeros = numOfZeros + 1;
-    }
-    let prefix = '';
-    let leftOfCode = code
-      .toString()
-      .substr(
-        header.toString().length + numOfZeros,
-        code.toString().length - header.toString().length,
+    try {
+      let header = parseInt(code.toString().substr(0, 3));
+      numOfZeros = 0;
+      while (code.toString()[numOfZeros] == '0') {
+        numOfZeros = numOfZeros + 1;
+      }
+      let prefix = '';
+      let leftOfCode = code
+        .toString()
+        .substr(
+          header.toString().length + numOfZeros,
+          code.toString().length - header.toString().length,
+        );
+      while (numOfZeros > 0) {
+        prefix = '0'.concat(prefix);
+        numOfZeros = numOfZeros - 1;
+      }
+      let selectedObject = partsListName.filter(
+        item => prefix.concat(item.value.SerialBarcode) == header,
       );
-    while (numOfZeros > 0) {
-      prefix = '0'.concat(prefix);
-      numOfZeros = numOfZeros - 1;
-    }
-    let selectedObject = partsListName.filter(
-      item => prefix.concat(item.value.SerialBarcode) == header,
-    );
-    let serialHeaderIndex = selectedObject[0].value.SerialFormat.indexOf('#');
-    if (selectedObject.length > 0) {
-      getObjBySerial(
-        selector.token,
-        `${selectedObject[0].value.SerialFormat.substr(
-          0,
-          serialHeaderIndex,
-        )}${leftOfCode}`,
-        selectedObject[0].value.Id,
-      ).then(data => {
-        if (data.errorCode == 0) {
-          let selectedVersion = selectedObject[0].value.Versions.filter(
-            item => item.Key == data.result.VersionId,
-          );
-          if (!!selectedItemList.Id) {
-            refactorObjectListItems(
-              'tempPart',
-              selectedObject[0],
-              selectedItemList.index,
+      let serialHeaderIndex = selectedObject[0].value.SerialFormat.indexOf('#');
+      if (selectedObject.length > 0) {
+        getObjBySerial(
+          selector.token,
+          `${selectedObject[0].value.SerialFormat.substr(
+            0,
+            serialHeaderIndex,
+          )}${leftOfCode}`,
+          selectedObject[0].value.Id,
+        ).then(data => {
+          if (data.errorCode == 0) {
+            let selectedVersion = selectedObject[0].value.Versions.filter(
+              item => item.Key == data.result.VersionId,
             );
-            refactorObjectListItems(
-              'tempVersion',
-              selectedVersion[0],
-              selectedItemList.index,
-            );
-            refactorObjectListItems(
-              'tempSerial',
-              `${selectedObject[0].value.SerialFormat.substr(
-                0,
-                serialHeaderIndex,
-              )}${leftOfCode}`,
-              selectedItemList.index,
-            );
-            refactorObjectListItems(
-              'availableVersions',
-              selectedObject[0].value.Versions,
-              selectedItemList.index,
-            );
-            setSelectedItemList({});
-            setQrScannerLoading(false);
+            if (!!selectedItemList.Id) {
+              refactorObjectListItems(
+                'tempPart',
+                selectedObject[0],
+                selectedItemList.index,
+              );
+              refactorObjectListItems(
+                'tempVersion',
+                selectedVersion[0],
+                selectedItemList.index,
+              );
+              refactorObjectListItems(
+                'tempSerial',
+                `${selectedObject[0].value.SerialFormat.substr(
+                  0,
+                  serialHeaderIndex,
+                )}${leftOfCode}`,
+                selectedItemList.index,
+              );
+              refactorObjectListItems(
+                'availableVersions',
+                selectedObject[0].value.Versions,
+                selectedItemList.index,
+              );
+              setSelectedItemList({});
+              setQrScannerLoading(false);
+            } else {
+              setFieldsObject({
+                ...fieldsObject,
+                partTypeSelected: selectedObject[0],
+                partVersionSelected: selectedVersion[0],
+                serial: `${selectedObject[0].value.SerialFormat.substr(
+                  0,
+                  serialHeaderIndex,
+                )}${leftOfCode}`,
+                availableVersions: selectedObject[0].value.Versions,
+              });
+              new_dropRef.current.setList(selectedObject[0].value.Versions);
+              setQrScannerLoading(false);
+            }
           } else {
-            setFieldsObject({
-              ...fieldsObject,
-              partTypeSelected: selectedObject[0],
-              partVersionSelected: selectedVersion[0],
-              serial: `${selectedObject[0].value.SerialFormat.substr(
-                0,
-                serialHeaderIndex,
-              )}${leftOfCode}`,
-              availableVersions:selectedObject[0].value.Versions
-            });
-            new_dropRef.current.setList(selectedObject[0].value.Versions);
+            ToastAndroid.showWithGravity(
+              data.message,
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
             setQrScannerLoading(false);
           }
-        } else {
-          ToastAndroid.showWithGravity(
-            data.message,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
-          setQrScannerLoading(false);
-        }
-      });
-    } else {
+        });
+      } else {
+        ToastAndroid.showWithGravity(
+          'کد اسکن شده معتبر نیست.',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+    } catch {
       ToastAndroid.showWithGravity(
-        'کد اسکن شده معتبر نیست.',
+        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
     }
-  } catch{
-    setScreenMode(false);
-  }
   };
 
   const searchBarcode = selectedItemList => {
-    try{
-    setSearchBarcodeLoading(true);
-    const object =
-      !!selectedItemList && !!selectedItemList.id
-        ? !!selectedItemList.partType
-          ? selectedItemList.partType
-          : null
-        : !!fieldsObject.partTypeSelected
-        ? fieldsObject.partTypeSelected
-        : null;
-    const sserial =
-      !!selectedItemList && !!selectedItemList.id
-        ? selectedItemList.serial.toUpperCase()
-        : !!fieldsObject.serial
-        ? fieldsObject.serial.toUpperCase()
-        : null;
-    if (!!object && !!sserial) {
-      if (!!object.value.SerialFormat.length > 0) {
-        let serialFormatHeader = object.value.SerialFormat.substr(
-          0,
-          object.value.SerialFormat.indexOf('#'),
-        );
-        let serialLengthWithoutHeader =
-          object.value.SerialFormat.length - serialFormatHeader.length;
-        let leftOfSerialFormat = object.value.SerialFormat.substr(
-          object.value.SerialFormat.indexOf('#'),
-          object.value.SerialFormat.length,
-        );
-        if (sserial.length === object.value.SerialFormat.length) {
-          if (
-            serialFormatHeader === sserial.substr(0, serialFormatHeader.length)
-          ) {
-            getObjBySerial(selector.token, sserial, object.value.Id).then(
-              data => {
-                if (data.errorCode == 0) {
-                  let selectedVersion = object.value.Versions.filter(
-                    item => item.Key == data.result.VersionId,
-                  );
+    try {
+      setSearchBarcodeLoading(true);
+      const object =
+        !!selectedItemList && !!selectedItemList.id
+          ? !!selectedItemList.partType
+            ? selectedItemList.partType
+            : null
+          : !!fieldsObject.partTypeSelected
+          ? fieldsObject.partTypeSelected
+          : null;
+      const sserial =
+        !!selectedItemList && !!selectedItemList.id
+          ? selectedItemList.serial.toUpperCase()
+          : !!fieldsObject.serial
+          ? fieldsObject.serial.toUpperCase()
+          : null;
+      if (!!object && !!sserial) {
+        if (!!object.value.SerialFormat.length > 0) {
+          let serialFormatHeader = object.value.SerialFormat.substr(
+            0,
+            object.value.SerialFormat.indexOf('#'),
+          );
+          let serialLengthWithoutHeader =
+            object.value.SerialFormat.length - serialFormatHeader.length;
+          let leftOfSerialFormat = object.value.SerialFormat.substr(
+            object.value.SerialFormat.indexOf('#'),
+            object.value.SerialFormat.length,
+          );
+          if (sserial.length === object.value.SerialFormat.length) {
+            if (
+              serialFormatHeader ===
+              sserial.substr(0, serialFormatHeader.length)
+            ) {
+              getObjBySerial(selector.token, sserial, object.value.Id).then(
+                data => {
+                  if (data.errorCode == 0) {
+                    let selectedVersion = object.value.Versions.filter(
+                      item => item.Key == data.result.VersionId,
+                    );
 
-                  if (!!selectedItemList.id) {
-                    refactorObjectListItems(
-                      'tempPart',
-                      object,
-                      selectedItemList.index,
-                    );
-                    refactorObjectListItems(
-                      'tempVersion',
-                      selectedVersion[0],
-                      selectedItemList.index,
-                    );
-                    refactorObjectListItems(
-                      'availableVersions',
-                      object.value.Versions,
-                      selectedItemList.index,
-                    );
-                    setSelectedItemList({});
+                    if (!!selectedItemList.id) {
+                      refactorObjectListItems(
+                        'tempPart',
+                        object,
+                        selectedItemList.index,
+                      );
+                      refactorObjectListItems(
+                        'tempVersion',
+                        selectedVersion[0],
+                        selectedItemList.index,
+                      );
+                      refactorObjectListItems(
+                        'availableVersions',
+                        object.value.Versions,
+                        selectedItemList.index,
+                      );
+                      setSelectedItemList({});
+                    } else {
+                      setFieldsObject({
+                        ...fieldsObject,
+                        partTypeSelected: object,
+                        partVersionSelected: selectedVersion[0],
+                        availableVersions: object.value.Versions,
+                      });
+                    }
+                    setSearchBarcodeLoading(false);
                   } else {
-                    setFieldsObject({
-                      ...fieldsObject,
-                      partTypeSelected: object,
-                      partVersionSelected: selectedVersion[0],
-                      availableVersions:object.value.Versions
-                    });
-                    // setSelectedPartVersionsList(object.value.Versions)
+                    setSearchBarcodeLoading(false);
+                    ToastAndroid.showWithGravity(
+                      data.message,
+                      ToastAndroid.SHORT,
+                      ToastAndroid.CENTER,
+                    );
                   }
-                  setSearchBarcodeLoading(false);
-                } else {
-                  setSearchBarcodeLoading(false);
-                  ToastAndroid.showWithGravity(
-                    data.errorCode,
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
+                },
+              );
+            } else {
+              setSearchBarcodeLoading(false);
+              ToastAndroid.showWithGravity(
+                `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+            }
+          } else if (sserial.length === serialLengthWithoutHeader) {
+            getObjBySerial(
+              selector.token,
+              `${serialFormatHeader}${sserial}`,
+              object.value.Id,
+            ).then(data => {
+              if (data.errorCode == 0) {
+                let selectedVersion = object.value.Versions.filter(
+                  item => item.Key == data.result.VersionId,
+                );
+                if (!!selectedItemList.id) {
+                  refactorObjectListItems(
+                    'tempPart',
+                    object,
+                    selectedItemList.index,
                   );
+                  refactorObjectListItems(
+                    'tempVersion',
+                    selectedVersion[0],
+                    selectedItemList.index,
+                  );
+                  setSelectedItemList({});
+                } else {
+                  setFieldsObject({
+                    ...fieldsObject,
+                    partTypeSelected: object,
+                    partVersionSelected: selectedVersion[0],
+                  });
                 }
-              },
-            );
+                setSearchBarcodeLoading(false);
+              } else {
+                setSearchBarcodeLoading(false);
+                ToastAndroid.showWithGravity(
+                  data.message,
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+                );
+              }
+            });
           } else {
             setSearchBarcodeLoading(false);
             ToastAndroid.showWithGravity(
@@ -273,49 +320,10 @@ const ServicePartsTab = ({
               ToastAndroid.CENTER,
             );
           }
-        } else if (sserial.length === serialLengthWithoutHeader) {
-          getObjBySerial(
-            selector.token,
-            `${serialFormatHeader}${sserial}`,
-            object.value.Id,
-          ).then(data => {
-            if (data.errorCode == 0) {
-              let selectedVersion = object.value.Versions.filter(
-                item => item.Key == data.result.VersionId,
-              );
-              if (!!selectedItemList.id) {
-                refactorObjectListItems(
-                  'tempPart',
-                  object,
-                  selectedItemList.index,
-                );
-                refactorObjectListItems(
-                  'tempVersion',
-                  selectedVersion[0],
-                  selectedItemList.index,
-                );
-                setSelectedItemList({});
-              } else {
-                setFieldsObject({
-                  ...fieldsObject,
-                  partTypeSelected: object,
-                  partVersionSelected: selectedVersion[0],
-                });
-              }
-              setSearchBarcodeLoading(false);
-            } else {
-              setSearchBarcodeLoading(false);
-              ToastAndroid.showWithGravity(
-                data.errorCode,
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
-            }
-          });
         } else {
           setSearchBarcodeLoading(false);
           ToastAndroid.showWithGravity(
-            `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+            'برای این قطعه باید نسخه را به صورت دستی وارد کنید.',
             ToastAndroid.SHORT,
             ToastAndroid.CENTER,
           );
@@ -323,22 +331,19 @@ const ServicePartsTab = ({
       } else {
         setSearchBarcodeLoading(false);
         ToastAndroid.showWithGravity(
-          'برای این قطعه باید نسخه را به صورت دستی وارد کنید.',
+          'لطفا نوع قطعه را مشخص کنید.',
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
       }
-    } else {
-      setSearchBarcodeLoading(false);
+    } catch(err) {
       ToastAndroid.showWithGravity(
-        'لطفا نوع قطعه را مشخص کنید.',
+        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
+      setSearchBarcodeLoading(false);
     }
-  } catch {
-    setSearchBarcodeLoading(false);
-  }
   };
 
   const refactorObjectListItems = (refactorFeild, newValue, objectIndex) => {
@@ -546,8 +551,15 @@ const ServicePartsTab = ({
                   marginHorizontal: 5,
                 }}
                 onPress={() => {
-                  setSelectedItemList(Item);
-                  setScreenMode(true);
+                  try {
+                    RnZxing.showQrReader(data => onSuccess(data));
+                  } catch {
+                    ToastAndroid.showWithGravity(
+                      'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                      ToastAndroid.SHORT,
+                      ToastAndroid.CENTER,
+                    );
+                  }
                 }}
               />
               <TextInput
@@ -776,7 +788,6 @@ const ServicePartsTab = ({
       setObjectsList(list);
       setInfo(list);
     } else {
-      // setSelectedPartVersionsList(fieldsObject.partTypeSelected.value.Versions);
       setObjectsList(list);
       setInfo(list);
       let obj = {
@@ -784,7 +795,7 @@ const ServicePartsTab = ({
         serial: '',
         partTypeSelected: fieldsObject.partTypeSelected,
         partVersionSelected: fieldsObject.partVersionSelected,
-        availableVersions:fieldsObject.availableVersions,
+        availableVersions: fieldsObject.availableVersions,
         Price: '0',
         failureDescription: '',
         hasGarantee: null,
@@ -793,7 +804,7 @@ const ServicePartsTab = ({
     }
   };
 
-  return !screenMode ? (
+  return (
     <>
       {qrScannerLoading && (
         <View
@@ -990,9 +1001,8 @@ const ServicePartsTab = ({
                         partTypeSelected: value,
                         serial: '',
                         partVersionSelected: {},
-                        availableVersions:value.value.Versions
+                        availableVersions: value.value.Versions,
                       });
-                      // setSelectedPartVersionsList(value.value.Versions);
                       new_dropRef.current.setList(value.value.Versions);
                     }}
                     placeholder={
@@ -1030,7 +1040,17 @@ const ServicePartsTab = ({
                       fontSize: normalize(30),
                       marginHorizontal: 5,
                     }}
-                    onPress={() => setScreenMode(true)}
+                    onPress={() => {
+                      try {
+                        RnZxing.showQrReader(data => onSuccess(data));
+                      } catch {
+                        ToastAndroid.showWithGravity(
+                          'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                          ToastAndroid.SHORT,
+                          ToastAndroid.CENTER,
+                        );
+                      }
+                    }}
                   />
                   <TextInput
                     style={Styles.serialInputStyle}
@@ -1055,7 +1075,7 @@ const ServicePartsTab = ({
                     ref={new_dropRef}
                     list={fieldsObject.availableVersions}
                     placeholder={
-                      !!fieldsObject.partVersionSelected && 
+                      !!fieldsObject.partVersionSelected &&
                       !!fieldsObject.partVersionSelected.Key
                         ? fieldsObject.partVersionSelected.Value
                         : 'نسخه مورد نظر خود را انتخاب کنید.'
@@ -1270,51 +1290,6 @@ const ServicePartsTab = ({
           </TouchableOpacity>
         </View>
       )}
-    </>
-  ) : (
-    <>
-      <QRCodeScanner
-        onRead={code => onSuccess(code.data)}
-        showMarker={true}
-        customMarker={
-          <>
-            <TouchableOpacity
-              onPress={() => setScreenMode(false)}
-              style={{
-                backgroundColor: '#fff',
-                justifyContent: 'center',
-                alignItems: 'center',
-                elevation: 5,
-                width: pageWidth * 0.12,
-                height: pageWidth * 0.12,
-                borderRadius: pageWidth * 0.06,
-                position: 'absolute',
-                top: 12,
-                right: 12,
-              }}>
-              <Icon name="close" style={{fontSize: 25}} color="#000" />
-            </TouchableOpacity>
-            <View
-              style={{
-                borderWidth: 1,
-                borderColor: 'green',
-                width: pageWidth * 0.7,
-                height: pageHeight * 0.3,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <View
-                style={{
-                  height: 0,
-                  width: pageWidth * 0.55,
-                  borderWidth: 1,
-                  borderBottomColor: 'red',
-                }}
-              />
-            </View>
-          </>
-        }
-      />
     </>
   );
 };

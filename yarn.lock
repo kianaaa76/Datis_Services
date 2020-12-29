@@ -1048,13 +1048,6 @@
   dependencies:
     deep-assign "^3.0.0"
 
-"@react-native-community/async-storage@^1.6.1":
-  version "1.12.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/async-storage/-/async-storage-1.12.1.tgz#25f821b4f6b13abe005ad67e47c6f1cee9f27b24"
-  integrity sha512-70WGaH3PKYASi4BThuEEKMkyAgE9k7VytBqmgPRx3MzJx9/MkspwqJGmn3QLCgHLIFUgF1pit2mWICbRJ3T3lg==
-  dependencies:
-    deep-assign "^3.0.0"
-
 "@react-native-community/checkbox@^0.5.4":
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/@react-native-community/checkbox/-/checkbox-0.5.4.tgz#0b16722eef46a36df80ef24dea7cc7b58a32f379"
@@ -7026,7 +7019,7 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.4"
 
-prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -7122,13 +7115,6 @@ react-native-android-location-services-dialog-box@^2.8.2:
   resolved "https://registry.yarnpkg.com/react-native-android-location-services-dialog-box/-/react-native-android-location-services-dialog-box-2.8.2.tgz#41d3dd1203cf635a5ef6ee81a1eb75dd20fd5c6f"
   integrity sha512-zBTi0xJQoF6GdImRhXOCXezYuALlPgbctqG3eOrZu63hdrlvTBhqATkb6DB5JM9kpcMbX1skMIOI3m71zKGsPA==
 
-react-native-camera@^3.40.0:
-  version "3.40.0"
-  resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-3.40.0.tgz#69845991e46b0892cc2b50322d49b18f292c3202"
-  integrity sha512-Ur0hZqZcl3SntTVMB9GxuiLYpQxqwgzhQVb+7EGae4WjfDzQEwlGF0bJ7UpZyeUTb1oZmsiSib58xUckn11XMw==
-  dependencies:
-    prop-types "^15.6.2"
-
 "react-native-fbads@https://github.com/callstack-io/react-native-fbads/tarball/v4.1.0":
   version "4.1.0"
   resolved "https://github.com/callstack-io/react-native-fbads/tarball/v4.1.0#e59aae9c953fff175dd617df5acc58a8e71a211e"
@@ -7182,24 +7168,10 @@ react-native-modal-datetime-picker@^9.0.0:
   dependencies:
     prop-types "^15.7.2"
 
-react-native-permissions@^2.0.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-2.2.2.tgz#3d2a63f6b7d6be52fc86e30f77412a9566283028"
-  integrity sha512-ihf4shQDSX5Oo9ChQXb9kr13mmyyNem5MaEvOpr3dCjhBOBWyEMztXm9/uPK1Qg5PsNpaYLa1KpcPZDCw87LXg==
-
 react-native-permissions@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-3.0.0.tgz#d9d107700741d41f8392f202f35a61f481fb0e68"
   integrity sha512-zBvf+o3NhgKmBk1I06GzZXaDfc9SUyO4M5TMcaCF1pwG1h4sI+XAv3gWSbryl6WnaZQc1zA+g7SocSoYcpJN5g==
-
-react-native-qrcode-scanner@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/react-native-qrcode-scanner/-/react-native-qrcode-scanner-1.6.0.tgz#dbb16ef515b33c990656183e529eb1d9d354ef35"
-  integrity sha512-9Mxa0RzRqbOVeKDLyGKkHFva0KmO/dcbypWO/ll5e09thxBvXoLAtz9MzrLYJsoZHImsAEbroqsZu/e4x/SmFg==
-  dependencies:
-    "@react-native-community/async-storage" "^1.6.1"
-    prop-types "^15.5.10"
-    react-native-permissions "^2.0.2"
 
 react-native-reanimated@^1.13.0:
   version "1.13.0"
@@ -7207,6 +7179,11 @@ react-native-reanimated@^1.13.0:
   integrity sha512-uadP/0QO+4TCsyPSvzRdl+76NPM7Bp8M25KQLB4Hg3tWBMjhrMrETnzNi33L/OPfmhU+7rceyi0QPe/DxKT5bQ==
   dependencies:
     fbjs "^1.0.0"
+
+react-native-rn-zxing@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-rn-zxing/-/react-native-rn-zxing-1.1.2.tgz#a0084f3d0307783cbd4029991f9a6fd80ba9aead"
+  integrity sha512-+LZt4pFUh+gLub3OgvW5QDz+Tj9FoE3fUht5NMDjcp7JV2qjHgVuA31OpfM5fXbEUHbeQ54JR88S66SSLuoioQ==
 
 react-native-safe-area-context@^3.1.7:
   version "3.1.7"

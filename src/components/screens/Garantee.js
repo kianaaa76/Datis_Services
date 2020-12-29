@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   TextInput,
@@ -6,46 +6,24 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  BackHandler,
   ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
 import Header from '../common/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import QRCodeScanner from 'react-native-qrcode-scanner';
+import RnZxing from 'react-native-rn-zxing';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
 import {toFaDigit, normalize} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
-const pageHeight = Dimensions.get('screen').height;
 
 const Garantee = ({navigation}) => {
   const selector = useSelector(state => state);
   const dispatch = useDispatch();
   const [serial, setSerial] = useState('');
-  const [screenMode, setScreenMode] = useState(false);
   const [loader, setLoader] = useState(false);
   const [product, setProduct] = useState(null);
-
-  useEffect(() => {
-    const backAction = () => {
-      if (screenMode) {
-        setScreenMode(false);
-      } else {
-        setSerial('');
-        setProduct(null);
-        navigation.goBack();
-      }
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-    return () => backHandler.remove();
-  });
 
   const inquiry = () => {
     setLoader(true);
@@ -82,103 +60,66 @@ const Garantee = ({navigation}) => {
 
   return (
     <View style={{flex: 1}}>
-      {!screenMode ? (
-        <>
-          <Header headerText={'استعلام گارانتی'} />
-          <View style={{flex: 1, alignItems: 'center'}}>
-            <View style={Styles.inputContainerStyle}>
-              <Icon
-                name={'barcode-scan'}
-                style={{
-                  color: '#000',
-                  fontSize: normalize(27),
-                  width: 50,
-                }}
-                onPress={() => {
-                  setScreenMode(true);
-                }}
-              />
-              <TextInput
-                placeholder={'سریال دستگاه'}
-                onChangeText={serial => {
-                  setSerial(serial);
-                }}
-                style={Styles.textInputStyle}
-                value={serial}
-              />
-              <View style={{width: 50}} />
-            </View>
-            <TouchableOpacity
-              style={Styles.buttonContainerStyle}
-              onPress={inquiry}>
-              {!!loader ? (
-                <ActivityIndicator size={'small'} color={'#000'} />
-              ) : (
-                <Text style={Styles.buttonTextStyle}>استعلام</Text>
-              )}
-            </TouchableOpacity>
-            {!!product ? (
-              <View style={{marginTop: 30}}>
-                {renderSingleItem(
-                  'وضعیت',
-                  product.RamzDate.length > 0
-                    ? product.RamzDate
-                    : 'عدم دریافت رمز',
-                )}
-                {renderSingleItem('تاریخ تولید', toFaDigit(product.ExitDate))}
-                {renderSingleItem(
-                  'گارانتی برد',
-                  product.Warranty ? 'دارد' : 'ندارد',
-                )}
-                {renderSingleItem('نوع محصول', product.ProductName)}
-              </View>
-            ) : null}
+      <>
+        <Header headerText={'استعلام گارانتی'} />
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <View style={Styles.inputContainerStyle}>
+            <Icon
+              name={'barcode-scan'}
+              style={{
+                color: '#000',
+                fontSize: normalize(27),
+                width: 50,
+              }}
+              onPress={() => {
+                try {
+                  RnZxing.showQrReader(data => onSuccess(data));
+                } catch {
+                  ToastAndroid.showWithGravity(
+                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
+              }}
+            />
+            <TextInput
+              placeholder={'سریال دستگاه'}
+              onChangeText={serial => {
+                setSerial(serial);
+              }}
+              style={Styles.textInputStyle}
+              value={serial}
+            />
+            <View style={{width: 50}} />
           </View>
-        </>
-      ) : (
-        <QRCodeScanner
-          onRead={code => setSerial(code.data)}
-          showMarker={true}
-          customMarker={
-            <>
-              <TouchableOpacity
-                onPress={() => setScreenMode(false)}
-                style={{
-                  backgroundColor: '#fff',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  elevation: 5,
-                  width: pageWidth * 0.12,
-                  height: pageWidth * 0.12,
-                  borderRadius: pageWidth * 0.06,
-                  position: 'absolute',
-                  top: 12,
-                  right: 12,
-                }}>
-                <Icon name="close" style={{fontSize: 25}} color="#000" />
-              </TouchableOpacity>
-              <View
-                style={{
-                  borderWidth: 1,
-                  borderColor: 'green',
-                  width: pageWidth * 0.7,
-                  height: pageHeight * 0.3,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    height: 0,
-                    width: pageWidth * 0.55,
-                    borderWidth: 1,
-                    borderBottomColor: 'red',
-                  }}
-                />
-              </View>
-            </>
-          }
-        />
-      )}
+          <TouchableOpacity
+            style={Styles.buttonContainerStyle}
+            onPress={inquiry}>
+            {!!loader ? (
+              <ActivityIndicator size={'small'} color={'#000'} />
+            ) : (
+              <Text style={Styles.buttonTextStyle}>استعلام</Text>
+            )}
+          </TouchableOpacity>
+          {!!product ? (
+            <View style={{marginTop: 30}}>
+              {renderSingleItem(
+                'وضعیت',
+                product.RamzDate.length > 0
+                  ? product.RamzDate
+                  : 'عدم دریافت رمز',
+              )}
+              {renderSingleItem('تاریخ تولید', toFaDigit(product.ExitDate))}
+              {renderSingleItem(
+                'گارانتی برد',
+                product.Warranty ? 'دارد' : 'ندارد',
+              )}
+              {renderSingleItem('نوع محصول', product.ProductName)}
+            </View>
+          ) : null}
+        </View>
+      </>
     </View>
   );
 };

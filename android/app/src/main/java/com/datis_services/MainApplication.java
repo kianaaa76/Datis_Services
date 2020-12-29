@@ -5,7 +5,6 @@ import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.zoontek.rnpermissions.RNPermissionsPackage;
-import org.reactnative.camera.RNCameraPackage;
 // import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
