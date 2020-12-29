@@ -17,7 +17,7 @@ import backgroundImage from '../../../assets/images/background_splash_screen.jpg
 import splashImage from '../../../assets/images/image_splash_screen.png';
 import {checkUpdate} from '../../actions/api';
 import {normalize} from '../utils/utilities';
-import { LOGIN } from '../../actions/types';
+import {LOGIN} from '../../actions/types';
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -26,46 +26,51 @@ const Splash = ({navigation}) => {
   const selector = useSelector(state => state);
   const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  useEffect(()=>{
-    if (!!selector.token){
+  useEffect(() => {
+    if (!!selector.token) {
       dispatch({
-        type:LOGIN,
+        type: LOGIN,
         token: selector.constantToken,
         userId: selector.constantUserId,
         constantToken: selector.constantToken,
-        constantUserId: selector.constantUserId
-      })
+        constantUserId: selector.constantUserId,
+      });
     }
-  },[])
+  }, []);
 
   useEffect(() => {
-    checkUpdate(VersionInfo.appVersion.toString())
-      .then(data => {
-        if (data.errorCode === 5) {
-          setShowUpdateModal(true);
-        } else {
-          if (!!selector.token) {
-            navigation.navigate('Home');
+    try {
+      checkUpdate(VersionInfo.appVersion.toString())
+        .then(data => {
+          if (data.errorCode === 5) {
+            setShowUpdateModal(true);
           } else {
-            navigation.navigate('SignedOut');
+            if (!!selector.token) {
+              navigation.navigate('Home');
+            } else {
+              navigation.navigate('SignedOut');
+            }
           }
-        }
-      })
-      .catch(err => {
-        Alert.alert(
-          `خطای دسترسی به اینترنت`,
-          'برای وارد شدن نیاز به اینترنت دارید. لطفا برنامه را ببندید و پس از فعالسازی اینترنت دستگاه خود دوباره وارد شوید.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                BackHandler.exitApp();
+        })
+        .catch(err => {
+          console.warn('err', err);
+          Alert.alert(
+            `خطای دسترسی به اینترنت`,
+            'برای وارد شدن نیاز به اینترنت دارید. لطفا برنامه را ببندید و پس از فعالسازی اینترنت دستگاه خود دوباره وارد شوید.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  BackHandler.exitApp();
+                },
               },
-            },
-          ],
-        );
-      });
-  });
+            ],
+          );
+        });
+    } catch {
+      console.warn("err")
+    }
+  }, []);
 
   return (
     <ImageBackground source={backgroundImage} style={Styles.containerStyle}>

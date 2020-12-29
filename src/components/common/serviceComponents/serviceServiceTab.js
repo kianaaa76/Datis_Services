@@ -148,31 +148,45 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               name={'camera-alt'}
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
-                ImagePicker.openCamera({
-                  // cropping: true,
-                  width: pageWidth - 20,
-                  height: pageHeight * 0.7,
-                  includeBase64: true,
-                  compressImageQuality: 0.7,
-                }).then(response => {
-                  setInfo({...info, image: response.data});
-                });
+                try {
+                  ImagePicker.openCamera({
+                    width: pageWidth - 20,
+                    height: pageHeight * 0.7,
+                    includeBase64: true,
+                    compressImageQuality: 0.7,
+                  }).then(response => {
+                    setInfo({...info, image: response.data});
+                  });
+                } catch {
+                  ToastAndroid.showWithGravity(
+                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
               }}
             />
             <Icon
               name={'file-upload'}
               style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() =>
-                ImagePicker.openPicker({
-                  // cropping: true,
-                  width: pageWidth - 20,
-                  height: pageHeight * 0.7,
-                  includeBase64: true,
-                  compressImageQuality: 0.7,
-                }).then(response => {
-                  setInfo({...info, image: response.data});
-                })
-              }
+              onPress={() => {
+                try {
+                  ImagePicker.openPicker({
+                    width: pageWidth - 20,
+                    height: pageHeight * 0.7,
+                    includeBase64: true,
+                    compressImageQuality: 0.7,
+                  }).then(response => {
+                    setInfo({...info, image: response.data});
+                  });
+                } catch {
+                  ToastAndroid.showWithGravity(
+                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
+              }}
             />
             {!!info.image && (
               <Icon
@@ -286,7 +300,6 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               style={Styles.datePickerConfirmButtonStyle}
               onPress={() => {
                 if (!dateIsSelected) {
-                  console.warn("yes");
                   setDate(Date.parse(new Date()));
                 }
                 setRenderTimePicker(true);

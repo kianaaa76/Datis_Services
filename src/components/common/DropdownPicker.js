@@ -13,7 +13,6 @@ import {
 import {normalize} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
-const pageHeight = Dimensions.get('screen').height;
 
 const DropdownPicker = forwardRef(
   ({placeholder, list, onSelect, listHeight}, ref) => {
@@ -30,108 +29,120 @@ const DropdownPicker = forwardRef(
     }));
 
     const renderListItem = item => {
-      return !!item.item.Key ? (
-        <TouchableOpacity
-          style={Styles.listItemsContainerStyle}
-          onPress={() => {
-            setSelecedItemName(item.item.Value);
-            onSelect(item.item);
-            setListIsShown(false);
-            setShowingList(list);
-          }}>
-          <Text>{item.item.Value}</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={Styles.listItemsContainerStyle}
-          onPress={() => {
-            setSelecedItemName(item.item.label);
-            onSelect(item.item);
-            setListIsShown(false);
-            setShowingList(list);
-          }}>
-          <Text>{item.item.label}</Text>
-        </TouchableOpacity>
-      );
+      try {
+        return !!item.item.Key ? (
+          <TouchableOpacity
+            style={Styles.listItemsContainerStyle}
+            onPress={() => {
+              setSelecedItemName(item.item.Value);
+              onSelect(item.item);
+              setListIsShown(false);
+              setShowingList(list);
+            }}>
+            <Text>{item.item.Key}</Text>
+            <Text> / </Text>
+            <Text>{item.item.Value}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={Styles.listItemsContainerStyle}
+            onPress={() => {
+              setSelecedItemName(item.item.label);
+              onSelect(item.item);
+              setListIsShown(false);
+              setShowingList(list);
+            }}>
+            <Text>{item.item.value.Id}</Text>
+            <Text> / </Text>
+            <Text>{item.item.label}</Text>
+          </TouchableOpacity>
+        );
+      } catch {}
     };
 
     const searchInList = text => {
-      let TEXT = text.toLowerCase().replace(/\s/g, '');
-      if (!!TEXT) {
-        let temp = list.filter(item =>
-          item.label
-            .toLowerCase()
-            .replace(/\s/g, '')
-            .includes(TEXT),
-        );
-        setShowingList(temp);
-      } else {
-        setShowingList(list);
+      try {
+        let TEXT = text
+          .toString()
+          .toLowerCase()
+          .replace(/\s/g, '');
+        if (!!TEXT) {
+          let temp = list.filter(
+            item =>
+              (!!item.label &&
+                item.label
+                  .toLowerCase()
+                  .replace(/\s/g, '')
+                  .includes(TEXT)) ||
+              (!!item.Value && item.Value.toLowerCase().includes(TEXT)) ||
+              (!!item.value &&
+                !!item.value.Id &&
+                item.value.Id.toString().includes(TEXT)) ||
+              (!!item.Key && item.Key.toString().includes(TEXT)),
+          );
+          setShowingList(temp);
+        } else {
+          setShowingList(list);
+        }
+      } catch (err) {
+        console.warn('err', err);
       }
     };
-
-    return (
-      <View style={{width: pageWidth * 0.7}}>
-        <TouchableOpacity
-          style={Styles.containerStyle}
-          onPress={() => {
-            setListIsShown(!listIsShown);
-          }}>
-          <Text style={{color: '#000'}}>
-            {!!selectedItemName
-              ? selectedItemName.length > 30
-                ? `${selectedItemName.substr(0, 30)}...`
-                : selectedItemName
-              : placeholder}
-          </Text>
-          {/* {listIsShown?(
-                    <FontAwesome name={"chevron-up"} style={Styles.upDownIconStyle} onPress={()=> {
-                        setShowingList(list);
-                        setSearchText("");
-                        setListIsShown(false);
-                    }}/>
-                ):(
-                    <FontAwesome name={"chevron-down"} style={Styles.upDownIconStyle}/>
-                )} */}
-        </TouchableOpacity>
-        {listIsShown && (
-          <View style={[Styles.listContainerStyle, {height: listHeight}]}>
-            <View style={Styles.searchbarContainerStyle}>
-              <TextInput
-                value={searchText}
-                placeholder={'جستجو کنید...'}
-                style={Styles.searchInputStyle}
-                onChangeText={text => {
-                  setSearchText(text);
-                  searchInList(text);
-                }}
-              />
-              {/* <FontAwesome name={"search"} style={Styles.searchIconStyle}/> */}
+    try {
+      return (
+        <View style={{width: pageWidth * 0.7}}>
+          <TouchableOpacity
+            style={Styles.containerStyle}
+            onPress={() => {
+              setListIsShown(!listIsShown);
+            }}>
+            <Text style={{color: '#000'}}>
+              {!!selectedItemName
+                ? selectedItemName.length > 30
+                  ? `${selectedItemName.substr(0, 30)}...`
+                  : selectedItemName
+                : placeholder}
+            </Text>
+          </TouchableOpacity>
+          {listIsShown && (
+            <View style={[Styles.listContainerStyle, {height: listHeight}]}>
+              <View style={Styles.searchbarContainerStyle}>
+                <TextInput
+                  value={searchText}
+                  placeholder={'جستجو کنید...'}
+                  style={Styles.searchInputStyle}
+                  onChangeText={text => {
+                    setSearchText(text);
+                    searchInList(text);
+                  }}
+                />
+                {/* <FontAwesome name={"search"} style={Styles.searchIconStyle}/> */}
+              </View>
+              <ScrollView
+                nestedScrollEnabled={true}
+                scrollEnabled={!!showingList.length}
+                keyboardShouldPersistTaps="always"
+                keyboardDismissMode="on-drag">
+                <FlatList
+                  data={showingList}
+                  renderItem={item => renderListItem(item)}
+                  ListEmptyComponent={() => (
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%',
+                      }}>
+                      <Text>موردی یافت نشد.</Text>
+                    </View>
+                  )}
+                />
+              </ScrollView>
             </View>
-            <ScrollView
-              nestedScrollEnabled={true}
-              scrollEnabled={!!showingList.length}
-              keyboardShouldPersistTaps="always"
-              keyboardDismissMode="on-drag">
-              <FlatList
-                data={showingList}
-                renderItem={item => renderListItem(item)}
-                ListEmptyComponent={() => (
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: '100%',
-                    }}>
-                    <Text>موردی یافت نشد.</Text>
-                  </View>
-                )}
-              />
-            </ScrollView>
-          </View>
-        )}
-      </View>
-    );
+          )}
+        </View>
+      );
+    } catch {}
   },
 );
 
@@ -146,13 +157,14 @@ const Styles = StyleSheet.create({
     borderColor: 'gray',
   },
   searchInputStyle: {
-    width: pageWidth * 0.6,
+    width: '100%',
     height: 50,
   },
   listItemsContainerStyle: {
+    flexDirection: 'row',
     width: '100%',
     paddingVertical: 5,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'flex-start',
     backgroundColor: '#fff',
     paddingHorizontal: 8,

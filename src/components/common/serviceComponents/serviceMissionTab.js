@@ -8,7 +8,7 @@ import {
   Switch,
   BackHandler,
   ToastAndroid,
-  Alert
+  Alert,
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Icon from 'react-native-vector-icons/Foundation';
@@ -22,7 +22,13 @@ const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 let cameraRef = {};
 let EndObject = '';
-const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation, isRejected}) => {
+const ServiceMissionTab = ({
+  info,
+  setInfo,
+  renderSaveModal,
+  navigation,
+  isRejected,
+}) => {
   const [startLocation, setStartLocation] = useState({
     startLatitude: info.startLatitude,
     startLongitude: info.startLongitude,
@@ -75,101 +81,106 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation, isReject
   };
 
   const mapOnLongPress = feature => {
-    if (!startLocation.startLatitude) {
-      setAreaHasChanged(false);
-      setStartLocation({
-        startLatitude: feature.geometry.coordinates[1],
-        startLongitude: feature.geometry.coordinates[0],
-      });
-      setInfo({
-        ...info,
-        startLatitude: feature.geometry.coordinates[1],
-        startLongitude: feature.geometry.coordinates[0],
-      });
-      fetch(
-        `https://map.ir/fast-reverse?lat=${
-          feature.geometry.coordinates[1]
-        }&lon=${feature.geometry.coordinates[0]}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY,
+    if (!!feature) {
+      if (!startLocation.startLatitude) {
+        setAreaHasChanged(false);
+        setStartLocation({
+          startLatitude: feature.geometry.coordinates[1],
+          startLongitude: feature.geometry.coordinates[0],
+        });
+        setInfo({
+          ...info,
+          startLatitude: feature.geometry.coordinates[1],
+          startLongitude: feature.geometry.coordinates[0],
+        });
+        fetch(
+          `https://map.ir/fast-reverse?lat=${
+            feature.geometry.coordinates[1]
+          }&lon=${feature.geometry.coordinates[0]}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': API_KEY,
+            },
           },
-        },
-      )
-        .then(response => response.json())
-        .then(data => {
-          setStartCity(data.city);
-          setInfo({
-            ...info,
-            startCity: data.city,
-            startLatitude: feature.geometry.coordinates[1],
-            startLongitude: feature.geometry.coordinates[0],
+        )
+          .then(response => response.json())
+          .then(data => {
+            setStartCity(data.city);
+            setInfo({
+              ...info,
+              startCity: data.city,
+              startLatitude: feature.geometry.coordinates[1],
+              startLongitude: feature.geometry.coordinates[0],
+            });
           });
+      } else if (!endLocation.endLatitude) {
+        setEndLocation({
+          endLatitude: feature.geometry.coordinates[1],
+          endLongitude: feature.geometry.coordinates[0],
         });
-    } else if (!endLocation.endLatitude) {
-      setEndLocation({
-        endLatitude: feature.geometry.coordinates[1],
-        endLongitude: feature.geometry.coordinates[0],
-      });
-      setInfo({
-        ...info,
-        endLatitude: feature.geometry.coordinates[1],
-        endLongitude: feature.geometry.coordinates[0],
-      });
-      fetch(
-        `https://map.ir/fast-reverse?lat=${
-          feature.geometry.coordinates[1]
-        }&lon=${feature.geometry.coordinates[0]}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': API_KEY,
+        setInfo({
+          ...info,
+          endLatitude: feature.geometry.coordinates[1],
+          endLongitude: feature.geometry.coordinates[0],
+        });
+        fetch(
+          `https://map.ir/fast-reverse?lat=${
+            feature.geometry.coordinates[1]
+          }&lon=${feature.geometry.coordinates[0]}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': API_KEY,
+            },
           },
-        },
-      )
-        .then(response => response.json())
-        .then(data => {
-          EndObject = data.city;
-          setEndCity(data.city);
-        });
-      fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${
-          startLocation.startLongitude
-        },${startLocation.startLatitude};${feature.geometry.coordinates[0]},${
-          feature.geometry.coordinates[1]
-        }?access_token=${MAPBOX_API_KEY}`,
-        {
-          method: 'GET',
-        },
-      )
-        .then(response => response.json())
-        .then(data => {
-          let dist = (
-            parseFloat(data.routes[0].legs[0].distance) / 1000
-          ).toString();
-          setDistance(dist.substr(0, dist.indexOf('.') + 3));
-          setInfo({
-            ...info,
-            distance: data.routes[0].legs[0].distance,
-            endCity: EndObject,
-            endLatitude: feature.geometry.coordinates[1],
-            endLongitude: feature.geometry.coordinates[0],
+        )
+          .then(response => response.json())
+          .then(data => {
+            EndObject = data.city;
+            setEndCity(data.city);
           });
+        fetch(
+          `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${
+            startLocation.startLongitude
+          },${startLocation.startLatitude};${feature.geometry.coordinates[0]},${
+            feature.geometry.coordinates[1]
+          }?access_token=${MAPBOX_API_KEY}`,
+          {
+            method: 'GET',
+          },
+        )
+          .then(response => response.json())
+          .then(data => {
+            let dist = (
+              parseFloat(data.routes[0].legs[0].distance) / 1000
+            ).toString();
+            setDistance(dist.substr(0, dist.indexOf('.') + 3));
+            setInfo({
+              ...info,
+              distance: data.routes[0].legs[0].distance,
+              endCity: EndObject,
+              endLatitude: feature.geometry.coordinates[1],
+              endLongitude: feature.geometry.coordinates[0],
+            });
+          });
+        setInfo({
+          ...info,
+          startCity:startCity,
+          endLatitude: feature.geometry.coordinates[1],
+          endLongitude: feature.geometry.coordinates[0],
+          startLatitude: startLocation.startLatitude,
+          startLongitude: startLocation.startLongitude,
         });
-      setInfo({
-        ...info,
-        startLatitude: startLocation.startLatitude,
-        startLongitude: startLocation.startLongitude,
-      });
-      cameraRef.fitBounds(
-        [startLocation.startLongitude, startLocation.startLatitude],
-        [feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-        [pageHeight * 0.1, 100, pageHeight * 0.4, 100],
-        100,
-      );
+        cameraRef.fitBounds(
+          [startLocation.startLongitude, startLocation.startLatitude],
+          [feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
+          [pageHeight * 0.1, 100, pageHeight * 0.4, 100],
+          100,
+        );
+      }
     }
   };
 
@@ -177,7 +188,7 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation, isReject
     <View style={Styles.containerStyle}>
       <MapboxGL.MapView
         style={{width: pageWidth, height: pageHeight}}
-        onLongPress={feature => isRejected ? {} : mapOnLongPress(feature)}
+        onLongPress={feature => (isRejected ? {} : mapOnLongPress(feature))}
         onRegionDidChange={() => setAreaHasChanged(true)}>
         <MapboxGL.UserLocation
           onUpdate={location => {
@@ -238,17 +249,18 @@ const ServiceMissionTab = ({info, setInfo, renderSaveModal, navigation, isReject
             'end',
           )}
       </MapboxGL.MapView>
-      {!isRejected && (!startLocation.startLongitude || !endLocation.endLongitude) && (
-        <View style={Styles.headerTextContainerStyle}>
-          <Text style={Styles.headerTextStyle}>
-            {!!startLocation.startLatitude
-              ? !!endLocation.endLatitude
-                ? null
-                : 'لطفا مقصد ماموریت را انتخاب کنید.'
-              : 'لطفا مبدا ماموریت را انتخاب کنید.'}
-          </Text>
-        </View>
-      )}
+      {!isRejected &&
+        (!startLocation.startLongitude || !endLocation.endLongitude) && (
+          <View style={Styles.headerTextContainerStyle}>
+            <Text style={Styles.headerTextStyle}>
+              {!!startLocation.startLatitude
+                ? !!endLocation.endLatitude
+                  ? null
+                  : 'لطفا مقصد ماموریت را انتخاب کنید.'
+                : 'لطفا مبدا ماموریت را انتخاب کنید.'}
+            </Text>
+          </View>
+        )}
       {isRejected && !startLocation.startLongitude ? (
         <View style={Styles.notHaveMissionTextContainerStyle}>
           <Text style={Styles.headerTextStyle}>

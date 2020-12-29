@@ -94,7 +94,7 @@ const MyService = ({navigation}) => {
         projectId: projectId,
         factorReceivedPrice: '',
         factorTotalPrice: '',
-        toCompanySettlement:'',
+        toCompanySettlement: '',
         serviceDescription: '',
         address: '',
         finalDate: '',
@@ -332,7 +332,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
   },
   flatlistContainerStyle: {
-    flex:1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

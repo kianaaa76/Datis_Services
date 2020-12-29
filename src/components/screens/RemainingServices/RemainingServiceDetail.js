@@ -85,6 +85,7 @@ const RemainingServiceDetail = ({navigation}) => {
         if (data.errorCode === 0) {
           setRenderToastModal(true);
           setEqualizationLoading(false);
+          navigation.gotBack();
         } else if (data.errorCode === 3) {
           dispatch({
             type: LOGOUT,
@@ -116,6 +117,7 @@ const RemainingServiceDetail = ({navigation}) => {
       if (data.errorCode === 0) {
         setRenderToastModal(true);
         setEqualizationLoading(false);
+        navigation.gotBack();
       } else if (data.errorCode === 3) {
         dispatch({
           type: LOGOUT,

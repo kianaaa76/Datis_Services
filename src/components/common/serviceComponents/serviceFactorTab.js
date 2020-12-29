@@ -129,36 +129,50 @@ const ServiceFactorTab = ({
               name={'camera-alt'}
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
-                ImagePicker.openCamera({
-                  width: pageWidth - 20,
-                  height: pageHeight * 0.7,
-                  // cropping: true,
-                  includeBase64: true,
-                  compressImageQuality: 0.7,
-                }).then(response => {
-                  setInfo({
-                    ...info,
-                    factorImage: response.data,
+                try {
+                  ImagePicker.openCamera({
+                    width: pageWidth - 20,
+                    height: pageHeight * 0.7,
+                    includeBase64: true,
+                    compressImageQuality: 0.7,
+                  }).then(response => {
+                    setInfo({
+                      ...info,
+                      factorImage: response.data,
+                    });
                   });
-                });
+                } catch {
+                  ToastAndroid.showWithGravity(
+                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
               }}
             />
             <Icon
               name={'file-upload'}
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
-                ImagePicker.openPicker({
-                  width: pageWidth - 20,
-                  height: pageHeight * 0.7,
-                  // cropping: true,
-                  includeBase64: true,
-                  compressImageQuality: 0.7,
-                }).then(response => {
-                  setInfo({
-                    ...info,
-                    factorImage: response.data,
+                try {
+                  ImagePicker.openPicker({
+                    width: pageWidth - 20,
+                    height: pageHeight * 0.7,
+                    includeBase64: true,
+                    compressImageQuality: 0.7,
+                  }).then(response => {
+                    setInfo({
+                      ...info,
+                      factorImage: response.data,
+                    });
                   });
-                });
+                } catch {
+                  ToastAndroid.showWithGravity(
+                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
               }}
             />
             {!isRejected && !!info.factorImage && (
@@ -205,37 +219,51 @@ const ServiceFactorTab = ({
               name={'camera-alt'}
               style={{color: '#000', fontSize: normalize(35)}}
               onPress={() => {
-                ImagePicker.openCamera({
-                  width: pageWidth - 20,
-                  height: pageHeight * 0.7,
-                  // cropping: true,
-                  includeBase64: true,
-                  compressImageQuality: 0.7,
-                }).then(response => {
-                  setInfo({
-                    ...info,
-                    billImage: response.data,
+                try {
+                  ImagePicker.openCamera({
+                    width: pageWidth - 20,
+                    height: pageHeight * 0.7,
+                    includeBase64: true,
+                    compressImageQuality: 0.7,
+                  }).then(response => {
+                    setInfo({
+                      ...info,
+                      billImage: response.data,
+                    });
                   });
-                });
+                } catch {
+                  ToastAndroid.showWithGravity(
+                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
               }}
             />
             <Icon
               name={'file-upload'}
               style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() =>
-                ImagePicker.openPicker({
-                  width: pageWidth - 20,
-                  height: pageHeight * 0.7,
-                  includeBase64: true,
-                  // cropping: true,
-                  compressImageQuality: 0.7,
-                }).then(response => {
-                  setInfo({
-                    ...info,
-                    billImage: response.data,
+              onPress={() => {
+                try {
+                  ImagePicker.openPicker({
+                    width: pageWidth - 20,
+                    height: pageHeight * 0.7,
+                    includeBase64: true,
+                    compressImageQuality: 0.7,
+                  }).then(response => {
+                    setInfo({
+                      ...info,
+                      billImage: response.data,
+                    });
                   });
-                })
-              }
+                } catch {
+                  ToastAndroid.showWithGravity(
+                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
+              }}
             />
             {!!info.billImage && (
               <Icon

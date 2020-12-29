@@ -106,7 +106,7 @@ const RejectedServiceListItem = ({
                         serviceResult: getServiceResult(data.result.Result),
                         serviceType: getServiceType(data.result.ServiceType),
                         objectList: data.result.ObjectList,
-                        startLatitude: !!data.result.Mission
+                        startLatitude: !!data.result.Mission && !!data.result.Mission.StartLocation
                           ? parseFloat(
                               data.result.Mission.StartLocation.substr(
                                 0,
@@ -114,7 +114,7 @@ const RejectedServiceListItem = ({
                               ),
                             )
                           : '',
-                        startLongitude: !!data.result.Mission
+                        startLongitude: !!data.result.Mission && !!data.result.Mission.StartLocation
                           ? parseFloat(
                               data.result.Mission.StartLocation.substr(
                                 data.result.Mission.StartLocation.indexOf(',') +
@@ -123,7 +123,7 @@ const RejectedServiceListItem = ({
                               ),
                             )
                           : '',
-                        endLatitude: !!data.result.Mission
+                        endLatitude: !!data.result.Mission && !!data.result.Mission.EndLocation
                           ? parseFloat(
                               data.result.Mission.EndLocation.substr(
                                 0,
@@ -131,7 +131,7 @@ const RejectedServiceListItem = ({
                               ),
                             )
                           : '',
-                        endLongitude: !!data.result.Mission
+                        endLongitude: !!data.result.Mission && !!data.result.Mission.EndLocation
                           ? parseFloat(
                               data.result.Mission.EndLocation.substr(
                                 data.result.Mission.EndLocation.indexOf(',') +
@@ -197,7 +197,7 @@ const RejectedServiceListItem = ({
                     );
                   }
                 })
-                .catch(() => {
+                .catch((err) => {
                   renderLoading(false);
                   setModalState(false);
                   Alert.alert(
@@ -225,7 +225,7 @@ const RejectedServiceListItem = ({
                       serviceResult: getServiceResult(data.result.Result),
                       serviceType: getServiceType(data.result.ServiceType),
                       objectList: data.result.ObjectList,
-                      startLatitude: !!data.result.Mission
+                      startLatitude: !!data.result.Mission && !!data.result.Mission.StartLocatio
                         ? parseFloat(
                             data.result.Mission.StartLocation.substr(
                               0,
@@ -233,7 +233,7 @@ const RejectedServiceListItem = ({
                             ),
                           )
                         : '',
-                      startLongitude: !!data.result.Mission
+                      startLongitude: !!data.result.Mission && !!data.result.Mission.StartLocatio
                         ? parseFloat(
                             data.result.Mission.StartLocation.substr(
                               data.result.Mission.StartLocation.indexOf(',') +
@@ -242,7 +242,7 @@ const RejectedServiceListItem = ({
                             ),
                           )
                         : '',
-                      endLatitude: !!data.result.Mission
+                      endLatitude: !!data.result.Mission && !!data.result.Mission.EndLocation
                         ? parseFloat(
                             data.result.Mission.EndLocation.substr(
                               0,
@@ -250,7 +250,7 @@ const RejectedServiceListItem = ({
                             ),
                           )
                         : '',
-                      endLongitude: !!data.result.Mission
+                      endLongitude: !!data.result.Mission && !!data.result.Mission.EndLocation
                         ? parseFloat(
                             data.result.Mission.EndLocation.substr(
                               data.result.Mission.EndLocation.indexOf(',') + 1,

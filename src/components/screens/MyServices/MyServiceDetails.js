@@ -321,7 +321,7 @@ const MyServiceDetails = ({navigation}) => {
     ) {
       setRequestLoading(false);
       setIndex(3);
-      Alert.alert('اخطار', 'لطفا مبدا ماموریت را مشخص کنید.', [
+      Alert.alert('اخطار', 'لطفا مقصد ماموریت را مشخص کنید.', [
         {text: 'OK', onPress: () => {}},
       ]);
     } else if (
@@ -687,7 +687,7 @@ const MyServiceDetails = ({navigation}) => {
               labelStyle={{
                 color: '#000',
                 textAlign: 'center',
-                fontSize: normalize(pageHeight * 0.018),
+                fontSize: normalize(pageHeight * 0.016),
                 fontFamily: 'IRANSansMobile_Light',
               }}
               indicatorStyle={{backgroundColor: '#660000'}}

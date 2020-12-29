@@ -92,6 +92,7 @@ const ServicePartsTab = ({
   });
 
   const onSuccess = async code => {
+    try{
     setScreenMode(false);
     let header = parseInt(code.toString().substr(0, 3));
     numOfZeros = 0;
@@ -182,9 +183,13 @@ const ServicePartsTab = ({
         ToastAndroid.CENTER,
       );
     }
+  } catch{
+    setScreenMode(false);
+  }
   };
 
   const searchBarcode = selectedItemList => {
+    try{
     setSearchBarcodeLoading(true);
     const object =
       !!selectedItemList && !!selectedItemList.id
@@ -222,6 +227,7 @@ const ServicePartsTab = ({
                   let selectedVersion = object.value.Versions.filter(
                     item => item.Key == data.result.VersionId,
                   );
+
                   if (!!selectedItemList.id) {
                     refactorObjectListItems(
                       'tempPart',
@@ -330,6 +336,9 @@ const ServicePartsTab = ({
         ToastAndroid.CENTER,
       );
     }
+  } catch {
+    setSearchBarcodeLoading(false);
+  }
   };
 
   const refactorObjectListItems = (refactorFeild, newValue, objectIndex) => {
@@ -506,7 +515,7 @@ const ServicePartsTab = ({
                       : `${Item.tempPart.label}`
                     : 'قطعه مورد نظر خود را انتخاب کنید.'
                 }
-                listHeight={150}
+                listHeight={200}
               />
               <Text
                 style={{
@@ -568,7 +577,7 @@ const ServicePartsTab = ({
                 onSelect={item =>
                   refactorObjectListItems('tempVersion', item, Item.index)
                 }
-                listHeight={150}
+                listHeight={200}
               />
               <Text style={Styles.labelStyle}>نسخه: </Text>
             </View>
@@ -996,7 +1005,7 @@ const ServicePartsTab = ({
                           : `${fieldsObject.partTypeSelected.label}`
                         : 'قطعه مورد نظر خود را انتخاب کنید.'
                     }
-                    listHeight={150}
+                    listHeight={200}
                   />
                   <Text style={Styles.labelStyle}>نوع قطعه:</Text>
                 </View>
@@ -1046,6 +1055,7 @@ const ServicePartsTab = ({
                     ref={new_dropRef}
                     list={fieldsObject.availableVersions}
                     placeholder={
+                      !!fieldsObject.partVersionSelected && 
                       !!fieldsObject.partVersionSelected.Key
                         ? fieldsObject.partVersionSelected.Value
                         : 'نسخه مورد نظر خود را انتخاب کنید.'
@@ -1056,7 +1066,7 @@ const ServicePartsTab = ({
                         partVersionSelected: item,
                       })
                     }
-                    listHeight={150}
+                    listHeight={200}
                   />
                   <Text style={Styles.labelStyle}>نسخه: </Text>
                 </View>

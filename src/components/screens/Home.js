@@ -45,17 +45,16 @@ const Home = ({navigation}) => {
 
   useEffect(() => {
     if (
-      (!selector.userList || selector.userList.length == 0) &&
-      (selector.constantUserId === 40 ||
-        selector.constantUserId === 41 ||
-        selector.constantUserId === 43 ||
-        selector.constantUserId === 51)
+      selector.constantUserId === 40 ||
+      selector.constantUserId === 41 ||
+      selector.constantUserId === 43 ||
+      selector.constantUserId === 51
     ) {
       getUsers().then(data => {
         if (data.errorCode === 0) {
           dispatch({
             type: SET_USER_LIST,
-            userList: JSON.stringify(data.result),
+            userList: data.result,
           });
           setShowingUserList(data.result);
           data.result.map(item => {
@@ -63,29 +62,17 @@ const Home = ({navigation}) => {
               setUser(item);
             }
           });
+          data.result.map(item=>{
+            if (item.ID == selector.userId) {
+              setUser(item);
+            }
+          })
           setChangeUserLoading(false);
         } else {
           setChangeUserLoading(false);
         }
       });
-    } else if (
-      !!selector.userList &&
-      selector.userList.length > 0 &&
-      (selector.constantUserId === 40 ||
-        selector.constantUserId === 41 ||
-        selector.constantUserId === 43 ||
-        selector.constantUserId === 51)
-    ) {
-      JSON.parse(selector.userList).map(item => {
-        if (item.ID == selector.userId) {
-          setUser(item);
-        }
-      });
-      setShowingUserList(selector.userList);
-      setChangeUserLoading(false);
-    } else {
-      setChangeUserLoading(false);
-    }
+    } 
   }, []);
 
   useEffect(() => {
@@ -153,7 +140,7 @@ const Home = ({navigation}) => {
   };
 
   const search = text => {
-    let temp = JSON.parse(selector.userList).filter(item =>
+    let temp = selector.userList.filter(item =>
       item.Name.includes(text),
     );
     setShowingUserList(temp);
@@ -215,7 +202,7 @@ const Home = ({navigation}) => {
                 <TouchableOpacity
                   onPress={() => {
                     setShowUserList(!showUserList);
-                    setShowingUserList(JSON.parse(selector.userList));
+                    setShowingUserList(selector.userList);
                   }}>
                   <Text
                     style={{
@@ -274,7 +261,7 @@ const Home = ({navigation}) => {
                       });
                       setUser(item.item);
                       setShowUserList(false);
-                      setShowingUserList(JSON.parse(selector.userList));
+                      setShowingUserList(selector.userList);
                       setChangeUserLoading(false);
                     }}>
                     <Text

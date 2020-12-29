@@ -70,7 +70,7 @@ const RemainingServiceList = ({navigation}) => {
     const renderEmptyList = () => {
         return (
             <View style={{width:pageWidth, height: pageHeight*0.8, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontSize: normalize(15), fontWeight: 'bold', color: '#000'}}>
+                <Text style={{fontSize: normalize(15), fontFamily:"IRANSansMobile", color: '#000'}}>
                     شما سرویس مانده دار ندارید.
                 </Text>
             </View>

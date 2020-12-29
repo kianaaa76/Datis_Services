@@ -29,10 +29,11 @@ const MyServiceListItem = ({
     AsyncStorage.getItem('savedServicesList').then(list => {
       if (!!list) {
         JSON.parse(list).map(item => {
-          if (item.projectId === Item.projectID) {
-            if (item.saveType === 'network') {
-              setIsNetworkSaved(true);
-            }
+          if (
+            item.projectId === Item.projectID &&
+            item.saveType === 'network'
+          ) {
+            setIsNetworkSaved(true);
           }
         });
       }
@@ -66,7 +67,7 @@ const MyServiceListItem = ({
                   projectId: '',
                   factorReceivedPrice: '',
                   factorTotalPrice: '',
-                  toCompanySettlement:'',
+                  toCompanySettlement: '',
                   serviceDescription: '',
                   address: '',
                   finalDate: '',
@@ -96,7 +97,7 @@ const MyServiceListItem = ({
                 projectId: '',
                 factorReceivedPrice: '',
                 factorTotalPrice: '',
-                toCompanySettlement:'',
+                toCompanySettlement: '',
                 serviceDescription: '',
                 address: '',
                 finalDate: '',
@@ -133,12 +134,20 @@ const MyServiceListItem = ({
         }}>
         {isNetworkSaved ? (
           <View style={Styles.secondRowContainerStyle}>
-            <Text style={{fontSize: normalize(12), fontFamily: 'IRANSansMobile_Light'}}>
+            <Text
+              style={{
+                fontSize: normalize(12),
+                fontFamily: 'IRANSansMobile_Light',
+              }}>
               درحال ارسال
             </Text>
             <View style={Styles.singleItemStyle}>
               <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-              <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
+              <Text
+                style={{
+                  fontSize: normalize(13),
+                  fontFamily: 'IRANSansMobile_Medium',
+                }}>
                 نام:{' '}
               </Text>
             </View>
@@ -147,7 +156,11 @@ const MyServiceListItem = ({
           <View style={Styles.firstRowContainerStyle}>
             <View style={Styles.singleItemStyle}>
               <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-              <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
+              <Text
+                style={{
+                  fontSize: normalize(13),
+                  fontFamily: 'IRANSansMobile_Medium',
+                }}>
                 نام:{' '}
               </Text>
             </View>
@@ -158,12 +171,18 @@ const MyServiceListItem = ({
             <Text style={Styles.valueTextStyle}>
               {toFaDigit(Item.projectID)}
             </Text>
-            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
+            <Text
+              style={{
+                fontSize: normalize(13),
+                fontFamily: 'IRANSansMobile_Medium',
+              }}>
               شماره‌ ‌پرونده:{' '}
             </Text>
           </View>
           <View style={Styles.singleItemStyle}>
-            <Text style={[Styles.valueTextStyle,{textAlign: 'center'}]}>{toFaDigit(Item.cell)}</Text>
+            <Text style={[Styles.valueTextStyle, {textAlign: 'center'}]}>
+              {toFaDigit(Item.cell)}
+            </Text>
             <Text
               style={{
                 fontSize: normalize(13),
