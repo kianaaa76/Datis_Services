@@ -647,7 +647,7 @@ const MyServiceDetails = ({navigation}) => {
             labelStyle={{
               color: '#000',
               textAlign: 'center',
-              fontSize: normalize(pageHeight * 0.016),
+              fontSize: normalize(12),
               fontFamily: 'IRANSansMobile_Light',
             }}
             indicatorStyle={{backgroundColor: '#660000'}}

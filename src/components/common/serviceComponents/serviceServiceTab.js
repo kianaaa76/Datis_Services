@@ -334,7 +334,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                   1000;
               setInfo({
                 ...info,
-                finalDate: new moment(finalTime).format('jYYYY/jM/jD HH:mm'),
+                finalDate: new moment(finalTime).format('jYYYY/jM/jD HH:mm:ss'),
               });
               setRenderTimePicker(false);
             }}

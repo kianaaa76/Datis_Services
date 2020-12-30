@@ -72,7 +72,9 @@ const Home = ({navigation}) => {
           setChangeUserLoading(false);
         }
       });
-    } 
+    }  else {
+      setChangeUserLoading(false);
+    }
   }, []);
 
   useEffect(() => {

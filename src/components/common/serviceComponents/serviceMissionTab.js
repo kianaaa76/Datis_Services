@@ -43,7 +43,14 @@ const ServiceMissionTab = ({
   const [startCity, setStartCity] = useState(info.startCity);
   const [endCity, setEndCity] = useState(info.endCity);
   const [travel, setTravel] = useState(info.travel);
-  const [distance, setDistance] = useState(parseFloat(info.distance) / 1000);
+  const [distance, setDistance] = useState(
+    (parseFloat(info.distance) / 1000)
+      .toString()
+      .substr(
+        0,
+        (parseFloat(info.distance) / 1000).toString().indexOf('.') + 4,
+      ),
+  );
 
   useEffect(() => {
     const backAction = () => {
@@ -168,7 +175,7 @@ const ServiceMissionTab = ({
           });
         setInfo({
           ...info,
-          startCity:startCity,
+          startCity: startCity,
           endLatitude: feature.geometry.coordinates[1],
           endLongitude: feature.geometry.coordinates[0],
           startLatitude: startLocation.startLatitude,
