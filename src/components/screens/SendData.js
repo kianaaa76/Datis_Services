@@ -110,6 +110,7 @@ const SendData = () => {
                 item.finalDate,
                 item.isRejectedService,
                 {
+                  Id:!!item.isRejectedService?item.missionId : null,
                   ServiceManId: selector.userId,
                   StartCity: item.startCity,
                   StartLocation: `${item.startLatitude},${item.startLongitude}`,

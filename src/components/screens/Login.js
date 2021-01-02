@@ -18,7 +18,7 @@ import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit, normalize} from '../utils/utilities';
 import {loginUser, loginVerification} from '../../actions/api';
-import {addDotsToPrice} from "../utils/utilities";
+import {addDotsToPrice} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -33,7 +33,6 @@ const Login = ({navigation}) => {
   const [receiveCodeLoading, setReceiveCodeLoading] = useState(false);
   const [enterSystemLoading, setEnterSystemLoading] = useState(false);
   const [code, setCode] = useState('');
-  
 
   const onReceiveCodePress = () => {
     setReceiveCodeLoading(true);
@@ -133,7 +132,7 @@ const Login = ({navigation}) => {
               onChangeText={phoneNumber => {
                 setPhoneNumber(phoneNumber);
               }}
-              keyboardType="numeric"
+              keyboardType={'phone-pad'}
               placeholderTextColor={inputActiveColor}
               value={phoneNumber}
             />
@@ -162,7 +161,7 @@ const Login = ({navigation}) => {
               style={Styles.textInputStyle}
               placeholder="کد فعالسازی"
               onChangeText={code => setCode(code)}
-              keyboardType="numeric"
+              keyboardType={'phone-pad'}
               placeholderTextColor={hasCode ? '#660000' : 'gray'}
               value={code}
             />

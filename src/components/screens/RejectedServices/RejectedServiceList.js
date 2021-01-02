@@ -10,7 +10,7 @@ import {
   Text,
   TouchableHighlight,
   Alert,
-  BackHandler
+  BackHandler,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -128,23 +128,64 @@ const MyService = ({navigation}) => {
               projectId: projectId,
               factorReceivedPrice: data.result.RecivedAmount,
               factorTotalPrice: data.result.InvoiceAmount,
-              toCompanySettlement: data.result.toCompanySettlement,
+              toCompanySettlement: data.result.ToCompanySettlement,
               serviceDescription: data.result.Details,
               address: data.result.Location,
               finalDate: data.result.DoneTime,
               serviceResult: getServiceResult(data.result.Result),
               serviceType: getServiceType(data.result.ServiceType),
               objectList: data.result.ObjectList,
-              startLatitude: '',
-              startLongitude: '',
-              endLatitude: '',
-              endLongitude: '',
-              startCity: '',
-              endCity: '',
-              missionDescription: '',
-              distance: '',
+              startLatitude:
+                !!data.result.Mission && !!data.result.Mission.StartLocation
+                  ? parseFloat(
+                      data.result.Mission.StartLocation.substr(
+                        0,
+                        data.result.Mission.StartLocation.indexOf(','),
+                      ),
+                    )
+                  : '',
+              startLongitude:
+                !!data.result.Mission && !!data.result.Mission.StartLocation
+                  ? parseFloat(
+                      data.result.Mission.StartLocation.substr(
+                        data.result.Mission.StartLocation.indexOf(',') + 1,
+                        data.result.Mission.StartLocation.length,
+                      ),
+                    )
+                  : '',
+              endLatitude:
+                !!data.result.Mission && !!data.result.Mission.EndLocation
+                  ? parseFloat(
+                      data.result.Mission.EndLocation.substr(
+                        0,
+                        data.result.Mission.EndLocation.indexOf(','),
+                      ),
+                    )
+                  : '',
+              endLongitude:
+                !!data.result.Mission && !!data.result.Mission.EndLocation
+                  ? parseFloat(
+                      data.result.Mission.EndLocation.substr(
+                        data.result.Mission.EndLocation.indexOf(',') + 1,
+                        data.result.Mission.EndLocation.length,
+                      ),
+                    )
+                  : '',
+              startCity: !!data.result.Mission
+                ? data.result.Mission.StartCity
+                : '',
+              endCity: !!data.result.Mission ? data.result.Mission.EndCity : '',
+              missionDescription: !!data.result.Mission
+                ? data.result.Mission.Description
+                : '',
+              missionId: !!data.result.Mission ? data.result.Mission.ID : 0,
+              distance: !!data.result.Mission
+                ? data.result.Mission.Distance
+                : '',
               saveType: '',
-              travel: false,
+              travel: !!data.result.Mission
+                ? data.result.Mission.Travel
+                : false,
             },
           });
           navigation.replace('RejectedServiceDetail', {
@@ -486,7 +527,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
   },
   flatlistContainerStyle: {
-    flex:1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     height: pageHeight,

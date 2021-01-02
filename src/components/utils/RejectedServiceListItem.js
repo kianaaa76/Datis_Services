@@ -225,7 +225,7 @@ const RejectedServiceListItem = ({
                       serviceResult: getServiceResult(data.result.Result),
                       serviceType: getServiceType(data.result.ServiceType),
                       objectList: data.result.ObjectList,
-                      startLatitude: !!data.result.Mission && !!data.result.Mission.StartLocatio
+                      startLatitude: !!data.result.Mission && !!data.result.Mission.StartLocation
                         ? parseFloat(
                             data.result.Mission.StartLocation.substr(
                               0,
@@ -233,7 +233,7 @@ const RejectedServiceListItem = ({
                             ),
                           )
                         : '',
-                      startLongitude: !!data.result.Mission && !!data.result.Mission.StartLocatio
+                      startLongitude: !!data.result.Mission && !!data.result.Mission.StartLocation
                         ? parseFloat(
                             data.result.Mission.StartLocation.substr(
                               data.result.Mission.StartLocation.indexOf(',') +

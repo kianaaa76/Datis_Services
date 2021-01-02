@@ -352,3 +352,20 @@ export const setHomeLocationOfUser = (token,address)=>{
   }).then((response) => response.json());
 }
 
+export const checkObjectVersion = (token, serialCode, objectId, versionId) => {
+  const msg = JSON.stringify({
+    Serial: serialCode,
+    Object_Id: objectId,
+    VersionId: versionId
+  });
+  return fetch(`${LOCAL_HOST}/CheckVersion`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body: msg,
+  }).then((response) => response.json());
+}
+
+

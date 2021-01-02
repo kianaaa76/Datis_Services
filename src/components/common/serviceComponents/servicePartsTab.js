@@ -21,7 +21,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
-import {getObjBySerial} from '../../../actions/api';
+import {getObjBySerial, checkObjectVersion} from '../../../actions/api';
 import RnZxing from 'react-native-rn-zxing';
 import {normalize, addDotsToPrice} from '../../utils/utilities';
 
@@ -190,70 +190,102 @@ const ServicePartsTab = ({
 
   const searchBarcode = selectedItemList => {
     try {
-      setSearchBarcodeLoading(true);
-      const object =
-        !!selectedItemList && !!selectedItemList.id
-          ? !!selectedItemList.partType
-            ? selectedItemList.partType
-            : null
-          : !!fieldsObject.partTypeSelected
-          ? fieldsObject.partTypeSelected
-          : null;
-      const sserial =
-        !!selectedItemList && !!selectedItemList.id
-          ? selectedItemList.serial.toUpperCase()
-          : !!fieldsObject.serial
-          ? fieldsObject.serial.toUpperCase()
-          : null;
-      if (!!object && !!sserial) {
-        if (!!object.value.SerialFormat.length > 0) {
-          let serialFormatHeader = object.value.SerialFormat.substr(
-            0,
-            object.value.SerialFormat.indexOf('#'),
+      if (!!selectedItemList) {
+        if (!selectedItemList.tempPart.value.SerialFormat) {
+          ToastAndroid.showWithGravity(
+            'برای این قطعه نسخه معتبری یافت نشد.',
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
           );
-          let serialLengthWithoutHeader =
-            object.value.SerialFormat.length - serialFormatHeader.length;
-          let leftOfSerialFormat = object.value.SerialFormat.substr(
-            object.value.SerialFormat.indexOf('#'),
-            object.value.SerialFormat.length,
-          );
-          if (sserial.length === object.value.SerialFormat.length) {
-            if (
-              serialFormatHeader ===
-              sserial.substr(0, serialFormatHeader.length)
-            ) {
-              getObjBySerial(selector.token, sserial, object.value.Id).then(
-                data => {
+        } else {
+          setSearchBarcodeLoading(true);
+          const object = !!selectedItemList.tempPart
+            ? selectedItemList.tempPart
+            : null;
+          const sserial = !!selectedItemList.tempSerial
+            ? selectedItemList.tempSerial.toUpperCase()
+            : null;
+          if (!!object && !!sserial) {
+            if (!!object.value.SerialFormat) {
+              let serialFormatHeader = object.value.SerialFormat.substr(
+                0,
+                object.value.SerialFormat.indexOf('#'),
+              );
+              let serialLengthWithoutHeader =
+                object.value.SerialFormat.length - serialFormatHeader.length;
+              let leftOfSerialFormat = object.value.SerialFormat.substr(
+                object.value.SerialFormat.indexOf('#'),
+                object.value.SerialFormat.length,
+              );
+
+              if (sserial.length === object.value.SerialFormat.length) {
+                if (
+                  serialFormatHeader ===
+                  sserial.substr(0, serialFormatHeader.length)
+                ) {
+                  getObjBySerial(selector.token, sserial, object.value.Id).then(
+                    data => {
+                      if (data.errorCode == 0) {
+                        let selectedVersion = object.value.Versions.filter(
+                          item => item.Key == data.result.VersionId,
+                        );
+                        refactorObjectListItems(
+                          'tempPart',
+                          object,
+                          selectedItemList.index,
+                        );
+                        refactorObjectListItems(
+                          'tempVersion',
+                          selectedVersion[0],
+                          selectedItemList.index,
+                        );
+                        refactorObjectListItems(
+                          'availableVersions',
+                          object.value.Versions,
+                          selectedItemList.index,
+                        );
+                        setSelectedItemList({});
+                        setSearchBarcodeLoading(false);
+                      } else {
+                        setSearchBarcodeLoading(false);
+                        ToastAndroid.showWithGravity(
+                          data.message,
+                          ToastAndroid.SHORT,
+                          ToastAndroid.CENTER,
+                        );
+                      }
+                    },
+                  );
+                } else {
+                  setSearchBarcodeLoading(false);
+                  ToastAndroid.showWithGravity(
+                    `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
+              } else if (sserial.length === serialLengthWithoutHeader) {
+                getObjBySerial(
+                  selector.token,
+                  `${serialFormatHeader}${sserial}`,
+                  object.value.Id,
+                ).then(data => {
                   if (data.errorCode == 0) {
                     let selectedVersion = object.value.Versions.filter(
                       item => item.Key == data.result.VersionId,
                     );
+                    refactorObjectListItems(
+                      'tempPart',
+                      object,
+                      selectedItemList.index,
+                    );
+                    refactorObjectListItems(
+                      'tempVersion',
+                      selectedVersion[0],
+                      selectedItemList.index,
+                    );
+                    setSelectedItemList({});
 
-                    if (!!selectedItemList.id) {
-                      refactorObjectListItems(
-                        'tempPart',
-                        object,
-                        selectedItemList.index,
-                      );
-                      refactorObjectListItems(
-                        'tempVersion',
-                        selectedVersion[0],
-                        selectedItemList.index,
-                      );
-                      refactorObjectListItems(
-                        'availableVersions',
-                        object.value.Versions,
-                        selectedItemList.index,
-                      );
-                      setSelectedItemList({});
-                    } else {
-                      setFieldsObject({
-                        ...fieldsObject,
-                        partTypeSelected: object,
-                        partVersionSelected: selectedVersion[0],
-                        availableVersions: object.value.Versions,
-                      });
-                    }
                     setSearchBarcodeLoading(false);
                   } else {
                     setSearchBarcodeLoading(false);
@@ -263,80 +295,149 @@ const ServicePartsTab = ({
                       ToastAndroid.CENTER,
                     );
                   }
-                },
-              );
-            } else {
-              setSearchBarcodeLoading(false);
-              ToastAndroid.showWithGravity(
-                `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
-            }
-          } else if (sserial.length === serialLengthWithoutHeader) {
-            getObjBySerial(
-              selector.token,
-              `${serialFormatHeader}${sserial}`,
-              object.value.Id,
-            ).then(data => {
-              if (data.errorCode == 0) {
-                let selectedVersion = object.value.Versions.filter(
-                  item => item.Key == data.result.VersionId,
-                );
-                if (!!selectedItemList.id) {
-                  refactorObjectListItems(
-                    'tempPart',
-                    object,
-                    selectedItemList.index,
-                  );
-                  refactorObjectListItems(
-                    'tempVersion',
-                    selectedVersion[0],
-                    selectedItemList.index,
-                  );
-                  setSelectedItemList({});
-                } else {
-                  setFieldsObject({
-                    ...fieldsObject,
-                    partTypeSelected: object,
-                    partVersionSelected: selectedVersion[0],
-                  });
-                }
-                setSearchBarcodeLoading(false);
+                });
               } else {
                 setSearchBarcodeLoading(false);
                 ToastAndroid.showWithGravity(
-                  data.message,
+                  `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
                   ToastAndroid.SHORT,
                   ToastAndroid.CENTER,
                 );
               }
-            });
+            } else {
+              setSearchBarcodeLoading(false);
+              ToastAndroid.showWithGravity(
+                'برای این قطعه باید نسخه را به صورت دستی وارد کنید.',
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+            }
           } else {
             setSearchBarcodeLoading(false);
             ToastAndroid.showWithGravity(
-              `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+              'لطفا نوع قطعه و سریال را مشخص کنید.',
               ToastAndroid.SHORT,
               ToastAndroid.CENTER,
             );
           }
-        } else {
-          setSearchBarcodeLoading(false);
+        }
+      } else {
+        if (!fieldsObject.partTypeSelected.value.SerialFormat) {
           ToastAndroid.showWithGravity(
-            'برای این قطعه باید نسخه را به صورت دستی وارد کنید.',
+            'برای این قطعه نسخه معتبری یافت نشد.',
             ToastAndroid.SHORT,
             ToastAndroid.CENTER,
           );
+        } else {
+          setSearchBarcodeLoading(true);
+          const object = !!fieldsObject.partTypeSelected
+            ? fieldsObject.partTypeSelected
+            : null;
+          const sserial = !!fieldsObject.serial
+            ? fieldsObject.serial.toUpperCase()
+            : null;
+          if (!!object && !!sserial) {
+            if (!!object.value.SerialFormat) {
+              let serialFormatHeader = object.value.SerialFormat.substr(
+                0,
+                object.value.SerialFormat.indexOf('#'),
+              );
+              let serialLengthWithoutHeader =
+                object.value.SerialFormat.length - serialFormatHeader.length;
+              let leftOfSerialFormat = object.value.SerialFormat.substr(
+                object.value.SerialFormat.indexOf('#'),
+                object.value.SerialFormat.length,
+              );
+
+              if (sserial.length === object.value.SerialFormat.length) {
+                if (
+                  serialFormatHeader ===
+                  sserial.substr(0, serialFormatHeader.length)
+                ) {
+                  getObjBySerial(selector.token, sserial, object.value.Id).then(
+                    data => {
+                      if (data.errorCode == 0) {
+                        let selectedVersion = object.value.Versions.filter(
+                          item => item.Key == data.result.VersionId,
+                        );
+                        setFieldsObject({
+                          ...fieldsObject,
+                          partTypeSelected: object,
+                          partVersionSelected: selectedVersion[0],
+                          availableVersions: object.value.Versions,
+                        });
+                        setSearchBarcodeLoading(false);
+                      } else {
+                        setSearchBarcodeLoading(false);
+                        ToastAndroid.showWithGravity(
+                          data.message,
+                          ToastAndroid.SHORT,
+                          ToastAndroid.CENTER,
+                        );
+                      }
+                    },
+                  );
+                } else {
+                  setSearchBarcodeLoading(false);
+                  ToastAndroid.showWithGravity(
+                    `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                  );
+                }
+              } else if (sserial.length === serialLengthWithoutHeader) {
+                getObjBySerial(
+                  selector.token,
+                  `${serialFormatHeader}${sserial}`,
+                  object.value.Id,
+                ).then(data => {
+                  if (data.errorCode == 0) {
+                    let selectedVersion = object.value.Versions.filter(
+                      item => item.Key == data.result.VersionId,
+                    );
+
+                    setFieldsObject({
+                      ...fieldsObject,
+                      partTypeSelected: object,
+                      partVersionSelected: selectedVersion[0],
+                    });
+                    setSearchBarcodeLoading(false);
+                  } else {
+                    setSearchBarcodeLoading(false);
+                    ToastAndroid.showWithGravity(
+                      data.message,
+                      ToastAndroid.SHORT,
+                      ToastAndroid.CENTER,
+                    );
+                  }
+                });
+              } else {
+                setSearchBarcodeLoading(false);
+                ToastAndroid.showWithGravity(
+                  `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+                );
+              }
+            } else {
+              setSearchBarcodeLoading(false);
+              ToastAndroid.showWithGravity(
+                'برای این قطعه باید نسخه را به صورت دستی وارد کنید.',
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+            }
+          } else {
+            setSearchBarcodeLoading(false);
+            ToastAndroid.showWithGravity(
+              'لطفا نوع قطعه و سریال را مشخص کنید.',
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
+          }
         }
-      } else {
-        setSearchBarcodeLoading(false);
-        ToastAndroid.showWithGravity(
-          'لطفا نوع قطعه را مشخص کنید.',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
       }
-    } catch(err) {
+    } catch (err) {
       ToastAndroid.showWithGravity(
         'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
         ToastAndroid.SHORT,
@@ -401,7 +502,7 @@ const ServicePartsTab = ({
           case 'setDirect':
             selectedObject = {
               ...selectedObject,
-              serial: selectedObject.tempSerial,
+              serial: !!newValue ? newValue : selectedObject.tempSerial,
               version: selectedObject.tempVersion,
               partType: selectedObject.tempPart,
               Price: selectedObject.tempPrice,
@@ -570,10 +671,9 @@ const ServicePartsTab = ({
                 value={Item.tempSerial}
               />
               <View style={{flexDirection: 'row'}}>
-                {!!Item.partType.label &&
-                Item.tempPart.value.SerialFormat.length > 0 ? (
+                {!!Item.tempPart.value.SerialFormat && (
                   <Icon name={'star'} style={{color: 'red'}} />
-                ) : null}
+                )}
                 <Text style={Styles.labelStyle}>سریال:</Text>
               </View>
             </View>
@@ -668,68 +768,108 @@ const ServicePartsTab = ({
             <TouchableOpacity
               style={Styles.footerIconContainerStyle}
               onPress={() => {
-                if (!Item.tempPart.label) {
-                  Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
-                    {text: 'OK', onPress: () => {}},
-                  ]);
-                } else if (!Item.tempVersion.Key) {
-                  Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
-                    {text: 'OK', onPress: () => {}},
-                  ]);
-                } else if (
-                  !!Item.tempPart.value.SerialFormat &&
-                  Item.tempSerial === ''
-                ) {
-                  Alert.alert('', 'لطفا سریال را مشخص کنید.', [
-                    {text: 'OK', onPress: () => {}},
-                  ]);
-                } else {
-                  const serialFormat = Item.tempPart.value.SerialFormat;
-                  if (!!serialFormat) {
-                    if (serialFormat.length === Item.tempSerial.length) {
-                      let i = 0;
-                      let faults = 0;
-                      while (serialFormat[i] !== '#') {
-                        if (
-                          serialFormat[i].toUpperCase() !==
-                          Item.tempSerial[i].toUpperCase()
-                        ) {
-                          faults = faults + 1;
+                try {
+                  if (!Item.tempPart.label) {
+                    Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
+                      {text: 'OK', onPress: () => {}},
+                    ]);
+                  } else if (!Item.tempVersion.Key) {
+                    Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
+                      {text: 'OK', onPress: () => {}},
+                    ]);
+                  } else if (
+                    !!Item.tempPart.value.SerialFormat &&
+                    Item.tempSerial === ''
+                  ) {
+                    Alert.alert('', 'لطفا سریال را مشخص کنید.', [
+                      {text: 'OK', onPress: () => {}},
+                    ]);
+                  } else {
+                    const serialFormat = Item.tempPart.value.SerialFormat;
+                    if (!!serialFormat) {
+                      if (serialFormat.length === Item.tempSerial.length) {
+                        let i = 0;
+                        let faults = 0;
+                        while (serialFormat[i] !== '#') {
+                          if (
+                            serialFormat[i].toUpperCase() !==
+                            Item.tempSerial[i].toUpperCase()
+                          ) {
+                            faults = faults + 1;
+                          }
+                          i = i + 1;
                         }
-                        i = i + 1;
-                      }
-                      if (faults > 0) {
-                        Alert.alert(
-                          '',
-                          'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                          [{text: 'OK', onPress: () => {}}],
-                        );
+                        if (faults > 0) {
+                          Alert.alert(
+                            '',
+                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                            [{text: 'OK', onPress: () => {}}],
+                          );
+                        } else {
+                          checkObjectVersion(
+                            selector.token,
+                            Item.tempSerial,
+                            Item.tempPart.value.Id,
+                            Item.tempVersion.Key,
+                          ).then(data => {
+                            if (data.errorCode == 0) {
+                              refactorObjectListItems(
+                                'setDirect',
+                                '',
+                                Item.index,
+                              );
+                            } else {
+                              ToastAndroid.showWithGravity(
+                                'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER,
+                              );
+                            }
+                          });
+                        }
                       } else {
-                        refactorObjectListItems('setDirect', '', Item.index);
+                        let hashtagIndex = 0;
+                        while (serialFormat[hashtagIndex] !== '#') {
+                          hashtagIndex = hashtagIndex + 1;
+                        }
+                        let rest = serialFormat.length - hashtagIndex;
+                        if (rest == Item.tempSerial.length) {
+                          const actualSerial = serialFormat
+                            .substr(0, hashtagIndex)
+                            .concat(Item.tempSerial);
+                          checkObjectVersion(
+                            selector.token,
+                            actualSerial,
+                            Item.tempPart.value.Id,
+                            Item.tempVersion.Key,
+                          ).then(data => {
+                            if (data.errorCode == 0) {
+                              refactorObjectListItems(
+                                'setDirect',
+                                actualSerial,
+                                Item.index,
+                              );
+                            } else {
+                              ToastAndroid.showWithGravity(
+                                'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER,
+                              );
+                            }
+                          });
+                        } else {
+                          Alert.alert(
+                            '',
+                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                            [{text: 'OK', onPress: () => {}}],
+                          );
+                        }
                       }
                     } else {
-                      let hashtagIndex = 0;
-                      while (serialFormat[hashtagIndex] !== '#') {
-                        hashtagIndex = hashtagIndex + 1;
-                      }
-                      let rest = serialFormat.length - hashtagIndex;
-                      if (rest == Item.tempSerial.length) {
-                        const actualSerial = serialFormat
-                          .substr(0, hashtagIndex)
-                          .concat(Item.tempSerial);
-                        refactorObjectListItems('setDirect', '', Item.index);
-                      } else {
-                        Alert.alert(
-                          '',
-                          'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                          [{text: 'OK', onPress: () => {}}],
-                        );
-                      }
+                      refactorObjectListItems('setDirect', '', Item.index);
                     }
-                  } else {
-                    refactorObjectListItems('setDirect', '', Item.index);
                   }
-                }
+                } catch {}
               }}>
               <Octicons
                 name={'check'}
@@ -1030,7 +1170,7 @@ const ServicePartsTab = ({
                         fontSize: normalize(30),
                         marginHorizontal: 5,
                       }}
-                      onPress={() => searchBarcode({})}
+                      onPress={() => searchBarcode()}
                     />
                   )}
                   <Icon
@@ -1174,87 +1314,121 @@ const ServicePartsTab = ({
               <TouchableOpacity
                 style={Styles.footerIconContainerStyle}
                 onPress={() => {
-                  if (
-                    fieldsObject.objectType !== 'new' &&
-                    fieldsObject.objectType !== 'failed'
-                  ) {
-                    Alert.alert(
-                      '',
-                      'لطفا جدید یا معیوب بودن قطعه را مشخص کنید.',
-                      [{text: 'OK', onPress: () => {}}],
-                    );
-                  } else if (!fieldsObject.partTypeSelected.label) {
-                    Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
-                      {text: 'OK', onPress: () => {}},
-                    ]);
-                  } else if (!fieldsObject.partVersionSelected.Key) {
-                    Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
-                      {text: 'OK', onPress: () => {}},
-                    ]);
-                  } else if (
-                    !!fieldsObject.partTypeSelected.value.SerialFormat &&
-                    fieldsObject.serial === ''
-                  ) {
-                    Alert.alert('', 'لطفا سریال را مشخص کنید.', [
-                      {text: 'OK', onPress: () => {}},
-                    ]);
-                  } else {
-                    const serialFormat =
-                      fieldsObject.partTypeSelected.value.SerialFormat;
-                    if (!!serialFormat) {
-                      if (serialFormat.length === fieldsObject.serial.length) {
-                        let i = 0;
-                        let faults = 0;
-                        while (serialFormat[i] !== '#') {
-                          if (
-                            serialFormat[i].toUpperCase() !==
-                            fieldsObject.serial[i].toUpperCase()
-                          ) {
-                            faults = faults + 1;
+                  try {
+                    if (
+                      fieldsObject.objectType !== 'new' &&
+                      fieldsObject.objectType !== 'failed'
+                    ) {
+                      Alert.alert(
+                        '',
+                        'لطفا جدید یا معیوب بودن قطعه را مشخص کنید.',
+                        [{text: 'OK', onPress: () => {}}],
+                      );
+                    } else if (!fieldsObject.partTypeSelected.label) {
+                      Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
+                        {text: 'OK', onPress: () => {}},
+                      ]);
+                    } else if (!fieldsObject.partVersionSelected.Key) {
+                      Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
+                        {text: 'OK', onPress: () => {}},
+                      ]);
+                    } else if (
+                      !!fieldsObject.partTypeSelected.value.SerialFormat &&
+                      fieldsObject.serial === ''
+                    ) {
+                      Alert.alert('', 'لطفا سریال را مشخص کنید.', [
+                        {text: 'OK', onPress: () => {}},
+                      ]);
+                    } else {
+                      const serialFormat =
+                        fieldsObject.partTypeSelected.value.SerialFormat;
+                      if (!!serialFormat) {
+                        if (
+                          serialFormat.length === fieldsObject.serial.length
+                        ) {
+                          let i = 0;
+                          let faults = 0;
+                          while (serialFormat[i] !== '#') {
+                            if (
+                              serialFormat[i].toUpperCase() !==
+                              fieldsObject.serial[i].toUpperCase()
+                            ) {
+                              faults = faults + 1;
+                            }
+                            i = i + 1;
                           }
-                          i = i + 1;
-                        }
-                        if (faults > 0) {
-                          Alert.alert(
-                            '',
-                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                            [{text: 'OK', onPress: () => {}}],
-                          );
+                          if (faults > 0) {
+                            Alert.alert(
+                              '',
+                              'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                              [{text: 'OK', onPress: () => {}}],
+                            );
+                          } else {
+                            checkObjectVersion(
+                              selector.token,
+                              fieldsObject.serial,
+                              fieldsObject.partTypeSelected.value.Id,
+                              fieldsObject.partVersionSelected.Key,
+                            ).then(data => {
+                              if (data.errorCode == 0) {
+                                let INFO = !!objectsList ? objectsList : [];
+                                let SERIAL = !!fieldsObject.serial
+                                  ? fieldsObject.serial
+                                  : '';
+                                addNewObject(INFO, SERIAL);
+                              } else {
+                                ToastAndroid.showWithGravity(
+                                  'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
+                                  ToastAndroid.SHORT,
+                                  ToastAndroid.CENTER,
+                                );
+                              }
+                            });
+                          }
                         } else {
-                          let INFO = !!objectsList ? objectsList : [];
-                          let SERIAL = !!fieldsObject.serial
-                            ? fieldsObject.serial
-                            : '';
-                          addNewObject(INFO, SERIAL);
+                          let hashtagIndex = 0;
+                          while (serialFormat[hashtagIndex] !== '#') {
+                            hashtagIndex = hashtagIndex + 1;
+                          }
+                          let rest = serialFormat.length - hashtagIndex;
+                          if (rest == fieldsObject.serial.length) {
+                            const actualSerial = serialFormat
+                              .substr(0, hashtagIndex)
+                              .concat(fieldsObject.serial);
+                            checkObjectVersion(
+                              selector.token,
+                              actualSerial,
+                              fieldsObject.partTypeSelected.value.Id,
+                              fieldsObject.partVersionSelected.Key,
+                            ).then(data => {
+                              if (data.errorCode == 0) {
+                                let INFO = !!objectsList ? objectsList : [];
+                                addNewObject(INFO, actualSerial);
+                              } else {
+                                ToastAndroid.showWithGravity(
+                                  'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
+                                  ToastAndroid.SHORT,
+                                  ToastAndroid.CENTER,
+                                );
+                              }
+                            });
+                          } else {
+                            Alert.alert(
+                              '',
+                              'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
+                              [{text: 'OK', onPress: () => {}}],
+                            );
+                          }
                         }
                       } else {
-                        let hashtagIndex = 0;
-                        while (serialFormat[hashtagIndex] !== '#') {
-                          hashtagIndex = hashtagIndex + 1;
-                        }
-                        let rest = serialFormat.length - hashtagIndex;
-                        if (rest == fieldsObject.serial.length) {
-                          const actualSerial = serialFormat
-                            .substr(0, hashtagIndex)
-                            .concat(fieldsObject.serial);
-                          let INFO = !!objectsList ? objectsList : [];
-                          addNewObject(INFO, actualSerial);
-                        } else {
-                          Alert.alert(
-                            '',
-                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                            [{text: 'OK', onPress: () => {}}],
-                          );
-                        }
+                        let INFO = !!objectsList ? objectsList : [];
+                        let SERIAL = !!fieldsObject.serial
+                          ? fieldsObject.serial
+                          : '';
+                        addNewObject(INFO, SERIAL);
                       }
-                    } else {
-                      let INFO = !!objectsList ? objectsList : [];
-                      let SERIAL = !!fieldsObject.serial
-                        ? fieldsObject.serial
-                        : '';
-                      addNewObject(INFO, SERIAL);
                     }
-                  }
+                  } catch {}
                 }}>
                 <Octicons
                   name={'check'}

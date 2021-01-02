@@ -67,9 +67,7 @@ const Splash = ({navigation}) => {
             ],
           );
         });
-    } catch {
-      console.warn("err")
-    }
+    } catch {}
   }, []);
 
   return (
