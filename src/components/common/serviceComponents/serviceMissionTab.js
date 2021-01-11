@@ -369,7 +369,6 @@ const ServiceMissionTab = ({
                         startLongitude: '',
                         endCity: '',
                         endLatitude: '',
-                        startLongitude: '',
                         distance: '',
                       });
                     },

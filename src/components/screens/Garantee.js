@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   TextInput,
@@ -8,6 +8,7 @@ import {
   Dimensions,
   ToastAndroid,
   ActivityIndicator,
+    BackHandler
 } from 'react-native';
 import Header from '../common/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -24,6 +25,21 @@ const Garantee = ({navigation}) => {
   const [serial, setSerial] = useState('');
   const [loader, setLoader] = useState(false);
   const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const backAction = () => {
+      setSerial("");
+      setProduct(null);
+      setLoader(false);
+      navigation.goBack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+    );
+    return () => backHandler.remove();
+  });
 
   const inquiry = () => {
     setLoader(true);
@@ -175,8 +191,7 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#A0A0A0',
-    width: pageWidth * 0.5,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     marginTop: 15,
   },

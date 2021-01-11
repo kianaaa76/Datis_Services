@@ -160,9 +160,9 @@ const SendData = () => {
                   `${dirs.DownloadDir}/${item.projectId}/1.png`,
                   'base64',
                 )
-                .then(async data => {
+                .then(data => {
                   if (!!data) {
-                    FACTOR_IMAGE = await data;
+                    setFactorImage(data);
                   }
                 });
               RNFetchBlob.fs
@@ -170,9 +170,9 @@ const SendData = () => {
                   `${dirs.DownloadDir}/${item.projectId}/2.png`,
                   'base64',
                 )
-                .then(async data => {
+                .then(data => {
                   if (!!data) {
-                    BILL_IMAGE = await data;
+                    setBillImage(data);
                   }
                 });
               RNFetchBlob.fs
@@ -180,9 +180,9 @@ const SendData = () => {
                   `${dirs.DownloadDir}/${item.projectId}/3.png`,
                   'base64',
                 )
-                .then(async data => {
+                .then(data => {
                   if (!!data) {
-                    IMAGE = await data;
+                    setImage(data);
                   }
                 });
                 let requestObjectList = [];
