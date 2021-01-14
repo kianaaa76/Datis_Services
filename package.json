@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "npx react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
@@ -19,6 +19,7 @@
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-android-location-services-dialog-box": "^2.8.2",
+    "react-native-check-box": "^2.1.7",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-image-crop-picker": "^0.35.1",
     "react-native-jalali-calendar-picker": "^0.2.6",
