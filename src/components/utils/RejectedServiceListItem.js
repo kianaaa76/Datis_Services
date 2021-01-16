@@ -93,6 +93,7 @@ const RejectedServiceListItem = ({
               rejectedServiceDetail(Item.projectID, selector.token)
                 .then(data => {
                   if (data.errorCode === 0) {
+                    console.warn("1111", data.result.Mission)
                     dispatch({
                       type: RESTORE_SERVICE_DATA,
                       savedServiceInfo: {
@@ -150,7 +151,7 @@ const RejectedServiceListItem = ({
                           ? data.result.Mission.Description
                           : '',
                         missionId: !!data.result.Mission
-                          ? data.result.Mission.Id
+                          ? data.result.Mission.ID
                           : 0,
                         distance: !!data.result.Mission
                           ? data.result.Mission.Distance
@@ -212,6 +213,7 @@ const RejectedServiceListItem = ({
             rejectedServiceDetail(Item.projectID, selector.token)
               .then(data => {
                 if (data.errorCode === 0) {
+                  console.warn("2222", data.result.Mission)
                   dispatch({
                     type: RESTORE_SERVICE_DATA,
                     savedServiceInfo: {

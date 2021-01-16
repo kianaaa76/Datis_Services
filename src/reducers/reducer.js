@@ -71,7 +71,6 @@ export default (state = INITIAL_STATE, action) => {
         unfinishedMissionId: null,
         selectedService: null,
         objectsList: [],
-        objectsList: [],
         savedServiceInfo: {
           projectId: '',
           factorReceivedPrice: 0,
@@ -101,7 +100,6 @@ export default (state = INITIAL_STATE, action) => {
         },
         editingService: '',
         forceUpdate: false,
-        userList: [],
       };
     case RESTORE_SERVICE_DATA:
       return {
