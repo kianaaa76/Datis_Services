@@ -89,7 +89,7 @@ const Garantee = ({navigation}) => {
               }}
               onPress={() => {
                 try {
-                  RnZxing.showQrReader(data => onSuccess(data));
+                  RnZxing.showQrReader(data => setSerial(data));
                 } catch {
                   ToastAndroid.showWithGravity(
                     'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',

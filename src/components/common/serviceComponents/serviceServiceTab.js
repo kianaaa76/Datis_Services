@@ -11,7 +11,7 @@ import {
   BackHandler,
   ToastAndroid,
 } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
+import CheckBox from 'react-native-check-box';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Foundation from 'react-native-vector-icons/Foundation';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -65,7 +65,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
       <View style={Styles.checkboxContainerStyle}>
         <Text style={Styles.checkboxTextStyle}>{title}</Text>
         <CheckBox
-          onValueChange={() => {
+          onClick={() => {
             if (checkboxPurpose === 'result') {
               setInfo({
                 ...info,
@@ -78,7 +78,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               });
             }
           }}
-          value={
+          isChecked={
             checkboxPurpose === 'result'
               ? info.serviceResult == title
                 ? true
@@ -87,7 +87,8 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               ? true
               : false
           }
-          tintColors={{true: '#660000', false: 'black'}}
+          checkedCheckBoxColor={"#660000"}
+          uncheckedCheckBoxColor={"black"}
         />
       </View>
     );

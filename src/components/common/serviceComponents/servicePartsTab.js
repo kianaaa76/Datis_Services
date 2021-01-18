@@ -14,7 +14,7 @@ import {
   Keyboard,
   BackHandler,
 } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
+import CheckBox from 'react-native-check-box';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Feather from 'react-native-vector-icons/Feather';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -1024,23 +1024,17 @@ const ServicePartsTab = ({
             <View style={Styles.partTypeSelectionContainerStyle}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox
-                  onValueChange={value => {
-                    if (value) {
+                  onClick={() => {
+                    if (fieldsObject.objectType !== "failed") {
                       setFieldsObject({
                         ...fieldsObject,
                         objectType: 'failed',
                       });
                       setIsNewPartFormExpanded(true);
-                    } else {
-                      setFieldsObject({
-                        ...fieldsObject,
-                        objectType: '',
-                      });
-                      setIsNewPartFormExpanded(false);
                     }
                   }}
-                  value={fieldsObject.objectType === 'failed' ? true : false}
-                  tintColors={{true: 'red', false: 'red'}}
+                  isChecked={fieldsObject.objectType === 'failed' ? true : false}
+                  checkBoxColor="red"
                 />
                 <TouchableHighlight
                   onPress={() => {
@@ -1077,23 +1071,17 @@ const ServicePartsTab = ({
               </View>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox
-                  onValueChange={value => {
-                    if (value) {
+                  onClick={() => {
+                    if (fieldsObject.objectType !== "new") {
                       setFieldsObject({
                         ...fieldsObject,
                         objectType: 'new',
                       });
                       setIsNewPartFormExpanded(true);
-                    } else {
-                      setFieldsObject({
-                        ...fieldsObject,
-                        objectType: '',
-                      });
-                      setIsNewPartFormExpanded(false);
                     }
                   }}
-                  value={fieldsObject.objectType == 'new' ? true : false}
-                  tintColors={{true: 'green', false: 'green'}}
+                  isChecked={fieldsObject.objectType == 'new' ? true : false}
+                  checkBoxColor="green"
                   style={{marginLeft: 20}}
                 />
                 <TouchableHighlight
