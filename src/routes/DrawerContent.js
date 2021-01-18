@@ -22,9 +22,11 @@ const DrawerContent = ({navigation}) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={Styles.titleContainerStyle}
-        onPress={()=>Linking.openURL(
-          'http://deka.datis-elevator.ir/download/ServicePriceList.pdf',
-        )}>
+        onPress={()=> navigation.navigate('PriceList')
+        //     Linking.openURL(
+        //   'http://deka.datis-elevator.ir/download/ServicePriceList.pdf',
+        // )
+        }>
         <Text style={Styles.titleTextStyle}>لیست قیمت قطعات</Text>
       </TouchableOpacity>
     </View>

@@ -18,6 +18,7 @@ import ServiceArchiveList from '../components/screens/ServiceArchive/ServiceArch
 import ServiceArchiveDetail from '../components/screens/ServiceArchive/ArchiveListServiceDetail';
 import Splash from '../components/screens/SplashScreen';
 import Garantee from '../components/screens/Garantee';
+import PriceList from "../components/screens/PriceList";
 import UserAddress from "../components/screens/UserAddress";
 
 export const drawer = createDrawerNavigator(
@@ -28,6 +29,9 @@ export const drawer = createDrawerNavigator(
     Garantee: {
       screen: Garantee,
     },
+      PriceList:{
+        screen: PriceList
+      }
   },
   {
     drawerPosition: 'right',
