@@ -23,7 +23,8 @@ import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial, checkObjectVersion} from '../../../actions/api';
 import RnZxing from 'react-native-rn-zxing';
-import {normalize, addDotsToPrice} from '../../utils/utilities';
+import {normalize} from '../../utils/utilities';
+import NumberFormat from "react-number-format";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -88,10 +89,14 @@ const ServicePartsTab = ({
     return () => backHandler.remove();
   });
 
+  useEffect(()=>{
+    console.warn("partsList", partsListName);
+  })
+
   const onSuccess = async code => {
     try {
       let header = parseInt(code.toString().substr(0, 3));
-      numOfZeros = 0;
+      let numOfZeros = 0;
       while (code.toString()[numOfZeros] == '0') {
         numOfZeros = numOfZeros + 1;
       }
@@ -120,13 +125,14 @@ const ServicePartsTab = ({
           selectedObject[0].value.Id,
         ).then(data => {
           if (data.errorCode == 0) {
+            let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
             let selectedVersion = selectedObject[0].value.Versions.filter(
-              item => item.Key == data.result.VersionId,
+              item => item.Key === data.result.VersionId,
             );
             if (!!selectedItemList.Id) {
               refactorObjectListItems(
                 'tempPart',
-                selectedObject[0],
+                selectedObjectt[0],
                 selectedItemList.index,
               );
               refactorObjectListItems(
@@ -144,7 +150,7 @@ const ServicePartsTab = ({
               );
               refactorObjectListItems(
                 'availableVersions',
-                selectedObject[0].value.Versions,
+                selectedObjectt[0].value.Versions,
                 selectedItemList.index,
               );
               setSelectedItemList({});
@@ -226,12 +232,13 @@ const ServicePartsTab = ({
                   getObjBySerial(selector.token, sserial, object.value.Id).then(
                     data => {
                       if (data.errorCode == 0) {
+                        let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
                         let selectedVersion = object.value.Versions.filter(
                           item => item.Key == data.result.VersionId,
                         );
                         refactorObjectListItems(
                           'tempPart',
-                          object,
+                          selectedObjectt[0],
                           selectedItemList.index,
                         );
                         refactorObjectListItems(
@@ -271,12 +278,13 @@ const ServicePartsTab = ({
                   object.value.Id,
                 ).then(data => {
                   if (data.errorCode == 0) {
+                    let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
                     let selectedVersion = object.value.Versions.filter(
                       item => item.Key == data.result.VersionId,
                     );
                     refactorObjectListItems(
                       'tempPart',
-                      object,
+                      selectedObjectt[0],
                       selectedItemList.index,
                     );
                     refactorObjectListItems(
@@ -357,12 +365,13 @@ const ServicePartsTab = ({
                   getObjBySerial(selector.token, sserial, object.value.Id).then(
                     data => {
                       if (data.errorCode == 0) {
+                        let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
                         let selectedVersion = object.value.Versions.filter(
                           item => item.Key == data.result.VersionId,
                         );
                         setFieldsObject({
                           ...fieldsObject,
-                          partTypeSelected: object,
+                          partTypeSelected: selectedObjectt[0],
                           partVersionSelected: selectedVersion[0],
                           availableVersions: object.value.Versions,
                         });
@@ -392,13 +401,14 @@ const ServicePartsTab = ({
                   object.value.Id,
                 ).then(data => {
                   if (data.errorCode == 0) {
+                    let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
                     let selectedVersion = object.value.Versions.filter(
                       item => item.Key == data.result.VersionId,
                     );
 
                     setFieldsObject({
                       ...fieldsObject,
-                      partTypeSelected: object,
+                      partTypeSelected: selectedObjectt[0],
                       partVersionSelected: selectedVersion[0],
                     });
                     setSearchBarcodeLoading(false);
@@ -698,14 +708,16 @@ const ServicePartsTab = ({
         {Item.isExpanded && Item.objectType === 'new' ? (
           <View style={Styles.priceContainerStyle}>
             <Text style={Styles.labelStyle}>ریال</Text>
-            <TextInput
-              style={Styles.priceInputStyle}
-              onChangeText={text =>
-                refactorObjectListItems('tempPrice', text, Item.index)
-              }
-              value={addDotsToPrice(Item.tempPrice)}
-              keyboardType="numeric"
-            />
+            <NumberFormat thousandSeparator={true} renderText={value => (
+                <TextInput
+                    style={Styles.priceInputStyle}
+                    onChangeText={(text) => {
+                      refactorObjectListItems('tempPrice', text, Item.index);
+                    }}
+                    value={value}
+                    keyboardType="numeric"
+                />
+            )} value={Item.tempPrice} displayType={'text'}/>
             <Text style={Styles.labelStyle}>قیمت:</Text>
           </View>
         ) : Item.isExpanded && Item.objectType === 'failed' ? (
@@ -738,14 +750,16 @@ const ServicePartsTab = ({
             </View>
             <View style={Styles.prePriceContainerStyle}>
               <Text style={Styles.labelStyle}>ریال</Text>
-              <TextInput
-                style={Styles.prePriceInputStyle}
-                onChangeText={text =>
-                  refactorObjectListItems('tempPrice', text, Item.index)
-                }
-                value={addDotsToPrice(Item.tempPrice)}
-                keyboardType="numeric"
-              />
+              <NumberFormat thousandSeparator={true} renderText={value => (
+                  <TextInput
+                      style={Styles.prePriceInputStyle}
+                      onChangeText={(text) => {
+                        refactorObjectListItems('tempPrice', text, Item.index);
+                      }}
+                      value={value}
+                      keyboardType="numeric"
+                  />
+              )} value={Item.tempPrice} displayType={'text'}/>
               <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
             </View>
           </View>
@@ -1223,14 +1237,16 @@ const ServicePartsTab = ({
             {isNewPartFormExpanded && fieldsObject.objectType === 'new' ? (
               <View style={Styles.priceContainerStyle}>
                 <Text style={Styles.labelStyle}>ریال</Text>
-                <TextInput
-                  style={Styles.priceInputStyle}
-                  onChangeText={text =>
-                    setFieldsObject({...fieldsObject, Price: text})
-                  }
-                  value={addDotsToPrice(fieldsObject.Price)}
-                  keyboardType="numeric"
-                />
+                <NumberFormat thousandSeparator={true} renderText={value => (
+                    <TextInput
+                        style={Styles.priceInputStyle}
+                        onChangeText={(text) => {
+                          setFieldsObject({...fieldsObject, Price: text});
+                        }}
+                        value={value}
+                        keyboardType="numeric"
+                    />
+                )} value={fieldsObject.Price} displayType={'text'}/>
                 <Text style={Styles.labelStyle}>قیمت:</Text>
               </View>
             ) : isNewPartFormExpanded &&
@@ -1265,14 +1281,16 @@ const ServicePartsTab = ({
                 </View>
                 <View style={Styles.prePriceContainerStyle}>
                   <Text style={Styles.labelStyle}>ریال</Text>
-                  <TextInput
-                    style={Styles.prePriceInputStyle}
-                    onChangeText={text =>
-                      setFieldsObject({...fieldsObject, Price: text})
-                    }
-                    value={addDotsToPrice(fieldsObject.Price)}
-                    keyboardType="numeric"
-                  />
+                  <NumberFormat thousandSeparator={true} renderText={value => (
+                      <TextInput
+                          style={Styles.prePriceInputStyle}
+                          onChangeText={(text) => {
+                            setFieldsObject({...fieldsObject, Price: text});
+                          }}
+                          value={value}
+                          keyboardType="numeric"
+                      />
+                  )} value={fieldsObject.Price} displayType={'text'}/>
                   <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
                 </View>
               </View>
@@ -1283,6 +1301,7 @@ const ServicePartsTab = ({
                 onPress={() => {
                   setIsNewPartFormExpanded(false);
                   setHasNew(false);
+                  setSearchBarcodeLoading(false);
                   setFieldsObject({
                     ...fieldsObject,
                     objectType: '',

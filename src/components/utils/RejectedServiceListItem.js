@@ -93,14 +93,13 @@ const RejectedServiceListItem = ({
               rejectedServiceDetail(Item.projectID, selector.token)
                 .then(data => {
                   if (data.errorCode === 0) {
-                    console.warn("1111", data.result.Mission)
                     dispatch({
                       type: RESTORE_SERVICE_DATA,
                       savedServiceInfo: {
                         projectId: Item.projectID,
-                        factorReceivedPrice: parseInt(data.result.RecivedAmount).toString(),
-                        factorTotalPrice: parseInt(data.result.InvoiceAmount).toString(),
-                        toCompanySettlement: parseInt(data.result.ToCompanySettlement).toString(),
+                        factorReceivedPrice: parseInt(data.result.RecivedAmount),
+                        factorTotalPrice: parseInt(data.result.InvoiceAmount),
+                        toCompanySettlement: parseInt(data.result.ToCompanySettlement),
                         serviceDescription: data.result.Details,
                         address: data.result.Location,
                         finalDate: data.result.DoneTime,
@@ -213,14 +212,13 @@ const RejectedServiceListItem = ({
             rejectedServiceDetail(Item.projectID, selector.token)
               .then(data => {
                 if (data.errorCode === 0) {
-                  console.warn("2222", data.result.Mission)
                   dispatch({
                     type: RESTORE_SERVICE_DATA,
                     savedServiceInfo: {
                       projectId: Item.projectID,
-                      factorReceivedPrice:parseInt(data.result.RecivedAmount).toString(),
-                      factorTotalPrice: parseInt(data.result.InvoiceAmount).toString(),
-                      toCompanySettlement: parseInt(data.result.ToCompanySettlement).toString(),
+                      factorReceivedPrice:parseInt(data.result.RecivedAmount),
+                      factorTotalPrice: parseInt(data.result.InvoiceAmount),
+                      toCompanySettlement: parseInt(data.result.ToCompanySettlement),
                       serviceDescription: data.result.Details,
                       address: data.result.Location,
                       finalDate: data.result.DoneTime,

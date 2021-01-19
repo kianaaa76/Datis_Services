@@ -98,8 +98,8 @@ const MyServiceDetails = ({navigation}) => {
           availableVersions: !!object.length ? object[0].value.Versions : [],
           partType: !!object.length ? object[0] : {},
           tempPart: !!object.length ? object[0] : {},
-          Price: parseInt(item.Price).toString(),
-          tempPrice: parseInt(item.Price).toString(),
+          Price: parseInt(item.Price.toString().split(',').join('')),
+          tempPrice: parseInt(item.Price.toString().split(',').join('')),
           serial: item.Serial,
           tempSerial: item.Serial,
           version: !!ver.length ? ver[0] : {},
@@ -348,7 +348,7 @@ const MyServiceDetails = ({navigation}) => {
             Object_Id: !!item.partType ? item.partType.value.Id : '',
             Direction: item.objectType === 'new' ? '0' : '1',
             Description: item.failureDescription,
-            Price: parseInt(item.Price.toString().split('.').join('')),
+            Price: parseInt(item.Price.toString().split(',').join('')),
             Serial: item.serial,
             VersionId: !!item.version ? item.version.Key : '',
           });
@@ -362,9 +362,9 @@ const MyServiceDetails = ({navigation}) => {
           serviceID,
           convertResultTitleToNum(serviceTabInfo.serviceResult),
           convertTypeTitleToNum(serviceTabInfo.serviceType),
-          parseInt(factorTabInfo.factorReceivedPrice.toString().split('.').join('')),
-          parseInt(factorTabInfo.factorTotalPrice.toString().split('.').join('')),
-          parseInt(factorTabInfo.toCompanySettlement.toString().split('.').join('')),
+          parseInt(factorTabInfo.factorReceivedPrice.toString().split(',').join('')),
+          parseInt(factorTabInfo.factorTotalPrice.toString().split(',').join('')), //toString().split(\',\').join(\'\')'
+          parseInt(factorTabInfo.toCompanySettlement.toString().split(',').join('')),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,
@@ -452,12 +452,7 @@ const MyServiceDetails = ({navigation}) => {
             Object_Id: !!item.partType ? item.partType.value.Id : '',
             Direction: item.objectType === 'new' ? '0' : '1',
             Description: item.failureDescription,
-            Price: parseInt(
-              item.Price
-                .toString()
-                .split('.')
-                .join(''),
-            ),
+            Price: parseInt(item.Price.toString().split(',').join('')),
             Serial: item.serial,
             VersionId: !!item.version ? item.version.Key : '',
           });
@@ -471,9 +466,9 @@ const MyServiceDetails = ({navigation}) => {
           serviceID,
           convertResultTitleToNum(serviceTabInfo.serviceResult),
           convertTypeTitleToNum(serviceTabInfo.serviceType),
-          parseInt(factorTabInfo.factorReceivedPrice.toString().split('.').join('')),
-          parseInt(factorTabInfo.factorTotalPrice.toString().split('.').join('')),
-          parseInt(factorTabInfo.toCompanySettlement.toString().split('.').join('')),
+          parseInt(factorTabInfo.factorReceivedPrice.toString().split(',').join('')),
+          parseInt(factorTabInfo.factorTotalPrice.toString().split(',').join('')),
+          parseInt(factorTabInfo.toCompanySettlement.toString().split(',').join('')),
           serviceTabInfo.address,
           serviceTabInfo.description,
           serviceTabInfo.image,

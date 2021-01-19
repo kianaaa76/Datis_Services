@@ -37,6 +37,7 @@ const DropdownPicker = forwardRef(
               setSelecedItemName(item.item.Value);
               onSelect(item.item);
               setListIsShown(false);
+              setSearchText("");
               setShowingList(list);
             }}>
             <Text>{item.item.Key}</Text>
@@ -50,6 +51,7 @@ const DropdownPicker = forwardRef(
               setSelecedItemName(item.item.label);
               onSelect(item.item);
               setListIsShown(false);
+              setSearchText("");
               setShowingList(list);
             }}>
             <Text>{item.item.value.Id}</Text>
@@ -94,6 +96,9 @@ const DropdownPicker = forwardRef(
           <TouchableOpacity
             style={Styles.containerStyle}
             onPress={() => {
+                if(listIsShown){
+                    setSearchText("");
+                }
               setListIsShown(!listIsShown);
             }}>
             <Text style={{color: '#000'}}>

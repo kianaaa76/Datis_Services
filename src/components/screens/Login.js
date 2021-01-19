@@ -18,7 +18,6 @@ import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit, normalize} from '../utils/utilities';
 import {loginUser, loginVerification} from '../../actions/api';
-import {addDotsToPrice} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;

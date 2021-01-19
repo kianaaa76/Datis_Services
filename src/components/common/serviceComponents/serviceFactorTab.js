@@ -11,9 +11,10 @@ import {
   BackHandler,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import NumberFormat from 'react-number-format';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../ImageViwer';
-import {normalize, addDotsToPrice} from '../../utils/utilities';
+import {normalize} from '../../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -51,14 +52,16 @@ const ServiceFactorTab = ({
         keyboardDismissMode="on-drag">
         <View style={Styles.rowDataStyle}>
           <Text style={Styles.rialTextStyle}>ریال</Text>
-          <TextInput
-            style={Styles.textInputStyle}
-            onChangeText={text => {
-              setInfo({...info, factorReceivedPrice: text});
-            }}
-            value={addDotsToPrice(info.factorReceivedPrice.toString())}
-            keyboardType="numeric"
-          />
+          <NumberFormat thousandSeparator={true} renderText={value => (
+              <TextInput
+                  style={Styles.textInputStyle}
+                  onChangeText={(text) => {
+                    setInfo({...info, factorReceivedPrice: text});
+                  }}
+                  value={value}
+                  keyboardType="numeric"
+              />
+          )} value={info.factorReceivedPrice} displayType={'text'}/>
           <View
             style={{
               flexDirection: 'row',
@@ -77,14 +80,16 @@ const ServiceFactorTab = ({
         </View>
         <View style={Styles.rowDataStyle}>
           <Text style={Styles.rialTextStyle}>ریال</Text>
-          <TextInput
-            style={Styles.textInputStyle}
-            onChangeText={text => {
-              setInfo({...info, toCompanySettlement: text});
-            }}
-            value={addDotsToPrice(info.toCompanySettlement.toString())}
-            keyboardType="numeric"
-          />
+          <NumberFormat thousandSeparator={true} renderText={value => (
+              <TextInput
+                  style={Styles.textInputStyle}
+                  onChangeText={(text) => {
+                    setInfo({...info, toCompanySettlement: text});
+                  }}
+                  value={value}
+                  keyboardType="numeric"
+              />
+          )} value={info.toCompanySettlement} displayType={'text'}/>
           <View
             style={{
               flexDirection: 'row',
@@ -96,17 +101,16 @@ const ServiceFactorTab = ({
         </View>
         <View style={Styles.rowDataStyle}>
           <Text style={Styles.rialTextStyle}>ریال</Text>
-          <TextInput
-            style={Styles.textInputStyle}
-            onChangeText={text => {
-              setInfo({
-                ...info,
-                factorTotalPrice: text,
-              });
-            }}
-            value={addDotsToPrice(info.factorTotalPrice.toString())}
-            keyboardType="numeric"
-          />
+          <NumberFormat thousandSeparator={true} renderText={value => (
+              <TextInput
+                  style={Styles.textInputStyle}
+                  onChangeText={(text) => {
+                    setInfo({...info, factorTotalPrice: text});
+                  }}
+                  value={value}
+                  keyboardType="numeric"
+              />
+          )} value={info.factorTotalPrice} displayType={'text'}/>
           <View
             style={{
               flexDirection: 'row',
@@ -135,13 +139,11 @@ const ServiceFactorTab = ({
                     includeBase64: true,
                     compressImageQuality: 0.7,
                   }).then(response => {
-                    console.warn("3333",response)
                     setInfo({
                       ...info,
                       factorImage: response.data,
                     });
                   }).catch(err=>{
-                    console.warn("4444",err)
                     ToastAndroid.showWithGravity(
                         'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
                         ToastAndroid.SHORT,
