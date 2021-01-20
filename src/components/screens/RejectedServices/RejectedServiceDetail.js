@@ -204,47 +204,15 @@ const MyServiceDetails = ({navigation}) => {
     navigation.replace('RejectedServices');
   };
 
-  const convertResultTitleToNum = title => {
-    switch (title) {
-      case 'موفق':
-        return 1;
-      case 'موفق مشکوک':
-        return 2;
-      case 'سرویس جدید - کسری قطعات':
-        return 3;
-      case 'سرویس جدید - آماده نبودن پروژه':
-        return 4;
-      case 'سرویس جدید - عدم تسلط':
-        return 5;
-      case 'لغو موفق':
-        return 6;
-      default:
-        return 0;
-    }
-  };
-
-  const convertTypeTitleToNum = title => {
-    switch (title) {
-      case 'خرابی یا تعویض قطعه':
-        return 1;
-      case 'ایراد نصب و تنظیم روتین':
-        return 2;
-      case 'تنظیم و عیب غیرروتین':
-        return 3;
-      default:
-        return 0;
-    }
-  };
-
   const onFinishServicePress = () => {
     setRequestLoading(true);
     setRenderConfirmModal(false);
     setRenderNetworkModal(false);
     if (
       !factorTabInfo.factorImage &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
+      serviceTabInfo.serviceResult !== 4 &&
+      serviceTabInfo.serviceResult !== 6 &&
+      serviceTabInfo.serviceResult !== 2
     ) {
       setRequestLoading(false);
       setIndex(1);
@@ -254,9 +222,9 @@ const MyServiceDetails = ({navigation}) => {
     } else if (
       !factorTabInfo.factorReceivedPrice &&
       factorTabInfo.factorReceivedPrice !== 0 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
+      serviceTabInfo.serviceResult !== 4 &&
+      serviceTabInfo.serviceResult !== 6 &&
+      serviceTabInfo.serviceResult !== 2
     ) {
       setRequestLoading(false);
       setIndex(1);
@@ -266,9 +234,9 @@ const MyServiceDetails = ({navigation}) => {
     } else if (
       !factorTabInfo.factorTotalPrice &&
       factorTabInfo.factorTotalPrice !== 0 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
+      serviceTabInfo.serviceResult !== 4 &&
+      serviceTabInfo.serviceResult !== 6 &&
+      serviceTabInfo.serviceResult !== 2
     ) {
       setRequestLoading(false);
       setIndex(1);
@@ -283,9 +251,9 @@ const MyServiceDetails = ({navigation}) => {
       ]);
     } else if (
       !serviceTabInfo.finalDate &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
+      serviceTabInfo.serviceResult !== 4 &&
+      serviceTabInfo.serviceResult !== 6 &&
+      serviceTabInfo.serviceResult !== 2
     ) {
       setRequestLoading(false);
       setIndex(0);
@@ -300,9 +268,9 @@ const MyServiceDetails = ({navigation}) => {
       ]);
     } else if (
       !serviceTabInfo.serviceType &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 4 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 6 &&
-      convertResultTitleToNum(serviceTabInfo.serviceResult) !== 2
+      serviceTabInfo.serviceResult !== 4 &&
+      serviceTabInfo.serviceResult !== 6 &&
+      serviceTabInfo.serviceResult !== 2
     ) {
       setRequestLoading(false);
       setIndex(0);
@@ -360,8 +328,8 @@ const MyServiceDetails = ({navigation}) => {
         sendServiceData(
           selector.token,
           serviceID,
-          convertResultTitleToNum(serviceTabInfo.serviceResult),
-          convertTypeTitleToNum(serviceTabInfo.serviceType),
+          serviceTabInfo.serviceResult,
+          serviceTabInfo.serviceType,
           parseInt(factorTabInfo.factorReceivedPrice.toString().split(',').join('')),
           parseInt(factorTabInfo.factorTotalPrice.toString().split(',').join('')), //toString().split(\',\').join(\'\')'
           parseInt(factorTabInfo.toCompanySettlement.toString().split(',').join('')),
@@ -464,8 +432,8 @@ const MyServiceDetails = ({navigation}) => {
         sendServiceData(
           selector.token,
           serviceID,
-          convertResultTitleToNum(serviceTabInfo.serviceResult),
-          convertTypeTitleToNum(serviceTabInfo.serviceType),
+          serviceTabInfo.serviceResult,
+          serviceTabInfo.serviceType,
           parseInt(factorTabInfo.factorReceivedPrice.toString().split(',').join('')),
           parseInt(factorTabInfo.factorTotalPrice.toString().split(',').join('')),
           parseInt(factorTabInfo.toCompanySettlement.toString().split(',').join('')),

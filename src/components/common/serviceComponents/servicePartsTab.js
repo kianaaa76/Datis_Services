@@ -89,10 +89,6 @@ const ServicePartsTab = ({
     return () => backHandler.remove();
   });
 
-  useEffect(()=>{
-    console.warn("partsList", partsListName);
-  })
-
   const onSuccess = async code => {
     try {
       let header = parseInt(code.toString().substr(0, 3));
@@ -232,7 +228,9 @@ const ServicePartsTab = ({
                   getObjBySerial(selector.token, sserial, object.value.Id).then(
                     data => {
                       if (data.errorCode == 0) {
+                        console.warn("data111", data);
                         let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
+                        console.warn("1111", selectedObjectt)
                         let selectedVersion = object.value.Versions.filter(
                           item => item.Key == data.result.VersionId,
                         );
@@ -277,8 +275,10 @@ const ServicePartsTab = ({
                   `${serialFormatHeader}${sserial}`,
                   object.value.Id,
                 ).then(data => {
+                  console.warn("data222", data);
                   if (data.errorCode == 0) {
                     let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
+                    console.warn("2222", selectedObjectt);
                     let selectedVersion = object.value.Versions.filter(
                       item => item.Key == data.result.VersionId,
                     );
@@ -356,7 +356,6 @@ const ServicePartsTab = ({
                 object.value.SerialFormat.indexOf('#'),
                 object.value.SerialFormat.length,
               );
-
               if (sserial.length === object.value.SerialFormat.length) {
                 if (
                   serialFormatHeader ===
@@ -365,15 +364,18 @@ const ServicePartsTab = ({
                   getObjBySerial(selector.token, sserial, object.value.Id).then(
                     data => {
                       if (data.errorCode == 0) {
-                        let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
-                        let selectedVersion = object.value.Versions.filter(
+                        console.warn("data333", data);
+                        console.warn("Object333",object.label);
+                        let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId);
+                        console.warn("3333", selectedObjectt[0]);
+                        let selectedVersion = selectedObjectt[0].value.Versions.filter(
                           item => item.Key == data.result.VersionId,
                         );
                         setFieldsObject({
                           ...fieldsObject,
                           partTypeSelected: selectedObjectt[0],
                           partVersionSelected: selectedVersion[0],
-                          availableVersions: object.value.Versions,
+                          availableVersions: selectedObjectt[0].value.Versions,
                         });
                         setSearchBarcodeLoading(false);
                       } else {
@@ -401,7 +403,9 @@ const ServicePartsTab = ({
                   object.value.Id,
                 ).then(data => {
                   if (data.errorCode == 0) {
+                    console.warn("data444", data);
                     let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
+                    console.warn("4444", selectedObjectt)
                     let selectedVersion = object.value.Versions.filter(
                       item => item.Key == data.result.VersionId,
                     );

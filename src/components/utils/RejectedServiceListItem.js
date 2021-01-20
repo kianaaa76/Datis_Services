@@ -43,38 +43,6 @@ const RejectedServiceListItem = ({
     });
   }, []);
 
-  const getServiceResult = resultNum => {
-    switch (resultNum) {
-      case 1:
-        return 'موفق';
-      case 2:
-        return 'موفق مشکوک';
-      case 3:
-        return 'سرویس جدید - کسری قطعات';
-      case 4:
-        return 'سرویس جدید - آماده نبودن پروژه';
-      case 5:
-        return 'سرویس جدید - عدم تسلط';
-      case 6:
-        return 'لغو موفق';
-      default:
-        return '';
-    }
-  };
-
-  const getServiceType = typeNum => {
-    switch (typeNum) {
-      case 1:
-        return 'خرابی یا تعویض قطعه';
-      case 2:
-        return 'ایراد نصب و تنظیم روتین';
-      case 3:
-        return 'تنظیم و عیب غیرروتین';
-      default:
-        return '';
-    }
-  };
-
   return (
     <TouchableWithoutFeedback
       onPress={async () => {
@@ -103,8 +71,8 @@ const RejectedServiceListItem = ({
                         serviceDescription: data.result.Details,
                         address: data.result.Location,
                         finalDate: data.result.DoneTime,
-                        serviceResult: getServiceResult(data.result.Result),
-                        serviceType: getServiceType(data.result.ServiceType),
+                        serviceResult: data.result.Result,
+                        serviceType: data.result.ServiceType,
                         objectList: data.result.ObjectList,
                         startLatitude: !!data.result.Mission && !!data.result.Mission.StartLocation
                           ? parseFloat(
@@ -222,8 +190,8 @@ const RejectedServiceListItem = ({
                       serviceDescription: data.result.Details,
                       address: data.result.Location,
                       finalDate: data.result.DoneTime,
-                      serviceResult: getServiceResult(data.result.Result),
-                      serviceType: getServiceType(data.result.ServiceType),
+                      serviceResult: data.result.Result,
+                      serviceType: data.result.ServiceType,
                       objectList: data.result.ObjectList,
                       startLatitude: !!data.result.Mission && !!data.result.Mission.StartLocation
                         ? parseFloat(

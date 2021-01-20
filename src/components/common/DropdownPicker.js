@@ -19,12 +19,10 @@ const DropdownPicker = forwardRef(
     const [listIsShown, setListIsShown] = useState(false);
     const [showingList, setShowingList] = useState(list);
     const [searchText, setSearchText] = useState('');
-    const [selectedItemName, setSelecedItemName] = useState('');
 
     useImperativeHandle(ref, () => ({
       setList(LIST) {
         setShowingList(LIST);
-        setSelecedItemName('');
       },
     }));
 
@@ -34,7 +32,6 @@ const DropdownPicker = forwardRef(
           <TouchableOpacity
             style={Styles.listItemsContainerStyle}
             onPress={() => {
-              setSelecedItemName(item.item.Value);
               onSelect(item.item);
               setListIsShown(false);
               setSearchText("");
@@ -48,7 +45,6 @@ const DropdownPicker = forwardRef(
           <TouchableOpacity
             style={Styles.listItemsContainerStyle}
             onPress={() => {
-              setSelecedItemName(item.item.label);
               onSelect(item.item);
               setListIsShown(false);
               setSearchText("");
@@ -102,11 +98,7 @@ const DropdownPicker = forwardRef(
               setListIsShown(!listIsShown);
             }}>
             <Text style={{color: '#000'}}>
-              {!!selectedItemName
-                ? selectedItemName.length > 30
-                  ? `${selectedItemName.substr(0, 30)}...`
-                  : selectedItemName
-                : placeholder}
+              {placeholder}
             </Text>
           </TouchableOpacity>
           {listIsShown && (

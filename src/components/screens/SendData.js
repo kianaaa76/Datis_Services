@@ -11,47 +11,20 @@ const SendData = () => {
   const [factorImage, setFactorImage] = useState("");
   const [billImage, setBillImage] = useState("");
   const [image, setImage] = useState("");
-  const convertResultTitleToNum = title => {
-    switch (title) {
-      case 'موفق':
-        return 1;
-      case 'موفق مشکوک':
-        return 2;
-      case 'سرویس جدید - کسری قطعات':
-        return 3;
-      case 'سرویس جدید - آماده نبودن پروژه':
-        return 4;
-      case 'سرویس جدید - عدم تسلط':
-        return 5;
-      case 'لغو موفق':
-        return 6;
-      default:
-        return 0;
-    }
-  };
-  const convertTypeTitleToNum = title => {
-    switch (title) {
-      case 'خرابی یا تعویض قطعه':
-        return 1;
-      case 'ایراد نصب و تنظیم روتین':
-        return 2;
-      case 'تنظیم و عیب غیرروتین':
-        return 3;
-      default:
-        return 0;
-    }
-  };
+
+
   const dirs = RNFetchBlob.fs.dirs;
   useEffect(() => {
     setInterval(()=>{
     AsyncStorage.getItem('savedServicesList').then(list => {
       if (!!list) {
+        console.warn("list");
         JSON.parse(list).map(item => {
           if (
             item.saveType === 'network' &&
             selector.editingService !== item.projectId
           ) {
-            if (!!item.startLatitude) {
+            if (!!item.startLatitude && !!item.endLatitude) {
               RNFetchBlob.fs
                 .readFile(
                   `${dirs.DownloadDir}/${item.projectId}/1.png`,
@@ -97,8 +70,8 @@ const SendData = () => {
               sendServiceData(
                 selector.token,
                 item.projectId,
-                convertResultTitleToNum(item.serviceResult),
-                convertTypeTitleToNum(item.serviceType),
+                item.serviceResult,
+                item.serviceType,
                 item.factorReceivedPrice,
                 item.factorTotalPrice,
                 item.toCompanySettlement,
@@ -200,8 +173,8 @@ const SendData = () => {
               sendServiceData(
                 selector.token,
                 item.projectId,
-                convertResultTitleToNum(item.serviceResult),
-                convertTypeTitleToNum(item.serviceType),
+                item.serviceResult,
+                item.serviceType,
                 item.factorReceivedPrice,
                 item.factorTotalPrice,
                 item.toCompanySettlement,

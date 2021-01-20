@@ -60,7 +60,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
     return () => backHandler.remove();
   });
 
-  const renderCheckbox = (title, checkboxPurpose) => {
+  const renderCheckbox = (title, checkboxPurpose, code) => {
     return (
       <View style={Styles.checkboxContainerStyle}>
         <Text style={Styles.checkboxTextStyle}>{title}</Text>
@@ -69,21 +69,21 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             if (checkboxPurpose === 'result') {
               setInfo({
                 ...info,
-                serviceResult: title,
+                serviceResult: code,
               });
             } else {
               setInfo({
                 ...info,
-                serviceType: title,
+                serviceType: code,
               });
             }
           }}
           isChecked={
             checkboxPurpose === 'result'
-              ? info.serviceResult == title
+              ? info.serviceResult == code
                 ? true
                 : false
-              : info.serviceType == title
+              : info.serviceType == code
               ? true
               : false
           }
@@ -265,9 +265,9 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                 )}
               <Text style={Styles.serviceTypeTextStyle}>نوع سرویس:</Text>
             </View>
-            {renderCheckbox('خرابی یا تعویض قطعه', 'type')}
-            {renderCheckbox('ایراد نصب و تنظیم روتین', 'type')}
-            {renderCheckbox('تنظیم و عیب غیرروتین', 'type')}
+            {renderCheckbox('خرابی یا تعویض قطعه', 'type',1 )}
+            {renderCheckbox('ایراد نصب و تنظیم روتین', 'type',2)}
+            {renderCheckbox('تنظیم و عیب غیرروتین', 'type',3)}
           </View>
           <View style={Styles.servicetypeContainerStyle}>
             <View
@@ -279,12 +279,12 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               <Icon name={'star'} style={{color: 'red'}} />
               <Text style={Styles.serviceTypeTextStyle}>نتیجه سرویس:</Text>
             </View>
-            {renderCheckbox('موفق', 'result')}
-            {renderCheckbox('موفق مشکوک', 'result')}
-            {renderCheckbox('سرویس جدید- کسری قطعات', 'result')}
-            {renderCheckbox('سرویس جدید- آماده نبودن پروژه', 'result')}
-            {renderCheckbox('سرویس جدید- عدم تسلط', 'result')}
-            {renderCheckbox('لغو موفق', 'result')}
+            {renderCheckbox('موفق', 'result', 1)}
+            {renderCheckbox('موفق مشکوک', 'result',2)}
+            {renderCheckbox('سرویس جدید- کسری قطعات', 'result',3)}
+            {renderCheckbox('سرویس جدید- آماده نبودن پروژه', 'result',4)}
+            {renderCheckbox('سرویس جدید- عدم تسلط', 'result',5)}
+            {renderCheckbox('لغو موفق', 'result',6)}
           </View>
         </View>
         {showDatePicker && (
