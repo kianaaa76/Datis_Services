@@ -18,7 +18,6 @@ const SendData = () => {
     setInterval(()=>{
     AsyncStorage.getItem('savedServicesList').then(list => {
       if (!!list) {
-        console.warn("list");
         JSON.parse(list).map(item => {
           if (
             item.saveType === 'network' &&

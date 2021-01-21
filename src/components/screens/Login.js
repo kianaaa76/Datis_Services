@@ -9,7 +9,6 @@ import {
   Dimensions,
   Image,
   ScrollView,
-  ToastAndroid,
   ActivityIndicator,
   StatusBar,
 } from 'react-native';
@@ -18,6 +17,8 @@ import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
 import {toFaDigit, normalize} from '../utils/utilities';
 import {loginUser, loginVerification} from '../../actions/api';
+import Toast from 'react-native-simple-toast';
+
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -52,11 +53,7 @@ const Login = ({navigation}) => {
           return () => clearInterval(counterInterval);
         }, 1000);
       } else {
-        ToastAndroid.showWithGravity(
-          data.message,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
       }
       setReceiveCodeLoading(false);
     });
@@ -66,19 +63,11 @@ const Login = ({navigation}) => {
     setEnterSystemLoading(true);
     if (counter == 0) {
       setEnterSystemLoading(false);
-      ToastAndroid.showWithGravity(
-        'لطفا مجددا درخواست کد فعالسازی دهید.',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
+      Toast.showWithGravity('لطفا مجددا درخواست کد فعالسازی دهید.', Toast.LONG, Toast.CENTER);
     } else {
       if (code.length !== 4) {
         setEnterSystemLoading(false);
-        ToastAndroid.showWithGravity(
-          'کد فعالسازی نادرست است.',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity('کد فعالسازی نادرست است.', Toast.LONG, Toast.CENTER);
       } else {
         loginVerification(phoneNumber, code).then(data => {
           if (data.errorCode === 0) {
@@ -100,11 +89,7 @@ const Login = ({navigation}) => {
               type: LOGOUT,
             });
             setEnterSystemLoading(false);
-            ToastAndroid.showWithGravity(
-              'کد وارد شده صحیح نیست.',
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity('کد وارد شده صحیح نیست.', Toast.LONG, Toast.CENTER);
           }
         });
       }

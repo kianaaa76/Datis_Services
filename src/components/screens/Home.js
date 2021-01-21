@@ -12,7 +12,6 @@ import {
   Keyboard,
   Linking,
   Alert,
-  ToastAndroid,
   TouchableHighlight,
   ActivityIndicator,
 } from 'react-native';
@@ -27,8 +26,11 @@ import {
   LOGOUT,
   SET_USER_LIST,
 } from '../../actions/types';
+import {MAPBOX_API_KEY} from "../../actions/types";
 import {call, getObjects, getUsers} from '../../actions/api';
 import {normalize} from '../utils/utilities';
+import Toast from 'react-native-simple-toast';
+
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -76,6 +78,17 @@ const Home = ({navigation}) => {
       setChangeUserLoading(false);
     }
   }, []);
+
+  useEffect(()=>{
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/تهران.json?access_token=${MAPBOX_API_KEY}&language=ar`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': MAPBOX_API_KEY,
+      },
+    },).then(response => response.json()).then(data=>console.warn("JJJJ", data))
+  },[]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -163,11 +176,7 @@ const Home = ({navigation}) => {
         });
         navigation.navigate('SignedOut');
       } else {
-        ToastAndroid.showWithGravity(
-          data.message,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
       }
     });
   };
@@ -305,11 +314,7 @@ const Home = ({navigation}) => {
             </View>
             <View style={Styles.SingleRowStyle}>
               {renderHomeItems('انبارداری', images[4], () => {
-                ToastAndroid.showWithGravity(
-                  'این قسمت بعدا اضافه خواهد شد.',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
+                Toast.showWithGravity('این قسمت بعدا اضافه خواهد شد.', Toast.LONG, Toast.CENTER);
               })}
               {renderHomeItems('ماموریت‌های من', images[5], () => {
                 navigation.navigate('Mission');
