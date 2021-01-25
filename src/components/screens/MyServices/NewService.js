@@ -92,7 +92,7 @@ const NewService = ({navigation}) => {
             <View style={Styles.iconContainerStyle}>
               {PhoneIcon({
                 color:"#000",
-                onPress: getPhoneByContacts,
+                onPress: ()=>getPhoneByContacts(),
                 width:25,
                 height:25
               })}

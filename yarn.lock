@@ -748,6 +748,13 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@expo/vector-icons@^4.0.0":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@expo/vector-icons/-/vector-icons-4.1.1.tgz#d9da106cde232254cccfc816f4f86cad2d6f1269"
+  integrity sha1-2doQbN4jIlTMz8gW9PhsrS1vEmk=
+  dependencies:
+    react-native-vector-icons "4.1.1"
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"
