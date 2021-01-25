@@ -17,8 +17,6 @@ import {
 } from 'react-native';
 import backgroundImage from '../../../assets/images/background_main_activity.jpg';
 import Header from '../common/Header';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import {
   GET_OBJECTS_LIST,
@@ -26,10 +24,10 @@ import {
   LOGOUT,
   SET_USER_LIST,
 } from '../../actions/types';
-import {MAPBOX_API_KEY} from "../../actions/types";
 import {call, getObjects, getUsers} from '../../actions/api';
 import {normalize} from '../utils/utilities';
 import Toast from 'react-native-simple-toast';
+import {MenuIcon, SearchIcon} from "../../assets/icons";
 
 
 const pageHeight = Dimensions.get('screen').height;
@@ -79,16 +77,6 @@ const Home = ({navigation}) => {
     }
   }, []);
 
-  useEffect(()=>{
-    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/تهران.json?access_token=${MAPBOX_API_KEY}&language=ar`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': MAPBOX_API_KEY,
-      },
-    },).then(response => response.json()).then(data=>console.warn("JJJJ", data))
-  },[]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -193,18 +181,22 @@ const Home = ({navigation}) => {
           style={{flex: 1, backgroundColor: 'transparent'}}
           keyboardShouldPersistTaps="handled">
           <Header
-            rightIcon={
-              <MaterialIcons
-                name={'menu'}
-                onPress={() => navigation.openDrawer()}
-                style={{
-                  fontSize: normalize(23),
-                  color: '#fff',
-                  marginLeft: 10,
-                }}
-              />
-            }
-            headerText="داتیس سرویس"
+            rightIcon={(
+              <TouchableOpacity style={{flexDirection:"row"}} onPress={()=>navigation.openDrawer()}>
+                <Text style={{fontSize: normalize(15),
+                  color: "#dadfe1",
+                  fontFamily:"IRANSansMobile"}}>
+                  داتیس سرویس
+                </Text>
+                {MenuIcon({
+                  color: "#fff",
+                  style: {
+                    fontSize: normalize(23),
+                    marginLeft: 10,
+                  }
+                })}
+              </TouchableOpacity>
+            )}
             leftIcon={
               selector.constantUserId == 40 ||
               selector.constantUserId == 41 ||
@@ -247,14 +239,14 @@ const Home = ({navigation}) => {
                     width: '100%',
                   }}
                 />
-                <Icon
-                  name={'search'}
-                  style={{
-                    fontSize: normalize(20),
-                    color: 'gray',
-                    marginLeft: 5,
-                  }}
-                />
+                {SearchIcon({
+                  color:"#000",
+                  width:20,
+                  height:20,
+                  style:{
+                    marginLeft: 5
+                  }
+                })}
               </View>
               <FlatList
                 data={ShowinUserList}

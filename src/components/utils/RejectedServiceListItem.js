@@ -5,9 +5,9 @@ import {
   TouchableWithoutFeedback,
   Text,
   Dimensions,
-  ToastAndroid,
   Alert,
 } from 'react-native';
+import Toast from "react-native-simple-toast";
 import {useDispatch, useSelector} from 'react-redux';
 import {toFaDigit, normalize} from './utilities';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -15,7 +15,6 @@ import {LOGOUT, RESTORE_SERVICE_DATA} from '../../actions/types';
 import {rejectedServiceDetail} from '../../actions/api';
 
 const pageWidth = Dimensions.get('screen').width;
-const pageHeight = Dimensions.get('screen').height;
 
 const RejectedServiceListItem = ({
   item,
@@ -27,21 +26,6 @@ const RejectedServiceListItem = ({
   const Item = item.item;
   const dispatch = useDispatch();
   const selector = useSelector(state => state);
-  const [isNetworkSaved, setIsNetworkSaved] = useState(false);
-
-  useEffect(() => {
-    AsyncStorage.getItem('savedServicesList').then(list => {
-      if (!!list) {
-        JSON.parse(list).map(item => {
-          if (item.projectId === Item.projectID) {
-            if (item.saveType === 'network') {
-              setIsNetworkSaved(true);
-            }
-          }
-        });
-      }
-    });
-  }, []);
 
   return (
     <TouchableWithoutFeedback
@@ -158,11 +142,7 @@ const RejectedServiceListItem = ({
                     navigation.navigate('SignedOut');
                   } else {
                     renderLoading(false);
-                    ToastAndroid.showWithGravity(
-                      data.message,
-                      ToastAndroid.SHORT,
-                      ToastAndroid.CENTER,
-                    );
+                    Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                   }
                 })
                 .catch((err) => {
@@ -275,11 +255,7 @@ const RejectedServiceListItem = ({
                   navigation.navigate('SignedOut');
                 } else {
                   renderLoading(false);
-                  ToastAndroid.showWithGravity(
-                    data.message,
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
-                  );
+                  Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                 }
               })
               .catch(() => {
@@ -297,8 +273,7 @@ const RejectedServiceListItem = ({
       <View
         style={{
           width: pageWidth * 0.9,
-          // height: pageHeight * 0.13,
-          backgroundColor: isNetworkSaved ? '#3399FF' : '#fff',
+          backgroundColor: '#fff',
           paddingHorizontal: 6,
           paddingVertical: 2,
           justifyContent: 'center',

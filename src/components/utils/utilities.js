@@ -36,29 +36,3 @@ export function toFaDigit(input) {
   return returnModel;
 }
 
-export function addDotsToPrice(price) {
-  if (price.length > 0) {
-    let removedDots = price.split('.').join("");
-    let reverseString = removedDots
-      .split('')
-      .reverse()
-      .join('');
-    reverseString = reverseString.match(/.{1,3}/g);
-    stringSplited = reverseString.reverse();
-    let finalString = '';
-    stringSplited.map((item, index) => {
-      finalString = finalString.concat(
-        item
-          .split('')
-          .reverse()
-          .join(''),
-      );
-      if (index != stringSplited.length - 1) {
-        finalString = finalString.concat('.');
-      }
-    });
-    return finalString;
-  } else {
-    return price;
-  }
-}

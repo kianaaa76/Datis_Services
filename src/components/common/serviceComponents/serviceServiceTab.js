@@ -9,12 +9,9 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   BackHandler,
-  ToastAndroid,
 } from 'react-native';
+import Toast from "react-native-simple-toast";
 import CheckBox from 'react-native-check-box';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import Foundation from 'react-native-vector-icons/Foundation';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../ImageViwer';
 import JalaliCalendarPicker from 'react-native-jalali-calendar-picker';
@@ -24,6 +21,14 @@ import MapboxGL from '@react-native-mapbox-gl/maps';
 import {API_KEY} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
+import {
+  CalendarIcon,
+  CameraIcon, CrossIcon, CurrentLocationIcon, DeleteIcon,
+  MapMarkerIcon,
+  SearchLocationIcon,
+  StarIcon,
+  UploadFileIcon
+} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -112,7 +117,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               flexDirection: 'row',
               justifyContent: 'flex-end',
             }}>
-            <Icon name={'star'} style={{color: 'red'}} />
+            {StarIcon()}
             <Text style={Styles.labelStyle}>توضیحات:</Text>
           </View>
           <TextInput
@@ -125,15 +130,14 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           />
         </View>
         <View style={Styles.addressRowStyle}>
-          <Icon
-            name={'location-searching'}
-            style={{color: '#000', fontSize: normalize(20)}}
-            onPress={() => {
-              setSelectedLongitude('');
-              setSelectedLatitude('');
-              setScreenMode('map');
-            }}
-          />
+          {SearchLocationIcon({
+            color:'#000',
+            onPress:() => {
+            setSelectedLongitude('');
+            setSelectedLatitude('');
+            setScreenMode('map');
+          }
+          })}
           <TextInput
             style={Styles.textInputStyle}
             onChangeText={text => {
@@ -145,58 +149,51 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
         </View>
         <View style={Styles.imageRowStyle}>
           <View style={Styles.getImageContainerViewStyle}>
-            <Icon
-              name={'camera-alt'}
-              style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() => {
-                try {
-                  ImagePicker.openCamera({
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setInfo({...info, image: response.data});
-                  });
-                } catch {
-                  ToastAndroid.showWithGravity(
-                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
-                  );
+            {CameraIcon({
+              onPress:() => {
+              try {
+              ImagePicker.openCamera({
+              width: pageWidth - 20,
+              height: pageHeight * 0.7,
+              includeBase64: true,
+              compressImageQuality: 0.7,
+            }).then(response => {
+              setInfo({...info, image: response.data});
+            });
+            } catch {
+              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+            }
+            },
+              color:"#000",
+              height:30,
+              width:30
+            })}
+            {UploadFileIcon({
+              onPress:() => {
+              try {
+              ImagePicker.openPicker({
+              width: pageWidth - 20,
+              height: pageHeight * 0.7,
+              includeBase64: true,
+              compressImageQuality: 0.7,
+            }).then(response => {
+              setInfo({...info, image: response.data});
+            });
+            } catch {
+              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+            }
+            },
+              color:"#000"
+            })}
+            {!!info.image && DeleteIcon(
+                {
+                  color:"#000",
+                  width:28,
+                  height:28,
+                  onPress:() => {
+                    setDeletingImage(3);
+                  }
                 }
-              }}
-            />
-            <Icon
-              name={'file-upload'}
-              style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() => {
-                try {
-                  ImagePicker.openPicker({
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setInfo({...info, image: response.data});
-                  });
-                } catch {
-                  ToastAndroid.showWithGravity(
-                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
-                  );
-                }
-              }}
-            />
-            {!!info.image && (
-              <Icon
-                name={'delete'}
-                style={{color: '#000', fontSize: normalize(30)}}
-                onPress={() => {
-                  setDeletingImage(3);
-                }}
-              />
             )}
           </View>
           <View style={{width: 70}}>
@@ -211,14 +208,15 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           />
         )}
         <View style={Styles.datePickerRowStyle}>
-          <FontAwesomeIcon
-            name={'calendar'}
-            style={{color: '#000', fontSize: normalize(30)}}
-            onPress={() => {
-              setDateIsSelected(false);
-              setShowDatePicke(true);
-            }}
-          />
+          {CalendarIcon({
+            width:30,
+            height:30,
+            color:"#000",
+            onPress:() => {
+            setDateIsSelected(false);
+            setShowDatePicke(true);
+          }
+          })}
           <View
             style={{
               width: pageWidth * 0.5,
@@ -238,12 +236,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             )}
             {info.serviceResult !== 'لغو موفق' &&
               info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' &&
-              info.serviceResult !== 'سرویس جدید- کسری قطعات' && (
-                <Icon
-                  name={'star'}
-                  style={{color: 'red', fontSize: normalize(10)}}
-                />
-              )}
+              info.serviceResult !== 'سرویس جدید- کسری قطعات' && StarIcon()}
             <Text style={Styles.labelStyle}>تاریخ انجام پروژه:</Text>
           </View>
         </View>
@@ -257,12 +250,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               }}>
               {info.serviceResult !== 'لغو موفق' &&
                 info.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' &&
-                info.serviceResult !== 'سرویس جدید- کسری قطعات' && (
-                  <Icon
-                    name={'star'}
-                    style={{color: 'red', fontSize: normalize(10)}}
-                  />
-                )}
+                info.serviceResult !== 'سرویس جدید- کسری قطعات' && StarIcon()}
               <Text style={Styles.serviceTypeTextStyle}>نوع سرویس:</Text>
             </View>
             {renderCheckbox('خرابی یا تعویض قطعه', 'type',1 )}
@@ -276,7 +264,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                 flexDirection: 'row',
                 justifyContent: 'flex-end',
               }}>
-              <Icon name={'star'} style={{color: 'red'}} />
+              {StarIcon()}
               <Text style={Styles.serviceTypeTextStyle}>نتیجه سرویس:</Text>
             </View>
             {renderCheckbox('موفق', 'result', 1)}
@@ -422,7 +410,10 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                     backgroundColor: 'transparent',
                     height: 100,
                   }}>
-                  <Foundation name="marker" color="red" size={45} />
+                  {MapMarkerIcon({
+                    color:"red",
+                    fill:"red"
+                  })}
                 </View>
               </View>
             </MapboxGL.MarkerView>
@@ -460,17 +451,14 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
               await cameraRef.zoomTo(11, 500);
             })
             .catch(() => {
-              ToastAndroid.showWithGravity(
-                'موقعیت در دسترس نیست.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity('موقعیت در دسترس نیست.', Toast.LONG, Toast.CENTER);
             });
         }}>
-        <Icon
-          name={'my-location'}
-          style={{fontSize: normalize(30), color: '#000'}}
-        />
+        {CurrentLocationIcon({
+          color:"#000",
+          width:27,
+          height:27
+        })}
       </TouchableOpacity>
       <TouchableOpacity
         style={{
@@ -486,7 +474,11 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
           alignItems: 'center',
         }}
         onPress={() => setScreenMode('tab')}>
-        <Icon name="close" style={{fontSize: 30, color: '#000'}} />
+        {CrossIcon({
+          color:"#000",
+          width:27,
+          height:27
+        })}
       </TouchableOpacity>
 
       <View style={Styles.bottomBoxContainerStyle}>

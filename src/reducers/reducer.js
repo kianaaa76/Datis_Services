@@ -40,7 +40,6 @@ const INITIAL_STATE = {
     missionDescription: '',
     missionId: '',
     distance: '',
-    saveType: '',
     travel: false,
   },
   editingService: '',
@@ -95,7 +94,6 @@ export default (state = INITIAL_STATE, action) => {
           missionDescription: '',
           missionId: '',
           distance: '',
-          saveType: '',
           travel: false,
         },
         editingService: '',
@@ -124,7 +122,6 @@ export default (state = INITIAL_STATE, action) => {
           missionDescription: action.savedServiceInfo.missionDescription,
           missionId: action.savedServiceInfo.missionId,
           distance: action.savedServiceInfo.distance,
-          saveType: action.savedServiceInfo.saveType,
           travel: action.savedServiceInfo.travel,
         },
       };

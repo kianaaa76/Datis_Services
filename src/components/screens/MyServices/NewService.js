@@ -8,16 +8,16 @@ import {
   Dimensions,
   TextInput,
   PermissionsAndroid,
-  ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-simple-toast';
 import {normalize} from '../../utils/utilities';
 import {selectContactPhone} from 'react-native-select-contact';
 import {useSelector, useDispatch} from 'react-redux';
 import Header from '../../common/Header';
 import {submitNewService} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
+import {PhoneIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -64,11 +64,7 @@ const NewService = ({navigation}) => {
             });
             navigation.navigate('SignedOut');
           } else {
-            ToastAndroid.showWithGravity(
-              data.message,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER)
           }
           setConfirmLoading(false);
         }
@@ -94,11 +90,12 @@ const NewService = ({navigation}) => {
           </Text>
           <View style={Styles.nameRowInputStyle}>
             <View style={Styles.iconContainerStyle}>
-              <FontAwesome
-                name={'phone'}
-                style={{color: '#000', fontSize: normalize(30)}}
-                onPress={getPhoneByContacts}
-              />
+              {PhoneIcon({
+                color:"#000",
+                onPress: getPhoneByContacts,
+                width:25,
+                height:25
+              })}
             </View>
             <TextInput
               placeholder={'نام و نام خانوادگی'}

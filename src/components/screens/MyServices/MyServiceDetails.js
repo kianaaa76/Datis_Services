@@ -3,17 +3,16 @@ import {
   View,
   Dimensions,
   StyleSheet,
-  ToastAndroid,
   ActivityIndicator,
   Text,
   TouchableOpacity,
   TouchableHighlight,
   Alert,
 } from 'react-native';
+import Toast from "react-native-simple-toast";
 import AsyncStorage from '@react-native-community/async-storage';
 import {TabView, TabBar} from 'react-native-tab-view';
 import Header from '../../common/Header';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useSelector, useDispatch} from 'react-redux';
 import {getServiceDetails, sendServiceData} from '../../../actions/api';
@@ -22,6 +21,7 @@ import {
   LOGOUT,
   SET_EDITING_SERVICE,
 } from '../../../actions/types';
+import {SaveIcon, CheckIcon} from "../../../assets/icons";
 import {normalize} from '../../utils/utilities';
 import ServiceInfoTab from '../../common/serviceComponents/serviceInfoTab';
 import ServiceFactorTab from '../../common/serviceComponents/serviceFactorTab';
@@ -147,7 +147,7 @@ const MyServiceDetails = ({navigation}) => {
     });
   };
 
-  const onSavePress = type => {
+  const onSavePress = () => {
     AsyncStorage.getItem('savedServicesList').then(list => {
       let savedList = !!list
         ? JSON.parse(list).filter(item => item.projectId != serviceID)
@@ -171,7 +171,6 @@ const MyServiceDetails = ({navigation}) => {
         endCity: missionTabInfo.endCity,
         missionDescription: missionTabInfo.missionDescription,
         distance: missionTabInfo.distance,
-        saveType: type,
         isRejectedService: false,
         travel: missionTabInfo.travel,
       });
@@ -371,11 +370,7 @@ const MyServiceDetails = ({navigation}) => {
                 editingService: '',
               });
               navigation.replace('MyServices');
-              ToastAndroid.showWithGravity(
-                'سرویس شما با موفقیت بسته شد.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER);
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
@@ -388,11 +383,7 @@ const MyServiceDetails = ({navigation}) => {
               navigation.navigate('SignedOut');
             } else {
               setRequestLoading(false);
-              ToastAndroid.showWithGravity(
-                data.message,
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
             }
           })
           .catch(err => {
@@ -463,11 +454,7 @@ const MyServiceDetails = ({navigation}) => {
                 editingService: '',
               });
               navigation.replace('MyServices');
-              ToastAndroid.showWithGravity(
-                'سرویس شما با موفقیت بسته شد.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER);
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
@@ -480,11 +467,7 @@ const MyServiceDetails = ({navigation}) => {
               navigation.navigate('SignedOut');
             } else {
               setRequestLoading(false);
-              ToastAndroid.showWithGravity(
-                data.message,
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
             }
           })
           .catch(err => {
@@ -537,11 +520,7 @@ const MyServiceDetails = ({navigation}) => {
             type: GET_SERVICE_DETAIL,
             selectedService: null,
           });
-          ToastAndroid.showWithGravity(
-            data.message,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
         }
         setDetailsLoading(false);
       }
@@ -623,22 +602,24 @@ const MyServiceDetails = ({navigation}) => {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <Icon
-              name="check"
-              style={{
-                fontSize: normalize(33),
-                color: '#dadfe1',
-              }}
-              onPress={() => setRenderConfirmModal(true)}
-            />
-            <Icon
-              name="save"
-              style={{
-                fontSize: normalize(33),
-                color: '#dadfe1',
-              }}
-              onPress={() => onSavePress('self')}
-            />
+            {CheckIcon({
+              color:"#fff",
+              width:30,
+              height:30,
+              onPress:() => setRenderConfirmModal(true),
+              style:{
+                fontSize:30
+              }
+            })}
+            {SaveIcon({
+              color:"#fff",
+              onPress:() => onSavePress(),
+              width:30,
+              height:30,
+              style:{
+                fontSize:50
+              }
+            })}
           </View>
         }
       />
@@ -730,7 +711,7 @@ const MyServiceDetails = ({navigation}) => {
               <TouchableOpacity
                 style={Styles.modalButtonStyle}
                 onPress={() => {
-                  onSavePress('self');
+                  onSavePress();
                 }}>
                 <Text style={Styles.modalButtonTextStyle}>بله</Text>
               </TouchableOpacity>
@@ -756,7 +737,7 @@ const MyServiceDetails = ({navigation}) => {
             <View style={Styles.modalFooterContainerStyle}>
               <TouchableOpacity
                 style={Styles.modalButtonStyle2}
-                onPress={() => onSavePress('network')}>
+                onPress={() => onSavePress()}>
                 <Text style={Styles.modalButtonTextStyle}>ذخیره</Text>
               </TouchableOpacity>
               <TouchableOpacity

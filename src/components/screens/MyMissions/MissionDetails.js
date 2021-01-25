@@ -3,9 +3,8 @@ import {View, StyleSheet, Dimensions, Text, BackHandler} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Header from '../../common/Header';
 import {toFaDigit, normalize} from '../../utils/utilities';
-import Icon from 'react-native-vector-icons/Foundation';
+import {MapMarkerIcon} from "../../../assets/icons";
 
-const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
 const MissionDetails = ({navigation}) => {
@@ -55,9 +54,12 @@ const MissionDetails = ({navigation}) => {
             height: 100,
             zIndex: -9999,
           }}>
-          <Icon name="marker" color={color} size={size} />
+          {MapMarkerIcon({
+            color:color,
+            fill:color
+          })}
           <Text style={Styles.markerLabelStyle}>
-            {type == 'start' ? 'مبدا' : 'مقصد'}
+            {type === 'start' ? 'مبدا' : 'مقصد'}
           </Text>
         </View>
       </MapboxGL.MarkerView>

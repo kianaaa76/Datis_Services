@@ -6,26 +6,25 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
-  ToastAndroid,
   Text,
   TouchableHighlight,
   Alert,
   BackHandler,
 } from 'react-native';
+import Toast from 'react-native-simple-toast';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useSelector, useDispatch} from 'react-redux';
 import Header from '../../common/Header';
 import {normalize} from '../../utils/utilities';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import ServiceListItem from '../../utils/MyServiceListItem';
-import Octicons from 'react-native-vector-icons/Octicons';
 import {getMyServicesList} from '../../../actions/api';
 import {
   LOGOUT,
   RESTORE_SERVICE_DATA,
   SET_EDITING_SERVICE,
 } from '../../../actions/types';
+import {RefreshIcon, PlusIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -168,11 +167,7 @@ const MyService = ({navigation}) => {
             });
             navigation.navigate('SignedOut');
           } else {
-            ToastAndroid.showWithGravity(
-              data.message,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER)
           }
         }
         setServiceListLoading(false);
@@ -189,14 +184,13 @@ const MyService = ({navigation}) => {
       <Header
         headerText="سرویس های من"
         leftIcon={
-          <Icon
-            name="refresh"
-            style={{
-              fontSize: normalize(30),
-              color: '#dadfe1',
-            }}
-            onPress={() => getMyServices(selector.userId, selector.token)}
-          />
+          RefreshIcon({
+            color:"#fff",
+            onPress:() => getMyServices(selector.userId, selector.token),
+              style:{
+                fontSize: normalize(30)
+              }
+          })
         }
       />
       {serviceListLoading ? (
@@ -226,13 +220,12 @@ const MyService = ({navigation}) => {
             onPress={() => {
               navigation.navigate('NewService');
             }}>
-            <Octicons
-              name="plus"
-              style={{
-                fontSize: normalize(33),
-                color: '#dadfe1',
-              }}
-            />
+            {PlusIcon({
+              color:"#fff",
+              width:30,
+              height:30
+
+            })}
           </TouchableOpacity>
           {renderRestoreModal && (
             <TouchableHighlight

@@ -7,16 +7,16 @@ import {
   TextInput,
   Switch,
   BackHandler,
-  ToastAndroid,
   Alert,
+  ActivityIndicator,
+  Keyboard
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import Icon from 'react-native-vector-icons/Foundation';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Toast from 'react-native-simple-toast';
 import {API_KEY, MAPBOX_API_KEY} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
+import {CurrentLocationIcon, SearchIcon, MapMarkerIcon, RemoveMarkerIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -26,7 +26,6 @@ const ServiceMissionTab = ({
   info,
   setInfo,
   renderSaveModal,
-  navigation,
   isRejected,
 }) => {
   const [startLocation, setStartLocation] = useState({
@@ -43,6 +42,9 @@ const ServiceMissionTab = ({
   const [startCity, setStartCity] = useState(info.startCity);
   const [endCity, setEndCity] = useState(info.endCity);
   const [travel, setTravel] = useState(info.travel);
+  const [searchText, setSearchText] = useState("");
+  const [searchLoading,setSearchLoading] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [distance, setDistance] = useState(
     (parseFloat(info.distance) / 1000)
       .toString()
@@ -64,6 +66,26 @@ const ServiceMissionTab = ({
     return () => backHandler.remove();
   });
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+        'keyboardDidShow',
+        () => {
+          setKeyboardVisible(true);
+        },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+        'keyboardDidHide',
+        () => {
+          setKeyboardVisible(false);
+        },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   const renderMarker = (latitude, longitude, color, size, id, type) => {
     return (
       <View>
@@ -76,7 +98,10 @@ const ServiceMissionTab = ({
                 backgroundColor: 'transparent',
                 height: 100,
               }}>
-              <Icon name="marker" color={color} size={size} />
+              {MapMarkerIcon({
+                color:color,
+                fill: color
+              })}
               <Text style={Styles.markerLabelStyle}>
                 {type === 'start' ? 'مبدا' : 'مقصد'}
               </Text>
@@ -191,6 +216,24 @@ const ServiceMissionTab = ({
     }
   };
 
+  const handleSearchOnMap = () => {
+    setSearchLoading(true);
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${searchText.replace(" ", /%20/g)}.json?access_token=${MAPBOX_API_KEY}&language=ar&country=IR`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': MAPBOX_API_KEY,
+          },
+        }).then(response => response.json()).then(data=> {
+          setSearchLoading(false);
+      cameraRef.moveTo(data.features[0].geometry.coordinates);
+      cameraRef.zoomTo(8);
+      Keyboard.dismiss();
+    }).catch(err=>
+        Toast.showWithGravity('مکان مورد نظر یافت نشد.', Toast.LONG, Toast.CENTER))
+  }
+
   return (
     <View style={Styles.containerStyle}>
       <MapboxGL.MapView
@@ -257,17 +300,21 @@ const ServiceMissionTab = ({
           )}
       </MapboxGL.MapView>
       {!isRejected &&
-        (!startLocation.startLongitude || !endLocation.endLongitude) && (
-          <View style={Styles.headerTextContainerStyle}>
-            <Text style={Styles.headerTextStyle}>
-              {!!startLocation.startLatitude
-                ? !!endLocation.endLatitude
-                  ? null
-                  : 'لطفا مقصد ماموریت را انتخاب کنید.'
-                : 'لطفا مبدا ماموریت را انتخاب کنید.'}
-            </Text>
-          </View>
-        )}
+      (!startLocation.startLongitude || !endLocation.endLongitude) && (
+          <View style={Styles.searchInputContainerStyle}>
+        <View style={Styles.searchInputContentContainerStyle} elevation={5}>
+          <TextInput style={{width: "80%", height: "100%"}}
+                     placeholder={"نام شهر مورد نظر خود را جستجو کنید..."}
+                     onChangeText={text=>setSearchText(text)}/>
+          {searchLoading ? (
+              <ActivityIndicator/>
+          ):SearchIcon({
+            onPress:handleSearchOnMap,
+            color: "#000"
+          })}
+        </View>
+      </View>)}
+
       {isRejected && !startLocation.startLongitude ? (
         <View style={Styles.notHaveMissionTextContainerStyle}>
           <Text style={Styles.headerTextStyle}>
@@ -275,24 +322,117 @@ const ServiceMissionTab = ({
           </Text>
         </View>
       ) : null}
-      {(!isRejected || (isRejected && !!startLocation.startLatitude)) && (
-        <View
-          style={[
-            Styles.myLocationContainerStyle,
-            {
-              bottom:
+      {(!isRejected || (isRejected && !!startLocation.startLatitude)) && !isKeyboardVisible && (
+          <View style={{width:"100%", flexDirection:"row",position:"absolute", bottom:
                 !!startLocation.startLatitude && !!endLocation.endLatitude
-                  ? pageHeight * 0.35 + 25
-                  : 20,
-            },
-          ]}>
-          <MaterialIcons
-            name={'my-location'}
-            style={{fontSize: normalize(30), color: '#000'}}
-            onPress={async () => {
-              LocationServicesDialogBox.checkLocationServicesIsEnabled({
+                    ? pageHeight * 0.35 + 25
+                    : 20, justifyContent:!startLocation.startLongitude || !endLocation.endLongitude ? "space-around" : isRejected ? "flex-end" : "space-between"}}>
+            {!isRejected && !!startLocation.startLatitude && (
+                <View
+                    style={[
+                      Styles.removeMarkerContainerStyle,
+                      {
+                        marginLeft:!!startLocation.startLatitude && !!endLocation.endLatitude ? 20 : 0
+                      },
+                    ]}>
+                  {RemoveMarkerIcon({
+                    width:30,
+                    height:30,
+                    onPress:() => {
+                    if (!!endLocation.endLatitude) {
+                    Alert.alert('', 'کدام موقعیت را میخواهید حذف کنید؟', [
+                  {
+                    text: 'هیچکدام',
+                    onPress: () => {},
+                  },
+                  {
+                    text: 'مقصد',
+                    onPress: () => {
+                    setEndLocation({});
+                    setEndCity('');
+                    setDistance('');
+                    setInfo({
+                    ...info,
+                    endCity: '',
+                    endLatitude: '',
+                    startLongitude: '',
+                  });
+                  },
+                  },
+                  {
+                    text: 'مبدا و مقصد',
+                    onPress: () => {
+                    setStartLocation({});
+                    setEndLocation({});
+                    setStartCity('');
+                    setEndCity('');
+                    setDistance('');
+                    setInfo({
+                    ...info,
+                    startCity: '',
+                    startLatitude: '',
+                    startLongitude: '',
+                    endCity: '',
+                    endLatitude: '',
+                    distance: '',
+                  });
+                  },
+                    style: 'cancel',
+                  },
+                    ]);
+                  } else {
+                    Alert.alert('', 'آیا از حذف کردن مبدا اطمینان دارید؟', [
+                  {
+                    text: 'خیر',
+                    onPress: () => {},
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'بله',
+                    onPress: () => {
+                    setStartCity('');
+                    setStartLocation({});
+                    setInfo({
+                    ...info,
+                    startCity: '',
+                    startLatitude: '',
+                    startLongitude: '',
+                  });
+                  },
+                  },
+                    ]);
+                  }
+                  }
+                  })}
+                </View>
+            )}
+            {!isRejected &&
+            (!startLocation.startLongitude || !endLocation.endLongitude) && (
+                <>
+                  {!startLocation.startLatitude && ( <View style={{width: 50}}/>)}
+                <View style={Styles.headerTextContainerStyle}>
+                  <Text style={Styles.headerTextStyle}>
+                    {!!startLocation.startLatitude
+                        ? !!endLocation.endLatitude
+                            ? null
+                            : 'لطفا مقصد ماموریت را انتخاب کنید.'
+                        : 'لطفا مبدا ماموریت را انتخاب کنید.'}
+                  </Text>
+                </View>
+                </>
+            )}
+            <View
+              style={[
+                Styles.myLocationContainerStyle,{marginRight:!!startLocation.startLatitude && !!endLocation.endLatitude ? 20 : 0}
+              ]}>
+              {CurrentLocationIcon({
+                color:"red",
+                width:28,
+                height:28,
+                onPress:async () => {
+                LocationServicesDialogBox.checkLocationServicesIsEnabled({
                 message:
-                  "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+                "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
                 ok: 'YES',
                 cancel: 'NO',
                 enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
@@ -303,103 +443,18 @@ const ServiceMissionTab = ({
                 providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
               })
                 .then(async () => {
-                  if (!!cameraRef && !!userLatitude && !!userLongitude) {
-                    await cameraRef.moveTo([userLongitude, userLatitude], 500);
-                    await cameraRef.zoomTo(11, 500);
-                  }
-                })
-                .catch(() => {
-                  ToastAndroid.showWithGravity(
-                    'موقعیت در دسترس نیست.',
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
-                  );
-                });
-            }}
-          />
-        </View>
-      )}
-      {!isRejected && !!startLocation.startLatitude && (
-        <View
-          style={[
-            Styles.removeMarkerContainerStyle,
-            {
-              bottom:
-                !!startLocation.startLatitude && !!endLocation.endLatitude
-                  ? pageHeight * 0.35 + 25
-                  : 20,
-            },
-          ]}>
-          <MaterialCommunityIcons
-            name="map-marker-remove-variant"
-            style={{fontSize: normalize(30), color: '#000'}}
-            onPress={() => {
-              if (!!endLocation.endLatitude) {
-                Alert.alert('', 'کدام موقعیت را میخواهید حذف کنید؟', [
-                  {
-                    text: 'هیچکدام',
-                    onPress: () => {},
-                  },
-                  {
-                    text: 'مقصد',
-                    onPress: () => {
-                      setEndLocation({});
-                      setEndCity('');
-                      setDistance('');
-                      setInfo({
-                        ...info,
-                        endCity: '',
-                        endLatitude: '',
-                        startLongitude: '',
-                      });
-                    },
-                  },
-                  {
-                    text: 'مبدا و مقصد',
-                    onPress: () => {
-                      setStartLocation({});
-                      setEndLocation({});
-                      setStartCity('');
-                      setEndCity('');
-                      setDistance('');
-                      setInfo({
-                        ...info,
-                        startCity: '',
-                        startLatitude: '',
-                        startLongitude: '',
-                        endCity: '',
-                        endLatitude: '',
-                        distance: '',
-                      });
-                    },
-                    style: 'cancel',
-                  },
-                ]);
-              } else {
-                Alert.alert('', 'آیا از حذف کردن مبدا اطمینان دارید؟', [
-                  {
-                    text: 'خیر',
-                    onPress: () => {},
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'بله',
-                    onPress: () => {
-                      setStartCity('');
-                      setStartLocation({});
-                      setInfo({
-                        ...info,
-                        startCity: '',
-                        startLatitude: '',
-                        startLongitude: '',
-                      });
-                    },
-                  },
-                ]);
+                if (!!cameraRef && !!userLatitude && !!userLongitude) {
+                await cameraRef.moveTo([userLongitude, userLatitude], 500);
+                await cameraRef.zoomTo(11, 500);
               }
-            }}
-          />
-        </View>
+              })
+                .catch(() => {
+                Toast.showWithGravity('موقعیت در دسترس نیست.', Toast.LONG, Toast.CENTER)
+              });
+              }
+              })}
+            </View>
+          </View>
       )}
       {!!startLocation.startLongitude && !!endLocation.endLongitude && (
         <View style={Styles.cardContentContainerStyle}>
@@ -479,7 +534,7 @@ const Styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerTextContainerStyle: {
-    width: pageWidth * 0.65,
+    width: "60%",
     height: 50,
     backgroundColor: 'rgba(255,255,255,0.7)',
     borderWidth: 1,
@@ -487,9 +542,6 @@ const Styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    bottom: pageHeight * 0.68,
-    left: pageWidth * 0.2,
   },
   notHaveMissionTextContainerStyle: {
     width: pageWidth,
@@ -616,8 +668,6 @@ const Styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   myLocationContainerStyle: {
-    position: 'absolute',
-    right: 20,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
@@ -627,8 +677,6 @@ const Styles = StyleSheet.create({
     elevation: 5,
   },
   removeMarkerContainerStyle: {
-    position: 'absolute',
-    left: 20,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
@@ -637,6 +685,24 @@ const Styles = StyleSheet.create({
     borderRadius: 25,
     elevation: 5,
   },
+  searchInputContainerStyle:{
+    width:"100%",
+    height:50,
+    position:"absolute",
+    top:10,
+    justifyContent:"center",
+    alignItems:"center",
+    paddingHorizontal:15
+  },
+  searchInputContentContainerStyle:{
+    height:"100%",
+    width:"100%",
+    backgroundColor:"#fff",
+    borderRadius:15,
+    alignItems:"center",
+    justifyContent:"space-around",
+    flexDirection:"row"
+  }
 });
 
 export default ServiceMissionTab;

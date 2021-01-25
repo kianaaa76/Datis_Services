@@ -6,7 +6,6 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
-  ToastAndroid,
   TextInput,
   ActivityIndicator,
   TouchableHighlight,
@@ -14,17 +13,25 @@ import {
   Keyboard,
   BackHandler,
 } from 'react-native';
+import Toast from "react-native-simple-toast";
 import CheckBox from 'react-native-check-box';
-import Octicons from 'react-native-vector-icons/Octicons';
-import Feather from 'react-native-vector-icons/Feather';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial, checkObjectVersion} from '../../../actions/api';
 import RnZxing from 'react-native-rn-zxing';
 import {normalize} from '../../utils/utilities';
 import NumberFormat from "react-number-format";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  BarcodeScannerIcon,
+  CheckIcon,
+  DeleteIcon,
+  MinusIcon,
+  PlusIcon,
+  SearchIcon,
+  StarIcon
+} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -166,27 +173,15 @@ const ServicePartsTab = ({
               setQrScannerLoading(false);
             }
           } else {
-            ToastAndroid.showWithGravity(
-              data.message,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
             setQrScannerLoading(false);
           }
         });
       } else {
-        ToastAndroid.showWithGravity(
-          'کد اسکن شده معتبر نیست.',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity('کد اسکن شده معتبر نیست.', Toast.LONG, Toast.CENTER);
       }
     } catch {
-      ToastAndroid.showWithGravity(
-        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
+      Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
     }
   };
 
@@ -194,11 +189,7 @@ const ServicePartsTab = ({
     try {
       if (!!selectedItemList) {
         if (!selectedItemList.tempPart.value.SerialFormat) {
-          ToastAndroid.showWithGravity(
-            'برای این قطعه نسخه معتبری یافت نشد.',
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);;
         } else {
           setSearchBarcodeLoading(true);
           const object = !!selectedItemList.tempPart
@@ -253,21 +244,13 @@ const ServicePartsTab = ({
                         setSearchBarcodeLoading(false);
                       } else {
                         setSearchBarcodeLoading(false);
-                        ToastAndroid.showWithGravity(
-                          data.message,
-                          ToastAndroid.SHORT,
-                          ToastAndroid.CENTER,
-                        );
+                        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                       }
                     },
                   );
                 } else {
                   setSearchBarcodeLoading(false);
-                  ToastAndroid.showWithGravity(
-                    `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
-                  );
+                  Toast.showWithGravity(`فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`, Toast.LONG, Toast.CENTER);
                 }
               } else if (sserial.length === serialLengthWithoutHeader) {
                 getObjBySerial(
@@ -297,45 +280,25 @@ const ServicePartsTab = ({
                     setSearchBarcodeLoading(false);
                   } else {
                     setSearchBarcodeLoading(false);
-                    ToastAndroid.showWithGravity(
-                      data.message,
-                      ToastAndroid.SHORT,
-                      ToastAndroid.CENTER,
-                    );
+                    Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                   }
                 });
               } else {
                 setSearchBarcodeLoading(false);
-                ToastAndroid.showWithGravity(
-                  `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
+                Toast.showWithGravity(`فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`, Toast.LONG, Toast.CENTER);
               }
             } else {
               setSearchBarcodeLoading(false);
-              ToastAndroid.showWithGravity(
-                'برای این قطعه باید نسخه را به صورت دستی وارد کنید.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity('برای این قطعه باید نسخه را به صورت دستی وارد کنید.', Toast.LONG, Toast.CENTER);
             }
           } else {
             setSearchBarcodeLoading(false);
-            ToastAndroid.showWithGravity(
-              'لطفا نوع قطعه و سریال را مشخص کنید.',
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity('لطفا نوع قطعه و سریال را مشخص کنید.', Toast.LONG, Toast.CENTER);
           }
         }
       } else {
         if (!fieldsObject.partTypeSelected.value.SerialFormat) {
-          ToastAndroid.showWithGravity(
-            'برای این قطعه نسخه معتبری یافت نشد.',
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);
         } else {
           setSearchBarcodeLoading(true);
           const object = !!fieldsObject.partTypeSelected
@@ -380,21 +343,13 @@ const ServicePartsTab = ({
                         setSearchBarcodeLoading(false);
                       } else {
                         setSearchBarcodeLoading(false);
-                        ToastAndroid.showWithGravity(
-                          data.message,
-                          ToastAndroid.SHORT,
-                          ToastAndroid.CENTER,
-                        );
+                        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                       }
                     },
                   );
                 } else {
                   setSearchBarcodeLoading(false);
-                  ToastAndroid.showWithGravity(
-                    `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
-                  );
+                  Toast.showWithGravity(`فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`, Toast.LONG, Toast.CENTER);
                 }
               } else if (sserial.length === serialLengthWithoutHeader) {
                 getObjBySerial(
@@ -418,45 +373,25 @@ const ServicePartsTab = ({
                     setSearchBarcodeLoading(false);
                   } else {
                     setSearchBarcodeLoading(false);
-                    ToastAndroid.showWithGravity(
-                      data.message,
-                      ToastAndroid.SHORT,
-                      ToastAndroid.CENTER,
-                    );
+                    Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                   }
                 });
               } else {
                 setSearchBarcodeLoading(false);
-                ToastAndroid.showWithGravity(
-                  `فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`,
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
+                Toast.showWithGravity(`فرمت سریال وارد شده صحیح نیست. سریال باید به فرم ${leftOfSerialFormat}${serialFormatHeader} وارد شود.`, Toast.LONG, Toast.CENTER);
               }
             } else {
               setSearchBarcodeLoading(false);
-              ToastAndroid.showWithGravity(
-                'برای این قطعه باید نسخه را به صورت دستی وارد کنید.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity('برای این قطعه باید نسخه را به صورت دستی وارد کنید.', Toast.LONG, Toast.CENTER);
             }
           } else {
             setSearchBarcodeLoading(false);
-            ToastAndroid.showWithGravity(
-              'لطفا نوع قطعه و سریال را مشخص کنید.',
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity('لطفا نوع قطعه و سریال را مشخص کنید.', Toast.LONG, Toast.CENTER);
           }
         }
       }
     } catch (err) {
-      ToastAndroid.showWithGravity(
-        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
+      Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
       setSearchBarcodeLoading(false);
     }
   };
@@ -569,17 +504,13 @@ const ServicePartsTab = ({
                   Item.index,
                 )
               }>
-              {Item.isExpanded ? (
-                <Feather
-                  name={'minus'}
-                  style={{color: '#fff', fontSize: normalize(17)}}
-                />
-              ) : (
-                <Feather
-                  name={'plus'}
-                  style={{color: '#fff', fontSize: normalize(17)}}
-                />
-              )}
+              {Item.isExpanded ? MinusIcon({
+                color:"#fff"
+              })
+               : PlusIcon({
+                    color:"#fff"
+                  })
+              }
             </TouchableOpacity>
             <Text
               style={{
@@ -599,17 +530,11 @@ const ServicePartsTab = ({
               }}>
               {!!Item.partType ? Item.partType.label : 'نام'}
             </Text>
-            {Item.objectType == 'new' ? (
-              <FontAwesome5
-                name={'arrow-right'}
-                style={{color: 'green', fontSize: normalize(20)}}
-              />
-            ) : (
-              <FontAwesome5
-                name={'arrow-left'}
-                style={{color: 'red', fontSize: normalize(20)}}
-              />
-            )}
+            {Item.objectType == 'new' ? ArrowRightIcon({
+              color:"green"
+            }) : ArrowLeftIcon({
+              color:"red"
+            })}
           </>
         </TouchableHighlight>
         {Item.isExpanded && (
@@ -648,35 +573,28 @@ const ServicePartsTab = ({
             <View style={Styles.serialContainerStyle}>
               {searchBarcodeLoading ? (
                 <ActivityIndicator size={'small'} color={'#000'} />
-              ) : (
-                <Icon
-                  name={'search'}
-                  style={{color: '#000', fontSize: normalize(30)}}
-                  onPress={async () => {
-                    await setSelectedItemList(Item);
-                    searchBarcode(Item);
-                  }}
-                />
-              )}
-              <Icon
-                name={'qr-code-2'}
-                style={{
-                  color: '#000',
-                  fontSize: normalize(30),
-                  marginHorizontal: 5,
-                }}
-                onPress={() => {
-                  try {
-                    RnZxing.showQrReader(data => onSuccess(data));
-                  } catch {
-                    ToastAndroid.showWithGravity(
-                      'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                      ToastAndroid.SHORT,
-                      ToastAndroid.CENTER,
-                    );
-                  }
-                }}
-              />
+              ) : SearchIcon({
+                color:"#000",
+                onPress:async () => {
+                await setSelectedItemList(Item);
+                searchBarcode(Item);
+              }
+              })
+              }
+              {BarcodeScannerIcon({
+                width:28,
+                height:28,
+                strokeWidth:6,
+                fill:"#000",
+                onPress:() => {
+                try {
+                RnZxing.showQrReader(data => onSuccess(data));
+              } catch {
+                Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+              }
+              },
+                color:"#000"
+              })}
               <TextInput
                 style={Styles.serialInputStyle}
                 onChangeText={text => {
@@ -685,9 +603,7 @@ const ServicePartsTab = ({
                 value={Item.tempSerial}
               />
               <View style={{flexDirection: 'row'}}>
-                {!!Item.tempPart.value.SerialFormat && (
-                  <Icon name={'star'} style={{color: 'red'}} />
-                )}
+                {!!Item.tempPart.value.SerialFormat && StarIcon()}
                 <Text style={Styles.labelStyle}>سریال:</Text>
               </View>
             </View>
@@ -778,10 +694,11 @@ const ServicePartsTab = ({
                   c.filter(_ => _.index !== Item.index),
                 );
               }}>
-              <Octicons
-                name={'trashcan'}
-                style={{fontSize: normalize(17), color: '#fff'}}
-              />
+              {DeleteIcon({
+                color:"#fff",
+                width:20,
+                height:20
+              })}
             </TouchableOpacity>
             <TouchableOpacity
               style={Styles.footerIconContainerStyle}
@@ -837,11 +754,7 @@ const ServicePartsTab = ({
                                 Item.index,
                               );
                             } else {
-                              ToastAndroid.showWithGravity(
-                                'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                ToastAndroid.SHORT,
-                                ToastAndroid.CENTER,
-                              );
+                              Toast.showWithGravity('نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.', Toast.LONG, Toast.CENTER);
                             }
                           });
                         }
@@ -868,11 +781,7 @@ const ServicePartsTab = ({
                                 Item.index,
                               );
                             } else {
-                              ToastAndroid.showWithGravity(
-                                'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                ToastAndroid.SHORT,
-                                ToastAndroid.CENTER,
-                              );
+                              Toast.showWithGravity('نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.', Toast.LONG, Toast.CENTER);
                             }
                           });
                         } else {
@@ -889,10 +798,11 @@ const ServicePartsTab = ({
                   }
                 } catch {}
               }}>
-              <Octicons
-                name={'check'}
-                style={{fontSize: normalize(17), color: '#fff'}}
-              />
+              {CheckIcon({
+                width:20,
+                height:20,
+                color:"#fff"
+              })}
             </TouchableOpacity>
           </View>
         )}
@@ -1006,17 +916,11 @@ const ServicePartsTab = ({
                 onPress={() =>
                   setIsNewPartFormExpanded(!isNewPartFormExpanded)
                 }>
-                {isNewPartFormExpanded ? (
-                  <Feather
-                    name={'minus'}
-                    style={{color: '#fff', fontSize: normalize(17)}}
-                  />
-                ) : (
-                  <Feather
-                    name={'plus'}
-                    style={{color: '#fff', fontSize: normalize(17)}}
-                  />
-                )}
+                {isNewPartFormExpanded ? MinusIcon({
+                  color:"#fff"
+                }) : PlusIcon({
+                  color:"#fff"
+                })}
               </TouchableOpacity>
               <Text
                 style={{
@@ -1027,6 +931,7 @@ const ServicePartsTab = ({
                 }}>
                 {!!fieldsObject.serial ? fieldsObject.serial : 'سریال'}
               </Text>
+              {/* TODO: check this color */}
               <Text
                 style={{
                   color: '#660000',
@@ -1168,36 +1073,27 @@ const ServicePartsTab = ({
                 <View style={Styles.serialContainerStyle}>
                   {searchBarcodeLoading ? (
                     <ActivityIndicator size={'small'} color={'#000'} />
-                  ) : (
-                    <Icon
-                      name={'search'}
-                      style={{
-                        color: '#000',
-                        fontSize: normalize(30),
-                        marginHorizontal: 5,
-                      }}
-                      onPress={() => searchBarcode()}
-                    />
-                  )}
-                  <Icon
-                    name={'qr-code-2'}
-                    style={{
-                      color: '#000',
-                      fontSize: normalize(30),
+                  ) : SearchIcon({
+                    onPress: searchBarcode,
+                    color:"#000",
+                    style:{
                       marginHorizontal: 5,
-                    }}
-                    onPress={() => {
+                    }
+                  })}
+                  {BarcodeScannerIcon({
+                    width:28,
+                    height:28,
+                    strokeWidth:6,
+                    fill:"#000",
+                    onPress:() => {
                       try {
                         RnZxing.showQrReader(data => onSuccess(data));
                       } catch {
-                        ToastAndroid.showWithGravity(
-                          'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                          ToastAndroid.SHORT,
-                          ToastAndroid.CENTER,
-                        );
+                        Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
                       }
-                    }}
-                  />
+                    },
+                    color:"#000"
+                  })}
                   <TextInput
                     style={Styles.serialInputStyle}
                     onChangeText={text => {
@@ -1210,9 +1106,7 @@ const ServicePartsTab = ({
                   />
                   <View style={{flexDirection: 'row'}}>
                     {!!fieldsObject.partTypeSelected.label &&
-                    !!fieldsObject.partTypeSelected.value.SerialFormat ? (
-                      <Icon name={'star'} style={{color: 'red'}} />
-                    ) : null}
+                    !!fieldsObject.partTypeSelected.value.SerialFormat ? StarIcon() : null}
                     <Text style={Styles.labelStyle}>سریال:</Text>
                   </View>
                 </View>
@@ -1317,10 +1211,11 @@ const ServicePartsTab = ({
                     Price: '',
                   });
                 }}>
-                <Octicons
-                  name={'trashcan'}
-                  style={{fontSize: normalize(17), color: '#fff'}}
-                />
+                {DeleteIcon({
+                  color:"#fff",
+                  width:20,
+                  height:20
+                })}
               </TouchableOpacity>
               <TouchableOpacity
                 style={Styles.footerIconContainerStyle}
@@ -1388,11 +1283,7 @@ const ServicePartsTab = ({
                                   : '';
                                 addNewObject(INFO, SERIAL);
                               } else {
-                                ToastAndroid.showWithGravity(
-                                  'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                  ToastAndroid.SHORT,
-                                  ToastAndroid.CENTER,
-                                );
+                                Toast.showWithGravity('نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.', Toast.LONG, Toast.CENTER);
                               }
                             });
                           }
@@ -1416,11 +1307,7 @@ const ServicePartsTab = ({
                                 let INFO = !!objectsList ? objectsList : [];
                                 addNewObject(INFO, actualSerial);
                               } else {
-                                ToastAndroid.showWithGravity(
-                                  'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                  ToastAndroid.SHORT,
-                                  ToastAndroid.CENTER,
-                                );
+                                Toast.showWithGravity('نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.', Toast.LONG, Toast.CENTER);
                               }
                             });
                           } else {
@@ -1441,10 +1328,11 @@ const ServicePartsTab = ({
                     }
                   } catch {}
                 }}>
-                <Octicons
-                  name={'check'}
-                  style={{fontSize: normalize(17), color: '#fff'}}
-                />
+                {CheckIcon({
+                  color:"#fff",
+                  width:20,
+                  height:20
+                })}
               </TouchableOpacity>
             </View>
           </View>
@@ -1456,22 +1344,16 @@ const ServicePartsTab = ({
             style={Styles.newPartbuttonStyle}
             onPress={() => {
               if (hasNew) {
-                ToastAndroid.showWithGravity(
-                  'لطفا ابتدا قطعه ی ناتمام را کامل کنید.',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
+                Toast.showWithGravity('لطفا ابتدا قطعه ی ناتمام را کامل کنید.', Toast.LONG, Toast.CENTER);
               } else {
                 setHasNew(true);
               }
             }}>
-            <Octicons
-              name="plus"
-              style={{
-                fontSize: normalize(33),
-                color: '#dadfe1',
-              }}
-            />
+            {PlusIcon({
+              color:"#fff",
+              width:30,
+              height:30
+            })}
           </TouchableOpacity>
         </View>
       )}

@@ -10,11 +10,13 @@ import {
   TouchableHighlight,
   BackHandler,
 } from 'react-native';
+import Toast from "react-native-simple-toast";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NumberFormat from 'react-number-format';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../ImageViwer';
 import {normalize} from '../../utils/utilities';
+import {StarIcon, UploadFileIcon, CameraIcon, DeleteIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -69,12 +71,8 @@ const ServiceFactorTab = ({
               justifyContent: 'flex-end',
             }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
-              serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon
-                  name={'star'}
-                  style={{color: 'red', fontSize: normalize(10)}}
-                />
-              )}
+            serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && StarIcon()
+            }
             <Text style={Styles.labelStyle}>مبلغ دریافتی:</Text>
           </View>
         </View>
@@ -118,74 +116,54 @@ const ServiceFactorTab = ({
               width: '35%',
             }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
-              serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && (
-                <Icon
-                  name={'star'}
-                  style={{color: 'red', fontSize: normalize(10)}}
-                />
-              )}
+              serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' && StarIcon()}
             <Text style={Styles.labelStyle}>جمع فاکتور:</Text>
           </View>
         </View>
         <View style={Styles.imageRowStyle}>
           <View style={Styles.getImageContainerViewStyle}>
-            <Icon
-              name={'camera-alt'}
-              style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() => {
-                  ImagePicker.openCamera({
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setInfo({
-                      ...info,
-                      factorImage: response.data,
-                    });
-                  }).catch(err=>{
-                    ToastAndroid.showWithGravity(
-                        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                        ToastAndroid.SHORT,
-                        ToastAndroid.CENTER,
-                    );
-                  });
-                }
-              }
-            />
-            <Icon
-              name={'file-upload'}
-              style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() => {
-                  ImagePicker.openPicker({
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setInfo({
-                      ...info,
-                      factorImage: response.data,
-                    });
-                  }).catch(err=>{
-                    ToastAndroid.showWithGravity(
-                        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                        ToastAndroid.SHORT,
-                        ToastAndroid.CENTER,
-                    );
-                  });
-                }
-              }
-            />
-            {!isRejected && !!info.factorImage && (
-              <Icon
-                name={'delete'}
-                style={{color: '#000', fontSize: normalize(30)}}
-                onPress={() => {
-                  setDeletingImage(1);
-                }}
-              />
-            )}
+            {CameraIcon({
+              onPress:() => {
+              ImagePicker.openCamera({
+              width: pageWidth - 20,
+              height: pageHeight * 0.7,
+              includeBase64: true,
+              compressImageQuality: 0.7,
+            }).then(response => {
+              setInfo({
+              ...info,
+              factorImage: response.data,
+            });
+            }).catch(err=>{
+              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+            });
+            }
+            })}
+            {UploadFileIcon({
+              onPress:() => {
+              ImagePicker.openPicker({
+              width: pageWidth - 20,
+              height: pageHeight * 0.7,
+              includeBase64: true,
+              compressImageQuality: 0.7,
+            }).then(response => {
+              setInfo({
+              ...info,
+              factorImage: response.data,
+            });
+            }).catch(err=>{
+              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+            });
+            }
+            })}
+            {!isRejected && !!info.factorImage && DeleteIcon({
+              color:"#000",
+              width:28,
+              height:28,
+              onPress:() => {
+              setDeletingImage(1);
+            }})
+            }
           </View>
           <View
             style={{
@@ -195,12 +173,7 @@ const ServiceFactorTab = ({
             }}>
             {serviceInfo.serviceResult !== 'لغو موفق' &&
               serviceInfo.serviceResult !== 'سرویس جدید- آماده نبودن پروژه' &&
-              serviceInfo.serviceResult !== 'سرویس جدید- کسری قطعات' && (
-                <Icon
-                  name={'star'}
-                  style={{color: 'red', fontSize: normalize(10)}}
-                />
-              )}
+              serviceInfo.serviceResult !== 'سرویس جدید- کسری قطعات' && StarIcon()}
             <Text style={Styles.labelStyle}>عکس فاکتور:</Text>
           </View>
         </View>
@@ -217,60 +190,51 @@ const ServiceFactorTab = ({
             {marginBottom: !!info.billImage ? 10 : 30},
           ]}>
           <View style={Styles.getImageContainerViewStyle}>
-            <Icon
-              name={'camera-alt'}
-              style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() => {
-                  ImagePicker.openCamera({
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setInfo({
-                      ...info,
-                      billImage: response.data,
-                    });
-                  }).catch(err=>{
-                    ToastAndroid.showWithGravity(
-                        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                        ToastAndroid.SHORT,
-                        ToastAndroid.CENTER,
-                    );
-                  });
-              }}
-            />
-            <Icon
-              name={'file-upload'}
-              style={{color: '#000', fontSize: normalize(35)}}
-              onPress={() => {
-                  ImagePicker.openPicker({
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setInfo({
-                      ...info,
-                      billImage: response.data,
-                    });
-                  }).catch(err=>{
-                    ToastAndroid.showWithGravity(
-                        'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                        ToastAndroid.SHORT,
-                        ToastAndroid.CENTER,
-                    );
-                  });
-              }}
-            />
-            {!!info.billImage && (
-              <Icon
-                name={'delete'}
-                style={{color: '#000', fontSize: normalize(30)}}
-                onPress={() => {
-                  setDeletingImage(2);
-                }}
-              />
+            {CameraIcon({
+              onPress:() => {
+              ImagePicker.openCamera({
+              width: pageWidth - 20,
+              height: pageHeight * 0.7,
+              includeBase64: true,
+              compressImageQuality: 0.7,
+            }).then(response => {
+              setInfo({
+              ...info,
+              billImage: response.data,
+            });
+            }).catch(err=>{
+              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+            });
+            }
+            })}
+            {UploadFileIcon({
+              width:30,
+              height:30,
+              onPress:() => {
+              ImagePicker.openPicker({
+              width: pageWidth - 20,
+              height: pageHeight * 0.7,
+              includeBase64: true,
+              compressImageQuality: 0.7,
+            }).then(response => {
+              setInfo({
+              ...info,
+              billImage: response.data,
+            });
+            }).catch(err=>{
+              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+            });
+            }
+            })}
+            {!!info.billImage && DeleteIcon(
+                {
+                  color:"#000",
+                  width:28,
+                  height:28,
+                  onPress:() => {
+                    setDeletingImage(2);
+                  }
+                }
             )}
           </View>
           <View

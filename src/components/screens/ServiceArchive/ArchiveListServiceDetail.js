@@ -2,12 +2,10 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   ActivityIndicator,
-  ToastAndroid,
   StyleSheet,
   Dimensions,
   ScrollView,
   Text,
-  TouchableOpacity,
   TextInput,
   BackHandler,
 } from 'react-native';
@@ -17,6 +15,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
 import ImageViewer from '../../common/ImageViwer';
+import Toast from "react-native-simple-toast";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -92,11 +91,7 @@ const ServiceArchiveDetail = ({navigation}) => {
         navigation.navigate('SignedOut');
       } else {
         setServiceDetail({});
-        ToastAndroid.showWithGravity(
-          data.message,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
         setDetailLoading(false);
       }
     });

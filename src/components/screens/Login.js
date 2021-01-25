@@ -40,7 +40,7 @@ const Login = ({navigation}) => {
     var iteration = 120;
     setCode('');
     loginUser(phoneNumber).then(data => {
-      if (data.errorCode == 0) {
+      if (data.errorCode === 0) {
         setHasCode(true);
         if (!!secondTextInputRef) {
           secondTextInputRef.focus();
@@ -61,7 +61,7 @@ const Login = ({navigation}) => {
 
   const onEnterSystemPress = () => {
     setEnterSystemLoading(true);
-    if (counter == 0) {
+    if (counter === 0) {
       setEnterSystemLoading(false);
       Toast.showWithGravity('لطفا مجددا درخواست کد فعالسازی دهید.', Toast.LONG, Toast.CENTER);
     } else {

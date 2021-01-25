@@ -3,19 +3,19 @@ import {
     View,
     FlatList,
     Dimensions,
-    ToastAndroid,
     ActivityIndicator,
     StyleSheet,
     Text,
     BackHandler
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Toast from "react-native-simple-toast";
 import {useSelector, useDispatch} from 'react-redux';
 import {unsettledServiceList} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
 import RemainingServiceListItem from '../../utils/RemainingServiceListItem';
 import {normalize} from "../../utils/utilities";
+import {RefreshIcon} from "../../../assets/icons";
 
 
 const pageWidth = Dimensions.get('screen').width;
@@ -52,11 +52,7 @@ const RemainingServiceList = ({navigation}) => {
                     navigation.navigate("SignedOut");
                 } else {
                     setServiceList([]);
-                    ToastAndroid.showWithGravity(
-                        data.message,
-                        ToastAndroid.SHORT,
-                        ToastAndroid.CENTER,
-                    );
+                    Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                 }
             }
             setListLoading(false);
@@ -82,14 +78,13 @@ const RemainingServiceList = ({navigation}) => {
             <Header
                 headerText="سرویس های مانده دار"
                 leftIcon={
-                    <Icon
-                        name="refresh"
-                        style={{
-                            fontSize: normalize(30),
-                            color: '#dadfe1',
-                        }}
-                        onPress={() => getServices()}
-                    />
+                    RefreshIcon({
+                        color:"#fff",
+                        onPress:() => getServices(),
+                        style:{
+                            fontSize: normalize(30)
+                        }
+                    })
                 }
             />
             {listLoading ? (

@@ -36,7 +36,7 @@ const App = () => {
 
   return (
     <Provider store={myStore}>
-        <SendData/>
+        {/*<SendData/>*/}
       <PersistGate loading={null} persistor={myPersistor}>
       <StatusBar backgroundColor="#520000"/>
         <RootNav/>

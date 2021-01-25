@@ -9,7 +9,6 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-// import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {normalize} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;

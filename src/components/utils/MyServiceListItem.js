@@ -21,24 +21,10 @@ const MyServiceListItem = ({
   setSelectedProjectId,
   setNetworkModalState,
 }) => {
-  const [isNetworkSaved, setIsNetworkSaved] = useState(false);
 
   const Item = item.item;
   const dispatch = useDispatch();
-  useEffect(() => {
-    AsyncStorage.getItem('savedServicesList').then(list => {
-      if (!!list) {
-        JSON.parse(list).map(item => {
-          if (
-            item.projectId === Item.projectID &&
-            item.saveType === 'network'
-          ) {
-            setIsNetworkSaved(true);
-          }
-        });
-      }
-    });
-  }, []);
+
   return (
     <TouchableWithoutFeedback
       style={{
@@ -124,7 +110,7 @@ const MyServiceListItem = ({
         style={{
           width: pageWidth * 0.9,
           height: pageHeight * 0.1,
-          backgroundColor: isNetworkSaved ? '#3399FF' : '#fff',
+          backgroundColor: '#fff',
           padding: 10,
           marginVertical: 5,
           marginHorizontal: 5,
@@ -132,40 +118,18 @@ const MyServiceListItem = ({
           alignItems: 'center',
           elevation: 5,
         }}>
-        {isNetworkSaved ? (
-          <View style={Styles.secondRowContainerStyle}>
+        <View style={Styles.firstRowContainerStyle}>
+          <View style={Styles.singleItemStyle}>
+            <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
             <Text
               style={{
-                fontSize: normalize(12),
-                fontFamily: 'IRANSansMobile_Light',
+                fontSize: normalize(13),
+                fontFamily: 'IRANSansMobile_Medium',
               }}>
-              درحال ارسال
+              نام:{' '}
             </Text>
-            <View style={Styles.singleItemStyle}>
-              <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-              <Text
-                style={{
-                  fontSize: normalize(13),
-                  fontFamily: 'IRANSansMobile_Medium',
-                }}>
-                نام:{' '}
-              </Text>
-            </View>
           </View>
-        ) : (
-          <View style={Styles.firstRowContainerStyle}>
-            <View style={Styles.singleItemStyle}>
-              <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-              <Text
-                style={{
-                  fontSize: normalize(13),
-                  fontFamily: 'IRANSansMobile_Medium',
-                }}>
-                نام:{' '}
-              </Text>
-            </View>
-          </View>
-        )}
+        </View>
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>

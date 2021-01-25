@@ -6,16 +6,16 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  ToastAndroid,
   ActivityIndicator,
     BackHandler
 } from 'react-native';
 import Header from '../common/Header';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Toast from "react-native-simple-toast";
 import RnZxing from 'react-native-rn-zxing';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
 import {toFaDigit, normalize} from '../utils/utilities';
+import {BarcodeScannerIcon} from "../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 
@@ -55,11 +55,7 @@ const Garantee = ({navigation}) => {
         setLoader(false);
       } else {
         setLoader(false);
-        ToastAndroid.showWithGravity(
-          'سریال وارد شده معتبر نیست.',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity('سریال وارد شده معتبر نیست.', Toast.LONG, Toast.CENTER);
       }
     });
   };
@@ -80,25 +76,19 @@ const Garantee = ({navigation}) => {
         <Header headerText={'استعلام گارانتی'} />
         <View style={{flex: 1, alignItems: 'center'}}>
           <View style={Styles.inputContainerStyle}>
-            <Icon
-              name={'barcode-scan'}
-              style={{
-                color: '#000',
-                fontSize: normalize(27),
-                width: 50,
-              }}
-              onPress={() => {
-                try {
-                  RnZxing.showQrReader(data => setSerial(data));
-                } catch {
-                  ToastAndroid.showWithGravity(
-                    'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER,
-                  );
-                }
-              }}
-            />
+            {BarcodeScannerIcon({
+              width:28,
+              height:28,
+              strokeWidth:6,
+              fill:"#000",
+              onPress:() => {
+              try {
+              RnZxing.showQrReader(data => setSerial(data));
+            } catch {
+              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+            }
+            }
+            })}
             <TextInput
               placeholder={'سریال دستگاه'}
               onChangeText={serial => {

@@ -9,10 +9,9 @@ import {
   BackHandler,
 } from 'react-native';
 import {toFaDigit, normalize} from '../../utils/utilities';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {PhoneIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
-const pageHeight = Dimensions.get('screen').height;
 
 const ServiceInfoTab = ({serviceData, renderSaveModal}) => {
   const data = serviceData;
@@ -33,13 +32,11 @@ const ServiceInfoTab = ({serviceData, renderSaveModal}) => {
     return (
       <View style={Styles.singleRowStyle}>
         <View>
-          {title === 'شماره تماس' ? (
-            <Icon
-              name={'phone-square'}
-              style={{fontSize: normalize(30), color: 'gray', marginLeft: 10}}
-              onPress={() => Linking.openURL(`tel:${text}`)}
-            />
-          ) : null}
+          {title === 'شماره تماس' ? PhoneIcon({
+            onPress:() => Linking.openURL(`tel:${text}`),
+            style:{fontSize: normalize(30), marginLeft: 10},
+            color:"#000"
+              }): null}
         </View>
         <View style={Styles.rightSideContainerStyle}>
           {!!text ? (

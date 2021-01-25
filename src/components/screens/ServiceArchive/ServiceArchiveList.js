@@ -3,7 +3,6 @@ import {
     View,
     FlatList,
     Dimensions,
-    ToastAndroid,
     ActivityIndicator,
     StyleSheet,
     Text,
@@ -11,13 +10,14 @@ import {
     TextInput,
     BackHandler
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Toast from "react-native-simple-toast";
 import {useSelector, useDispatch} from 'react-redux';
 import {serviceArchiveListWithSerial, serviceArchiveListWithoutSerial} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
 import {toFaDigit, normalize} from "../../utils/utilities";
 import ServiceArchiveListItem from "../../utils/ServiceArchiveListItem";
+import {RefreshIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -58,11 +58,7 @@ const ServiceArchiveList = ({navigation}) => {
                         });
                         navigation.navigate("SignedOut");
                     } else {
-                        ToastAndroid.showWithGravity(
-                            data.message,
-                            ToastAndroid.SHORT,
-                            ToastAndroid.CENTER,
-                        );
+                        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                     }
                 }
                 setServiceLoading(false);
@@ -78,11 +74,7 @@ const ServiceArchiveList = ({navigation}) => {
                         });
                         navigation.navigate("SignedOut");
                     } else {
-                        ToastAndroid.showWithGravity(
-                            data.message,
-                            ToastAndroid.SHORT,
-                            ToastAndroid.CENTER,
-                        );
+                        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
                     }
                 }
                 setServiceLoading(false);
@@ -105,17 +97,16 @@ const ServiceArchiveList = ({navigation}) => {
             <Header
                 headerText="آرشیو سرویس ها"
                 leftIcon={
-                    <Icon
-                        name="refresh"
-                        style={{
-                            fontSize: normalize(30),
-                            color: '#dadfe1',
-                        }}
-                        onPress={() => {
+                    RefreshIcon({
+                        color:"#fff",
+                        onPress:() => {
                             setSerial("");
                             getServices();
-                        }}
-                    />
+                        },
+                        style:{
+                            fontSize: normalize(30)
+                        }
+                    })
                 }
             />
             {serviceLoading ? (

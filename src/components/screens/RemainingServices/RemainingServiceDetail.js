@@ -2,16 +2,15 @@ import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   ActivityIndicator,
-  ToastAndroid,
   StyleSheet,
   Dimensions,
   ScrollView,
   Text,
   TouchableOpacity,
-  Image,
   TouchableHighlight,
   BackHandler,
 } from 'react-native';
+import Toast from "react-native-simple-toast";
 import Header from '../../common/Header';
 import {
   companyPayment,
@@ -21,9 +20,9 @@ import {
 import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from '../../../actions/types';
 import {toFaDigit, normalize} from '../../utils/utilities';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../../common/ImageViwer';
+import {CameraIcon, DeleteIcon, UploadFileIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -56,6 +55,7 @@ const RemainingServiceDetail = ({navigation}) => {
 
   useEffect(() => {
     unsettledServiceDetail(SERVICE.projectID, selector.token).then(data => {
+      console.warn("FFF", data);
       if (data.errorCode === 0) {
         setServiceDetail(data.result);
         setDetailLoading(false);
@@ -67,11 +67,7 @@ const RemainingServiceDetail = ({navigation}) => {
         navigation.navigate('SignedOut');
       } else {
         setServiceDetail({});
-        ToastAndroid.showWithGravity(
-          data.message,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
         setDetailLoading(false);
       }
     });
@@ -93,11 +89,7 @@ const RemainingServiceDetail = ({navigation}) => {
           navigation.navigate('SignedOut');
           setEqualizationLoading(false);
         } else {
-          ToastAndroid.showWithGravity(
-            data.message,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
           setRenderConfirmModal(false);
           setEqualizationLoading(false);
         }
@@ -125,11 +117,7 @@ const RemainingServiceDetail = ({navigation}) => {
         navigation.navigate('SignedOut');
         setEqualizationLoading(false);
       } else {
-        ToastAndroid.showWithGravity(
-          data.message,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
+        Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
         setRenderConfirmModal(false);
         setEqualizationLoading(false);
       }
@@ -248,11 +236,16 @@ const RemainingServiceDetail = ({navigation}) => {
                     serviceDetail.DocumentDetails.Address,
                   )}
                   {renderSingleItem(
-                    'نام و تلفن:',
+                    'نام صاحب پرونده:',
                     '#000',
-                    `${serviceDetail.DocumentDetails.PhoneName} ${toFaDigit(
-                      serviceDetail.DocumentDetails.Phone,
-                    )}`,
+                    `${serviceDetail.DocumentDetails.PhoneName}`,
+                  )}
+                  {renderSingleItem(
+                      'تلفن صاحب پرونده:',
+                      '#000',
+                      `${toFaDigit(
+                          serviceDetail.DocumentDetails.Phone,
+                      )}`,
                   )}
                   {renderSingleItem(
                     'علت خرابی:',
@@ -334,11 +327,7 @@ const RemainingServiceDetail = ({navigation}) => {
                       setEqualizationType('company');
                       setRenderConfirmModal(true);
                     } else {
-                      ToastAndroid.showWithGravity(
-                        'لطفا تصویر فاکتور واریزی را بارگذاری نمایید. ',
-                        ToastAndroid.SHORT,
-                        ToastAndroid.CENTER,
-                      );
+                      Toast.showWithGravity('لطفا تصویر فاکتور واریزی را بارگذاری نمایید. ', Toast.LONG, Toast.CENTER);
                     }
                   }}>
                   <Text style={Styles.buttonTextStyle}>تسویه به حساب شرکت</Text>
@@ -354,53 +343,38 @@ const RemainingServiceDetail = ({navigation}) => {
               </View>
             )}
             <View style={Styles.imageIconContainerStyle}>
-              <Icon
-                name={'camera-alt'}
-                style={{
-                  color: '#000',
-                  fontSize: normalize(35),
-                  marginHorizontal: 7,
-                }}
-                onPress={() =>
-                  ImagePicker.openCamera({
-                    // cropping: true,
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setFactorImage(response.data);
-                  })
-                }
-              />
-              <Icon
-                name={'file-upload'}
-                style={{
-                  color: '#000',
-                  fontSize: normalize(35),
-                  marginHorizontal: 7,
-                }}
-                onPress={() =>
-                  ImagePicker.openPicker({
-                    // cropping: true,
-                    width: pageWidth - 20,
-                    height: pageHeight * 0.7,
-                    includeBase64: true,
-                    compressImageQuality: 0.7,
-                  }).then(response => {
-                    setFactorImage(response.data);
-                  })
-                }
-              />
-              {!!factorImage && (
-                <Icon
-                  name={'delete'}
-                  style={{color: '#000', fontSize: normalize(30)}}
-                  onPress={() => {
-                    setDeletingImage(1);
-                  }}
-                />
-              )}
+              {CameraIcon({
+                onPress:() =>
+                ImagePicker.openCamera({
+                width: pageWidth - 20,
+                height: pageHeight * 0.7,
+                includeBase64: true,
+                compressImageQuality: 0.7,
+              }).then(response => {
+                setFactorImage(response.data);
+              }),
+              })}
+              {UploadFileIcon({
+                onPress:() =>
+                ImagePicker.openPicker({
+                width: pageWidth - 20,
+                height: pageHeight * 0.7,
+                includeBase64: true,
+                compressImageQuality: 0.7,
+              }).then(response => {
+                setFactorImage(response.data);
+              }),
+                color:"#000",
+                height:30,
+                width:30
+              })}
+              {!!factorImage && DeleteIcon({
+                onPress:() => {
+                setDeletingImage(1);
+              },
+                color:"#000"
+              })
+              }
             </View>
             {!!factorImage && (
               <ImageViewer

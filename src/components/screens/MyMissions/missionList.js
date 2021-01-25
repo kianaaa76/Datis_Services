@@ -3,22 +3,20 @@ import {
   View,
   FlatList,
   Dimensions,
-  ToastAndroid,
   ActivityIndicator,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   Text,
   BackHandler
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-simple-toast';
 import {useSelector, useDispatch} from 'react-redux';
 import {getMissionList} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
 import MissionListItem from '../../utils/missionListItem';
 import {normalize} from '../../utils/utilities';
+import {RefreshIcon, SearchIcon} from "../../../assets/icons";
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
@@ -54,11 +52,7 @@ const MissionList = ({navigation}) => {
           });
           navigation.navigate('SignedOut');
         } else {
-          ToastAndroid.showWithGravity(
-            data.message,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER);
         }
       }
       setMissionListLoading(false);
@@ -109,14 +103,13 @@ const MissionList = ({navigation}) => {
       <Header
         headerText="ماموریت‌های من"
         leftIcon={
-          <Icon
-            name="refresh"
-            style={{
-              fontSize: normalize(30),
-              color: '#dadfe1',
-            }}
-            onPress={() => getMissions()}
-          />
+          RefreshIcon({
+            color:"#fff",
+            onPress:() => getMissions(),
+            style:{
+              fontSize: normalize(30)
+            }
+          })
         }
       />
       {missionListLoading ? (
@@ -131,10 +124,9 @@ const MissionList = ({navigation}) => {
               style={Styles.searchInputStyle}
               placeholder={'شهر مورد نظر خود را جستجو کنید...'}
             />
-            <FontAwesome
-              name={'search'}
-              style={{fontSize: 25, color: '#000', width: '10%'}}
-            />
+            {SearchIcon({
+              color: "#000"
+            })}
           </View>
           <View style={Styles.flatlistContainerStyle}>
             <FlatList

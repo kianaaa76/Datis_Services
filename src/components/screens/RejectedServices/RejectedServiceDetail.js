@@ -3,7 +3,6 @@ import {
   View,
   Dimensions,
   StyleSheet,
-  ToastAndroid,
   ActivityIndicator,
   Alert,
   TouchableHighlight,
@@ -11,9 +10,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import Toast from "react-native-simple-toast";
 import {TabView, TabBar} from 'react-native-tab-view';
 import Header from '../../common/Header';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useSelector, useDispatch} from 'react-redux';
 import ServiceInfoTab from '../../common/serviceComponents/serviceInfoTab';
@@ -24,6 +23,7 @@ import ServiceMissionTab from '../../common/serviceComponents/serviceMissionTab'
 import {sendServiceData} from '../../../actions/api';
 import {LOGOUT, SET_EDITING_SERVICE} from '../../../actions/types';
 import {normalize} from '../../utils/utilities';
+import {CheckIcon, SaveIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -147,7 +147,7 @@ const MyServiceDetails = ({navigation}) => {
     });
   };
 
-  const onSavePress = type => {
+  const onSavePress = () => {
     AsyncStorage.getItem('savedServicesList').then(list => {
       let savedList = !!list
         ? JSON.parse(list).filter(item => item.projectId != serviceID)
@@ -172,7 +172,6 @@ const MyServiceDetails = ({navigation}) => {
         missionDescription: missionTabInfo.missionDescription,
         missionId: missionTabInfo.missionId,
         distance: missionTabInfo.distance,
-        saveType: type,
         isRejectedService: true,
         travel: missionTabInfo.travel,
       });
@@ -374,11 +373,7 @@ const MyServiceDetails = ({navigation}) => {
                 editingService: '',
               });
               navigation.replace('RejectedServices');
-              ToastAndroid.showWithGravity(
-                'سرویس شما با موفقیت بسته شد.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER)
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
@@ -391,11 +386,7 @@ const MyServiceDetails = ({navigation}) => {
               navigation.navigate('SignedOut');
             } else {
               setRequestLoading(false);
-              ToastAndroid.showWithGravity(
-                data.message,
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER)
             }
           })
           .catch(err => {
@@ -468,11 +459,7 @@ const MyServiceDetails = ({navigation}) => {
                 editingService: '',
               });
               navigation.replace('RejectedServices');
-              ToastAndroid.showWithGravity(
-                'سرویس شما با موفقیت بسته شد.',
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER)
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
@@ -485,11 +472,7 @@ const MyServiceDetails = ({navigation}) => {
               navigation.navigate('SignedOut');
             } else {
               setRequestLoading(false);
-              ToastAndroid.showWithGravity(
-                data.message,
-                ToastAndroid.SHORT,
-                ToastAndroid.CENTER,
-              );
+              Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER)
             }
           })
           .catch(err => {
@@ -581,24 +564,24 @@ const MyServiceDetails = ({navigation}) => {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <Icon
-              name="check"
-              style={{
-                fontSize: normalize(33),
-                color: '#dadfe1',
-              }}
-              onPress={() => {
-                setRenderConfirmModal(true);
-              }}
-            />
-            <Icon
-              name="save"
-              style={{
-                fontSize: normalize(33),
-                color: '#dadfe1',
-              }}
-              onPress={() => onSavePress('self')}
-            />
+            {CheckIcon({
+              color:"#fff",
+              width:30,
+              height:30,
+              onPress:() => setRenderConfirmModal(true),
+              style:{
+                fontSize:30
+              }
+            })}
+            {SaveIcon({
+              color:"#fff",
+              onPress:() => onSavePress(),
+              width:30,
+              height:30,
+              style:{
+                fontSize:50
+              }
+            })}
           </View>
         }
       />
@@ -684,7 +667,7 @@ const MyServiceDetails = ({navigation}) => {
               <TouchableOpacity
                 style={Styles.modalButtonStyle}
                 onPress={() => {
-                  onSavePress('self');
+                  onSavePress();
                 }}>
                 <Text style={Styles.modalButtonTextStyle}>بله</Text>
               </TouchableOpacity>
@@ -710,7 +693,7 @@ const MyServiceDetails = ({navigation}) => {
             <View style={Styles.modalFooterContainerStyle}>
               <TouchableOpacity
                 style={Styles.modalButtonStyle2}
-                onPress={() => onSavePress('network')}>
+                onPress={() => onSavePress()}>
                 <Text style={Styles.modalButtonTextStyle}>ذخیره</Text>
               </TouchableOpacity>
               <TouchableOpacity

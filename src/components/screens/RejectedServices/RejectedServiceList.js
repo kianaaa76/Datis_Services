@@ -6,17 +6,16 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
-  ToastAndroid,
   Text,
   TouchableHighlight,
   Alert,
   BackHandler,
 } from 'react-native';
+import Toast from "react-native-simple-toast";
 import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useSelector, useDispatch} from 'react-redux';
 import Header from '../../common/Header';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import RejectedServiceListItem from '../../utils/RejectedServiceListItem';
 import {rejectedServiceDetail, rejectedServiceList} from '../../../actions/api';
 import {
@@ -25,6 +24,7 @@ import {
   SET_EDITING_SERVICE,
 } from '../../../actions/types';
 import {normalize} from '../../utils/utilities';
+import {RefreshIcon} from "../../../assets/icons";
 
 let FACTOR_IMAGE = '';
 let BILL_IMAGE = '';
@@ -56,38 +56,6 @@ const MyService = ({navigation}) => {
     );
     return () => backHandler.remove();
   });
-
-  const getServiceResult = resultNum => {
-    switch (resultNum) {
-      case 1:
-        return 'موفق';
-      case 2:
-        return 'موفق مشکوک';
-      case 3:
-        return 'سرویس جدید - کسری قطعات';
-      case 4:
-        return 'سرویس جدید - آماده نبودن پروژه';
-      case 5:
-        return 'سرویس جدید - عدم تسلط';
-      case 6:
-        return 'لغو موفق';
-      default:
-        return '';
-    }
-  };
-
-  const getServiceType = typeNum => {
-    switch (typeNum) {
-      case 1:
-        return 'خرابی یا تعویض قطعه';
-      case 2:
-        return 'ایراد نصب و تنظیم روتین';
-      case 3:
-        return 'تنظیم و عیب غیرروتین';
-      default:
-        return '';
-    }
-  };
 
   const renderEmptyList = () => {
     return (
@@ -132,8 +100,8 @@ const MyService = ({navigation}) => {
               serviceDescription: data.result.Details,
               address: data.result.Location,
               finalDate: data.result.DoneTime,
-              serviceResult: getServiceResult(data.result.Result),
-              serviceType: getServiceType(data.result.ServiceType),
+              serviceResult: data.result.Result,
+              serviceType: data.result.ServiceType,
               objectList: data.result.ObjectList,
               startLatitude:
                 !!data.result.Mission && !!data.result.Mission.StartLocation
@@ -182,7 +150,6 @@ const MyService = ({navigation}) => {
               distance: !!data.result.Mission
                 ? data.result.Mission.Distance
                 : '',
-              saveType: '',
               travel: !!data.result.Mission
                 ? data.result.Mission.Travel
                 : false,
@@ -220,19 +187,18 @@ const MyService = ({navigation}) => {
         } else {
           setModalLoading(false);
           setRenderRestoreModal(false);
-          ToastAndroid.showWithGravity(
-            data.message,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER)
         }
       })
       .catch(() => {
         setSelectItemLoading(false);
+        setModalLoading(false);
         Alert.alert(
           'اخطار',
           'به دلیل عدم دسترسی به اینترنت امکان باز کردن این سرویس وجود ندارد.',
-          [{text: 'OK', onPress: () => {}}],
+          [{text: 'OK', onPress: () => {
+            setRenderRestoreModal(false);
+            }}],
         );
       });
   };
@@ -289,7 +255,6 @@ const MyService = ({navigation}) => {
           endCity: currentList[Index].endCity,
           missionDescription: currentList[Index].missionDescription,
           distance: currentList[Index].distance,
-          saveType: currentList[Index].saveType,
           travel: currentList[Index].travel,
         },
       });
@@ -328,16 +293,13 @@ const MyService = ({navigation}) => {
           } else {
             setRenderRestoreModal(false);
             setModalLoading(false);
-            ToastAndroid.showWithGravity(
-              data.message,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER)
           }
         })
         .catch(() => {
           setRenderRestoreModal(false);
           setSelectItemLoading(false);
+          setModalLoading(false);
           Alert.alert(
             'اخطار',
             'به دلیل عدم دسترسی به اینترنت امکان باز کردن این سرویس وجود ندارد.',
@@ -360,11 +322,7 @@ const MyService = ({navigation}) => {
             });
             navigation.navigate('SignedOut');
           } else {
-            ToastAndroid.showWithGravity(
-              data.message,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
+            Toast.showWithGravity(data.message, Toast.LONG, Toast.CENTER)
           }
         }
         setServiceListLoading(false);
@@ -389,14 +347,13 @@ const MyService = ({navigation}) => {
       <Header
         headerText="سرویس های ردشده"
         leftIcon={
-          <Icon
-            name="refresh"
-            style={{
-              fontSize: normalize(30),
-              color: '#dadfe1',
-            }}
-            onPress={() => getRejectedServices(selector.userId, selector.token)}
-          />
+          RefreshIcon({
+            color:"#fff",
+            onPress:() => getRejectedServices(selector.userId, selector.token),
+            style:{
+              fontSize: normalize(30)
+            }
+          })
         }
       />
       {serviceListLoading ? (

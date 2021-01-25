@@ -5,18 +5,16 @@ import {
   Dimensions,
   TouchableOpacity,
   Text,
-  ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Foundation';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Toast from "react-native-simple-toast";
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import Header from '../common/Header';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import {normalize} from '../utils/utilities';
 import {setHomeLocationOfUser} from '../../actions/api';
 import {useSelector} from 'react-redux';
+import {CurrentLocationIcon, MapMarkerIcon, RemoveMarkerIcon} from "../../assets/icons";
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -50,7 +48,11 @@ const UserAddress = ({navigation}) => {
             height: 100,
             zIndex: -9999,
           }}>
-          <Icon name="marker" color={'#660000'} size={45} />
+          {MapMarkerIcon({
+            color:"#660000",
+            width:35,
+            height:35
+          })}
         </View>
       </MapboxGL.MarkerView>
     );
@@ -67,11 +69,7 @@ const UserAddress = ({navigation}) => {
     setRequestLoading(true);
     if (!userLocation.userLatitude && !userLocation.userLongitude) {
       setRequestLoading(false);
-      ToastAndroid.showWithGravity(
-        'ابتدا موقعیت منزل خود را مشخص کنید.',
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
-      );
+      Toast.showWithGravity('ابتدا موقعیت منزل خود را مشخص کنید.', Toast.LONG, Toast.CENTER);
     } else {
       setHomeLocationOfUser(
         selector.token,
@@ -82,11 +80,7 @@ const UserAddress = ({navigation}) => {
           navigation.navigate('Home');
         } else {
           setRequestLoading(false);
-          ToastAndroid.showWithGravity(
-            'مشکلی پیش آمد. دوباره تلاش کنید.',
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          Toast.showWithGravity('مشکلی پیش آمد. دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
         }
       });
     }
@@ -161,61 +155,59 @@ const UserAddress = ({navigation}) => {
           </TouchableOpacity>
           {!!userLocation.userLatitude && !!userLocation.userLongitude && (
             <View style={Styles.removeMarkerContainerStyle}>
-              <MaterialCommunityIcons
-                name="map-marker-remove-variant"
-                style={{fontSize: normalize(30), color: '#000'}}
-                onPress={() => {
-                  setUserLoaction({
-                    userLatitude: '',
-                    userLongitude: '',
-                  });
-                }}
-              />
+              {RemoveMarkerIcon({
+                width:30,
+                height:30,
+                color:"#000",
+                onPress:() => {
+                setUserLoaction({
+                userLatitude: '',
+                userLongitude: '',
+              });
+              }
+              })}
             </View>
           )}
 
           <View style={Styles.myLocationContainerStyle}>
-            <MaterialIcons
-              name={'my-location'}
-              style={{fontSize: normalize(30), color: '#000'}}
-              onPress={async () => {
-                LocationServicesDialogBox.checkLocationServicesIsEnabled({
-                  message:
-                    "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
-                  ok: 'YES',
-                  cancel: 'NO',
-                  enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
-                  showDialog: true, // false => Opens the Location access page directly
-                  openLocationServices: true, // false => Directly catch method is called if location services are turned off
-                  preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
-                  preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
-                  providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
-                })
-                  .then(async () => {
-                    if (
-                      !!cameraRef &&
-                      !!currentLocation.currentLongitude &&
-                      !!currentLocation.curerntLatitude
-                    ) {
-                      await cameraRef.moveTo(
-                        [
-                          currentLocation.currentLongitude,
-                          currentLocation.curerntLatitude,
-                        ],
-                        500,
-                      );
-                      await cameraRef.zoomTo(11, 500);
-                    }
-                  })
-                  .catch(() => {
-                    ToastAndroid.showWithGravity(
-                      'موقعیت در دسترس نیست.',
-                      ToastAndroid.SHORT,
-                      ToastAndroid.CENTER,
-                    );
-                  });
-              }}
-            />
+            {CurrentLocationIcon({
+              color:"#000",
+              width:27,
+              height:27,
+              onPress:async () => {
+              LocationServicesDialogBox.checkLocationServicesIsEnabled({
+              message:
+              "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+              ok: 'YES',
+              cancel: 'NO',
+              enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER
+              showDialog: true, // false => Opens the Location access page directly
+              openLocationServices: true, // false => Directly catch method is called if location services are turned off
+              preventOutSideTouch: false, // true => To prevent the location services window from closing when it is clicked outside
+              preventBackClick: false, // true => To prevent the location services popup from closing when it is clicked back button
+              providerListener: false, // true ==> Trigger locationProviderStatusChange listener when the location state changes
+            })
+              .then(async () => {
+              if (
+              !!cameraRef &&
+              !!currentLocation.currentLongitude &&
+              !!currentLocation.curerntLatitude
+              ) {
+              await cameraRef.moveTo(
+              [
+              currentLocation.currentLongitude,
+              currentLocation.curerntLatitude,
+              ],
+              500,
+              );
+              await cameraRef.zoomTo(11, 500);
+            }
+            })
+              .catch(() => {
+              Toast.showWithGravity('موقعیت در دسترس نیست.', Toast.LONG, Toast.CENTER);
+            });
+            }
+            })}
           </View>
         </View>
       )}
