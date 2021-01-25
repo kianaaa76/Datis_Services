@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-simple-toast';
-import {normalize} from '../../utils/utilities';
+import {normalize, getFontsName} from '../../utils/utilities';
 import {selectContactPhone} from 'react-native-select-contact';
 import {useSelector, useDispatch} from 'react-redux';
 import Header from '../../common/Header';
@@ -78,13 +78,13 @@ const NewService = ({navigation}) => {
       contentContainerStyle={Styles.contentContainerStyle}
       keyboardShouldPersistTaps="always"
       keyboardDismissMode="on-drag">
-      <Header headerText={'سرویس جدید'} />
+      <Header headerText={'سرویس جدید'} isCurrentRootHome={false} onBackPress={()=>navigation.goBack()}/>
       <View style={Styles.contentStyle}>
         <View style={Styles.singleItemContainerStyle}>
           <Text
             style={{
               fontSize: normalize(14),
-              fontFamily: 'IRANSansMobile_Light',
+              fontFamily: getFontsName('IRANSansMobile_Light'),
             }}>
             نام و نام خانوادگی صاحب پروژه
           </Text>
@@ -111,7 +111,7 @@ const NewService = ({navigation}) => {
           <Text
             style={{
               fontSize: normalize(14),
-              fontFamily: 'IRANSansMobile_Light',
+              fontFamily: getFontsName('IRANSansMobile_Light'),
             }}>
             شماره تماس صاحب پروژه
           </Text>
@@ -128,7 +128,7 @@ const NewService = ({navigation}) => {
           <Text
             style={{
               fontSize: normalize(14),
-              fontFamily: 'IRANSansMobile_Light',
+              fontFamily: getFontsName('IRANSansMobile_Light'),
             }}>
             آدرس محل پروژه
           </Text>
@@ -144,7 +144,7 @@ const NewService = ({navigation}) => {
           <Text
             style={{
               fontSize: normalize(14),
-              fontFamily: 'IRANSansMobile_Light',
+              fontFamily: getFontsName('IRANSansMobile_Light'),
             }}>
             سریال پروژه
           </Text>
@@ -204,7 +204,7 @@ const Styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: '#660000',
     textAlign: 'center',
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   buttonStyle: {
     backgroundColor: '#660000',
@@ -218,7 +218,7 @@ const Styles = StyleSheet.create({
     textAlign: 'center',
     color: '#fff',
     fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   singleItemContainerStyle: {
     width: '100%',

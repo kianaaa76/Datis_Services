@@ -3,15 +3,19 @@ import {
   PermissionsAndroid,
   Platform,
   StatusBar,
-  I18nManager
+  I18nManager,
+  StyleSheet,
+  Dimensions,
+  View
 } from 'react-native';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {RootNav} from './src/routes/routes';
 import {getStore, getPersistor} from './src/store/index';
-import SendData from "./src/components/screens/SendData";
 
 I18nManager.allowRTL(false);
+const pageWidth = Dimensions.get("screen").width;
+
 
 const App = () => {
   const myStore = getStore();
@@ -38,12 +42,21 @@ const App = () => {
     <Provider store={myStore}>
         {/*<SendData/>*/}
       <PersistGate loading={null} persistor={myPersistor}>
-      <StatusBar backgroundColor="#520000"/>
+      <View style={styles.statusBarBackground} />
+      {/* <StatusBar backgroundColor="#520000" height={Platform.OS == 'ios' ? 20 : 0}/> */}
         <RootNav/>
       </PersistGate>
     </Provider>
   );
 };
+
+const styles = StyleSheet.create({
+  statusBarBackground: {
+    backgroundColor: "#520000",
+    height: Platform.OS === "ios" ? 20 : 0,
+    width: pageWidth
+  }
+});
 
 
 

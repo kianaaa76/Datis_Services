@@ -6,7 +6,7 @@ import {
   Text,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {toFaDigit, normalize} from '../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../utils/utilities';
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -115,11 +115,11 @@ const Styles = StyleSheet.create({
   },
   titleTextStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   valueTextStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
 });
 

@@ -19,7 +19,7 @@ import {
 } from '../../../actions/api';
 import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from '../../../actions/types';
-import {toFaDigit, normalize} from '../../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../../common/ImageViwer';
 import {CameraIcon, DeleteIcon, UploadFileIcon} from "../../../assets/icons";
@@ -169,7 +169,7 @@ const RemainingServiceDetail = ({navigation}) => {
       <View style={Styles.singleItemContainerstyle}>
         <Text
           style={{
-            fontFamily: 'IRANSansMobile_Light',
+            fontFamily: getFontsName('IRANSansMobile_Light'),
             fontSize: normalize(13),
             flexShrink: 1,
           }}>
@@ -178,7 +178,7 @@ const RemainingServiceDetail = ({navigation}) => {
         <Text
           style={{
             fontSize: normalize(12),
-            fontFamily: 'IRANSansMobile_Medium',
+            fontFamily: getFontsName('IRANSansMobile_Medium'),
             marginLeft: 10,
             color: titleColor,
           }}>
@@ -199,7 +199,7 @@ const RemainingServiceDetail = ({navigation}) => {
         }
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag">
-        <Header headerText={'جزئیات'} />
+        <Header headerText={'جزئیات'} isCurrentRootHome={false} onBackPress={()=>navigation.goBack()}/>
         {detailLoading ? (
           <View
             style={{
@@ -275,7 +275,7 @@ const RemainingServiceDetail = ({navigation}) => {
                   <View style={{width: '100%'}}>
                     <Text
                       style={{
-                        fontFamily: 'IRANSansMobile_Light',
+                        fontFamily: getFontsName('IRANSansMobile_Light'),
                         fontSize: normalize(13),
                       }}>
                       {toFaDigit(
@@ -496,12 +496,12 @@ const Styles = StyleSheet.create({
   },
   itemLabelStyle: {
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     marginLeft: 10,
   },
   itemLabelStyle2: {
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     marginLeft: 10,
     color: '#CB3434',
   },
@@ -523,7 +523,7 @@ const Styles = StyleSheet.create({
     fontSize: normalize(13),
     color: '#fff',
     textAlign: 'center',
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   imageIconContainerStyle: {
     flexDirection: 'row',

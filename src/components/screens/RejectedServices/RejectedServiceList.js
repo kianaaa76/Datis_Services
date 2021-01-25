@@ -23,7 +23,7 @@ import {
   RESTORE_SERVICE_DATA,
   SET_EDITING_SERVICE,
 } from '../../../actions/types';
-import {normalize} from '../../utils/utilities';
+import {normalize, getFontsName} from '../../utils/utilities';
 import {RefreshIcon} from "../../../assets/icons";
 
 let FACTOR_IMAGE = '';
@@ -69,7 +69,7 @@ const MyService = ({navigation}) => {
         <Text
           style={{
             fontSize: normalize(15),
-            fontFamily: 'IRANSansMobile_Medium',
+            fontFamily: getFontsName('IRANSansMobile_Medium'),
             color: '#000',
           }}>
           درحال حاضر سرویسی وجود ندارد.
@@ -355,6 +355,8 @@ const MyService = ({navigation}) => {
             }
           })
         }
+        isCurrentRootHome={false}
+        onBackPress={()=>navigation.goBack()}
       />
       {serviceListLoading ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -526,7 +528,7 @@ const Styles = StyleSheet.create({
   modalHeaderTextStyle: {
     color: '#fff',
     fontSize: normalize(17),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -539,7 +541,7 @@ const Styles = StyleSheet.create({
     color: '#660000',
     textAlign: 'center',
     fontSize: normalize(15),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -559,7 +561,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   onScreenLoadingContainerStyle: {
     width: pageWidth,

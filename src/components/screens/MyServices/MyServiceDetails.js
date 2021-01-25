@@ -22,7 +22,7 @@ import {
   SET_EDITING_SERVICE,
 } from '../../../actions/types';
 import {SaveIcon, CheckIcon} from "../../../assets/icons";
-import {normalize} from '../../utils/utilities';
+import {normalize, getFontsName} from '../../utils/utilities';
 import ServiceInfoTab from '../../common/serviceComponents/serviceInfoTab';
 import ServiceFactorTab from '../../common/serviceComponents/serviceFactorTab';
 import ServiceServicesTab from '../../common/serviceComponents/serviceServiceTab';
@@ -622,6 +622,8 @@ const MyServiceDetails = ({navigation}) => {
             })}
           </View>
         }
+        isCurrentRootHome={false}
+        onBackPress={()=>navigation.replace("MyServices")}
       />
       {detailsLoading ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -637,7 +639,7 @@ const MyServiceDetails = ({navigation}) => {
                 color: '#000',
                 textAlign: 'center',
                 fontSize: normalize(12),
-                fontFamily: 'IRANSansMobile_Light',
+                fontFamily: getFontsName('IRANSansMobile_Light'),
               }}
               indicatorStyle={{backgroundColor: '#660000'}}
             />
@@ -659,7 +661,7 @@ const MyServiceDetails = ({navigation}) => {
               <Text
                 style={{
                   fontSize: normalize(15),
-                  fontFamily: 'IRANSansMobile_Medium',
+                  fontFamily: getFontsName('IRANSansMobile_Medium'),
                 }}>
                 آیا از ارسال اطلاعات اطمینان دارید؟
               </Text>
@@ -693,7 +695,7 @@ const MyServiceDetails = ({navigation}) => {
               <Text
                 style={{
                   fontSize: normalize(14),
-                  fontFamily: 'IRANSansMobile_Medium',
+                  fontFamily: getFontsName('IRANSansMobile_Medium'),
                   textAlign: 'center',
                 }}>
                 آیا مایل به ذخیره اطلاعات وارد شده هستید؟
@@ -807,7 +809,7 @@ const Styles = StyleSheet.create({
   modalHeaderTextStyle: {
     color: '#fff',
     fontSize: normalize(15),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -827,7 +829,7 @@ const Styles = StyleSheet.create({
     color: '#660000',
     textAlign: 'center',
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -858,7 +860,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   onScreenLoadingContainerStyle: {
     width: pageWidth,

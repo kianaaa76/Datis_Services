@@ -16,7 +16,7 @@ import VersionInfo from 'react-native-version-info';
 import backgroundImage from '../../../assets/images/background_splash_screen.jpg';
 import splashImage from '../../../assets/images/image_splash_screen.png';
 import {checkUpdate} from '../../actions/api';
-import {normalize} from '../utils/utilities';
+import {normalize, getFontsName} from '../utils/utilities';
 import {LOGIN} from '../../actions/types';
 
 const pageHeight = Dimensions.get('screen').height;
@@ -151,7 +151,7 @@ const Styles = StyleSheet.create({
   modalHeaderTextStyle: {
     color: '#fff',
     fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -164,7 +164,7 @@ const Styles = StyleSheet.create({
     color: '#660000',
     textAlign: 'center',
     fontSize: normalize(15),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -184,7 +184,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
 });
 

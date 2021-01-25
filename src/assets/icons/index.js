@@ -475,6 +475,27 @@ export function SearchLocationIcon(props) {
     )
 }
 
+export function BackIosIcon(props) {
+    return (
+        <Svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={27}
+          height={27}
+          viewBox="0 0 27 27"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          color="#fff"
+          className="prefix__feather prefix__feather-chevron-left"
+          {...props}
+        >
+          <Path d="M15 18l-6-6 6-6" />
+        </Svg>
+      )
+  }
+
 
 
 

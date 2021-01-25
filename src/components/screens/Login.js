@@ -15,7 +15,7 @@ import {
 import {LOGIN, LOGOUT} from '../../actions/types';
 import {useDispatch} from 'react-redux';
 import backgroundImage from '../../../assets/images/background_login_screen.png';
-import {toFaDigit, normalize} from '../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../utils/utilities';
 import {loginUser, loginVerification} from '../../actions/api';
 import Toast from 'react-native-simple-toast';
 
@@ -237,7 +237,7 @@ const Styles = StyleSheet.create({
     fontSize: normalize(13),
     textAlign: 'center',
     color: '#660000',
-    fontFamily: 'IRANSansMobile_Bold',
+    fontFamily: getFontsName('IRANSansMobile_Bold'),
   },
   textInputStyle: {
     width: pageWidth * 0.45,
@@ -245,7 +245,7 @@ const Styles = StyleSheet.create({
     backgroundColor: 'transparent',
     margin: 10,
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile',
+    fontFamily: getFontsName('IRANSansMobile'),
   },
   textInputContainerStyle: {
     justifyContent: 'center',

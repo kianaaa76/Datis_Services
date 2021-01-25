@@ -1,4 +1,4 @@
-import {Dimensions, Platform, PixelRatio} from 'react-native';
+import {Dimensions, PixelRatio, Platform} from 'react-native';
 
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
@@ -8,7 +8,7 @@ const scale = SCREEN_WIDTH / 320;
 export function normalize(size) {
   const newSize = size * scale;
   if (Platform.OS === 'ios') {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+    return Math.round(PixelRatio.roundToNearestPixel(newSize))-2;
   } else {
     return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 4;
   }
@@ -36,3 +36,17 @@ export function toFaDigit(input) {
   return returnModel;
 }
 
+export function getFontsName(name){
+  if (Platform.OS == "android"){
+    return name;
+  } else {
+    if (name === 'IRANSansMobile_Medium'){
+      return 'IRANSansMobile-Medium';
+    } else if (name == 'IRANSansMobile_Light'){
+      return 'IRANSansMobile-Light';
+    } else if (name == 'IRANSansMobile_Bold'){
+      return 'IRANSansMobile-Bold';
+    } else if (name == 'IRANSansMobile'){
+      return name;
+  }
+}}

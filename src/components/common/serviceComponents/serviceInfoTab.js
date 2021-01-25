@@ -8,7 +8,7 @@ import {
   Dimensions,
   BackHandler,
 } from 'react-native';
-import {toFaDigit, normalize} from '../../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import {PhoneIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -81,14 +81,15 @@ const Styles = StyleSheet.create({
   },
   titleTextStyle: {
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     width: '39%',
+    textAlign:"right"
   },
   textStyle: {
     fontSize: normalize(14),
     textAlign: 'right',
     width: pageWidth - 160,
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     flexShrink: 1,
   },
   rightSideContainerStyle: {

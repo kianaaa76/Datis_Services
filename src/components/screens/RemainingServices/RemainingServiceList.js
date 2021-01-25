@@ -14,7 +14,7 @@ import {unsettledServiceList} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
 import RemainingServiceListItem from '../../utils/RemainingServiceListItem';
-import {normalize} from "../../utils/utilities";
+import {normalize, getFontsName} from "../../utils/utilities";
 import {RefreshIcon} from "../../../assets/icons";
 
 
@@ -66,7 +66,7 @@ const RemainingServiceList = ({navigation}) => {
     const renderEmptyList = () => {
         return (
             <View style={{width:pageWidth, height: pageHeight*0.8, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontSize: normalize(15), fontFamily:"IRANSansMobile", color: '#000'}}>
+                <Text style={{fontSize: normalize(15), fontFamily:getFontsName("IRANSansMobile"), color: '#000'}}>
                     شما سرویس مانده دار ندارید.
                 </Text>
             </View>
@@ -86,6 +86,8 @@ const RemainingServiceList = ({navigation}) => {
                         }
                     })
                 }
+                isCurrentRootHome={false}
+                onBackPress={()=>navigation.goBack()}
             />
             {listLoading ? (
                 <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

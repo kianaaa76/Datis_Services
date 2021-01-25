@@ -14,7 +14,7 @@ import {
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Toast from 'react-native-simple-toast';
 import {API_KEY, MAPBOX_API_KEY} from '../../../actions/types';
-import {toFaDigit, normalize} from '../../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import {CurrentLocationIcon, SearchIcon, MapMarkerIcon, RemoveMarkerIcon} from "../../../assets/icons";
 
@@ -475,7 +475,7 @@ const ServiceMissionTab = ({
               <Text
                 style={{
                   fontSize: normalize(13),
-                  fontFamily: 'IRANSansMobile_Light',
+                  fontFamily: getFontsName('IRANSansMobile_Light'),
                 }}>
                 کیلومتر
               </Text>
@@ -483,7 +483,7 @@ const ServiceMissionTab = ({
                 style={{
                   marginHorizontal: 5,
                   fontSize: normalize(12),
-                  fontFamily: 'IRANSansMobile_Light',
+                  fontFamily: getFontsName('IRANSansMobile_Light'),
                 }}>
                 {!!distance ? toFaDigit(distance) : toFaDigit('0')}
               </Text>
@@ -530,7 +530,7 @@ const Styles = StyleSheet.create({
   },
   headerTextStyle: {
     fontSize: normalize(15),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     textAlign: 'center',
   },
   headerTextContainerStyle: {
@@ -601,7 +601,7 @@ const Styles = StyleSheet.create({
     marginLeft: 10,
     width: '35%',
     textAlign: 'center',
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   cityDataContentContainerStyle: {
     flexDirection: 'row',
@@ -617,7 +617,7 @@ const Styles = StyleSheet.create({
   },
   descriptionTitleTextStyle: {
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     marginBottom: 5,
   },
   descriptionTextInputStyle: {
@@ -629,7 +629,7 @@ const Styles = StyleSheet.create({
     textAlignVertical: 'top',
     paddingHorizontal: 15,
     paddingVertical: 8,
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     fontSize: normalize(13),
   },
   markerLabelStyle: {
@@ -641,7 +641,7 @@ const Styles = StyleSheet.create({
     backgroundColor: '#A8A7A7',
     color: '#000',
     fontSize: normalize(12),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   switchContainerStyle: {
     flexDirection: 'row',
@@ -658,7 +658,7 @@ const Styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     textAlign: 'center',
   },
   distanceContainerStyle: {

@@ -19,7 +19,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment-jalaali';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import {API_KEY} from '../../../actions/types';
-import {toFaDigit, normalize} from '../../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import {
   CalendarIcon,
@@ -229,7 +229,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                 style={{
                   fontSize: normalize(14),
                   marginRight: 10,
-                  fontFamily: 'IRANSansMobile(FaNum)_Light',
+                  fontFamily: getFontsName('IRANSansMobile(FaNum)_Light'),
                 }}>
                 {`${toFaDigit(info.finalDate)}`}
               </Text>
@@ -341,7 +341,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             <View style={Styles.modalBodyContainerStyle2}>
               <Text
                 style={{
-                  fontFamily: 'IRANSansMobile_Medium',
+                  fontFamily: getFontsName('IRANSansMobile_Medium'),
                   fontSize: normalize(14),
                   textAlign: 'center',
                 }}>
@@ -533,15 +533,16 @@ const Styles = StyleSheet.create({
     borderColor: '#000',
     borderRadius: 10,
     textAlignVertical: 'top',
+    textAlign:'right',
     paddingHorizontal: 15,
     paddingVertical: 0,
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   serviceTypeTextStyle: {
     fontSize: normalize(13),
     color: '#660000',
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   addressRowStyle: {
     flexDirection: 'row',
@@ -559,7 +560,7 @@ const Styles = StyleSheet.create({
     borderBottomColor: '#660000',
     paddingHorizontal: 10,
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     color: '#000',
   },
   imageRowStyle: {
@@ -674,8 +675,9 @@ const Styles = StyleSheet.create({
   },
   checkboxTextStyle: {
     fontSize: normalize(12),
+    textAlign:"right",
     width: '75%',
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   modalBackgroundStyle: {
     flex: 1,
@@ -736,10 +738,10 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   labelStyle: {
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     fontSize: normalize(14),
   },
 });

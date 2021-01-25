@@ -13,7 +13,7 @@ import Header from '../../common/Header';
 import {unsettledServiceDetail} from '../../../actions/api';
 import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from '../../../actions/types';
-import {toFaDigit, normalize} from '../../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import ImageViewer from '../../common/ImageViwer';
 import Toast from "react-native-simple-toast";
 
@@ -103,7 +103,7 @@ const ServiceArchiveDetail = ({navigation}) => {
         <Text
           style={{
             fontSize: normalize(13),
-            fontFamily: 'IRANSansMobile_Light',
+            fontFamily: getFontsName('IRANSansMobile_Light'),
             flexShrink: 1,
           }}>
           {text}
@@ -111,7 +111,7 @@ const ServiceArchiveDetail = ({navigation}) => {
         <Text
           style={{
             fontSize: normalize(13),
-            fontFamily: 'IRANSansMobile_Medium',
+            fontFamily: getFontsName('IRANSansMobile_Medium'),
             marginLeft: 10,
             color: titleColor,
           }}>
@@ -124,7 +124,7 @@ const ServiceArchiveDetail = ({navigation}) => {
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 1}}>
-        <Header headerText={'اطلاعات سرویس'} />
+        <Header headerText={'اطلاعات سرویس'} isCurrentRootHome={false} onBackPress={()=>navigation.goBack()}/>
         <ScrollView
           style={{flex: 1}}
           contentContainerstyle={{
@@ -205,7 +205,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                         <Text
                           style={{
                             fontSize: normalize(13),
-                            fontFamily: 'IRANSansMobile(FaNum)_Light',
+                            fontFamily: getFontsName('IRANSansMobile_Light'),
                           }}>
                           {toFaDigit(
                             serviceDetail.DocumentDetails.Msg.substr(
@@ -242,7 +242,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                           style={{
                             marginBottom: 10,
                             fontSize: normalize(13),
-                            fontFamily: 'IRANSansMobile_Light',
+                            fontFamily: getFontsName('IRANSansMobile_Light'),
                           }}>
                           توضیحات:
                         </Text>
@@ -259,7 +259,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                           style={{
                             marginBottom: 10,
                             fontSize: normalize(13),
-                            fontFamily: 'IRANSansMobile_Light',
+                            fontFamily: getFontsName('IRANSansMobile_Light'),
                           }}>
                           آدرس:
                         </Text>
@@ -365,7 +365,7 @@ const Styles = StyleSheet.create({
     fontSize: normalize(14),
     color: '#fff',
     textAlign: 'center',
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   imageIconContainerStyle: {
     flexDirection: 'row',
@@ -433,7 +433,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   descriptionContainerStyle: {
     flexDirection: 'row',
@@ -457,7 +457,7 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 5,
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     color: '#000',
   },
   addressTitleContainerStyle: {
@@ -475,7 +475,7 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 5,
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     color: '#000',
   },
 
@@ -533,7 +533,7 @@ const Styles = StyleSheet.create({
   },
   labelStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   myLocationContainerStye: {
     position: 'absolute',

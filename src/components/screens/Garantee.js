@@ -7,15 +7,16 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
-    BackHandler
+    BackHandler,
+    Platform
 } from 'react-native';
 import Header from '../common/Header';
 import Toast from "react-native-simple-toast";
 import RnZxing from 'react-native-rn-zxing';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
-import {toFaDigit, normalize} from '../utils/utilities';
-import {BarcodeScannerIcon} from "../../assets/icons";
+import {toFaDigit, normalize, getFontsName} from '../utils/utilities';
+import {BarcodeScannerIcon, RefreshIcon, BackIosIcon} from "../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 
@@ -73,7 +74,10 @@ const Garantee = ({navigation}) => {
   return (
     <View style={{flex: 1}}>
       <>
-        <Header headerText={'استعلام گارانتی'} />
+        <Header 
+        headerText={'استعلام گارانتی'} 
+        onBackPress={()=>navigation.goBack()}
+        />
         <View style={{flex: 1, alignItems: 'center'}}>
           <View style={Styles.inputContainerStyle}>
             {BarcodeScannerIcon({
@@ -137,7 +141,7 @@ const Styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#A0A0A0',
     paddingVertical: 2,
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     marginHorizontal: 10,
   },
   inputContainerStyle: {
@@ -175,7 +179,7 @@ const Styles = StyleSheet.create({
   },
   buttonTextStyle: {
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   singleItemContainerStyle: {
     flexDirection: 'row',
@@ -187,11 +191,11 @@ const Styles = StyleSheet.create({
   },
   titleTextStyle: {
     fontSize: normalize(14),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   valueTextStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
 });
 

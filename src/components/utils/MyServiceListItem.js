@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
-import {toFaDigit, normalize} from './utilities';
+import {toFaDigit, normalize, getFontsName} from './utilities';
 import AsyncStorage from '@react-native-community/async-storage';
 import {RESTORE_SERVICE_DATA} from '../../actions/types';
 
@@ -124,7 +124,7 @@ const MyServiceListItem = ({
             <Text
               style={{
                 fontSize: normalize(13),
-                fontFamily: 'IRANSansMobile_Medium',
+                fontFamily: getFontsName('IRANSansMobile_Medium'),
               }}>
               نام:{' '}
             </Text>
@@ -138,7 +138,7 @@ const MyServiceListItem = ({
             <Text
               style={{
                 fontSize: normalize(13),
-                fontFamily: 'IRANSansMobile_Medium',
+                fontFamily: getFontsName('IRANSansMobile_Medium'),
               }}>
               شماره‌ ‌پرونده:{' '}
             </Text>
@@ -150,7 +150,7 @@ const MyServiceListItem = ({
             <Text
               style={{
                 fontSize: normalize(13),
-                fontFamily: 'IRANSansMobile_Medium',
+                fontFamily: getFontsName('IRANSansMobile_Medium'),
                 textAlign: 'center',
               }}>
               همراه:{' '}
@@ -184,7 +184,7 @@ const Styles = StyleSheet.create({
   },
   valueTextStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
 });
 

@@ -15,7 +15,7 @@ import {getMissionList} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
 import MissionListItem from '../../utils/missionListItem';
-import {normalize} from '../../utils/utilities';
+import {normalize, getFontsName} from '../../utils/utilities';
 import {RefreshIcon, SearchIcon} from "../../../assets/icons";
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -75,7 +75,7 @@ const MissionList = ({navigation}) => {
         <Text
           style={{
             fontSize: normalize(15),
-            fontFamily: 'IRANSansMobile_Medium',
+            fontFamily: getFontsName('IRANSansMobile_Medium'),
             color: '#000',
           }}>
           ماموریتی وجود ندارد.
@@ -111,6 +111,8 @@ const MissionList = ({navigation}) => {
             }
           })
         }
+        isCurrentRootHome={false}
+        onBackPress={()=>navigation.goBack()}
       />
       {missionListLoading ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -184,6 +186,7 @@ const Styles = StyleSheet.create({
     elevation: 5,
   },
   searchInputStyle: {
+    textAlign:"right",
     width: '85%',
     padding: 5,
     marginRight: '5%',

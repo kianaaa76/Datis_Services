@@ -2,7 +2,7 @@ import React,{useEffect} from 'react';
 import {View, StyleSheet, Dimensions, Text, BackHandler} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Header from '../../common/Header';
-import {toFaDigit, normalize} from '../../utils/utilities';
+import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import {MapMarkerIcon} from "../../../assets/icons";
 
 const pageHeight = Dimensions.get('screen').height;
@@ -58,17 +58,19 @@ const MissionDetails = ({navigation}) => {
             color:color,
             fill:color
           })}
-          <Text style={Styles.markerLabelStyle}>
-            {type === 'start' ? 'مبدا' : 'مقصد'}
-          </Text>
+          <View style={Styles.markerLabelContainerStyle}>
+            <Text style={Styles.markerLabelStyle}>
+              {type === 'start' ? 'مبدا' : 'مقصد'}
+            </Text>
+          </View>
         </View>
       </MapboxGL.MarkerView>
     );
   };
 
   return (
-    <View style={{flex: 1}}>
-      <Header headerText="داتیس سرویس" />
+    <View style={{flex: 1}}> 
+      <Header headerText="داتیس سرویس" onBackPress={()=>navigation.goBack()} iisCurrentRootHome={false}/>
       <View style={Styles.contentContainerStyle}>
         <View>
           <MapboxGL.MapView style={{width: '100%', height: pageHeight * 0.57}}>
@@ -198,26 +200,28 @@ const Styles = StyleSheet.create({
     width: '60%',
   },
   itemTitleStyle: {
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     fontSize: normalize(13),
   },
   itemTextStyle: {
     fontSize: normalize(12),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     flexShrink: 1,
   },
   markerLabelStyle: {
+    alignSelf: 'center',
+    textAlign: 'center',
+    color: '#000',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
+    fontSize: normalize(12),
+  },
+  markerLabelContainerStyle:{
     width: 50,
     height: 20,
     justifyContent: 'center',
-    alignSelf: 'center',
-    textAlign: 'center',
     borderRadius: 10,
     backgroundColor: '#A8A7A7',
-    color: '#000',
-    fontFamily: 'IRANSansMobile_Medium',
-    fontSize: normalize(12),
-  },
+  }
 });
 
 export default MissionDetails;

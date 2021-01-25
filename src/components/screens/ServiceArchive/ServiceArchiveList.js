@@ -15,7 +15,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {serviceArchiveListWithSerial, serviceArchiveListWithoutSerial} from '../../../actions/api';
 import {LOGOUT} from '../../../actions/types';
 import Header from '../../common/Header';
-import {toFaDigit, normalize} from "../../utils/utilities";
+import {toFaDigit, normalize, getFontsName} from "../../utils/utilities";
 import ServiceArchiveListItem from "../../utils/ServiceArchiveListItem";
 import {RefreshIcon} from "../../../assets/icons";
 
@@ -85,7 +85,7 @@ const ServiceArchiveList = ({navigation}) => {
     const renderEmptyList = () => {
         return (
             <View style={{height:pageHeight*0.8, width:pageWidth, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontSize: normalize(15), fontFamily:"IRANSansMobile_Medium", color: '#000'}}>
+                <Text style={{fontSize: normalize(15), fontFamily:getFontsName("IRANSansMobile_Medium"), color: '#000'}}>
                     سرویس مورد نظر یافت نشد.
                 </Text>
             </View>
@@ -108,6 +108,8 @@ const ServiceArchiveList = ({navigation}) => {
                         }
                     })
                 }
+                isCurrentRootHome={false}
+                onBackPress={()=>navigation.goBack()}
             />
             {serviceLoading ? (
                 <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -231,7 +233,7 @@ const Styles = StyleSheet.create({
     modalHeaderTextStyle:{
         color:"#fff",
         fontSize:normalize(16),
-        fontFamily:"IRANSansMobile_Light"
+        fontFamily:getFontsName("IRANSansMobile_Light")
     },
     modalBodyContainerStyle:{
         width:"100%",
@@ -244,7 +246,7 @@ const Styles = StyleSheet.create({
         color: "#5B5B5B",
         textAlign:"center",
         fontSize: normalize(13),
-        fontFamily:"IRANSansMobile_Light"
+        fontFamily:getFontsName("IRANSansMobile_Light")
     },
     modalFooterContainerStyle:{
         flexDirection:"row",
@@ -265,7 +267,7 @@ const Styles = StyleSheet.create({
     modalButtonTextStyle:{
         color:"#fff",
         fontSize:normalize(14),
-        fontFamily:'IRANSansMobile_Medium'
+        fontFamily:getFontsName('IRANSansMobile_Medium')
     },
     modalBodyInputContainerStyle:{
         flexDirection: "row",
@@ -284,13 +286,13 @@ const Styles = StyleSheet.create({
         paddingHorizontal: 8,
         backgroundColor:"transparent",
         textAlign:"center",
-        fontFamily:"IRANSansMobile_Light"
+        fontFamily:getFontsName("IRANSansMobile_Light")
     },
     inputLabelStyle:{
         fontSize:normalize(13),
         color:"#5B5B5B",
         textAlign: "center",
-        fontFamily:"IRANSansMobile_Light",
+        fontFamily:getFontsName("IRANSansMobile_Light"),
         width:"40%"
     }
 });

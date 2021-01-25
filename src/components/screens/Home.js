@@ -25,7 +25,7 @@ import {
   SET_USER_LIST,
 } from '../../actions/types';
 import {call, getObjects, getUsers} from '../../actions/api';
-import {normalize} from '../utils/utilities';
+import {normalize, getFontsName} from '../utils/utilities';
 import Toast from 'react-native-simple-toast';
 import {MenuIcon, SearchIcon} from "../../assets/icons";
 
@@ -185,7 +185,7 @@ const Home = ({navigation}) => {
               <TouchableOpacity style={{flexDirection:"row"}} onPress={()=>navigation.openDrawer()}>
                 <Text style={{fontSize: normalize(15),
                   color: "#dadfe1",
-                  fontFamily:"IRANSansMobile"}}>
+                  fontFamily:getFontsName("IRANSansMobile")}}>
                   داتیس سرویس
                 </Text>
                 {MenuIcon({
@@ -211,13 +211,14 @@ const Home = ({navigation}) => {
                     style={{
                       color: '#fff',
                       fontSize: normalize(16),
-                      fontFamily: 'IRANSansMobile_Light',
+                      fontFamily: getFontsName('IRANSansMobile_Light'),
                     }}>
                     {user.Name}
                   </Text>
                 </TouchableOpacity>
               ) : null
             }
+            isCurrentRootHome={true}
           />
 
           {showUserList && (
@@ -234,7 +235,7 @@ const Home = ({navigation}) => {
                   placeholder={'جستجو کنید...'}
                   onChangeText={text => search(text)}
                   style={{
-                    fontFamily: 'IRANSansMobile_Light',
+                    fontFamily: getFontsName('IRANSansMobile_Light'),
                     fontSize: normalize(12),
                     width: '100%',
                   }}
@@ -271,7 +272,7 @@ const Home = ({navigation}) => {
                       style={{
                         color: '#000',
                         fontSize: normalize(13),
-                        fontFamily: 'IRANSansMobile_Light',
+                        fontFamily: getFontsName('IRANSansMobile_Light'),
                       }}>
                       {item.item.Name}
                     </Text>
@@ -430,7 +431,7 @@ const Styles = StyleSheet.create({
     color: 'gray',
     fontSize: normalize(13),
     textAlign: 'center',
-    fontFamily: 'IRANSansMobile(FaNum)_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   callIconStyle: {
     width: pageWidth * 0.14,
@@ -486,7 +487,7 @@ const Styles = StyleSheet.create({
   modalHeaderTextStyle: {
     color: '#fff',
     fontSize: normalize(17),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   modalBodyContainerStyle: {
     width: '100%',
@@ -499,7 +500,7 @@ const Styles = StyleSheet.create({
     color: '#660000',
     textAlign: 'center',
     fontSize: normalize(15),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   modalFooterContainerStyle: {
     flexDirection: 'row',
@@ -519,7 +520,7 @@ const Styles = StyleSheet.create({
   modalButtonTextStyle: {
     color: 'gray',
     fontSize: normalize(16),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
 });
 

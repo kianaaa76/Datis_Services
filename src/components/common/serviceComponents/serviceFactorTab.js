@@ -11,11 +11,10 @@ import {
   BackHandler,
 } from 'react-native';
 import Toast from "react-native-simple-toast";
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import NumberFormat from 'react-number-format';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageViewer from '../ImageViwer';
-import {normalize} from '../../utils/utilities';
+import {normalize, getFontsName} from '../../utils/utilities';
 import {StarIcon, UploadFileIcon, CameraIcon, DeleteIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
@@ -243,12 +242,7 @@ const ServiceFactorTab = ({
               width: '35%',
               justifyContent: 'flex-end',
             }}>
-            {!!info.toCompanySettlement && info.toCompanySettlement != '0' && (
-              <Icon
-                name={'star'}
-                style={{color: 'red', fontSize: normalize(10)}}
-              />
-            )}
+            {!!info.toCompanySettlement && info.toCompanySettlement != '0' && StarIcon()}
             <Text style={Styles.labelStyle}>عکس فیش واریزی:</Text>
           </View>
         </View>
@@ -340,10 +334,10 @@ const Styles = StyleSheet.create({
   },
   rialTextStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
   },
   labelStyle: {
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     fontSize: normalize(15),
     // flexShrink: 1,
     textAlign: 'right',

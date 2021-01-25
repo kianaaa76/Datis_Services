@@ -8,6 +8,7 @@ import {
   Linking,
 } from 'react-native';
 import logo from '../../assets/images/image_splash_screen.png';
+import {getFontsName} from "../components/utils/utilities";
 
 const DrawerContent = ({navigation}) => {
   return (
@@ -34,7 +35,7 @@ const DrawerContent = ({navigation}) => {
 const Styles = StyleSheet.create({
   titleTextStyle: {
     fontSize: 14,
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     color: '#000',
   },
   titleContainerStyle: {

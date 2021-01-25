@@ -10,8 +10,6 @@ target 'Datis_Services' do
 
   pod 'RNImageCropPicker', :path => '../node_modules/react-native-image-crop-picker'
   
-  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
-
   target 'Datis_ServicesTests' do
     inherit! :complete
     # Pods for testing

@@ -19,7 +19,7 @@ import DropdownPicker from '../DropdownPicker';
 import {useSelector} from 'react-redux';
 import {getObjBySerial, checkObjectVersion} from '../../../actions/api';
 import RnZxing from 'react-native-rn-zxing';
-import {normalize} from '../../utils/utilities';
+import {normalize, getFontsName} from '../../utils/utilities';
 import NumberFormat from "react-number-format";
 import {
   ArrowLeftIcon,
@@ -508,7 +508,7 @@ const ServicePartsTab = ({
                 color: '#660000',
                 fontSize: normalize(12),
                 textAlign: 'center',
-                fontFamily: 'IRANSansMobile_Light',
+                fontFamily: getFontsName('IRANSansMobile_Light'),
               }}>
               {!!Item.serial ? Item.serial : 'سریال'}
             </Text>
@@ -517,7 +517,7 @@ const ServicePartsTab = ({
                 color: '#660000',
                 fontSize: normalize(12),
                 textAlign: 'center',
-                fontFamily: 'IRANSansMobile_Light',
+                fontFamily: getFontsName('IRANSansMobile_Light'),
               }}>
               {!!Item.partType ? Item.partType.label : 'نام'}
             </Text>
@@ -556,7 +556,7 @@ const ServicePartsTab = ({
               <Text
                 style={{
                   fontSize: normalize(13),
-                  fontFamily: 'IRANSansMobile_Light',
+                  fontFamily: getFontsName('IRANSansMobile_Light'),
                 }}>
                 نوع قطعه:
               </Text>
@@ -918,7 +918,7 @@ const ServicePartsTab = ({
                   color: '#660000',
                   fontSize: normalize(12),
                   textAlign: 'center',
-                  fontFamily: 'IRANSansMobile_Light',
+                  fontFamily: getFontsName('IRANSansMobile_Light'),
                 }}>
                 {!!fieldsObject.serial ? fieldsObject.serial : 'سریال'}
               </Text>
@@ -928,7 +928,7 @@ const ServicePartsTab = ({
                   color: '#660000',
                   fontSize: normalize(12),
                   textAlign: 'center',
-                  fontFamily: 'IRANSansMobile_Light',
+                  fontFamily: getFontsName('IRANSansMobile_Light'),
                 }}>
                 {!!fieldsObject.partTypeSelected.label
                   ? fieldsObject.partTypeSelected.label
@@ -977,7 +977,7 @@ const ServicePartsTab = ({
                     style={{
                       color: '#000',
                       fontSize: normalize(12),
-                      fontFamily: 'IRANSansMobile_Medium',
+                      fontFamily: getFontsName('IRANSansMobile_Medium'),
                     }}>
                     قطعه معیوب
                   </Text>
@@ -1025,7 +1025,7 @@ const ServicePartsTab = ({
                     style={{
                       color: '#000',
                       fontSize: normalize(12),
-                      fontFamily: 'IRANSansMobile_Medium',
+                      fontFamily: getFontsName('IRANSansMobile_Medium'),
                     }}>
                     قطعه جدید
                   </Text>
@@ -1502,7 +1502,8 @@ const Styles = StyleSheet.create({
   },
   labelStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
+    textAlign:"right"
   },
 });
 

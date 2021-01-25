@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { View, StyleSheet, Text, Dimensions } from "react-native";
-import {normalize} from "../utils/utilities";
+import { View, StyleSheet, Text, Dimensions, Platform } from "react-native";
+import {normalize, getFontsName} from "../utils/utilities";
+import {BackIosIcon, RefreshIcon} from "../../assets/icons";
 
 const pageWidth = Dimensions.get("screen").width;
 const pageHeight = Dimensions.get("screen").height;
@@ -23,11 +24,18 @@ export default class extends Component {
   }
 
   render() {
-    const { headerText, leftIcon, rightIcon } = this.props;
+    const { headerText, leftIcon, rightIcon, onBackPress, isCurrentRootHome } = this.props;
     return (
       <View style={Styles.headercontainerStyle}>
         <View style={Styles.headerContentStyle}>
-          <View style={{ justifyContent:'center', height:"100%" }}>
+          <View style={{ justifyContent:'center', height:"100%", flexDirection:"row", alignItems:"center" }}>
+            {Platform.OS == "ios" && !isCurrentRootHome && (
+              <View style={{marginRight:10, justifyContent:"center", alignItems:"center"}}>
+              {BackIosIcon({
+              onPress:()=>onBackPress()
+            })}
+            </View>
+            )} 
             {!!leftIcon && this.renderHeaderLeft()}
           </View>
           <View style={Styles.headerTextContainerStyle}>
@@ -61,7 +69,7 @@ const Styles = StyleSheet.create({
   headerTitleStyle: {
     fontSize: normalize(15),
     color: "#dadfe1",
-    fontFamily:"IRANSansMobile"
+    fontFamily:getFontsName("IRANSansMobile")
   },
   headerTextContainerStyle: {
     flexDirection: "row",

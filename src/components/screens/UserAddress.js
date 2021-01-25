@@ -11,7 +11,7 @@ import Toast from "react-native-simple-toast";
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import Header from '../common/Header';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import {normalize} from '../utils/utilities';
+import {normalize, getFontsName} from '../utils/utilities';
 import {setHomeLocationOfUser} from '../../actions/api';
 import {useSelector} from 'react-redux';
 import {CurrentLocationIcon, MapMarkerIcon, RemoveMarkerIcon} from "../../assets/icons";
@@ -88,7 +88,7 @@ const UserAddress = ({navigation}) => {
 
   return (
     <View style={Styles.containerStyle}>
-      <Header headerText="اطلاعات کاربری" />
+      <Header headerText="اطلاعات کاربری" isCurrentRootHome={false}/>
       {pageLoading ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <ActivityIndicator size="large" color="#660000" />
@@ -254,7 +254,7 @@ const Styles = StyleSheet.create({
   },
   headerTextStyle: {
     fontSize: normalize(15),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
     textAlign: 'center',
   },
   headerTextContainerStyle: {
@@ -286,7 +286,7 @@ const Styles = StyleSheet.create({
   confirmButtonTextStyle: {
     color: '#fff',
     fontSize: normalize(17),
-    fontFamily: 'IRANSansMobile_Medium',
+    fontFamily: getFontsName('IRANSansMobile_Medium'),
   },
   removeMarkerContainerStyle: {
     position: 'absolute',

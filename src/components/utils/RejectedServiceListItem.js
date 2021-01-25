@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import Toast from "react-native-simple-toast";
 import {useDispatch, useSelector} from 'react-redux';
-import {toFaDigit, normalize} from './utilities';
+import {toFaDigit, normalize, getFontsName} from './utilities';
 import AsyncStorage from '@react-native-community/async-storage';
 import {LOGOUT, RESTORE_SERVICE_DATA} from '../../actions/types';
 import {rejectedServiceDetail} from '../../actions/api';
@@ -285,17 +285,17 @@ const RejectedServiceListItem = ({
         <View style={Styles.secondRowContainerStyle}>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.projectID)}</Text>
-            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>پرونده: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium')}}>پرونده: </Text>
           </View>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.Name)}</Text>
-            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>نام: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium')}}>نام: </Text>
           </View>
         </View>
         <View style={[Styles.firstRowContainerStyle, {marginBottom: 2}]}>
           <View style={Styles.singleItemStyle}>
             <Text style={Styles.valueTextStyle}>{toFaDigit(Item.cell)}</Text>
-            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>همراه: </Text>
+            <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium')}}>همراه: </Text>
           </View>
         </View>
         <View style={Styles.firstRowContainerStyle}>
@@ -303,7 +303,7 @@ const RejectedServiceListItem = ({
             <Text style={Styles.valueTextStyle}>
             {Item.Resone}
             </Text>
-            <Text style={{fontSize: normalize(13), fontFamily: 'IRANSansMobile_Medium'}}>
+            <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium')}}>
               دلیل ردشدن پروژه:{' '}
             </Text>
           </View>
@@ -333,7 +333,7 @@ const Styles = StyleSheet.create({
   },
   valueTextStyle: {
     fontSize: normalize(13),
-    fontFamily: 'IRANSansMobile_Light',
+    fontFamily: getFontsName('IRANSansMobile_Light'),
     flexShrink:1,
     textAlign:"right"
   },

@@ -155,6 +155,8 @@ const Styles = StyleSheet.create({
   searchInputStyle: {
     width: '100%',
     height: 50,
+    textAlign:"right",
+    paddingHorizontal:10
   },
   listItemsContainerStyle: {
     flexDirection: 'row',
