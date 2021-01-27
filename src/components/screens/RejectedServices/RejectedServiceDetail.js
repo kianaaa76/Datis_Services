@@ -21,7 +21,7 @@ import ServiceServicesTab from '../../common/serviceComponents/serviceServiceTab
 import ServicePartsTab from '../../common/serviceComponents/servicePartsTab';
 import ServiceMissionTab from '../../common/serviceComponents/serviceMissionTab';
 import {sendServiceData} from '../../../actions/api';
-import {LOGOUT, SET_EDITING_SERVICE} from '../../../actions/types';
+import {LOGOUT} from '../../../actions/types';
 import {normalize, getFontsName} from '../../utils/utilities';
 import {CheckIcon, SaveIcon} from "../../../assets/icons";
 
@@ -178,28 +178,24 @@ const MyServiceDetails = ({navigation}) => {
       AsyncStorage.setItem('savedServicesList', JSON.stringify(savedList));
     });
     RNFetchBlob.fs.writeFile(
-      `${dirs.DownloadDir}/${serviceID}/1.png`,
+      `${dirs.DocumentDir}/${serviceID}/1.png`,
       factorTabInfo.factorImage,
       'base64',
     );
     if (!!factorTabInfo.billImage) {
       RNFetchBlob.fs.writeFile(
-        `${dirs.DownloadDir}/${serviceID}/2.png`,
+        `${dirs.DocumentDir}/${serviceID}/2.png`,
         factorTabInfo.billImage,
         'base64',
       );
     }
     if (!!serviceTabInfo.image) {
       RNFetchBlob.fs.writeFile(
-        `${dirs.DownloadDir}/${serviceID}/3.png`,
+        `${dirs.DocumentDir}/${serviceID}/3.png`,
         serviceTabInfo.image,
         'base64',
       );
     }
-    dispatch({
-      type: SET_EDITING_SERVICE,
-      editingService: '',
-    });
     navigation.replace('RejectedServices');
   };
 
@@ -366,22 +362,14 @@ const MyServiceDetails = ({navigation}) => {
                   JSON.stringify(tempList),
                 );
               });
-              RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+              RNFetchBlob.fs.unlink(`${dirs.DocumentDir}/${serviceID}`);
               setRequestLoading(false);
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
-              });
               navigation.replace('RejectedServices');
               Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER)
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
                 type: LOGOUT,
-              });
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
               });
               navigation.navigate('SignedOut');
             } else {
@@ -452,22 +440,14 @@ const MyServiceDetails = ({navigation}) => {
                   JSON.stringify(tempList),
                 );
               });
-              RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+              RNFetchBlob.fs.unlink(`${dirs.DocumentDir}/${serviceID}`);
               setRequestLoading(false);
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
-              });
               navigation.replace('RejectedServices');
               Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER)
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
                 type: LOGOUT,
-              });
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
               });
               navigation.navigate('SignedOut');
             } else {

@@ -95,7 +95,6 @@ const RemainingServiceList = ({navigation}) => {
                 </View>
             ) : (
                 <View style={Styles.contentContianerStyle}>
-                    <View style={Styles.flatlistContainerStyle}>
                         <FlatList
                             data={serviceList}
                             renderItem={(item) => (
@@ -104,7 +103,6 @@ const RemainingServiceList = ({navigation}) => {
                             keyExtractor={(item) => item.projectID.toString()}
                             ListEmptyComponent={() => renderEmptyList()}
                         />
-                    </View>
                 </View>
             )}
         </View>
@@ -120,11 +118,6 @@ const Styles = StyleSheet.create({
     contentContianerStyle: {
         flex: 1,
         padding: 5,
-    },
-    flatlistContainerStyle: {
-        flex:1,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     newMissionbuttonStyle: {
         width: pageWidth * 0.2,

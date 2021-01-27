@@ -117,16 +117,14 @@ const ServiceArchiveList = ({navigation}) => {
                 </View>
             ) : (
                 <View style={Styles.contentContianerStyle}>
-                    <View style={Styles.flatlistContainerStyle}>
-                        <FlatList
-                            data={serviceList}
-                            renderItem={(item) => (
-                                <ServiceArchiveListItem item={item} navigation={navigation} />
-                            )}
-                            keyExtractor={(item) => item.projectID.toString()}
-                            ListEmptyComponent={()=>renderEmptyList()}
-                        />
-                    </View>
+                    <FlatList
+                        data={serviceList}
+                        renderItem={(item) => (
+                            <ServiceArchiveListItem item={item} navigation={navigation} />
+                        )}
+                        keyExtractor={(item) => item.projectID.toString()}
+                        ListEmptyComponent={()=>renderEmptyList()}
+                    />
                 </View>
             )}
             {renderModal && (
@@ -189,11 +187,6 @@ const Styles = StyleSheet.create({
     contentContianerStyle: {
         flex: 1,
         padding: 5,
-    },
-    flatlistContainerStyle: {
-        flex:1,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     newMissionbuttonStyle: {
         width: pageWidth * 0.2,

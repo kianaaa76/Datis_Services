@@ -22,7 +22,6 @@ import {getMyServicesList} from '../../../actions/api';
 import {
   LOGOUT,
   RESTORE_SERVICE_DATA,
-  SET_EDITING_SERVICE,
 } from '../../../actions/types';
 import {RefreshIcon, PlusIcon} from "../../../assets/icons";
 
@@ -37,7 +36,6 @@ const MyService = ({navigation}) => {
   const [serviceListLoading, setServiceListLoading] = useState(false);
   const [renderRestoreModal, setRenderRestoreModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState('');
-  const [renderSendDataModal, setRenderSendDataModal] = useState(false);
 
   useEffect(() => {
     const backAction = () => {
@@ -79,7 +77,7 @@ const MyService = ({navigation}) => {
       let currentList = JSON.parse(list);
       let Index = 0;
       currentList.map((item, index) => {
-        if (item.projectId == projectId) {
+        if (item.projectId === projectId) {
           Index = index;
         }
       });
@@ -111,7 +109,7 @@ const MyService = ({navigation}) => {
         type: '',
       },
     });
-    RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${projectId}`);
+    RNFetchBlob.fs.unlink(`${dirs.DocumentDir}/${projectId}`);
     navigation.replace('MyServiceDetails', {serviceID: projectId});
   };
 
@@ -149,7 +147,6 @@ const MyService = ({navigation}) => {
         },
       });
       setRenderRestoreModal(false);
-      setRenderSendDataModal(false);
       navigation.replace('MyServiceDetails', {serviceID: projectId});
     });
   };
@@ -201,7 +198,6 @@ const MyService = ({navigation}) => {
         </View>
       ) : (
         <View style={Styles.contentContianerStyle}>
-          <View style={Styles.flatlistContainerStyle}>
             <FlatList
               data={serviceList}
               renderItem={item => (
@@ -209,14 +205,12 @@ const MyService = ({navigation}) => {
                   item={item}
                   navigation={navigation}
                   setModalState={setRenderRestoreModal}
-                  setNetworkModalState={setRenderSendDataModal}
                   setSelectedProjectId={setSelectedProjectId}
                 />
               )}
               keyExtractor={item => item.projectID.toString()}
               ListEmptyComponent={() => renderEmptyList()}
             />
-          </View>
           <TouchableOpacity
             style={Styles.newServiceButtonStyle}
             onPress={() => {
@@ -261,56 +255,6 @@ const MyService = ({navigation}) => {
               </View>
             </TouchableHighlight>
           )}
-          {renderSendDataModal && (
-            <TouchableHighlight
-              style={Styles.modalBackgroundStyle}
-              onPress={() => setRenderSendDataModal(false)}
-              underlayColor="none">
-              <View style={Styles.modalContainerStyle}>
-                <View style={Styles.modalHeaderContainerStyle}>
-                  <Text style={Styles.modalHeaderTextStyle}>داتیس سرویس</Text>
-                </View>
-                <View style={Styles.modalBodyContainerStyle}>
-                  <Text style={Styles.modalBodyTextStyle}>
-                    برای تغییر اطلاعات ارسال گزینه ویرایش را انتخاب نمایید. در
-                    غیر این صورت اطلاعات هنگام برقراری ارتباط با اینترنت ارسال
-                    میشوند.
-                  </Text>
-                </View>
-                <View style={Styles.modalFooterContainerStyle}>
-                  <TouchableOpacity
-                    style={Styles.modalButtonStyle}
-                    onPress={() => setRenderSendDataModal(false)}>
-                    <Text style={Styles.modalButtonTextStyle}>بازگشت</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={Styles.modalButtonStyle}
-                    onPress={() => {
-                      AsyncStorage.getItem('savedServicesList').then(list => {
-                        let temp = list.filter(
-                          item => item.projectId === selectedProjectId,
-                        );
-                        if (temp.length > 0) {
-                          dispatch({
-                            type: SET_EDITING_SERVICE,
-                            editingService: selectedProjectId,
-                          });
-                          onConfirmDataPress(selectedProjectId);
-                        } else {
-                          Alert.alert(
-                            '',
-                            'سرویس فعلی بسته شده است. لطفا لیست سرویس ها را به روزرسانی کنید.',
-                            [{text: 'OK', onPress: () => {}}],
-                          );
-                        }
-                      });
-                    }}>
-                    <Text style={Styles.modalButtonTextStyle}>ویرایش</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableHighlight>
-          )}
         </View>
       )}
     </View>
@@ -324,11 +268,6 @@ const Styles = StyleSheet.create({
   contentContianerStyle: {
     flex: 1,
     padding: 5,
-    alignItems: 'center',
-  },
-  flatlistContainerStyle: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   newServiceButtonStyle: {

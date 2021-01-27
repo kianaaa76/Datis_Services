@@ -19,7 +19,6 @@ import {getServiceDetails, sendServiceData} from '../../../actions/api';
 import {
   GET_SERVICE_DETAIL,
   LOGOUT,
-  SET_EDITING_SERVICE,
 } from '../../../actions/types';
 import {SaveIcon, CheckIcon} from "../../../assets/icons";
 import {normalize, getFontsName} from '../../utils/utilities';
@@ -81,8 +80,9 @@ const MyServiceDetails = ({navigation}) => {
 
   useEffect(() => {
     RNFetchBlob.fs
-      .readFile(`${dirs.DownloadDir}/${serviceID}/1.png`, 'base64')
+      .readFile(`${dirs.DocumentDir}/${serviceID}/1.png`, 'base64')
       .then(data => {
+        console.warn("@@@@@@@@", data);
         if (!!data) {
           setFactorTabInfo({
             ...factorTabInfo,
@@ -91,7 +91,7 @@ const MyServiceDetails = ({navigation}) => {
         }
       });
     RNFetchBlob.fs
-      .readFile(`${dirs.DownloadDir}/${serviceID}/2.png`, 'base64')
+      .readFile(`${dirs.DocumentDir}/${serviceID}/2.png`, 'base64')
       .then(data => {
         if (!!data) {
           setFactorTabInfo({
@@ -101,7 +101,7 @@ const MyServiceDetails = ({navigation}) => {
         }
       });
     RNFetchBlob.fs
-      .readFile(`${dirs.DownloadDir}/${serviceID}/3.png`, 'base64')
+      .readFile(`${dirs.DocumentDir}/${serviceID}/3.png`, 'base64')
       .then(data => {
         if (!!data) {
           setFactorTabInfo({
@@ -177,28 +177,24 @@ const MyServiceDetails = ({navigation}) => {
       AsyncStorage.setItem('savedServicesList', JSON.stringify(savedList));
     });
     RNFetchBlob.fs.writeFile(
-      `${dirs.DownloadDir}/${serviceID}/1.png`,
+      `${dirs.DocumentDir}/${serviceID}/1.png`,
       factorTabInfo.factorImage,
       'base64',
     );
     if (!!factorTabInfo.billImage) {
       RNFetchBlob.fs.writeFile(
-        `${dirs.DownloadDir}/${serviceID}/2.png`,
+        `${dirs.DocumentDir}/${serviceID}/2.png`,
         factorTabInfo.billImage,
         'base64',
-      );
+      ).then(res=>console.warn(res));
     }
     if (!!serviceTabInfo.image) {
       RNFetchBlob.fs.writeFile(
-        `${dirs.DownloadDir}/${serviceID}/3.png`,
+        `${dirs.DocumentDir}/${serviceID}/3.png`,
         serviceTabInfo.image,
         'base64',
       );
     }
-    dispatch({
-      type: SET_EDITING_SERVICE,
-      editingService: '',
-    });
     navigation.replace('MyServices');
   };
 
@@ -345,7 +341,7 @@ const MyServiceDetails = ({navigation}) => {
             EndLocation: `${missionTabInfo.endLatitude},${missionTabInfo.endLongitude}`,
             Distance: missionTabInfo.distance,
             Description: missionTabInfo.missionDescription,
-            Travel: missionTabInfo.travel,
+            Travel: !!missionTabInfo.travel,
           },
           selector.userId,
           factorTabInfo.billImage,
@@ -363,22 +359,14 @@ const MyServiceDetails = ({navigation}) => {
                   JSON.stringify(tempList),
                 );
               });
-              RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+              RNFetchBlob.fs.unlink(`${dirs.DocumentDir}/${serviceID}`);
               setRequestLoading(false);
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
-              });
               navigation.replace('MyServices');
               Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER);
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
                 type: LOGOUT,
-              });
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
               });
               navigation.navigate('SignedOut');
             } else {
@@ -447,22 +435,14 @@ const MyServiceDetails = ({navigation}) => {
                   JSON.stringify(tempList),
                 );
               });
-              RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${serviceID}`);
+              RNFetchBlob.fs.unlink(`${dirs.DocumentDir}/${serviceID}`);
               setRequestLoading(false);
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
-              });
               navigation.replace('MyServices');
               Toast.showWithGravity('سرویس شما با موفقیت بسته شد.', Toast.LONG, Toast.CENTER);
             } else if (data.errorCode === 3) {
               setRequestLoading(false);
               dispatch({
                 type: LOGOUT,
-              });
-              dispatch({
-                type: SET_EDITING_SERVICE,
-                editingService: '',
               });
               navigation.navigate('SignedOut');
             } else {
@@ -509,10 +489,6 @@ const MyServiceDetails = ({navigation}) => {
         if (data.errorCode === 3) {
           dispatch({
             type: LOGOUT,
-          });
-          dispatch({
-            type: SET_EDITING_SERVICE,
-            editingService: '',
           });
           navigation.navigate('SignedOut');
         } else {

@@ -3,7 +3,6 @@ import {
   LOGOUT,
   GET_SERVICE_DETAIL,
   RESTORE_SERVICE_DATA,
-  SET_EDITING_SERVICE,
   GET_OBJECTS_LIST,
   SET_USER_LIST,
 } from '../actions/types';
@@ -125,8 +124,6 @@ export default (state = INITIAL_STATE, action) => {
           travel: action.savedServiceInfo.travel,
         },
       };
-    case SET_EDITING_SERVICE:
-      return {...state, editingService: action.editingService};
     case GET_OBJECTS_LIST:
       return {...state, objectsList: action.objectsList};
     case SET_USER_LIST:

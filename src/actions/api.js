@@ -238,25 +238,6 @@ export const serviceArchiveListWithoutSerial = (servicemanId, token)=>{
   }).then((response) => response.json());
 }
 
-export const updateService = (serviceId, servicemanId, token, address, description, factorImage, image)=>{
-  const msg = JSON.stringify({
-    ServiceManId: servicemanId,
-    projectID: serviceId,
-    Image: image,
-    FactorImage: factorImage,
-    Location: address,
-    Details:"a"
-  });
-  return fetch(`${LOCAL_HOST}/UpdateServiceDocument`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `bearer ${token}`,
-    },
-    body: msg
-  }).then((response) => response.json());
-}
-
 export const sendServiceData = (
     token,
     serviceId,

@@ -21,7 +21,6 @@ import {rejectedServiceDetail, rejectedServiceList} from '../../../actions/api';
 import {
   LOGOUT,
   RESTORE_SERVICE_DATA,
-  SET_EDITING_SERVICE,
 } from '../../../actions/types';
 import {normalize, getFontsName} from '../../utils/utilities';
 import {RefreshIcon} from "../../../assets/icons";
@@ -85,7 +84,7 @@ const MyService = ({navigation}) => {
         ? JSON.parse(list).filter(service => service.projectId !== projectId)
         : [];
       AsyncStorage.setItem('savedServicesList', JSON.stringify(tempList));
-      RNFetchBlob.fs.unlink(`${dirs.DownloadDir}/${projectId}`);
+      RNFetchBlob.fs.unlink(`${dirs.DocumentDir}/${projectId}`);
     });
     rejectedServiceDetail(projectId, selector.token)
       .then(data => {
@@ -206,21 +205,21 @@ const MyService = ({navigation}) => {
   const onConfirmDataPress = projectId => {
     setModalLoading(true);
     RNFetchBlob.fs
-      .readFile(`${dirs.DownloadDir}/${projectId}/1.png`, 'base64')
+      .readFile(`${dirs.DocumentDir}/${projectId}/1.png`, 'base64')
       .then(data => {
         if (!!data) {
           FACTOR_IMAGE = data;
         }
       });
     RNFetchBlob.fs
-      .readFile(`${dirs.DownloadDir}/${projectId}/2.png`, 'base64')
+      .readFile(`${dirs.DocumentDir}/${projectId}/2.png`, 'base64')
       .then(data => {
         if (!!data) {
           BILL_IMAGE = data;
         }
       });
     RNFetchBlob.fs
-      .readFile(`${dirs.DownloadDir}/${projectId}/3.png`, 'base64')
+      .readFile(`${dirs.DocumentDir}/${projectId}/3.png`, 'base64')
       .then(data => {
         if (!!data) {
           IMAGE = data;
@@ -364,7 +363,6 @@ const MyService = ({navigation}) => {
         </View>
       ) : (
         <View style={Styles.contentContianerStyle}>
-          <View style={Styles.flatlistContainerStyle}>
             <FlatList
               data={serviceList}
               renderItem={item => (
@@ -379,7 +377,6 @@ const MyService = ({navigation}) => {
               keyExtractor={item => item.projectID.toString()}
               ListEmptyComponent={() => renderEmptyList()}
             />
-          </View>
           {renderRestoreModal && (
             <TouchableHighlight
               style={Styles.modalBackgroundStyle}
@@ -448,10 +445,6 @@ const MyService = ({navigation}) => {
                           item => item.projectId === selectedProjectId,
                         );
                         if (temp.length > 0) {
-                          dispatch({
-                            type: SET_EDITING_SERVICE,
-                            editingService: selectedProjectId,
-                          });
                           onConfirmDataPress(selectedProjectId);
                         } else {
                           Alert.alert(
@@ -484,12 +477,7 @@ const Styles = StyleSheet.create({
     flex: 1,
     padding: 5,
     alignItems: 'center',
-  },
-  flatlistContainerStyle: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: pageHeight,
+    marginBottom: 25
   },
   newServiceButtonStyle: {
     width: pageWidth * 0.2,

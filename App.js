@@ -40,10 +40,9 @@ const App = () => {
 
   return (
     <Provider store={myStore}>
-        {/*<SendData/>*/}
       <PersistGate loading={null} persistor={myPersistor}>
-      <View style={styles.statusBarBackground} />
-      {/* <StatusBar backgroundColor="#520000" height={Platform.OS == 'ios' ? 20 : 0}/> */}
+        {Platform.OS === "ios" && (<View style={styles.statusBarBackground}/>)}
+        {Platform.OS === "android" && ( <StatusBar backgroundColor="#520000"/>)}
         <RootNav/>
       </PersistGate>
     </Provider>

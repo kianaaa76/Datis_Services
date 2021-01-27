@@ -139,6 +139,7 @@ const Login = ({navigation}) => {
               style={Styles.iconStyle}
             />
             <TextInput
+              editable={!!hasCode}
               ref={input => {
                 secondTextInputRef = input;
               }}

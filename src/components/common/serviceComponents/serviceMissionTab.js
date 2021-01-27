@@ -494,11 +494,20 @@ const ServiceMissionTab = ({
                 trackColor={{false: 'gray', true: '#660000'}}
                 thumbColor={travel ? '#990000' : '#C0C0C0'}
                 onValueChange={() => {
-                  setTravel(!travel);
-                  setInfo({
-                    ...info,
-                    travel: !info.travel,
-                  });
+                  if (!!travel){
+                    setTravel(false);
+                    setInfo({
+                      ...info,
+                      travel: false,
+                    });
+                  } else {
+                    setTravel(true);
+                    setInfo({
+                      ...info,
+                      travel: true,
+                    });
+                  }
+
                 }}
                 value={travel}
               />

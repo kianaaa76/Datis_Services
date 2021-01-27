@@ -19,7 +19,6 @@ const MyServiceListItem = ({
   navigation,
   setModalState,
   setSelectedProjectId,
-  setNetworkModalState,
 }) => {
 
   const Item = item.item;
@@ -37,11 +36,7 @@ const MyServiceListItem = ({
             let flag = false;
             JSON.parse(list).map(item => {
               if (item.projectId === Item.projectID) {
-                if (item.saveType === 'self') {
-                  setModalState(true);
-                } else {
-                  setNetworkModalState(true);
-                }
+                setModalState(true);
                 setSelectedProjectId(Item.projectID);
                 flag = true;
               }
@@ -68,7 +63,6 @@ const MyServiceListItem = ({
                   endCity: '',
                   missionDescription: '',
                   distance: '',
-                  saveType: '',
                   travel: false,
                 },
               });
@@ -98,7 +92,6 @@ const MyServiceListItem = ({
                 endCity: '',
                 missionDescription: '',
                 distance: '',
-                saveType: '',
                 travel: false,
               },
             });

@@ -55,7 +55,6 @@ const RemainingServiceDetail = ({navigation}) => {
 
   useEffect(() => {
     unsettledServiceDetail(SERVICE.projectID, selector.token).then(data => {
-      console.warn("FFF", data);
       if (data.errorCode === 0) {
         setServiceDetail(data.result);
         setDetailLoading(false);
