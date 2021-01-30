@@ -235,6 +235,8 @@ const Home = ({navigation}) => {
                   placeholder={'جستجو کنید...'}
                   onChangeText={text => search(text)}
                   style={{
+                    height:pageHeight*0.05,
+                    textAlign:"right",
                     fontFamily: getFontsName('IRANSansMobile_Light'),
                     fontSize: normalize(12),
                     width: '100%',
@@ -253,7 +255,7 @@ const Home = ({navigation}) => {
                 data={ShowinUserList}
                 renderItem={item => (
                   <TouchableOpacity
-                    style={{height: 30, marginVertical: 5}}
+                    style={{height: 30, marginVertical: 5, alignItems:"flex-end"}}
                     onPress={() => {
                       setChangeUserLoading(true);
                       dispatch({
