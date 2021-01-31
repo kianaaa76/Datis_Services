@@ -189,7 +189,39 @@ const ServicePartsTab = ({
     try {
       if (!!selectedItemList) {
         if (!selectedItemList.tempPart.value.SerialFormat) {
-          Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);;
+          setSearchBarcodeLoading(true);
+          getObjBySerial(
+              selector.token,
+              selectedItemList.tempSerial,
+              selectedItemList.tempPart.value.Id,
+          ).then(data=>{
+            if (data.errorCode === 0){
+              let responseObject = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
+              let responseVersion = responseObject[0].value.Versions.filter(
+                  item => item.Key == data.result.VersionId,
+              );
+              refactorObjectListItems(
+                  'tempPart',
+                  responseObject[0],
+                  selectedItemList.index,
+              );
+              refactorObjectListItems(
+                  'tempVersion',
+                  responseVersion[0],
+                  selectedItemList.index,
+              );
+              refactorObjectListItems(
+                  'availableVersions',
+                  responseObject[0].value.Versions,
+                  selectedItemList.index,
+              );
+              setSelectedItemList({});
+              setSearchBarcodeLoading(false);
+            } else {
+              setSearchBarcodeLoading(false);
+              Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);
+            }
+          })
         } else {
           setSearchBarcodeLoading(true);
           const object = !!selectedItemList.tempPart
@@ -294,7 +326,29 @@ const ServicePartsTab = ({
         }
       } else {
         if (!fieldsObject.partTypeSelected.value.SerialFormat) {
-          Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);
+          setSearchBarcodeLoading(true);
+          getObjBySerial(
+              selector.token,
+              fieldsObject.serial,
+              fieldsObject.partTypeSelected.value.Id,
+          ).then(data=>{
+            if (data.errorCode === 0){
+              let responseObject = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
+              let responseVersion = responseObject[0].value.Versions.filter(
+                  item => item.Key == data.result.VersionId,
+              );
+              setFieldsObject({
+                ...fieldsObject,
+                partTypeSelected: responseObject[0],
+                partVersionSelected: responseVersion[0],
+                availableVersions: responseObject[0].value.Versions,
+              });
+              setSearchBarcodeLoading(false);
+            } else {
+              Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);
+              setSearchBarcodeLoading(false);
+            }
+          })
         } else {
           setSearchBarcodeLoading(true);
           const object = !!fieldsObject.partTypeSelected
