@@ -127,7 +127,7 @@ const ServicePartsTab = ({
           )}${leftOfCode}`,
           selectedObject[0].value.Id,
         ).then(data => {
-          if (data.errorCode == 0) {
+          if (data.errorCode === 0) {
             let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
             let selectedVersion = selectedObject[0].value.Versions.filter(
               item => item.Key === data.result.VersionId,
@@ -198,7 +198,7 @@ const ServicePartsTab = ({
             if (data.errorCode === 0){
               let responseObject = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
               let responseVersion = responseObject[0].value.Versions.filter(
-                  item => item.Key == data.result.VersionId,
+                  item => item.Key === data.result.VersionId,
               );
               refactorObjectListItems(
                   'tempPart',
@@ -250,9 +250,9 @@ const ServicePartsTab = ({
                 ) {
                   getObjBySerial(selector.token, sserial, object.value.Id).then(
                     data => {
-                      if (data.errorCode == 0) {
+                      if (data.errorCode === 0) {
                         let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
-                        let selectedVersion = object.value.Versions.filter(
+                        let selectedVersion = selectedObjectt[0].value.Versions.filter(
                           item => item.Key == data.result.VersionId,
                         );
                         refactorObjectListItems(
@@ -288,9 +288,9 @@ const ServicePartsTab = ({
                   `${serialFormatHeader}${sserial}`,
                   object.value.Id,
                 ).then(data => {
-                  if (data.errorCode == 0) {
+                  if (data.errorCode === 0) {
                     let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
-                    let selectedVersion = object.value.Versions.filter(
+                    let selectedVersion = selectedObjectt[0].value.Versions.filter(
                       item => item.Key == data.result.VersionId,
                     );
                     refactorObjectListItems(
@@ -343,6 +343,7 @@ const ServicePartsTab = ({
                 partVersionSelected: responseVersion[0],
                 availableVersions: responseObject[0].value.Versions,
               });
+              console.warn("fieldsObject", fieldsObject);
               setSearchBarcodeLoading(false);
             } else {
               Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);
@@ -406,10 +407,9 @@ const ServicePartsTab = ({
                 ).then(data => {
                   if (data.errorCode == 0) {
                     let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
-                    let selectedVersion = object.value.Versions.filter(
-                      item => item.Key == data.result.VersionId,
+                    let selectedVersion = selectedObjectt[0].value.Versions.filter(
+                      item => item.Key === data.result.VersionId,
                     );
-
                     setFieldsObject({
                       ...fieldsObject,
                       partTypeSelected: selectedObjectt[0],
