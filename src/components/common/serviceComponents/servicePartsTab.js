@@ -44,6 +44,7 @@ const ServicePartsTab = ({
   setHasNew,
 }) => {
   const selector = useSelector(state => state);
+
   const [fieldsObject, setFieldsObject] = useState({
     objectType: '',
     serial: '',

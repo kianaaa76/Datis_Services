@@ -51,7 +51,8 @@ const UserAddress = ({navigation}) => {
           {MapMarkerIcon({
             color:"#660000",
             width:35,
-            height:35
+            height:35,
+            fill:"#660000"
           })}
         </View>
       </MapboxGL.MarkerView>
