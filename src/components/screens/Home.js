@@ -305,11 +305,7 @@ const Home = ({navigation}) => {
             </View>
             <View style={Styles.SingleRowStyle}>
               {renderHomeItems('انبارداری', images[4], () => {
-                ToastAndroid.showWithGravity(
-                  'این قسمت بعدا اضافه خواهد شد.',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
+                navigation.navigate('WarehouseDetail');
               })}
               {renderHomeItems('ماموریت‌های من', images[5], () => {
                 navigation.navigate('Mission');

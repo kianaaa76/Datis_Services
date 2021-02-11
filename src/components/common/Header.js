@@ -60,7 +60,7 @@ const Styles = StyleSheet.create({
   },
   headerTitleStyle: {
     fontSize: normalize(15),
-    color: "#dadfe1",
+    color: "#fff",
     fontFamily:"IRANSansMobile"
   },
   headerTextContainerStyle: {
