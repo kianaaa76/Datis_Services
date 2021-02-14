@@ -20,6 +20,7 @@ import Splash from '../components/screens/SplashScreen';
 import Garantee from '../components/screens/Garantee';
 import PriceList from "../components/screens/PriceList";
 import UserAddress from "../components/screens/UserAddress";
+import WarehouseDetail from "../components/screens/Warehousing/WarehouseDetail";
 
 export const drawer = createDrawerNavigator(
   {
@@ -78,6 +79,9 @@ const SignedIn = createStackNavigator(
     ServiceArchiveDetail: {
       screen: ServiceArchiveDetail,
     },
+      WarehouseDetail:{
+        screen: WarehouseDetail
+      }
   },
   {
     headerMode: 'none',

@@ -91,7 +91,7 @@ const ServicePartsTab = ({
   const onSuccess = async code => {
     try {
       let header = parseInt(code.toString().substr(0, 3));
-      numOfZeros = 0;
+      let numOfZeros = 0;
       while (code.toString()[numOfZeros] == '0') {
         numOfZeros = numOfZeros + 1;
       }

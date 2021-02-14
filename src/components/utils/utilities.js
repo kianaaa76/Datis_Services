@@ -44,7 +44,7 @@ export function addDotsToPrice(price) {
       .reverse()
       .join('');
     reverseString = reverseString.match(/.{1,3}/g);
-    stringSplited = reverseString.reverse();
+    let stringSplited = reverseString.reverse();
     let finalString = '';
     stringSplited.map((item, index) => {
       finalString = finalString.concat(
