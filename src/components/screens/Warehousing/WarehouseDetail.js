@@ -15,9 +15,9 @@ const WarehouseDetail = ()=>{
 
 const [index, setIndex] = React.useState(2);
   const [routes] = React.useState([
-    {key: 'first', title: 'انبارگرداتی'},
     {key: 'second', title: 'درخواست کالا'},
     {key: 'third', title: 'ارسال'},
+    {key: 'first', title: 'انبارگردانی'}
   ]);
   const renderScene = ({route}) => {
     switch (route.key) {

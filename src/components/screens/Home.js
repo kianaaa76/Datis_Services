@@ -304,7 +304,7 @@ const Home = ({navigation}) => {
               })}
             </View>
             <View style={Styles.SingleRowStyle}>
-              {renderHomeItems('انبارداری', images[4], () => {
+              {renderHomeItems('انبار من', images[4], () => {
                 navigation.navigate('WarehouseDetail');
               })}
               {renderHomeItems('ماموریت‌های من', images[5], () => {

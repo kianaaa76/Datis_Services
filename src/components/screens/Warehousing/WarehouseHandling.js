@@ -7,153 +7,110 @@ import {
   Text,
   FlatList,
   Alert,
+    TextInput
 } from 'react-native';
 import {normalize} from '../../utils/utilities';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import CheckBox from '@react-native-community/checkbox';
+import Octicons from 'react-native-vector-icons/Octicons';
+import Entypo from "react-native-vector-icons/Entypo";
+import iterableToArray from "@babel/runtime/helpers/esm/iterableToArray";
+
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
 
 const WarehouseHandling = () => {
   const [screenMode, setScreenMode] = useState("all");
-  const [newObjectsList, setNewObjectsList] = useState([
-    {
-      objectName: 'testObject1',
-      objectInventory: [
-        {
-          serial: 'TEST1111111',
-          version: 'testVersion1',
-          count: 1,
-        },
-        {
-          serial: 'TEST2222222',
-          version: 'testVersion2',
-          count: 2,
-        },
-        {
-          serial: 'TEST3333333',
-          version: 'testVersion3',
-          count: 3,
-        },
-      ],
-      isExpanded: false,
-    },
-    {
-      objectName: 'testObject2',
-      objectInventory: [
-        {
-          serial: 'TEST11113456',
-          version: 'testVersion1',
-          count: 1,
-        },
-        {
-          serial: 'TEST22222345',
-          version: 'testVersion2',
-          count: 2,
-        },
-        {
-          serial: 'TEST3333345',
-          version: 'testVersion3',
-          count: 3,
-        },
-      ],
-      isExpanded: false,
-    },
-  ]);
-
-  const [failedObjectsList, setFailedObjectsList] = useState([
-    {
-      objectName: 'testObject3',
-      objectInventory: [
-        {
-          count: 2,
-          version: 'testVersion1',
-        },
-        {
-          count: 3,
-          version: 'testVersion2',
-        },
-        {
-          count: 2,
-          version: 'testVersion3',
-        },
-      ],
-      isExpanded: false,
-    },
-    {
-      objectName: 'testObject4',
-      objectInventory: [
-        {
-          count: 2,
-          version: 'testVersion1',
-        },
-        {
-          count: 3,
-          version: 'testVersion2',
-        },
-        {
-          count: 2,
-          version: 'testVersion3',
-        },
-      ],
-      isExpanded: false,
-    },
-  ]);
-
   const [allObjectsList, setAllObjectsList] = useState([
     {
       objectName: 'testObject1',
+      totalItems: 5,
+      type:1,
+      isChecked:false,
       objectInventory: [
         {
-          serial: 'TEST1111111',
+          serialList: [{
+            serialString:'TEST1111111',
+            isChecked: false
+          }, {
+            serialString: "TEST2222222",
+            isChecked: false
+          }],
           version: 'testVersion1',
-          count: 1,
+          count: 2
         },
         {
-          serial: 'TEST2222222',
+          serialList: [{
+            serialString: 'TEST2222222',
+            isChecked: false
+          }, {
+            serialString: "TEST11113456",
+            isChecked: false
+          }],
           version: 'testVersion2',
-          count: 2,
+          count: 2
         },
         {
-          serial: 'TEST3333333',
+          serialList: [{
+            serialString: 'TEST3333333',
+            isChecked: false
+          }],
           version: 'testVersion3',
-          count: 3,
+          count: 1
         },
       ],
       isExpanded: false,
     },
     {
       objectName: 'testObject2',
+      totalItems: 3,
+      type:1,
+      isChecked:false,
       objectInventory: [
         {
-          serial: 'TEST11113456',
+          serialList: [{
+            serialString: 'TEST11113456',
+            isChecked: false
+          }, {
+            serialString: "TEST22222345",
+            isChecked: false
+          }],
           version: 'testVersion1',
-          count: 1,
+          count: 2
         },
         {
-          serial: 'TEST22222345',
+          serialList: [{
+            serialString: 'TEST22222345',
+            isChecked: false
+          }],
           version: 'testVersion2',
-          count: 2,
-        },
-        {
-          serial: 'TEST3333345',
-          version: 'testVersion3',
-          count: 3,
+          count: 1
         },
       ],
       isExpanded: false,
     },
     {
       objectName: 'testObject3',
+      totalItems: 7,
+      type:0,
+      isChecked:false,
       objectInventory: [
         {
+          serialList: [],
+          selectedCount: 0,
           count: 2,
           version: 'testVersion1',
         },
         {
+          serialList: [],
+          selectedCount: 0,
           count: 3,
           version: 'testVersion2',
         },
         {
+          serialList: [],
+          selectedCount: 0,
           count: 2,
           version: 'testVersion3',
         },
@@ -161,28 +118,170 @@ const WarehouseHandling = () => {
       isExpanded: false,
     },
     {
+      type:0,
       objectName: 'testObject4',
+      totalItems: 7,
+      isChecked:false,
       objectInventory: [
         {
+          serialList: [],
+          selectedCount: 0,
           count: 2,
           version: 'testVersion1',
         },
         {
+          serialList: [],
+          selectedCount: 0,
           count: 3,
           version: 'testVersion2',
         },
         {
+          serialList: [],
+          selectedCount: 0,
           count: 2,
           version: 'testVersion3',
         },
       ],
       isExpanded: false,
     },
-  ])
-
+  ]);
+  const [constList, setConstList] = useState([
+    {
+      objectName: 'testObject1',
+      totalItems: 5,
+      type:1,
+      isChecked:false,
+      objectInventory: [
+        {
+          serialList: [{
+            serialString:'TEST1111111',
+            isChecked: false
+          }, {
+            serialString: "TEST2222222",
+            isChecked: false
+          }],
+          version: 'testVersion1',
+          count: 2
+        },
+        {
+          serialList: [{
+            serialString: 'TEST2222222',
+            isChecked: false
+          }, {
+            serialString: "TEST11113456",
+            isChecked: false
+          }],
+          version: 'testVersion2',
+          count: 2
+        },
+        {
+          serialList: [{
+            serialString: 'TEST3333333',
+            isChecked: false
+          }],
+          version: 'testVersion3',
+          count: 1
+        },
+      ],
+      isExpanded: false,
+    },
+    {
+      objectName: 'testObject2',
+      totalItems: 3,
+      type:1,
+      isChecked:false,
+      objectInventory: [
+        {
+          serialList: [{
+            serialString: 'TEST11113456',
+            isChecked: false
+          }, {
+            serialString: "TEST22222345",
+            isChecked: false
+          }],
+          version: 'testVersion1',
+          count: 2
+        },
+        {
+          serialList: [{
+            serialString: 'TEST22222345',
+            isChecked: false
+          }],
+          version: 'testVersion2',
+          count: 1
+        },
+      ],
+      isExpanded: false,
+    },
+    {
+      objectName: 'testObject3',
+      totalItems: 7,
+      type:0,
+      isChecked:false,
+      objectInventory: [
+        {
+          serialList: [],
+          selectedCount: 0,
+          count: 2,
+          version: 'testVersion1',
+        },
+        {
+          serialList: [],
+          selectedCount: 0,
+          count: 3,
+          version: 'testVersion2',
+        },
+        {
+          serialList: [],
+          selectedCount: 0,
+          count: 2,
+          version: 'testVersion3',
+        },
+      ],
+      isExpanded: false,
+    },
+    {
+      type:0,
+      objectName: 'testObject4',
+      totalItems: 7,
+      isChecked:false,
+      objectInventory: [
+        {
+          serialList: [],
+          selectedCount: 0,
+          count: 2,
+          version: 'testVersion1',
+        },
+        {
+          serialList: [],
+          selectedCount: 0,
+          count: 3,
+          version: 'testVersion2',
+        },
+        {
+          serialList: [],
+          selectedCount: 0,
+          count: 2,
+          version: 'testVersion3',
+        },
+      ],
+      isExpanded: false,
+    },
+  ]);
   const [hasToBeRefreshed, setHasToBeRefreshed] = useState(false);
+  const [allSelected, setAllSelected] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   const Separator = () => <View style={Styles.separator} />;
+
+  const handleSearch = (searchValue)=>{
+    if (!!searchValue){
+      let tempList = constList.filter(item=>item.objectName.toLowerCase().includes(searchValue));
+      setAllObjectsList(tempList);
+    } else {
+      setAllObjectsList(constList);
+    }
+  };
 
   return (
     <View style={Styles.containerStyle}>
@@ -194,7 +293,16 @@ const WarehouseHandling = () => {
               ? Styles.activeHeaderButtonStyle
               : Styles.deactiveHeaderButtonStyle
           }
-          onPress={() => setScreenMode("fail")}>
+          onPress={() => {
+            if (screenMode !== "fail") {
+              let tmp = [...allObjectsList];
+              tmp.map((it, itIndex) => {
+                tmp[itIndex] = {...it, isExpanded: false}
+              })
+              setAllObjectsList(tmp);
+              setScreenMode("fail")
+            }
+          }}>
           <Text
             style={
               screenMode === "fail"
@@ -212,7 +320,16 @@ const WarehouseHandling = () => {
               ? Styles.activeHeaderButtonStyle
               : Styles.deactiveHeaderButtonStyle
           }
-          onPress={() => setScreenMode("new")}>
+          onPress={() => {
+            if (screenMode !== "new") {
+              let tmp = [...allObjectsList];
+              tmp.map((it, itIndex) => {
+                tmp[itIndex] = {...it, isExpanded: false}
+              })
+              setAllObjectsList(tmp);
+              setScreenMode("new")
+            }
+          }}>
           <Text
             style={
               screenMode === "new"
@@ -230,7 +347,16 @@ const WarehouseHandling = () => {
                   ? Styles.activeHeaderButtonStyle
                   : Styles.deactiveHeaderButtonStyle
             }
-            onPress={() => setScreenMode("all")}>
+            onPress={() => {
+              if (screenMode !== "all") {
+                let tmp = [...allObjectsList];
+                tmp.map((it, itIndex) => {
+                  tmp[itIndex] = {...it, isExpanded: false}
+                })
+                setAllObjectsList(tmp);
+                setScreenMode("all")
+              }
+            }}>
           <Text
               style={
                 screenMode === "all"
@@ -242,79 +368,248 @@ const WarehouseHandling = () => {
           <View style={screenMode === "all" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle}/>
         </TouchableOpacity>
       </View>
+      <View style={Styles.searchbarContainerStyle}>
+        <TextInput
+            style={Styles.textinputStyle}
+            placeholder={"نام قطعه و نسخه را جستجو کنید..."}
+            onChangeText={(text)=>{
+              setSearchText(text);
+              handleSearch(text);
+            }}
+            value={searchText}
+        />
+        <FontAwesome
+            name={'search'}
+            style={{fontSize: 25, color: '#000'}}
+        />
+      </View>
+      <View style={Styles.selectAllCheckBoxContainerStyle}>
+          <TouchableOpacity style={Styles.confirmButtonStyle}>
+            <Text style={Styles.confirmButtonTextStyle}>
+              تایید
+            </Text>
+          </TouchableOpacity>
+        <View style={{flexDirection:"row"}}>
+          <Text style={{fontFamily:'IRANSansMobile_Light'}}>
+            انتخاب همه
+          </Text>
+          <CheckBox tintColors={{ true: '#9C0000', false: 'black' }} onValueChange={()=>{
+            let currentList = [...allObjectsList];
+                currentList.map((item,index)=>{
+                  if (screenMode === "all"){
+                    currentList.splice(index, 1, {
+                      ...item, isChecked: allSelected !== "all"
+                    });
+                    currentList[index].objectInventory.map((ver, verIndex)=>{
+                      if (!!ver.serialList.length)
+                      {
+                        ver.serialList.map((ser, serIndex) => {
+                          currentList[index].objectInventory[verIndex].serialList[serIndex] = {
+                            ...ser,
+                            isChecked: allSelected !== "all"
+                          }
+                        })
+                      } else {
+                        currentList[index].objectInventory[verIndex].selectedCount = currentList[index].objectInventory[verIndex].count;
+                      }
+                    })
+                    setAllSelected(allSelected==="all" ? "" : screenMode);
+                  } else if (screenMode === "new" && !!item.type){
+                    currentList.splice(index, 1, {
+                      ...item, isChecked: allSelected === "fail" || allSelected === ""
+                    });
+                    currentList[index].objectInventory.map((ver, verIndex)=>{
+                      if (!!ver.serialList.length) {
+                        ver.serialList.map((ser, serIndex) => {
+                          currentList[index].objectInventory[verIndex].serialList[serIndex] = {
+                            ...ser,
+                            isChecked: allSelected === "fail" || allSelected === ""
+                          }
+                        })
+                      } else {
+                        currentList[index].objectInventory[verIndex].selectedCount = currentList[index].objectInventory[verIndex].count;
+                      }
+                    });
+                    setAllSelected(allSelected === "all" ? "fail" : allSelected === "new" ? "" : allSelected === "fail" ? "all" : screenMode);
+                  } else if (screenMode === "fail" && !item.type) {
+                    currentList.splice(index, 1, {
+                      ...item, isChecked: allSelected === "new" || allSelected === ""
+                    });
+                    currentList[index].objectInventory.map((ver, verIndex)=>{
+                      if (!!ver.serialList.length) {
+                        ver.serialList.map((ser, serIndex) => {
+                          currentList[index].objectInventory[verIndex].serialList[serIndex] = {
+                            ...ser,
+                            isChecked: allSelected === "new" || allSelected === ""
+                          }
+                        });
+                      }else {
+                        currentList[index].objectInventory[verIndex].selectedCount = currentList[index].objectInventory[verIndex].count;
+                      }
+                    });
+                    setAllSelected(allSelected==="all" ? "new" : allSelected==="fail" ? "" : allSelected === "new" ? "all" : screenMode);
+                  }
+                });
+                setAllObjectsList(currentList);
+                setHasToBeRefreshed(!hasToBeRefreshed);
+            }} value={allSelected === "all" ? true : allSelected === screenMode}/>
+        </View>
+      </View>
       <View style={{flex: 1}}>
         <FlatList
-          data={screenMode === "new" ? newObjectsList : screenMode === "fail" ? failedObjectsList : allObjectsList}
-          renderItem={({item, index}) => (
-            <TouchableOpacity
-              onPress={() => {
-                if (
-                  !item.isExpanded &&
-                  item.objectInventory.length === 0
-                ) {
-                  Alert.alert('از این قطعه موجود نداریم!');
-                } else {
-                  let currentList = screenMode === "new"
-                    ? newObjectsList
-                    : screenMode === "fail" ? failedObjectsList : allObjectsList;
+          data={allObjectsList}
+          renderItem={({item, index}) => screenMode === "all" || (screenMode === "new" && !!item.type ) || (screenMode === "fail" && !item.type) ? (
+            <View
+              style={[Styles.cardHeaderStyle,{
+                backgroundColor: !!item.type ? "#90DA9F" : "#FF9999",
+              }]}>
+              <TouchableOpacity style={{width:"100%", flexDirection:"row", alignItems:"center", justifyContent:"space-around"}} onPress={() => {
+                  let currentList = allObjectsList;
                   currentList.splice(index, 1, {
                     ...item,
-                    isExpanded: item.isExpanded ? false : true,
+                    isExpanded: !item.isExpanded,
                   });
-                  if (screenMode === "new") {
-                    setNewObjectsList(currentList);
-                  } else if (screenMode === "fail") {
-                    setFailedObjectsList(currentList);
-                  } else {
                     setAllObjectsList(currentList);
-                  }
                   setHasToBeRefreshed(!hasToBeRefreshed);
                 }
-              }}
-              style={{
-                width: pageWidth * 0.9,
-                backgroundColor: '#fff',
-                padding: 10,
-                marginVertical: 4,
-                marginHorizontal: 3,
-                justifyContent: 'center',
-                alignItems: 'center',
-                elevation: 3,
-                alignSelf: 'center',
-              }}>
-              <Text
-                style={Styles.labelTextStyle}>
-               نام قطعه: {item.objectName}
-              </Text>
+              }>
+                <Text style={Styles.labelTextStyle}>
+                  تعداد کل: {item.totalItems}
+                </Text>
+                <Text
+                  style={Styles.labelTextStyle}>
+                 نام قطعه: {item.objectName}
+                </Text>
+                <CheckBox tintColors={{true: '#9C0000', false: 'black'}} value={item.isChecked} onChange={()=>{
+                  if (item.isChecked){
+                    if (allSelected === "all" && !!item.type){
+                      setAllSelected("fail");
+                    } else if (allSelected === "all" && !item.type){
+                      setAllSelected("new");
+                    } else {
+                      setAllSelected('');
+                    }
+                  }
+                  let currentList = [];
+                      currentList = [...allObjectsList];
+                      let ITEM_OBJECT_INVENTORY = currentList[index].objectInventory;
+                      ITEM_OBJECT_INVENTORY.map((version, versionIndex) => {
+                        if (!!ITEM_OBJECT_INVENTORY[versionIndex].serialList.length) {
+                          ITEM_OBJECT_INVENTORY[versionIndex].serialList.map((serial, serialIndex) => {
+                            ITEM_OBJECT_INVENTORY[versionIndex].serialList[serialIndex] = {
+                              ...serial,
+
+                              isChecked: !item.isChecked
+                            }
+                          })
+                        } else {
+                          ITEM_OBJECT_INVENTORY[versionIndex].selectedCount = ITEM_OBJECT_INVENTORY[versionIndex].count
+                        }
+                      })
+                    currentList[index] ={
+                      ...item, isChecked : !item.isChecked, objectInventory: ITEM_OBJECT_INVENTORY
+                    };
+                    setAllObjectsList(currentList);
+                  setHasToBeRefreshed(!hasToBeRefreshed);
+                }}/>
+              </TouchableOpacity>
               {item.isExpanded && !!item.objectInventory && (
                 <>
                   <Separator />
                   <View style={{width: '100%'}}>
-                    {item.objectInventory.map(I => (
+                    {item.objectInventory.map((I, IIndex) => (
                       <View
                         style={{
                           flexDirection: 'row',
-                          alignItems: 'center',
-                          marginVertical: 5,
+                          alignItems: 'flex-start',
+                          marginBottom: 15,
                           justifyContent: 'space-around',
                         }}>
-                        {!!I.serial ? (
-                            <Text style={Styles.labelTextStyle}>{I.serial}</Text>
+                        {!!I.serialList.length ? (
+                            <View>
+                              {I.serialList.map((serial, serialIndex)=>(
+                                  <View style={{flexDirection:"row", alignItems:"center"}}>
+                                    <CheckBox tintColors={{true: '#9C0000', false: 'black'}} value={serial.isChecked} onChange={()=>{
+                                      if (serial.isChecked){
+                                        if (allSelected === "all" && !!item.type) {
+                                          setAllSelected("fail");
+                                        } else if (allSelected === "all" && !item.type) {
+                                          setAllSelected("new");
+                                        } else if (allSelected === "new" && !!item.type){
+                                          setAllSelected("");
+                                        } else if (allSelected === "fail" && !item.type) {
+                                          setAllSelected("");
+                                        }
+                                      }
+                                      let currentList = [...I.serialList];
+                                      currentList.splice(serialIndex, 1, {
+                                        ...serial, isChecked: !serial.isChecked
+                                      })
+                                        let LIST = [...allObjectsList];
+                                        let tempObjectInventory = [...item.objectInventory];
+                                        tempObjectInventory[IIndex] = {
+                                          ...I, serialList: currentList
+                                        };
+                                        LIST[index] = {...item, objectInventory: tempObjectInventory, isChecked: serial.isChecked ? false : item.isChecked};
+                                        setAllObjectsList(LIST);
+                                      setHasToBeRefreshed(!hasToBeRefreshed);}}/>
+                                    <Text style={Styles.labelTextStyle}>{serial.serialString}</Text>
+                                  </View>
+                        ))}
+                            </View>
                         ) : (
-                            <View style={{flexDirection: "row"}}>
-                              <TouchableOpacity style={{width:35, height:30, justifyContent:"center", alignItems:"center", backgroundColor:"#660000"}}>
-                                <Text style={{color:"#fff"}}>
-                                  کم
-                                </Text>
+                            <View style={{flexDirection: "row", alignItems:"center"}}>
+                              <TouchableOpacity style={Styles.plusButtonContainerStyle} onPress={()=>{
+                                if (I.selectedCount < I.count){
+                                  let tempList = [...allObjectsList];
+                                  tempList[index].objectInventory[IIndex] = {...I, selectedCount: I.selectedCount + 1}
+                                  setAllObjectsList(tempList);
+                                  setHasToBeRefreshed(!hasToBeRefreshed);
+                                }
+                              }}>
+                                <Octicons
+                                    name="plus"
+                                    style={{
+                                      fontSize: normalize(20),
+                                      color: '#fff',
+                                    }}
+                                />
                               </TouchableOpacity>
-                              <Text style={{width:30, height:30, textAlign:"center", borderColor:"#660000", borderWidth:1}}>
-                                {I.count}
+                              <Text style={{textAlign:"center", fontFamily:"IRANSansMobile_Medium"}}>
+                                از {I.count}
                               </Text>
-                              <TouchableOpacity style={{width:35, height:30, justifyContent:"center", alignItems:"center", backgroundColor:"#660000"}}>
-                                <Text style={{color:"#fff"}}>
-                                  اضافه
-                                </Text>
+                              <Text style={{marginHorizontal: 5}}>
+                                {I.selectedCount}
+                              </Text>
+                              <TouchableOpacity style={Styles.plusButtonContainerStyle} onPress={()=>{
+                                if (I.selectedCount > 0){
+                                  if (allSelected === "all"){
+                                    if (!!item.type) {
+                                      setAllSelected("fail");
+                                    } else {
+                                      setAllSelected("new");
+                                    }
+                                  } else if (!!allSelected){
+                                    setAllSelected("");
+                                  }
+                                  let tempList = [...allObjectsList];
+                                  tempList[index].isChecked = false;
+                                  tempList[index].objectInventory[IIndex] = {...I, selectedCount: I.selectedCount - 1}
+                                  setAllObjectsList(tempList);
+                                  setHasToBeRefreshed(!hasToBeRefreshed);
+                                }
+                              }}>
+                                <Entypo
+                                    name="minus"
+                                    style={{
+                                      fontSize: normalize(20),
+                                      color: '#fff',
+                                    }}
+                                />
                               </TouchableOpacity>
+                              <Text style={{textAlign:"center", fontFamily:"IRANSansMobile_Medium"}}>
+                                تعداد :
+                              </Text>
                             </View>
                         )}
                         <Text style={Styles.labelTextStyle}>نام نسخه: {I.version}</Text>
@@ -323,8 +618,8 @@ const WarehouseHandling = () => {
                   </View>
                 </>
               )}
-            </TouchableOpacity>
-          )}
+            </View>
+          ) : null}
         />
       </View>
     </View>
@@ -368,7 +663,7 @@ const Styles = StyleSheet.create({
   },
   separator: {
     marginVertical: 8,
-    borderBottomColor: 'gray',
+    borderBottomColor: "#000",
     borderBottomWidth: 1,
     width: '100%',
   },
@@ -384,10 +679,10 @@ const Styles = StyleSheet.create({
     width:pageWidth*0.05,
     height:pageWidth*0.05,
     borderRadius:pageWidth*0.025,
-    borderColor: "#AC0000",
+    borderColor: "#7C0000",
     borderWidth:1.5,
     marginLeft:10,
-    backgroundColor:"#AC0000"
+    backgroundColor:"#7C0000"
   },
   deactiveRadioButtonStyle: {
     width:pageWidth*0.05,
@@ -396,6 +691,65 @@ const Styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth:1.5,
     marginLeft:10,
+  },
+  searchbarContainerStyle: {
+    width:"94%",
+    height:pageHeight*0.08,
+    backgroundColor: "#fff",
+    borderRadius:30,
+    elevation:5,
+    alignSelf:"center",
+    marginBottom:5,
+    paddingHorizontal:10,
+    paddingVertical:7,
+    flexDirection:"row",
+    justifyContent:'space-around',
+    alignItems:"center"
+  },
+  textinputStyle:{
+    width:"84%",
+    height:"100%",
+    fontFamily:'IRANSansMobile_Light',
+    fontSize:12,
+  },
+  selectAllCheckBoxContainerStyle:{
+    width:"100%",
+    height:pageHeight*0.08,
+    flexDirection:"row",
+    alignItems:"center",
+    paddingHorizontal: 20,
+    justifyContent: "space-between"
+  },
+  cardHeaderStyle: {
+    width: pageWidth * 0.9,
+    padding: 10,
+    marginVertical: 4,
+    marginHorizontal: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    alignSelf: 'center',
+  },
+  confirmButtonStyle:{
+    width:pageWidth*0.2,
+    height:pageHeight*0.06,
+    backgroundColor:"#660000",
+    borderRadius:15,
+    justifyContent:"center",
+    alignItems:"center"
+  },
+  confirmButtonTextStyle:{
+    color:"#fff",
+    fontFamily:"IRANSansMobile_Medium"
+  },
+  plusButtonContainerStyle: {
+    width:30,
+    height:30,
+    backgroundColor:"#660000",
+    borderRadius:15,
+    marginRight:5,
+    justifyContent:"center",
+    alignItems:"center"
   }
 });
 
