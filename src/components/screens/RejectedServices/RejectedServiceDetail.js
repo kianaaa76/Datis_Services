@@ -319,14 +319,14 @@ const MyServiceDetails = ({navigation}) => {
           openParts.push(index + 1);
         }
       });
-      if (openParts.length == 0) {
+      if (openParts.length === 0) {
         sendServiceData(
           selector.token,
           serviceID,
           serviceTabInfo.serviceResult,
           serviceTabInfo.serviceType,
           parseInt(factorTabInfo.factorReceivedPrice.toString().split(',').join('')),
-          parseInt(factorTabInfo.factorTotalPrice.toString().split(',').join('')), //toString().split(\',\').join(\'\')'
+          parseInt(factorTabInfo.factorTotalPrice.toString().split(',').join('')),
           parseInt(factorTabInfo.toCompanySettlement.toString().split(',').join('')),
           serviceTabInfo.address,
           serviceTabInfo.description,

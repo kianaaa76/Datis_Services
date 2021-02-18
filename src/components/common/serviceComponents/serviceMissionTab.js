@@ -460,12 +460,16 @@ const ServiceMissionTab = ({
         <View style={Styles.cardContentContainerStyle}>
           <View style={Styles.cityDataContainerStyle}>
             <View style={Styles.cityDataContentContainerStyle}>
-              <TextInput style={Styles.cityDataTextStyle}>{endCity}</TextInput>
+              <TextInput style={Styles.cityDataTextStyle} onChangeText={(text)=>{
+                setInfo({...info, endCity: text});
+              }}>{info.endCity}</TextInput>
               <Text style={Styles.titleStyle}>شهر مقصد: </Text>
             </View>
             <View style={Styles.cityDataContentContainerStyle}>
-              <TextInput style={Styles.cityDataTextStyle}>
-                {startCity}
+              <TextInput style={Styles.cityDataTextStyle} onChangeText={(text)=>{
+                setInfo({...info, startCity: text})
+              }}>
+                {info.startCity}
               </TextInput>
               <Text style={Styles.titleStyle}>شهر مبدا: </Text>
             </View>
