@@ -29,6 +29,13 @@ const DrawerContent = ({navigation}) => {
         }>
         <Text style={Styles.titleTextStyle}>لیست قیمت قطعات</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+          style={Styles.titleContainerStyle}
+          onPress={()=> {
+            navigation.navigate('Salary')
+          }}>
+        <Text style={Styles.titleTextStyle}>حقوق من</Text>
+      </TouchableOpacity>
     </View>
   );
 };

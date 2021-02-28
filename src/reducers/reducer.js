@@ -13,6 +13,7 @@ const INITIAL_STATE = {
   userId: '',
   constantUserId: '',
   constantToken: '',
+  serviceManName:'',
   unfinishedMissionId: null,
   selectedService: null,
   objectsList: [],
@@ -57,6 +58,7 @@ export default (state = INITIAL_STATE, action) => {
         token: action.token,
         userId: action.userId,
         constantUserId: action.constantUserId,
+        serviceManName: action.serviceManName
       };
     case GET_SERVICE_DETAIL:
       return {...state, selectedService: action.selectedService};

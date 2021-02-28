@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,21 +6,31 @@ import {
   Dimensions,
   Text,
   FlatList,
-  Alert,
-    TextInput
+  TextInput,
+  ScrollView,
+  ToastAndroid,
+    ActivityIndicator
 } from 'react-native';
 import {normalize} from '../../utils/utilities';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import CheckBox from '@react-native-community/checkbox';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from "react-native-vector-icons/Entypo";
-import iterableToArray from "@babel/runtime/helpers/esm/iterableToArray";
+import Input from "../../common/Input";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import ImagePicker from "react-native-image-crop-picker";
+import ImageViewer from "../../common/ImageViwer";
+import {useSelector, useDispatch} from 'react-redux';
+import {getInventoryObjects} from "../../../actions/api";
+import {LOGOUT} from "../../../actions/types";
 
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
 
-const WarehouseHandling = () => {
+const WarehouseHandling = ({navigation}) => {
+  const dispatch = useDispatch();
+  const selector = useSelector(state => state);
   const [screenMode, setScreenMode] = useState("all");
   const [allObjectsList, setAllObjectsList] = useState([
     {
@@ -271,8 +281,45 @@ const WarehouseHandling = () => {
   const [hasToBeRefreshed, setHasToBeRefreshed] = useState(false);
   const [allSelected, setAllSelected] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [renderConfirmModal, setRenderConfirmModal] = useState(false);
+  const [barnameNumber, setBarnameNumber] = useState("");
+  const [barnameImage, setBarnameImage] = useState("");
+  const [inventoryLoading, setInventoryLoading] = useState(true);
 
   const Separator = () => <View style={Styles.separator} />;
+
+  useEffect(()=>{
+    getInventory();
+  },[])
+
+  const getInventory = ()=>{
+    getInventoryObjects(selector.token).then(data=>{
+      console.warn("FFFFF", data.result[12].Versions);
+      if (data.errorCode === 0){
+        let tmp = [];
+        data.result.map(item=>{
+          tmp.push({...item, isExpanded:false, isChecked:false});
+        })
+        setAllObjectsList(tmp);
+        setInventoryLoading(false);
+      } else {
+        if (data.errorCode === 3) {
+          dispatch({
+            type: LOGOUT,
+          });
+          navigation.navigate('SignedOut');
+        } else {
+          ToastAndroid.showWithGravity(
+              data.message,
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+          );
+        }
+      }
+      setInventoryLoading(false);
+      console.warn("DDDDD", data.result[12].Versions);
+    })
+  }
 
   const handleSearch = (searchValue)=>{
     if (!!searchValue){
@@ -368,7 +415,7 @@ const WarehouseHandling = () => {
           <View style={screenMode === "all" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle}/>
         </TouchableOpacity>
       </View>
-      <View style={Styles.searchbarContainerStyle}>
+      <View style={[Styles.searchbarContainerStyle,{elevation: renderConfirmModal ? 0 : 5}]}>
         <TextInput
             style={Styles.textinputStyle}
             placeholder={"نام قطعه و نسخه را جستجو کنید..."}
@@ -384,7 +431,7 @@ const WarehouseHandling = () => {
         />
       </View>
       <View style={Styles.selectAllCheckBoxContainerStyle}>
-          <TouchableOpacity style={Styles.confirmButtonStyle}>
+          <TouchableOpacity style={Styles.confirmButtonStyle} onPress={()=>setRenderConfirmModal(true)}>
             <Text style={Styles.confirmButtonTextStyle}>
               تایید
             </Text>
@@ -456,29 +503,28 @@ const WarehouseHandling = () => {
         </View>
       </View>
       <View style={{flex: 1}}>
+        {inventoryLoading ? (
+            <ActivityIndicator/>
+        ) : (
         <FlatList
           data={allObjectsList}
           renderItem={({item, index}) => screenMode === "all" || (screenMode === "new" && !!item.type ) || (screenMode === "fail" && !item.type) ? (
             <View
               style={[Styles.cardHeaderStyle,{
-                backgroundColor: !!item.type ? "#90DA9F" : "#FF9999",
+                backgroundColor: !!item.Broken ? "#90DA9F" : "#FF9999",
               }]}>
               <TouchableOpacity style={{width:"100%", flexDirection:"row", alignItems:"center", justifyContent:"space-around"}} onPress={() => {
-                  let currentList = allObjectsList;
-                  currentList.splice(index, 1, {
-                    ...item,
-                    isExpanded: !item.isExpanded,
-                  });
-                    setAllObjectsList(currentList);
+                  let currentList = [...allObjectsList];
+                  currentList[index] = {...item, isExpanded: !item.isExpanded};
+                  setAllObjectsList(currentList);
                   setHasToBeRefreshed(!hasToBeRefreshed);
                 }
               }>
                 <Text style={Styles.labelTextStyle}>
-                  تعداد کل: {item.totalItems}
+                  تعداد کل: {item.Total}
                 </Text>
-                <Text
-                  style={Styles.labelTextStyle}>
-                 نام قطعه: {item.objectName}
+                <Text style={Styles.labelTextStyle}>
+                 نام قطعه: {item.Object_Name.length > 13 ? `${item.Object_Name.substr(0,13)}...` : item.Object_Name}
                 </Text>
                 <CheckBox tintColors={{true: '#9C0000', false: 'black'}} value={item.isChecked} onChange={()=>{
                   if (item.isChecked){
@@ -513,11 +559,11 @@ const WarehouseHandling = () => {
                   setHasToBeRefreshed(!hasToBeRefreshed);
                 }}/>
               </TouchableOpacity>
-              {item.isExpanded && !!item.objectInventory && (
+              {item.isExpanded && (
                 <>
                   <Separator />
                   <View style={{width: '100%'}}>
-                    {item.objectInventory.map((I, IIndex) => (
+                    {item.Versions.map((I, IIndex) => (
                       <View
                         style={{
                           flexDirection: 'row',
@@ -525,9 +571,9 @@ const WarehouseHandling = () => {
                           marginBottom: 15,
                           justifyContent: 'space-around',
                         }}>
-                        {!!I.serialList.length ? (
+                        {!!I.Serials.length ? (
                             <View>
-                              {I.serialList.map((serial, serialIndex)=>(
+                              {I.Serials.map((serial, serialIndex)=>(
                                   <View style={{flexDirection:"row", alignItems:"center"}}>
                                     <CheckBox tintColors={{true: '#9C0000', false: 'black'}} value={serial.isChecked} onChange={()=>{
                                       if (serial.isChecked){
@@ -576,7 +622,7 @@ const WarehouseHandling = () => {
                                 />
                               </TouchableOpacity>
                               <Text style={{textAlign:"center", fontFamily:"IRANSansMobile_Medium"}}>
-                                از {I.count}
+                                از {I.Count}
                               </Text>
                               <Text style={{marginHorizontal: 5}}>
                                 {I.selectedCount}
@@ -612,7 +658,7 @@ const WarehouseHandling = () => {
                               </Text>
                             </View>
                         )}
-                        <Text style={Styles.labelTextStyle}>نام نسخه: {I.version}</Text>
+                        <Text style={Styles.labelTextStyle}>نام نسخه: {I.Version_Name}</Text>
                       </View>
                     ))}
                   </View>
@@ -621,7 +667,94 @@ const WarehouseHandling = () => {
             </View>
           ) : null}
         />
+            )}
       </View>
+      {renderConfirmModal && (
+          <View style={Styles.modalBackgroundStyle}>
+            <ScrollView style={[Styles.modalContainerStyle,{height:!!barnameImage ? "70%" : "40%", top:!!barnameImage ? pageHeight*0.04 : pageHeight*0.17}]} contentContainerStyle={{justifyContent:"center", alignSelf:"center", alignItems:'center'}}>
+              <View style={Styles.modalBodyContainerStyle2}>
+                  <Input label={"شماره بارنامه"} keyboardType={"numeric"} onChangeText={text=>setBarnameNumber(text)} value={barnameNumber}/>
+                {!barnameImage && <Text style={{fontFamily: "IRANSansMobile_Light"}}>لطفا عکس بارنامه را بارگذاری کنید.</Text>}
+                  <View style={Styles.getImageContainerViewStyle}>
+                    <Icon
+                        name={'camera-alt'}
+                        style={{color: '#000', fontSize: normalize(35), marginHorizontal:10}}
+                        onPress={() => {
+                          ImagePicker.openCamera({
+                            width: pageWidth - 20,
+                            height: pageHeight * 0.7,
+                            includeBase64: true,
+                            compressImageQuality: 0.7,
+                          }).then(response => {
+                            setBarnameImage(response.data);
+                          }).catch(err=>{
+                            ToastAndroid.showWithGravity(
+                                'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER,
+                            );
+                          });
+                        }
+                        }
+                    />
+                    <Icon
+                        name={'file-upload'}
+                        style={{color: '#000', fontSize: normalize(35), marginHorizontal:10}}
+                        onPress={() => {
+                          ImagePicker.openPicker({
+                            width: pageWidth - 20,
+                            height: pageHeight * 0.7,
+                            includeBase64: true,
+                            compressImageQuality: 0.7,
+                          }).then(response => {
+                            setBarnameImage(response.data);
+                          }).catch(err=>{
+                            ToastAndroid.showWithGravity(
+                                'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER,
+                            );
+                          });
+                        }
+                        }
+                    />
+                    {!!barnameImage && (
+                        <Icon
+                            name={'delete'}
+                            style={{color: '#000', fontSize: normalize(30), marginHorizontal:10}}
+                            onPress={() => {
+                              setBarnameImage("");
+                            }}
+                        />
+                    )}
+                  </View>
+                  {!!barnameImage && (
+                      <ImageViewer
+                          width={pageWidth - 30}
+                          height={pageHeight * 0.7}
+                          imageUrl={`data:image/jpeg;base64,${barnameImage}`}
+                      />
+                  )}
+              </View>
+              <View style={Styles.modalFooterContainerStyle}>
+                <TouchableOpacity
+                    style={Styles.modalButtonStyle}
+                    onPress={() => {
+                      setBarnameNumber("");
+                      setBarnameImage("");
+                      setRenderConfirmModal(false)
+                    }}>
+                  <Text style={Styles.modalButtonTextStyle}>انصراف</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={Styles.modalButtonStyle}
+                    onPress={() => {}}>
+                  <Text style={Styles.modalButtonTextStyle}>تایید</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+      )}
     </View>
   );
 };
@@ -697,7 +830,6 @@ const Styles = StyleSheet.create({
     height:pageHeight*0.08,
     backgroundColor: "#fff",
     borderRadius:30,
-    elevation:5,
     alignSelf:"center",
     marginBottom:5,
     paddingHorizontal:10,
@@ -750,7 +882,59 @@ const Styles = StyleSheet.create({
     marginRight:5,
     justifyContent:"center",
     alignItems:"center"
-  }
+  },
+  modalBackgroundStyle: {
+    flex: 1,
+    width: pageWidth,
+    height: pageHeight,
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  modalContainerStyle: {
+    position: 'absolute',
+    height:'70%',
+    width: pageWidth - 15,
+    backgroundColor: '#fff',
+    marginBottom: pageHeight * 0.25,
+    borderRadius: 15,
+    overflow: 'scroll',
+  },
+  modalBodyContainerStyle2: {
+    width: '100%',
+    alignItems: 'center',
+    padding: 10,
+    justifyContent: 'center',
+  },
+  modalButtonTextStyle: {
+    color: 'white',
+    fontSize: normalize(14),
+    fontFamily: 'IRANSansMobile_Medium',
+  },
+  modalButtonStyle: {
+    backgroundColor: '#660000',
+    width: pageWidth * 0.2,
+    height: 35,
+    borderRadius: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    marginHorizontal: 20
+  },
+  modalFooterContainerStyle: {
+    flexDirection:"row",
+    alignItems:"center",
+  marginBottom:15
+  },
+  getImageContainerViewStyle: {
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexDirection: 'row',
+    alignSelf:"center",
+    marginVertical:20
+  },
 });
 
 export default WarehouseHandling;

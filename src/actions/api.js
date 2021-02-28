@@ -368,4 +368,54 @@ export const checkObjectVersion = (token, serialCode, objectId, versionId) => {
   }).then((response) => response.json());
 }
 
+export const getInventoryObjects = (token) => {
+  return fetch(`${LOCAL_HOST}/GetInventorySummery`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    }
+  }).then((response) => response.json());
+}
+
+export const getInfo = (token) => {
+  return fetch(`${LOCAL_HOST}/GetUserInfo`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    }
+  }).then((response) => response.json());
+}
+
+export const getRecieptList = (token)=>{
+  return fetch(`${LOCAL_HOST}/GetServiceManRecieptList`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    }
+  }).then((response) => response.json());
+}
+
+export const getSingleReciept = (token, id) =>{
+  return fetch(`${LOCAL_HOST}/GetServiceManReciept?id=${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    }
+  }).then((response) => response.json());
+}
+
+export const getRecieptDetails = (token, id)=>{
+  return fetch(`${LOCAL_HOST}/GetServiceManRecieptDetail?id=${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    }
+  }).then((response) => response.json());
+}
+
 

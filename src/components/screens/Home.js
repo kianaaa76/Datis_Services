@@ -27,7 +27,7 @@ import {
   LOGOUT,
   SET_USER_LIST,
 } from '../../actions/types';
-import {call, getObjects, getUsers} from '../../actions/api';
+import {call, getObjects, getUsers, getInfo} from '../../actions/api';
 import {normalize} from '../utils/utilities';
 
 const pageHeight = Dimensions.get('screen').height;
@@ -42,6 +42,15 @@ const Home = ({navigation}) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
   const [changeUserLoading, setChangeUserLoading] = useState(true);
+
+  useEffect(()=>{
+    getInfo(selector.token).then(data=>{
+      if (data.errorCode === 0 && !data.result){
+        navigation.replace("UserAddress");
+      }
+    });
+  },[]);
+
 
   useEffect(() => {
     if (
@@ -60,11 +69,27 @@ const Home = ({navigation}) => {
           data.result.map(item => {
             if (item.ID == selector.userId) {
               setUser(item);
+              dispatch({
+                type: LOGIN,
+                constantToken: selector.constantToken,
+                token: selector.token,
+                userId: selector.userId,
+                constantUserId: selector.constantUserId,
+                serviceManName: item.Name
+              });
             }
           });
           data.result.map(item=>{
             if (item.ID == selector.userId) {
               setUser(item);
+              dispatch({
+                type: LOGIN,
+                constantToken: selector.constantToken,
+                token: selector.token,
+                userId: selector.userId,
+                constantUserId: selector.constantUserId,
+                serviceManName: item.Name
+              });
             }
           })
           setChangeUserLoading(false);
@@ -260,6 +285,7 @@ const Home = ({navigation}) => {
                         constantToken: selector.constantToken,
                         userId: item.item.ID,
                         constantUserId: selector.constantUserId,
+                        serviceManName: item.item.Name
                       });
                       setUser(item.item);
                       setShowUserList(false);

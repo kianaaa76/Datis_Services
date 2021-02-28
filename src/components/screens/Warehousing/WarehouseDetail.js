@@ -3,20 +3,17 @@ import {View, Text, StyleSheet, Dimensions} from "react-native";
 import Header from "../../common/Header";
 import {TabView, TabBar} from 'react-native-tab-view';
 import WarehouseHandling from "./WarehouseHandling";
-import SendGoods from "./SendGoods";
+import History from "./History";
 import RequestGoods from "./RequestGoods";
 import {normalize} from "../../utils/utilities";
 
-
 const pageHeight = Dimensions.get("screen").height;
 
-
 const WarehouseDetail = ()=>{
-
 const [index, setIndex] = React.useState(2);
   const [routes] = React.useState([
+      {key: 'third', title: 'تاریخچه'},
     {key: 'second', title: 'درخواست کالا'},
-    {key: 'third', title: 'ارسال'},
     {key: 'first', title: 'انبارگردانی'}
   ]);
   const renderScene = ({route}) => {
@@ -27,11 +24,11 @@ const [index, setIndex] = React.useState(2);
         );
       case 'second':
         return (
-          <SendGoods/>
+          <RequestGoods/>
         );
       case 'third':
         return (
-          <RequestGoods/>
+          <History/>
         );
       default:
         return null;

@@ -17,7 +17,7 @@ const App = () => {
   const myStore = getStore();
   const myPersistor = getPersistor();
   useEffect(() => {
-    if (Platform.OS == 'android') {
+    if (Platform.OS === 'android') {
       const granted = PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         PermissionsAndroid.PERMISSIONS.CAMERA,
