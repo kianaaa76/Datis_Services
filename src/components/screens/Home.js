@@ -67,7 +67,7 @@ const Home = ({navigation}) => {
           });
           setShowingUserList(data.result);
           data.result.map(item => {
-            if (item.ID == selector.userId) {
+            if (item.ID === selector.userId) {
               setUser(item);
               dispatch({
                 type: LOGIN,
@@ -80,7 +80,7 @@ const Home = ({navigation}) => {
             }
           });
           data.result.map(item=>{
-            if (item.ID == selector.userId) {
+            if (item.ID === selector.userId) {
               setUser(item);
               dispatch({
                 type: LOGIN,

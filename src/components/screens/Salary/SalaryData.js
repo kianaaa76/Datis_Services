@@ -4,6 +4,7 @@ import Header from "../../common/Header";
 import {getSingleReciept} from "../../../actions/api";
 import {useSelector, useDispatch} from "react-redux";
 import {LOGOUT} from "../../../actions/types";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const pageHeight = Dimensions.get("screen").height;
 const pageWidth = Dimensions.get("screen").width;
@@ -64,7 +65,9 @@ const SalaryData = ({navigation})=>{
 
     return(
         <View style={{flex:1}}>
-            <Header headerText={"اطلاعات پرداخت"}/>
+            <Header headerText={"اطلاعات پرداخت"} leftIcon={
+                <MaterialIcons name={"file-download"} style={{fontSize:30, color:"#fff", marginLeft:10}}/>
+            }/>
             {dataLoading ? (
                 <View style={{flex:1}}>
                     <ActivityIndicator size={"large"} color={"#660000"}/>
