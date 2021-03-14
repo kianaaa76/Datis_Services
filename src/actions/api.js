@@ -418,4 +418,29 @@ export const getRecieptDetails = (token, id)=>{
   }).then((response) => response.json());
 }
 
+export const requestObject = (token, Objects, Description)=>{
+  const msg = JSON.stringify({
+    Objects,
+    Description
+  });
+  return fetch(`${LOCAL_HOST}/RequestObject`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body:msg
+  }).then((response) => response.json());
+}
+
+export const requestsHistory = (token)=>{
+  return fetch(`${LOCAL_HOST}/PortageSummery`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+
 

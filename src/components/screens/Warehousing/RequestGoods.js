@@ -8,52 +8,60 @@ import {
     TouchableOpacity,
     ToastAndroid,
     TextInput,
-    ActivityIndicator,
     TouchableHighlight,
     Alert,
+    Keyboard,
+    ActivityIndicator
 } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
+import {requestObject} from "../../../actions/api";
 import Octicons from 'react-native-vector-icons/Octicons';
 import Feather from 'react-native-vector-icons/Feather';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DropdownPicker from '../../common/DropdownPicker';
 import {useSelector} from 'react-redux';
-import {getObjBySerial, checkObjectVersion} from '../../../actions/api';
-import RnZxing from 'react-native-rn-zxing';
-import {normalize, addDotsToPrice} from '../../utils/utilities';
+import {normalize} from '../../utils/utilities';
+import {LOGOUT} from "../../../actions/types";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
 
-const RequestObject = ({
-                             setInfo,
-                             info,
-                             renderSaveModal,
-                             hasNew,
-                             setHasNew,
-                         }) => {
+const RequestObject = ({navigation}) => {
     const selector = useSelector(state => state);
     const [fieldsObject, setFieldsObject] = useState({
-        objectType: '',
-        serial: '',
         partTypeSelected: {},
         partVersionSelected: {},
-        Price: '0',
-        failureDescription: '',
-        hasGarantee: null,
+        count:0,
         availableVersions: [],
     });
     const dropRef = useRef();
     const new_dropRef = useRef();
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-    const [isNewPartFormExpanded, setIsNewPartFormExpanded] = useState(false);
-    const [partsListName, setPartsListName] = useState(selector.objectsList);
-    const [searchBarcodeLoading, setSearchBarcodeLoading] = useState(false);
-    const [objectsList, setObjectsList] = useState(info);
-    const [selectedItemList, setSelectedItemList] = useState({});
+    const [partsListName] = useState(selector.objectsList);
+    const [objectsList, setObjectsList] = useState([]);
     const [rerender, setRerender] = useState(false);
-    const [qrScannerLoading, setQrScannerLoading] = useState(false);
+    const [hasNew, setHasNew] = useState(false);
+    const [openSendModal,setOpenSendModal] = useState(false);
+    const [requestDescription, setRequestDescription] = useState("");
+    const [requestLoading, setRequestLoading] = useState(false);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => {
+                setKeyboardVisible(true);
+            },
+        );
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                setKeyboardVisible(false);
+            },
+        );
+
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+        };
+    }, []);
 
     const refactorObjectListItems = (refactorFeild, newValue, objectIndex) => {
         let currentList = !!objectsList.length ? objectsList : [];
@@ -69,16 +77,6 @@ const RequestObject = ({
                     case 'availableVersions':
                         selectedObject = {...selectedObject, availableVersions: newValue};
                         break;
-                    case 'hasGarantee':
-                        selectedObject = {...selectedObject, hasGarantee: newValue};
-                        break;
-                    case 'tempSerial':
-                        selectedObject = {
-                            ...selectedObject,
-                            tempSerial: newValue,
-                            isConfirmed: false,
-                        };
-                        break;
                     case 'tempPart':
                         selectedObject = {
                             ...selectedObject,
@@ -93,28 +91,20 @@ const RequestObject = ({
                             isConfirmed: false,
                         };
                         break;
-                    case 'tempPrice':
+                    case 'tempCount':
                         selectedObject = {
                             ...selectedObject,
-                            tempPrice: newValue,
-                            isConfirmed: false,
-                        };
-                        break;
-                    case 'tempFailureDescription':
-                        selectedObject = {
-                            ...selectedObject,
-                            tempFailureDescription: newValue,
+                            tempCount: newValue,
                             isConfirmed: false,
                         };
                         break;
                     case 'setDirect':
                         selectedObject = {
                             ...selectedObject,
-                            serial: !!newValue ? newValue : selectedObject.tempSerial,
                             version: selectedObject.tempVersion,
                             partType: selectedObject.tempPart,
-                            Price: selectedObject.tempPrice,
-                            failureDescription: selectedObject.tempFailureDescription,
+                            count: selectedObject.tempPrice,
+                            description: selectedObject.tempFailureDescription,
                             isExpanded: false,
                             isConfirmed: true,
                         };
@@ -125,7 +115,6 @@ const RequestObject = ({
         });
         currentList.splice(Index, 1, selectedObject);
         setObjectsList(currentList);
-        setInfo(currentList);
         setRerender(!rerender);
     };
 
@@ -182,7 +171,7 @@ const RequestObject = ({
                                 textAlign: 'center',
                                 fontFamily: 'IRANSansMobile_Light',
                             }}>
-                            {!!Item.serial ? Item.serial : 'سریال'}
+                            {!!Item.tempVersion.Value ? Item.tempVersion.Value : 'نسخه'}
                         </Text>
                         <Text
                             style={{
@@ -191,29 +180,18 @@ const RequestObject = ({
                                 textAlign: 'center',
                                 fontFamily: 'IRANSansMobile_Light',
                             }}>
-                            {!!Item.partType ? Item.partType.label : 'نام'}
+                            {!!Item.partType ? Item.partType.label : 'قطعه'}
                         </Text>
-                        {Item.objectType == 'new' ? (
-                            <FontAwesome5
-                                name={'arrow-right'}
-                                style={{color: 'green', fontSize: normalize(20)}}
-                            />
-                        ) : (
-                            <FontAwesome5
-                                name={'arrow-left'}
-                                style={{color: 'red', fontSize: normalize(20)}}
-                            />
-                        )}
                     </>
                 </TouchableHighlight>
                 {Item.isExpanded && (
+                    <>
                     <View style={Styles.bothOptionsContainerStyle}>
                         <View style={Styles.partTypeContainerStyle}>
                             <DropdownPicker
                                 list={partsListName}
                                 onSelect={value => {
                                     refactorObjectListItems('tempPart', value, Item.index);
-                                    refactorObjectListItems('tempSerial', '', Item.index);
                                     refactorObjectListItems('tempVersion', {}, Item.index);
                                     refactorObjectListItems(
                                         'availableVersions',
@@ -239,52 +217,6 @@ const RequestObject = ({
                                 نوع قطعه:
                             </Text>
                         </View>
-                        <View style={Styles.serialContainerStyle}>
-                            {searchBarcodeLoading ? (
-                                <ActivityIndicator size={'small'} color={'#000'} />
-                            ) : (
-                                <Icon
-                                    name={'search'}
-                                    style={{color: '#000', fontSize: normalize(30)}}
-                                    onPress={async () => {
-                                        await setSelectedItemList(Item);
-                                        searchBarcode(Item);
-                                    }}
-                                />
-                            )}
-                            <Icon
-                                name={'qr-code-2'}
-                                style={{
-                                    color: '#000',
-                                    fontSize: normalize(30),
-                                    marginHorizontal: 5,
-                                }}
-                                onPress={() => {
-                                    try {
-                                        RnZxing.showQrReader(data => onSuccess(data));
-                                    } catch {
-                                        ToastAndroid.showWithGravity(
-                                            'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                                            ToastAndroid.SHORT,
-                                            ToastAndroid.CENTER,
-                                        );
-                                    }
-                                }}
-                            />
-                            <TextInput
-                                style={Styles.serialInputStyle}
-                                onChangeText={text => {
-                                    refactorObjectListItems('tempSerial', text, Item.index);
-                                }}
-                                value={Item.tempSerial}
-                            />
-                            <View style={{flexDirection: 'row'}}>
-                                {!!Item.tempPart.value.SerialFormat && (
-                                    <Icon name={'star'} style={{color: 'red'}} />
-                                )}
-                                <Text style={Styles.labelStyle}>سریال:</Text>
-                            </View>
-                        </View>
                         <View style={Styles.partTypeContainerStyle}>
                             <DropdownPicker
                                 ref={dropRef}
@@ -302,195 +234,81 @@ const RequestObject = ({
                             <Text style={Styles.labelStyle}>نسخه: </Text>
                         </View>
                     </View>
-                )}
-                {Item.isExpanded && Item.objectType === 'new' ? (
-                    <View style={Styles.priceContainerStyle}>
-                        <Text style={Styles.labelStyle}>ریال</Text>
-                        <TextInput
-                            style={Styles.priceInputStyle}
-                            onChangeText={text =>
-                                refactorObjectListItems('tempPrice', text, Item.index)
-                            }
-                            value={addDotsToPrice(Item.tempPrice)}
-                            keyboardType="numeric"
-                        />
-                        <Text style={Styles.labelStyle}>قیمت:</Text>
-                    </View>
-                ) : Item.isExpanded && Item.objectType === 'failed' ? (
-                    <View style={{marginTop: 15, width: '100%'}}>
-                        <Text style={Styles.labelStyle}>
-                            شرح نوع خرابی و علت احتمالی آن:{' '}
-                        </Text>
-                        <View style={Styles.failureDescriptionContainerStyle}>
-                            <Text style={[Styles.labelStyle, {marginBottom: 5}]}>
-                                توضیحات:{' '}
-                            </Text>
-                            <TextInput
-                                style={Styles.descriptionInputStyle}
-                                onChangeText={text =>
-                                    refactorObjectListItems(
-                                        'tempFailureDescription',
-                                        text,
-                                        Item.index,
-                                    )
-                                }
-                                value={Item.tempFailureDescription}
-                                multiline
-                            />
-                        </View>
-                        <View style={Styles.garanteeContainerStyle}>
-                            <Text style={{marginRight: 10}}>
-                                {!!Item.hasGarantee ? Item.hasGarantee : '-'}
-                            </Text>
-                            <Text style={Styles.labelStyle}>گارانتی:</Text>
-                        </View>
-                        <View style={Styles.prePriceContainerStyle}>
-                            <Text style={Styles.labelStyle}>ریال</Text>
-                            <TextInput
-                                style={Styles.prePriceInputStyle}
-                                onChangeText={text =>
-                                    refactorObjectListItems('tempPrice', text, Item.index)
-                                }
-                                value={addDotsToPrice(Item.tempPrice)}
-                                keyboardType="numeric"
-                            />
-                            <Text style={Styles.labelStyle}>مبلغ عودت داده شده:</Text>
-                        </View>
-                    </View>
-                ) : null}
-                {Item.isExpanded && (
-                    <View style={Styles.formFooterContainerstyle}>
-                        <TouchableOpacity
-                            style={Styles.footerIconContainerStyle}
-                            onPress={async () => {
-                                await setInfo(c => c.filter(_ => _.index !== Item.index));
-                                await setObjectsList(c =>
-                                    c.filter(_ => _.index !== Item.index),
-                                );
-                            }}>
-                            <Octicons
-                                name={'trashcan'}
-                                style={{fontSize: normalize(17), color: '#fff'}}
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={Styles.footerIconContainerStyle}
-                            onPress={() => {
-                                try {
-                                    if (!Item.tempPart.label) {
-                                        Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
-                                            {text: 'OK', onPress: () => {}},
-                                        ]);
-                                    } else if (!Item.tempVersion.Key) {
-                                        Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
-                                            {text: 'OK', onPress: () => {}},
-                                        ]);
-                                    } else if (
-                                        !!Item.tempPart.value.SerialFormat &&
-                                        Item.tempSerial === ''
-                                    ) {
-                                        Alert.alert('', 'لطفا سریال را مشخص کنید.', [
-                                            {text: 'OK', onPress: () => {}},
-                                        ]);
-                                    } else {
-                                        const serialFormat = Item.tempPart.value.SerialFormat;
-                                        if (!!serialFormat) {
-                                            if (serialFormat.length === Item.tempSerial.length) {
-                                                let i = 0;
-                                                let faults = 0;
-                                                while (serialFormat[i] !== '#') {
-                                                    if (
-                                                        serialFormat[i].toUpperCase() !==
-                                                        Item.tempSerial[i].toUpperCase()
-                                                    ) {
-                                                        faults = faults + 1;
-                                                    }
-                                                    i = i + 1;
-                                                }
-                                                if (faults > 0) {
-                                                    Alert.alert(
-                                                        '',
-                                                        'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                                                        [{text: 'OK', onPress: () => {}}],
-                                                    );
-                                                } else {
-                                                    checkObjectVersion(
-                                                        selector.token,
-                                                        Item.tempSerial,
-                                                        Item.tempPart.value.Id,
-                                                        Item.tempVersion.Key,
-                                                    ).then(data => {
-                                                        if (data.errorCode == 0) {
-                                                            refactorObjectListItems(
-                                                                'setDirect',
-                                                                '',
-                                                                Item.index,
-                                                            );
-                                                        } else {
-                                                            ToastAndroid.showWithGravity(
-                                                                'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                                                ToastAndroid.SHORT,
-                                                                ToastAndroid.CENTER,
-                                                            );
-                                                        }
-                                                    });
-                                                }
-                                            } else {
-                                                let hashtagIndex = 0;
-                                                while (serialFormat[hashtagIndex] !== '#') {
-                                                    hashtagIndex = hashtagIndex + 1;
-                                                }
-                                                let rest = serialFormat.length - hashtagIndex;
-                                                if (rest == Item.tempSerial.length) {
-                                                    const actualSerial = serialFormat
-                                                        .substr(0, hashtagIndex)
-                                                        .concat(Item.tempSerial);
-                                                    checkObjectVersion(
-                                                        selector.token,
-                                                        actualSerial,
-                                                        Item.tempPart.value.Id,
-                                                        Item.tempVersion.Key,
-                                                    ).then(data => {
-                                                        if (data.errorCode == 0) {
-                                                            refactorObjectListItems(
-                                                                'setDirect',
-                                                                actualSerial,
-                                                                Item.index,
-                                                            );
-                                                        } else {
-                                                            ToastAndroid.showWithGravity(
-                                                                'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                                                ToastAndroid.SHORT,
-                                                                ToastAndroid.CENTER,
-                                                            );
-                                                        }
-                                                    });
-                                                } else {
-                                                    Alert.alert(
-                                                        '',
-                                                        'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                                                        [{text: 'OK', onPress: () => {}}],
-                                                    );
-                                                }
-                                            }
-                                        } else {
-                                            refactorObjectListItems('setDirect', '', Item.index);
+                            <View style={Styles.countContainerStyle}>
+                                <View style={Styles.countChangeButtonContainerStyle}>
+                                    <TouchableOpacity style={Styles.countChangeButtonsStyle} onPress={()=>{
+                                        if (Item.tempCount > 0) {
+                                            refactorObjectListItems("tempCount",parseInt(Item.tempCount) - 1, Item.index);
                                         }
-                                    }
-                                } catch {}
-                            }}>
-                            <Octicons
-                                name={'check'}
-                                style={{fontSize: normalize(17), color: '#fff'}}
-                            />
-                        </TouchableOpacity>
-                    </View>
+                                    }}>
+                                        <Feather
+                                            name={'minus'}
+                                            style={{color: '#fff', fontSize: normalize(17)}}
+                                        />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={Styles.countChangeButtonsStyle} onPress={()=>{
+                                        refactorObjectListItems("tempCount",parseInt(Item.tempCount) + 1, Item.index);
+                                    }}>
+                                        <Feather
+                                            name={'plus'}
+                                            style={{color: '#fff', fontSize: normalize(17)}}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                                <TextInput
+                                    style={Styles.priceInputStyle}
+                                    onChangeText={txt=>refactorObjectListItems("tempCount",parseInt(txt), Item.index)}
+                                    keyboardType="numeric"
+                                    value={Item.tempCount.toString()}/>
+                                <Text style={Styles.labelStyle}>تعداد:</Text>
+                            </View>
+                            <View style={Styles.formFooterContainerstyle}>
+                                <TouchableOpacity
+                                    style={Styles.footerIconContainerStyle}
+                                    onPress={async () => {
+                                        await setObjectsList(c =>
+                                            c.filter(_ => _.index !== Item.index),
+                                        );
+                                    }}>
+                                    <Octicons
+                                        name={'trashcan'}
+                                        style={{fontSize: normalize(17), color: '#fff'}}
+                                    />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={Styles.footerIconContainerStyle}
+                                    onPress={() => {
+                                        try {
+                                            if (!Item.tempPart.label) {
+                                                Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
+                                                    {text: 'OK', onPress: () => {}},
+                                                ]);
+                                            } else if (!Item.tempVersion.Key) {
+                                                Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
+                                                    {text: 'OK', onPress: () => {}},
+                                                ]);
+                                            } else if (!Item.tempCount) {
+                                                Alert.alert('', 'لطفا تعداد را مشخص کنید.', [
+                                                    {text: 'OK', onPress: () => {}},
+                                                ]);
+                                            } else {
+                                                refactorObjectListItems('setDirect', '', Item.index);
+                                            }
+                                        } catch {}
+                                    }}>
+                                    <Octicons
+                                        name={'check'}
+                                        style={{fontSize: normalize(17), color: '#fff'}}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </>
                 )}
             </View>
         );
     };
 
-    const addNewObject = (list, serial) => {
+    const addNewObject = (list) => {
         let maxIndex = 0;
         if (list.length > 0) {
             list.map(item => {
@@ -501,56 +319,63 @@ const RequestObject = ({
         }
         list.push({
             index: maxIndex + 1,
-            serial: serial,
             isExpanded: false,
-            failureDescription: !!fieldsObject.failureDescription
-                ? fieldsObject.failureDescription
-                : '',
-            hasGarantee: fieldsObject.hasGarantee,
-            Price: !!fieldsObject.Price ? fieldsObject.Price : '0',
+            count: !!fieldsObject.count ? fieldsObject.count : 0,
             objectType: fieldsObject.objectType,
             partType: fieldsObject.partTypeSelected,
             availableVersions: fieldsObject.availableVersions,
             version: fieldsObject.partVersionSelected,
             tempPart: fieldsObject.partTypeSelected,
             tempVersion: fieldsObject.partVersionSelected,
-            tempPrice: !!fieldsObject.Price ? fieldsObject.Price : '0',
-            tempSerial: serial,
+            tempCount: !!fieldsObject.count ? fieldsObject.count : 0,
             isConfirmed: true,
-            tempFailureDescription: !!fieldsObject.failureDescription
-                ? fieldsObject.failureDescription
-                : '',
         });
-        if (fieldsObject.objectType == 'new') {
+            setObjectsList(list);
+            setHasNew(false);
             setFieldsObject({
-                ...fieldsObject,
-                objectType: '',
-                serial: '',
                 partTypeSelected: {},
                 partVersionSelected: {},
-                Price: '',
-                failureDescription: '',
-                hasGarantee: null,
+                count:0,
+                availableVersions: [],
             });
-            setHasNew(false);
-            setObjectsList(list);
-            setInfo(list);
-        } else {
-            setObjectsList(list);
-            setInfo(list);
-            let obj = {
-                objectType: 'new',
-                serial: '',
-                partTypeSelected: fieldsObject.partTypeSelected,
-                partVersionSelected: fieldsObject.partVersionSelected,
-                availableVersions: fieldsObject.availableVersions,
-                Price: '0',
-                failureDescription: '',
-                hasGarantee: null,
-            };
-            setFieldsObject(obj);
-        }
     };
+
+    const handleSubmitRequest = ()=>{
+        setRequestLoading(true);
+        let tempList = [];
+        objectsList.map(item=>{
+            tempList.push({
+                ObjectID:item.partType.value.Id,
+                VersionID:item.version.Key,
+                Count:item.count,
+            })
+        });
+        requestObject(selector.token, tempList, requestDescription).then(data=>{
+            if (data.errorCode === 0){
+                setOpenSendModal(false);
+                setRequestDescription("");
+                setObjectsList([]);
+                ToastAndroid.showWithGravity(
+                    "درخواست شما با موفقیت ثبت شد.",
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                );
+            } else if (data.errorCode === 3){
+                dispatch({
+                    type: LOGOUT,
+                });
+                setRequestLoading(false);
+                navigation.navigate('SignedOut');
+            } else {
+                ToastAndroid.showWithGravity(
+                    data.message,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                );
+                setRequestLoading(false);
+            }
+        })
+    }
 
     return (
         <>
@@ -558,182 +383,74 @@ const RequestObject = ({
                 style={{flex: 0.8, padding: 15}}
                 keyboardShouldPersistTaps="always"
                 keyboardDismissMode="on-drag">
-                {!!info && info.length > 0 && (
-                    <View style={{flex: 1, marginBottom: 10}}>
-                        {info.map(item => renderServicePartItem(item))}
+                {objectsList.length > 0 && (
+                    <View style={{flex: 1}}>
+                        {objectsList.map(item => renderServicePartItem(item))}
                     </View>
                 )}
                 {hasNew && (
                     <View style={Styles.newformContainerStyle}>
-                        <View style={Styles.partTypeSelectionContainerStyle}>
-                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                <CheckBox
-                                    onValueChange={value => {
-                                        if (value) {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: 'failed',
-                                            });
-                                            setIsNewPartFormExpanded(true);
-                                        } else {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: '',
-                                            });
-                                            setIsNewPartFormExpanded(false);
-                                        }
+                            <View style={Styles.partTypeContainerStyle}>
+                                <DropdownPicker
+                                    list={partsListName}
+                                    onSelect={async value => {
+                                        await setFieldsObject({
+                                            ...fieldsObject,
+                                            partTypeSelected: value,
+                                            partVersionSelected: {},
+                                            availableVersions: value.value.Versions,
+                                        });
+                                        new_dropRef.current.setList(value.value.Versions);
                                     }}
-                                    value={fieldsObject.objectType === 'failed' ? true : false}
-                                    tintColors={{true: 'red', false: 'red'}}
+                                    placeholder={
+                                        !!fieldsObject.partTypeSelected.label
+                                            ? fieldsObject.partTypeSelected.label.length > 30
+                                            ? `${fieldsObject.partTypeSelected.label.substr(
+                                                0,
+                                                30,
+                                            )}...`
+                                            : `${fieldsObject.partTypeSelected.label}`
+                                            : 'قطعه مورد نظر خود را انتخاب کنید.'
+                                    }
+                                    listHeight={200}
                                 />
-                                <TouchableHighlight
-                                    onPress={() => {
-                                        if (fieldsObject.objectType == 'new') {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: 'failed',
-                                            });
-                                            setIsNewPartFormExpanded(true);
-                                        } else if (fieldsObject.objectType == 'failed') {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: '',
-                                            });
-                                            setIsNewPartFormExpanded(false);
-                                        } else {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: 'failed',
-                                            });
-                                            setIsNewPartFormExpanded(true);
-                                        }
-                                    }}
-                                    underlayColor="none">
-                                    <Text
-                                        style={{
-                                            color: '#000',
-                                            fontSize: normalize(12),
-                                            fontFamily: 'IRANSansMobile_Medium',
-                                        }}>
-                                        قطعه معیوب
-                                    </Text>
-                                </TouchableHighlight>
+                                <Text style={Styles.labelStyle}>نوع قطعه:</Text>
                             </View>
-                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                <CheckBox
-                                    onValueChange={value => {
-                                        if (value) {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: 'new',
-                                            });
-                                            setIsNewPartFormExpanded(true);
-                                        } else {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: '',
-                                            });
-                                            setIsNewPartFormExpanded(false);
-                                        }
-                                    }}
-                                    value={fieldsObject.objectType == 'new' ? true : false}
-                                    tintColors={{true: 'green', false: 'green'}}
-                                    style={{marginLeft: 20}}
+                            <View style={Styles.partTypeContainerStyle}>
+                                <DropdownPicker
+                                    ref={new_dropRef}
+                                    list={fieldsObject.availableVersions}
+                                    placeholder={
+                                        !!fieldsObject.partVersionSelected &&
+                                        !!fieldsObject.partVersionSelected.Key
+                                            ? fieldsObject.partVersionSelected.Value
+                                            : 'نسخه مورد نظر خود را انتخاب کنید.'
+                                    }
+                                    onSelect={item =>
+                                        setFieldsObject({
+                                            ...fieldsObject,
+                                            partVersionSelected: item,
+                                        })
+                                    }
+                                    listHeight={200}
                                 />
-                                <TouchableHighlight
-                                    onPress={() => {
-                                        if (fieldsObject.objectType == 'failed') {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: 'new',
-                                            });
-                                            setIsNewPartFormExpanded(true);
-                                        } else if (fieldsObject.objectType == 'new') {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: '',
-                                            });
-                                            setIsNewPartFormExpanded(false);
-                                        } else {
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                objectType: 'new',
-                                            });
-                                            setIsNewPartFormExpanded(true);
-                                        }
-                                    }}
-                                    underlayColor="none">
-                                    <Text
-                                        style={{
-                                            color: '#000',
-                                            fontSize: normalize(12),
-                                            fontFamily: 'IRANSansMobile_Medium',
-                                        }}>
-                                        قطعه جدید
-                                    </Text>
-                                </TouchableHighlight>
+                                <Text style={Styles.labelStyle}>نسخه: </Text>
                             </View>
-                        </View>
-                        {!!fieldsObject.objectType && isNewPartFormExpanded && (
-                            <View style={Styles.bothOptionsContainerStyle}>
-                                <View style={Styles.partTypeContainerStyle}>
-                                    <DropdownPicker
-                                        list={partsListName}
-                                        onSelect={async value => {
-                                            await setFieldsObject({
-                                                ...fieldsObject,
-                                                partTypeSelected: value,
-                                                serial: '',
-                                                partVersionSelected: {},
-                                                availableVersions: value.value.Versions,
-                                            });
-                                            new_dropRef.current.setList(value.value.Versions);
-                                        }}
-                                        placeholder={
-                                            !!fieldsObject.partTypeSelected.label
-                                                ? fieldsObject.partTypeSelected.label.length > 30
-                                                ? `${fieldsObject.partTypeSelected.label.substr(
-                                                    0,
-                                                    30,
-                                                )}...`
-                                                : `${fieldsObject.partTypeSelected.label}`
-                                                : 'قطعه مورد نظر خود را انتخاب کنید.'
+                            <View style={Styles.countContainerStyle}>
+                                <View style={Styles.countChangeButtonContainerStyle}>
+                                    <TouchableOpacity style={Styles.countChangeButtonsStyle} onPress={()=>{
+                                        if (parseInt(fieldsObject.count) > 0) {
+                                            setFieldsObject({...fieldsObject, count: parseInt(fieldsObject.count) - 1})
                                         }
-                                        listHeight={200}
-                                    />
-                                    <Text style={Styles.labelStyle}>نوع قطعه:</Text>
-                                </View>
-                                <View style={Styles.partTypeContainerStyle}>
-                                    <DropdownPicker
-                                        ref={new_dropRef}
-                                        list={fieldsObject.availableVersions}
-                                        placeholder={
-                                            !!fieldsObject.partVersionSelected &&
-                                            !!fieldsObject.partVersionSelected.Key
-                                                ? fieldsObject.partVersionSelected.Value
-                                                : 'نسخه مورد نظر خود را انتخاب کنید.'
-                                        }
-                                        onSelect={item =>
-                                            setFieldsObject({
-                                                ...fieldsObject,
-                                                partVersionSelected: item,
-                                            })
-                                        }
-                                        listHeight={200}
-                                    />
-                                    <Text style={Styles.labelStyle}>نسخه: </Text>
-                                </View>
-                            </View>
-                        )}
-                            <View style={Styles.priceContainerStyle}>
-                                <View style={{flexDirection:"row", width:pageWidth*0.15, alignItems:"center", justifyContent:"space-between"}}>
-                                    <TouchableOpacity style={{width:pageWidth*0.07, height:pageWidth*0.07, borderRadius:pageWidth*0.035, justifyContent:"center", alignItems:"center", backgroundColor:"#660000"}}>
+                                    }}>
                                         <Feather
                                             name={'minus'}
                                             style={{color: '#fff', fontSize: normalize(17)}}
                                         />
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={{width:pageWidth*0.07, height:pageWidth*0.07, borderRadius:pageWidth*0.035, justifyContent:"center", alignItems:"center", backgroundColor:"#660000"}}>
+                                    <TouchableOpacity style={Styles.countChangeButtonsStyle} onPress={()=>{
+                                        setFieldsObject({...fieldsObject, count: parseInt(fieldsObject.count) + 1})
+                                    }}>
                                         <Feather
                                             name={'plus'}
                                             style={{color: '#fff', fontSize: normalize(17)}}
@@ -742,29 +459,22 @@ const RequestObject = ({
                                 </View>
                                 <TextInput
                                     style={Styles.priceInputStyle}
-                                    onChangeText={text =>
-                                        setFieldsObject({...fieldsObject, Price: text})
-                                    }
-                                    value={addDotsToPrice(fieldsObject.Price)}
+                                    onChangeText={txt=>setFieldsObject({...fieldsObject, count: parseInt(txt)})}
                                     keyboardType="numeric"
-                                />
+                                    value={fieldsObject.count.toString()}/>
                                 <Text style={Styles.labelStyle}>تعداد:</Text>
                             </View>
                         <View style={Styles.formFooterContainerstyle}>
                             <TouchableOpacity
                                 style={Styles.footerIconContainerStyle}
                                 onPress={() => {
-                                    setIsNewPartFormExpanded(false);
                                     setHasNew(false);
                                     setFieldsObject({
                                         ...fieldsObject,
-                                        objectType: '',
-                                        serial: '',
                                         partTypeSelected: {},
                                         partVersionSelected: {},
-                                        failureDescription: '',
-                                        hasGarantee: null,
-                                        Price: '',
+                                        description: '',
+                                        count: 0,
                                     });
                                 }}>
                                 <Octicons
@@ -776,16 +486,7 @@ const RequestObject = ({
                                 style={Styles.footerIconContainerStyle}
                                 onPress={() => {
                                     try {
-                                        if (
-                                            fieldsObject.objectType !== 'new' &&
-                                            fieldsObject.objectType !== 'failed'
-                                        ) {
-                                            Alert.alert(
-                                                '',
-                                                'لطفا جدید یا معیوب بودن قطعه را مشخص کنید.',
-                                                [{text: 'OK', onPress: () => {}}],
-                                            );
-                                        } else if (!fieldsObject.partTypeSelected.label) {
+                                        if (!fieldsObject.partTypeSelected.label) {
                                             Alert.alert('', 'لطفا نوع قطعه را مشخص کنید.', [
                                                 {text: 'OK', onPress: () => {}},
                                             ]);
@@ -793,101 +494,9 @@ const RequestObject = ({
                                             Alert.alert('', 'لطفا نسخه قطعه را مشخص کنید.', [
                                                 {text: 'OK', onPress: () => {}},
                                             ]);
-                                        } else if (
-                                            !!fieldsObject.partTypeSelected.value.SerialFormat &&
-                                            fieldsObject.serial === ''
-                                        ) {
-                                            Alert.alert('', 'لطفا سریال را مشخص کنید.', [
-                                                {text: 'OK', onPress: () => {}},
-                                            ]);
                                         } else {
-                                            const serialFormat =
-                                                fieldsObject.partTypeSelected.value.SerialFormat;
-                                            if (!!serialFormat) {
-                                                if (
-                                                    serialFormat.length === fieldsObject.serial.length
-                                                ) {
-                                                    let i = 0;
-                                                    let faults = 0;
-                                                    while (serialFormat[i] !== '#') {
-                                                        if (
-                                                            serialFormat[i].toUpperCase() !==
-                                                            fieldsObject.serial[i].toUpperCase()
-                                                        ) {
-                                                            faults = faults + 1;
-                                                        }
-                                                        i = i + 1;
-                                                    }
-                                                    if (faults > 0) {
-                                                        Alert.alert(
-                                                            '',
-                                                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                                                            [{text: 'OK', onPress: () => {}}],
-                                                        );
-                                                    } else {
-                                                        checkObjectVersion(
-                                                            selector.token,
-                                                            fieldsObject.serial,
-                                                            fieldsObject.partTypeSelected.value.Id,
-                                                            fieldsObject.partVersionSelected.Key,
-                                                        ).then(data => {
-                                                            if (data.errorCode == 0) {
-                                                                let INFO = !!objectsList ? objectsList : [];
-                                                                let SERIAL = !!fieldsObject.serial
-                                                                    ? fieldsObject.serial
-                                                                    : '';
-                                                                addNewObject(INFO, SERIAL);
-                                                            } else {
-                                                                ToastAndroid.showWithGravity(
-                                                                    'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                                                    ToastAndroid.SHORT,
-                                                                    ToastAndroid.CENTER,
-                                                                );
-                                                            }
-                                                        });
-                                                    }
-                                                } else {
-                                                    let hashtagIndex = 0;
-                                                    while (serialFormat[hashtagIndex] !== '#') {
-                                                        hashtagIndex = hashtagIndex + 1;
-                                                    }
-                                                    let rest = serialFormat.length - hashtagIndex;
-                                                    if (rest == fieldsObject.serial.length) {
-                                                        const actualSerial = serialFormat
-                                                            .substr(0, hashtagIndex)
-                                                            .concat(fieldsObject.serial);
-                                                        checkObjectVersion(
-                                                            selector.token,
-                                                            actualSerial,
-                                                            fieldsObject.partTypeSelected.value.Id,
-                                                            fieldsObject.partVersionSelected.Key,
-                                                        ).then(data => {
-                                                            if (data.errorCode == 0) {
-                                                                let INFO = !!objectsList ? objectsList : [];
-                                                                addNewObject(INFO, actualSerial);
-                                                            } else {
-                                                                ToastAndroid.showWithGravity(
-                                                                    'نسخه انتخاب شده با سریال وارد شده همخوانی ندارد.',
-                                                                    ToastAndroid.SHORT,
-                                                                    ToastAndroid.CENTER,
-                                                                );
-                                                            }
-                                                        });
-                                                    } else {
-                                                        Alert.alert(
-                                                            '',
-                                                            'سریال قطعه انتخاب شده با سریال وارد شده مطابقت ندارد.',
-                                                            [{text: 'OK', onPress: () => {}}],
-                                                        );
-                                                    }
-                                                }
-                                            } else {
-                                                let INFO = !!objectsList ? objectsList : [];
-                                                let SERIAL = !!fieldsObject.serial
-                                                    ? fieldsObject.serial
-                                                    : '';
-                                                addNewObject(INFO, SERIAL);
-                                            }
+                                            let INFO = !!objectsList ? objectsList : [];
+                                            addNewObject(INFO);
                                         }
                                     } catch {}
                                 }}>
@@ -900,57 +509,104 @@ const RequestObject = ({
                     </View>
                 )}
             </ScrollView>
-                <View style={{flex: 0.2, paddingHorizontal: 10}}>
-                    <TouchableOpacity
-                        style={Styles.newPartbuttonStyle}
-                        onPress={() => {
-                            if (hasNew) {
-                                ToastAndroid.showWithGravity(
-                                    'لطفا ابتدا قطعه ی ناتمام را کامل کنید.',
-                                    ToastAndroid.SHORT,
-                                    ToastAndroid.CENTER,
-                                );
-                            } else {
-                                setHasNew(true);
-                            }
-                        }}>
-                        <Octicons
-                            name="plus"
-                            style={{
-                                fontSize: normalize(33),
-                                color: '#dadfe1',
-                            }}
-                        />
-                    </TouchableOpacity>
-                </View>
+            {!isKeyboardVisible && (
+                <View style={Styles.screenFooterContainerstyle}>
+                <TouchableOpacity
+                    style={Styles.newPartbuttonStyle}
+                    onPress={() => {
+                        if (hasNew) {
+                            ToastAndroid.showWithGravity(
+                                'لطفا ابتدا قطعه ی ناتمام را کامل کنید.',
+                                ToastAndroid.SHORT,
+                                ToastAndroid.CENTER,
+                            );
+                        } else {
+                            setHasNew(true);
+                        }
+                    }}>
+                    <Octicons
+                        name="plus"
+                        style={{
+                            fontSize: normalize(25),
+                            color: '#dadfe1',
+                        }}
+                    />
+                </TouchableOpacity>
+                {objectsList.length > 0 && (<TouchableOpacity
+                    style={Styles.newPartbuttonStyle}
+                    onPress={() => {
+                        setOpenSendModal(true);
+                    }}>
+                    <Octicons
+                        name="check"
+                        style={{
+                            fontSize: normalize(25),
+                            color: '#dadfe1',
+                        }}
+                    />
+                </TouchableOpacity>)}
+            </View>)}
+            {openSendModal && (
+                <TouchableHighlight
+                    style={Styles.modalBackgroundStyle}
+                    onPress={() => {
+                        if(!isKeyboardVisible) {
+                            setRequestDescription("");
+                            setOpenSendModal(false);
+                        }
+                    }}
+                    underlayColor="none">
+                    <View style={{
+                        top:isKeyboardVisible ? 0 : pageHeight*0.15,
+                        position: 'absolute',
+                        width: pageWidth * 0.8,
+                        height: pageHeight*0.5,
+                        backgroundColor: '#E8E8E8',
+                        borderRadius: 15,
+                        padding:10,
+                        overflow: 'hidden',
+                        alignItems: 'center'
+                    }}>
+                        <View style={Styles.modalBodyContainerStyle}>
+                            <Text style={Styles.modalBodyTextStyle}>
+                                آیا از درخواست خود اطمینان دارید؟
+                            </Text>
+                        </View>
+                        <View style={{width:"100%", paddingRight:10}}>
+                            <Text style={Styles.labelStyle}>توضیحات:</Text>
+                        </View>
+                        <TextInput value={requestDescription} onChangeText={txt=>setRequestDescription(txt)} style={Styles.descriptionTextInputStyle}/>
+                        {requestLoading ? (
+                            <View style={Styles.modalFooterContainerStyle}>
+                                <ActivityIndicator size={"small"} color={"#660000"}/>
+                            </View>
+                        ) : (<View style={Styles.modalFooterContainerStyle}>
+                            <TouchableOpacity
+                                style={Styles.modalButtonStyle}
+                                onPress={() => {
+                                    setOpenSendModal(false);
+                                    setRequestDescription("");
+                                }}>
+                                <Text style={Styles.modalButtonTextStyle}>انصراف</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={Styles.modalButtonStyle}
+                                onPress={handleSubmitRequest}>
+                                <Text style={Styles.modalButtonTextStyle}>تایید</Text>
+                            </TouchableOpacity>
+                        </View>)}
+                    </View>
+                </TouchableHighlight>
+            )}
         </>
     );
 };
 
 const Styles = StyleSheet.create({
-    preview: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    barcodeContainerStyle: {
-        width: pageWidth * 0.7,
-        height: pageWidth * 0.4,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: 'green',
-    },
-    barcodeLineStyle: {
-        width: pageWidth * 0.5,
-        height: 0,
-        borderWidth: 1,
-        borderColor: '#660000',
-    },
     newPartbuttonStyle: {
-        width: pageWidth * 0.2,
-        height: pageWidth * 0.2,
-        borderRadius: pageWidth * 0.1,
+        width: pageWidth * 0.17,
+        height: pageWidth * 0.17,
+        borderRadius: pageWidth * 0.085,
         backgroundColor: '#660000',
         justifyContent: 'center',
         alignItems: 'center',
@@ -975,17 +631,6 @@ const Styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    ItemFromHeaderStyle: {
-        width: '92%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    partTypeSelectionContainerStyle: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-    },
     formFooterContainerstyle: {
         width: '100%',
         justifyContent: 'center',
@@ -1007,77 +652,126 @@ const Styles = StyleSheet.create({
         width: '100%',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 15,
-    },
-    bothOptionsContainerStyle: {
         marginTop: 10,
     },
-    serialContainerStyle: {
-        flexDirection: 'row',
-        width: '100%',
-        marginVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    serialInputStyle: {
-        width: '55%',
-        borderBottomWidth: 2,
-        borderBottomColor: '#000',
-        height: 40,
-        marginHorizontal: 10,
-    },
-    priceContainerStyle: {
+    countContainerStyle: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
         marginVertical: 10,
+        height: pageHeight*0.08
     },
     priceInputStyle: {
-        width: '70%',
-        borderBottomWidth: 2,
+        width: '40%',
+        borderBottomWidth: 1,
         borderBottomColor: '#000',
-        marginHorizontal: 10,
-        height: 40,
-        paddingHorizontal: 10,
-    },
-    descriptionInputStyle: {
-        width: '100%',
-        height: pageHeight * 0.15,
-        borderWidth: 1,
-        borderColor: '#000',
-        borderRadius: 10,
-        textAlignVertical: 'top',
-        padding: 15,
-    },
-    failureDescriptionContainerStyle: {
-        width: '100%',
-        marginVertical: 10,
-    },
-    garanteeContainerStyle: {
-        width: '100%',
-        marginVertical: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-    },
-    prePriceContainerStyle: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginVertical: 10,
-        width: '100%',
-    },
-    prePriceInputStyle: {
-        flex: 1,
-        borderBottomWidth: 2,
-        borderBottomColor: '#000',
-        padding: 10,
-        marginHorizontal: 5,
+        justifyContent:"center",
+        textAlign:"center",
+        height:35
+
     },
     labelStyle: {
         fontSize: normalize(13),
         fontFamily: 'IRANSansMobile_Light',
+    },
+    countChangeButtonsStyle:{
+        width:pageWidth*0.11,
+        height:pageWidth*0.11,
+        borderRadius:pageWidth*0.055,
+        justifyContent:"center",
+        alignItems:"center",
+        backgroundColor:"#660000"
+    },
+    countChangeButtonContainerStyle:{
+        flexDirection:"row",
+        width:pageWidth*0.26,
+        alignItems:"center",
+        justifyContent:"space-between"
+    },
+    descriptionTextInputStyle: {
+        width:"100%",
+        height:pageHeight*0.15,
+        borderWidth:1,
+        marginTop:10,
+        borderRadius:15,
+        borderColor:"gray",
+        textAlignVertical: 'top',
+        padding:15
+    },
+    screenFooterContainerstyle:{
+        flex: 0.2,
+        paddingHorizontal: 10,
+        flexDirection:"row",
+        width:"100%",
+        justifyContent:"space-between",
+        alignItems:"center"
+    },
+    modalBackgroundStyle: {
+        flex: 1,
+        width: pageWidth,
+        height: pageHeight,
+        position: 'absolute',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+    },
+    modalContainerStyle2: {
+        position: 'absolute',
+        width: pageWidth * 0.8,
+        height: pageHeight*0.5,
+        backgroundColor: '#E8E8E8',
+        borderRadius: 15,
+        padding:10,
+        overflow: 'hidden',
+        alignItems: 'center',
+    },
+    modalHeaderContainerStyle: {
+        width: '100%',
+        height: '23%',
+        backgroundColor: '#660000',
+        justifyContent: 'center',
+        paddingHorizontal: 10,
+    },
+    modalHeaderTextStyle: {
+        color: '#fff',
+        fontSize: normalize(15),
+        fontFamily: 'IRANSansMobile_Medium',
+    },
+    modalBodyContainerStyle: {
+        width: '100%',
+        height: '26%',
+        alignItems: 'center',
+        justifyContent:"center",
+        padding: 10,
+    },
+    modalBodyTextStyle: {
+        color: '#660000',
+        textAlign: 'center',
+        fontSize: normalize(16),
+        fontFamily: 'IRANSansMobile_Light',
+    },
+    modalFooterContainerStyle: {
+        flexDirection: 'row',
+        width: '100%',
+        height: '30%',
+        justifyContent: 'space-around',
+    },
+    modalButtonStyle: {
+        backgroundColor: '#660000',
+        width: pageWidth * 0.23,
+        height: 45,
+        borderRadius: 7,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: pageHeight * 0.03,
+        elevation: 5,
+    },
+    modalButtonTextStyle: {
+        color: '#fff',
+        fontSize: normalize(14),
+        fontFamily: 'IRANSansMobile_Medium',
     },
 });
 

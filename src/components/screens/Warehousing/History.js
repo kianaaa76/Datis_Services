@@ -1,99 +1,113 @@
 import React,{useEffect, useState} from "react";
-import {TextInput, View, StyleSheet, Dimensions, FlatList, Text, TouchableOpacity} from "react-native";
+import {TextInput, View, StyleSheet, Dimensions, FlatList, Text, TouchableOpacity, ToastAndroid, ActivityIndicator} from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import CheckBox from "@react-native-community/checkbox";
-import Octicons from "react-native-vector-icons/Octicons";
 import {normalize} from "../../utils/utilities";
-import Entypo from "react-native-vector-icons/Entypo";
+import {requestsHistory} from "../../../actions/api";
+import {useSelector, useDispatch} from "react-redux";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {LOGOUT} from "../../../actions/types";
 
 const pageHeight = Dimensions.get("screen").height;
 const pageWidth = Dimensions.get("screen").width;
 
-const History = ()=>{
-    const [historyList, setHistoryList] = useState([
-        {
-            Id:1,
-        Objects:[
-            {
-                objectName:"objectTest1",
-                count:3,
-                versions:[
-                    {
-                        versionName:"v3",
-                        serialList:["TEST1234567", "TEST44444444"],
-                        count:2
-                    },
-                    {
-                        versionName:"v4",
-                        serialList:["TEST1234555"],
-                        count: 1
-                    }
-                ],
-                type: 1
-            },
-            {
-                objectName: "objectTest2",
-                count:2,
-                versions: [
-                    {
-                        versionName:"v1",
-                        serialList: [],
-                        count: 1
-                    },
-                    {
-                        versionName:"v2",
-                        serialList: [],
-                        count: 1
-                    }
-                ],
-                type: 1
-            }
-        ],
-            date:"1399/12/11",
-            interchangeType:1,  //1 for received 0 for sent
-            isExpanded: false
-        },
-        {
-            Id:2,
-            Objects:[
-                {
-                    objectName: "objectTest2",
-                    count:1,
-                    versions: [
-                        {
-                            versionName:"v5",
-                            serialList: ["test2222222"],
-                            count: 1
-                        }
-                    ],
-                    type:1   // 1 for new objects and 0 for failed objects
-                },
-                {
-                    objectName:"objectTest1",
-                    count:3,
-                    versions:[
-                        {
-                            versionName: "v6",
-                            serialList:[],
-                            count:2
-                        },
-                        {
-                            versionName: "v7",
-                            serialList:[],
-                            count: 1
-                        }
-                    ],
-                    type: 0
-                }
-            ],
-            date:"1399/12/10",
-            interchangeType:0,  //1 for received 0 for sent
-            isExpanded: false
-        }
-    ]);
+const History = ({navigation})=>{
+    const selector = useSelector(state=>state);
+    const dispatch = useDispatch();
+    const [historyList, setHistoryList] = useState([]);
+    const [constHistoryList, setConstHistoryList] = useState([]);
+    const [listLoading, setListLoading] = useState(true);
+
+    useEffect(()=>{
+        getHistory();
+    },[])
 
     const Separator = ({color}) => <View style={[Styles.separator,{borderBottomColor:color}]} />;
+
+    const getHistory = ()=>{
+        setListLoading(true);
+        requestsHistory(selector.token).then(data=>{
+            if (data.errorCode === 0){
+                let tempList = [];
+                data.result.map(req=>{
+                    let objectList = [];
+                    req.Objects.map(obj=>{
+                        let serialList = [];
+                        let versionId = null;
+                        let versionList = obj.Versions;
+                        obj.Versions.map((vers, index)=>{
+                            if (!!vers.Serial) {
+                                if (vers.VersionId === versionId){
+                                    serialList.push(vers.Serial);
+                                } else {
+                                    if (!versionId){
+                                        versionId = vers.VersionId;
+                                        serialList.push(vers.Serial);
+                                        delete vers["Serial"];
+                                        delete vers["Count"];
+                                        versionList[index] = {...vers, SerialList: serialList, Count: serialList.length};
+                                    } else {
+                                        serialList.push(vers.Serial);
+                                        versionList.splice(index, 1);
+                                        serialList = [];
+                                    }
+                                }
+                            }
+                        })
+                        if (!!obj.Versions[0].Serial) {
+                            objectList.push({...obj, Versions: versionList})
+                        } else {
+                            objectList.push(obj);
+                        }
+                    });
+                    tempList.push({...req, Objects:objectList, isExpanded:false});
+                });
+                setHistoryList(tempList);
+                setConstHistoryList(tempList);
+                setListLoading(false);
+            } else if (data.errorCode === 3) {
+                dispatch({
+                    type: LOGOUT,
+                });
+                setListLoading(false);
+                navigation.navigate('SignedOut');
+            } else {
+                ToastAndroid.showWithGravity(
+                    data.message,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                );
+                setListLoading(false);
+            }
+        })
+    };
+
+    const getStateName = (code)=>{
+        switch (code) {
+            case 120:
+                return "ارسال شده";
+            case 125:
+                return "تحویل داده شده";
+            case 20:
+                return "لغو شده";
+            case 106:
+                return "منتظر تایید";
+            case 110:
+                return "آماده ارسال";
+            default:
+                return "نامعلوم";
+        }
+    };
+
+    const handleSearchRequest = (searchText)=>{
+        setListLoading(true);
+        if (!!searchText) {
+            let tmpList = constHistoryList.filter(item => item.ID.toString().includes(searchText));
+            setHistoryList(tmpList);
+            setListLoading(false);
+        } else {
+            getHistory();
+        }
+    }
 
     return(
         <View style={{flex:1, paddingHorizontal: 5}}>
@@ -102,6 +116,7 @@ const History = ()=>{
                     style={Styles.textinputStyle}
                     placeholder={"شماره درخواست مورد نظر خود را جستجو کنید..."}
                     onChangeText={(text)=>{
+                        handleSearchRequest(text);
                     }}
                 />
                 <FontAwesome
@@ -109,83 +124,105 @@ const History = ()=>{
                     style={{fontSize: 25, color: '#000'}}
                 />
             </View>
-            <FlatList style={{flex:1, paddingHorizontal: 10}} data={historyList} renderItem={({item, index})=>(
+            {listLoading ? (
+                <View style={{flex:1, justifyContent:"center", alignItem:"center"}}>
+                    <ActivityIndicator color={"#660000"} size={"large"}/>
+                </View>
+            ):(<FlatList style={{flex: 1, paddingHorizontal: 10}} data={historyList} keyExtractor={item=>item.ID.toString()} renderItem={({item, index}) => (
                 <View style={Styles.cardHeaderStyle}>
-                    <TouchableOpacity style={{ width:"100%", justifyContent:"center", alignItems:"center"}} onPress={()=>{
-                        let tmp = [...historyList];
-                        tmp[index] = {...item, isExpanded: !item.isExpanded}
-                        setHistoryList(tmp);
-                    }}>
-                        <View style={{flexDirection: "row", width:"100%", justifyContent:"space-between"}}>
-                            <Text style={Styles.labelTextStyle}>
-                                وضعیت: {!!item.interchangeType?"دریافت شده":"ارسال شده"}
-                            </Text>
-                            <Text style={Styles.labelTextStyle}>
-                                شناسه: {item.Id}
-                            </Text>
+                    <TouchableOpacity
+                        style={{width: "100%", justifyContent: "center", alignItems: "center", flexDirection: "row"}}
+                        onPress={() => {
+                            let tmp = [...historyList];
+                            tmp[index] = {...item, isExpanded: !item.isExpanded}
+                            setHistoryList(tmp);
+                        }}>
+                        <View style={{width: "85%"}}>
+                            <View style={{flexDirection: "row", width: "100%", justifyContent: "space-between"}}>
+                                <Text style={Styles.labelTextStyle}>
+                                    وضعیت: {getStateName(item.State)}
+                                </Text>
+                                <Text style={Styles.labelTextStyle}>
+                                    شناسه: {item.ID}
+                                </Text>
+                            </View>
+                            <View style={{
+                                width: "100%",
+                                flexDirection: "row",
+                                justifyContent: "flex-end",
+                                alignItems: "center"
+                            }}>
+                                <Text style={Styles.labelTextStyle}>
+                                    تاریخ: {item.Date}
+                                </Text>
+                            </View>
                         </View>
-                        <View style={{width:"100%", flexDirection: "row", justifyContent:"flex-end", alignItems:"center" }}>
-                            <Text style={Styles.labelTextStyle}>
-                                تاریخ: {item.date}
-                            </Text>
+                        <View style={{width: "15%", justifyContent: "center", alignItems: "center"}}>
+                            <FontAwesome5 name={!!item.Type ? "arrow-down" : "arrow-up"} color={"#660000"} size={25}/>
                         </View>
                     </TouchableOpacity>
                     {item.isExpanded ? (
                         <>
                             <Separator color={"black"}/>
-                            {item.Objects.map((obj,objIndex)=>(
+                            {item.Objects.map((obj, objIndex) => (
                                 <>
-                                <View style={{padding: 5, width:"100%"}}>
-                                    <View style={{width:"100%", flexDirection:"row", alignItems:"center", justifyContent:"space-between", marginBottom: 10, backgroundColor: "#E6E6E6", padding:5 }}>
-                                        <Text style={Styles.labelTextStyle}>
-                                            تعداد کل: {obj.count}
-                                        </Text>
-                                        <View style={{flexDirection: "row", alignItems:"center"}}>
-                                        <Text style={Styles.labelTextStyle}>
-                                            نام قطعه: {obj.objectName}
-                                        </Text>
-                                        <FontAwesome5
-                                            name={!!obj.type ? 'arrow-right' : "arrow-left"}
-                                            style={{color: !!obj.type ? 'green' : "red", fontSize: normalize(20), width:pageWidth*0.08, justifyContent:"center", textAlign:"center"}}
-                                        />
-                                        </View>
-                                    </View>
-                                    <View
-                                        style={{
-                                            alignItems: 'flex-start',
-                                             justifyContent: 'space-around',
+                                    <View style={{padding: 5, width: "100%"}}>
+                                        <View style={{
+                                            width: "100%",
+                                            flexDirection: "row",
+                                            alignItems: "flex-start",
+                                            justifyContent: "space-between",
+                                            marginBottom: 10,
+                                            backgroundColor: "#E6E6E6",
+                                            padding: 5
                                         }}>
-                                                {obj.versions.map((version, versionIndex)=>(
-                                                    <View style={{flexDirection:"row", alignItems:"flex-start", justifyContent:"space-between", width:"100%", marginBottom: 10}}>
-                                                        <View>
-                                                        {version.serialList.length === 0 ? (
+                                            <Text style={Styles.labelTextStyle}>
+                                                تعداد کل: {obj.Total}
+                                            </Text>
+                                            <View style={{flexDirection: "row", alignItems: "flex-start", width:"70%", flexShrink:1, justifyContent:'flex-end'}}>
+                                                <Text style={Styles.labelTextStyle}>
+                                                    نام قطعه: {obj.Object_Name}
+                                                </Text>
+                                                <View style={{width:14, height:14, borderRadius: 7, backgroundColor: !!obj.Broken ? 'red' : "green", marginHorizontal: 5, marginTop: 5}}/>
+                                            </View>
+                                        </View>
+                                        <View
+                                            style={{
+                                                alignItems: 'flex-start',
+                                                justifyContent: 'space-around',
+                                            }}>
+                                            {obj.Versions.map((version, versionIndex) => !version.Serial && (
+                                                <View style={{
+                                                    flexDirection: "row",
+                                                    alignItems: "flex-start",
+                                                    justifyContent: "space-between",
+                                                    width: "100%",
+                                                    marginBottom: 10
+                                                }}>
+                                                    <View>
+                                                        {!version.SerialList ? (
                                                             <Text style={Styles.labelTextStyle}>
-                                                                تعداد: {version.count}
+                                                                تعداد: {version.Count}
                                                             </Text>
-                                                        ) : version.serialList.map((serial)=>(
+                                                        ) : version.SerialList.map((serial) => (
                                                             <Text>
                                                                 {serial}
                                                             </Text>
-                                                            ))}
-                                                        </View>
-                                                        <Text style={[Styles.labelTextStyle,{marginRight:pageWidth*0.08}]}>نام نسخه: {version.versionName}</Text>
+                                                        ))}
                                                     </View>
-                                                ))}
+                                                    <Text
+                                                        style={[Styles.labelTextStyle, {marginRight: pageWidth * 0.08}]}>نام
+                                                        نسخه: {version.Version_Name}</Text>
+                                                </View>
+                                            ))}
+                                        </View>
                                     </View>
-                                </View>
-                                    {(!!item.interchangeType || objIndex!==item.Objects.length -1) && <Separator color={"#C0C0C0"}/>}
-                                    </>
+                                </>
                             ))}
-                            {!!item.interchangeType && (
-                                <TouchableOpacity style={{width:pageWidth*0.3, height: pageHeight*0.08, backgroundColor:'#660000', justifyContent:"center", alignItems:"center", borderRadius: 15}}>
-                                    <Text style={{color:"white", fontSize:14, fontFamily:'IRANSansMobile_Medium'}}>
-                                        دریافت شد
-                                    </Text>
-                                </TouchableOpacity>)}
                         </>
-                    ):null}
+                    ) : null}
                 </View>
-            )}/>
+            )}/>)}
         </View>
     );
 }

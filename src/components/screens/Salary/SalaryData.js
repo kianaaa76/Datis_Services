@@ -65,9 +65,7 @@ const SalaryData = ({navigation})=>{
 
     return(
         <View style={{flex:1}}>
-            <Header headerText={"اطلاعات پرداخت"} leftIcon={
-                <MaterialIcons name={"file-download"} style={{fontSize:30, color:"#fff", marginLeft:10}}/>
-            }/>
+            <Header headerText={"اطلاعات پرداخت"}/>
             {dataLoading ? (
                 <View style={{flex:1}}>
                     <ActivityIndicator size={"large"} color={"#660000"}/>
