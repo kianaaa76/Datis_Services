@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import logo from '../../assets/images/image_splash_screen.png';
 import {getFontsName} from "../components/utils/utilities";
+import toPropertyKey from "@babel/runtime/helpers/esm/toPropertyKey";
 
 const DrawerContent = ({navigation}) => {
   return (
@@ -23,10 +24,21 @@ const DrawerContent = ({navigation}) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={Styles.titleContainerStyle}
-        onPress={()=>Linking.openURL(
-          'http://deka.datis-elevator.ir/download/ServicePriceList.pdf',
-        )}>
+        onPress={()=> {
+            // navigation.navigate('PriceList')
+            Linking.openURL(
+                'http://deka.datis-elevator.ir/download/ServicePriceList.pdf',
+            )
+        }
+        }>
         <Text style={Styles.titleTextStyle}>لیست قیمت قطعات</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+          style={Styles.titleContainerStyle}
+          onPress={()=> {
+            navigation.navigate('Salary')
+          }}>
+        <Text style={Styles.titleTextStyle}>حقوق من</Text>
       </TouchableOpacity>
     </View>
   );

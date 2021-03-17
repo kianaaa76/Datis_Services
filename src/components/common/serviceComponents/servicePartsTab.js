@@ -344,7 +344,6 @@ const ServicePartsTab = ({
                 partVersionSelected: responseVersion[0],
                 availableVersions: responseObject[0].value.Versions,
               });
-              console.warn("fieldsObject", fieldsObject);
               setSearchBarcodeLoading(false);
             } else {
               Toast.showWithGravity('برای این قطعه نسخه معتبری یافت نشد.', Toast.LONG, Toast.CENTER);

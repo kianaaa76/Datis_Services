@@ -18,7 +18,29 @@ import ServiceArchiveList from '../components/screens/ServiceArchive/ServiceArch
 import ServiceArchiveDetail from '../components/screens/ServiceArchive/ArchiveListServiceDetail';
 import Splash from '../components/screens/SplashScreen';
 import Garantee from '../components/screens/Garantee';
+import PriceList from "../components/screens/PriceList";
 import UserAddress from "../components/screens/UserAddress";
+import WarehouseDetail from "../components/screens/Warehousing/WarehouseDetail";
+import SalaryList from "../components/screens/Salary/Salary";
+import SalaryData from "../components/screens/Salary/SalaryData";
+import SalaryDetail from "../components/screens/Salary/SalaryDetail"
+
+const SalaryStack = createStackNavigator({
+    salaryList: {
+        screen: SalaryList,
+    },
+    SalaryData: {
+        screen: SalaryData,
+    },
+    SalaryDetail: {
+        screen: SalaryDetail,
+    },
+},{
+    headerMode: 'none',
+    navigationOptions: {
+        headerVisible: false,
+    },
+});
 
 export const drawer = createDrawerNavigator(
   {
@@ -28,6 +50,12 @@ export const drawer = createDrawerNavigator(
     Garantee: {
       screen: Garantee,
     },
+    PriceList:{
+      screen: PriceList
+    },
+    Salary:{
+      screen: SalaryStack
+    }
   },
   {
     drawerPosition: 'right',
@@ -41,6 +69,9 @@ const SignedIn = createStackNavigator(
     Home: {
       screen: drawer,
     },
+      UserAddress: {
+          screen: UserAddress
+      },
     Mission: {
       screen: Missions,
     },
@@ -74,6 +105,9 @@ const SignedIn = createStackNavigator(
     ServiceArchiveDetail: {
       screen: ServiceArchiveDetail,
     },
+      WarehouseDetail:{
+        screen: WarehouseDetail
+      },
   },
   {
     headerMode: 'none',

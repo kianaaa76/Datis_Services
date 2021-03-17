@@ -23,7 +23,10 @@ import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 import {
   CalendarIcon,
-  CameraIcon, CrossIcon, CurrentLocationIcon, DeleteIcon,
+  CameraIcon,
+  CrossIcon,
+  CurrentLocationIcon,
+  DeleteIcon,
   MapMarkerIcon,
   SearchLocationIcon,
   StarIcon,

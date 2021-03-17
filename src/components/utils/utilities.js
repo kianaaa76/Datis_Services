@@ -36,17 +36,18 @@ export function toFaDigit(input) {
   return returnModel;
 }
 
-export function getFontsName(name){
-  if (Platform.OS == "android"){
+export function getFontsName(name) {
+  if (Platform.OS === "android") {
     return name;
   } else {
-    if (name === 'IRANSansMobile_Medium'){
+    if (name === 'IRANSansMobile_Medium') {
       return 'IRANSansMobile-Medium';
-    } else if (name == 'IRANSansMobile_Light'){
+    } else if (name === 'IRANSansMobile_Light') {
       return 'IRANSansMobile-Light';
-    } else if (name == 'IRANSansMobile_Bold'){
+    } else if (name === 'IRANSansMobile_Bold') {
       return 'IRANSansMobile-Bold';
-    } else if (name == 'IRANSansMobile'){
+    } else if (name === 'IRANSansMobile') {
       return name;
+    }
   }
-}}
+}

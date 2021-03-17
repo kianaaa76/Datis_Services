@@ -24,11 +24,10 @@ import {
   LOGOUT,
   SET_USER_LIST,
 } from '../../actions/types';
-import {call, getObjects, getUsers} from '../../actions/api';
 import {normalize, getFontsName} from '../utils/utilities';
 import Toast from 'react-native-simple-toast';
 import {MenuIcon, SearchIcon} from "../../assets/icons";
-
+import {call, getObjects, getUsers, getInfo} from '../../actions/api';
 
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
@@ -42,6 +41,15 @@ const Home = ({navigation}) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
   const [changeUserLoading, setChangeUserLoading] = useState(true);
+
+  useEffect(()=>{
+    getInfo(selector.token).then(data=>{
+      if (data.errorCode === 0 && !data.result){
+        navigation.replace("UserAddress");
+      }
+    });
+  },[]);
+
 
   useEffect(() => {
     if (
@@ -58,13 +66,29 @@ const Home = ({navigation}) => {
           });
           setShowingUserList(data.result);
           data.result.map(item => {
-            if (item.ID == selector.userId) {
+            if (item.ID === selector.userId) {
               setUser(item);
+              dispatch({
+                type: LOGIN,
+                constantToken: selector.constantToken,
+                token: selector.token,
+                userId: selector.userId,
+                constantUserId: selector.constantUserId,
+                serviceManName: item.Name
+              });
             }
           });
           data.result.map(item=>{
-            if (item.ID == selector.userId) {
+            if (item.ID === selector.userId) {
               setUser(item);
+              dispatch({
+                type: LOGIN,
+                constantToken: selector.constantToken,
+                token: selector.token,
+                userId: selector.userId,
+                constantUserId: selector.constantUserId,
+                serviceManName: item.Name
+              });
             }
           })
           setChangeUserLoading(false);
@@ -264,6 +288,7 @@ const Home = ({navigation}) => {
                         constantToken: selector.constantToken,
                         userId: item.item.ID,
                         constantUserId: selector.constantUserId,
+                        serviceManName: item.item.Name
                       });
                       setUser(item.item);
                       setShowUserList(false);
@@ -308,8 +333,9 @@ const Home = ({navigation}) => {
               })}
             </View>
             <View style={Styles.SingleRowStyle}>
-              {renderHomeItems('انبارداری', images[4], () => {
-                Toast.showWithGravity('این قسمت بعدا اضافه خواهد شد.', Toast.LONG, Toast.CENTER);
+              {renderHomeItems('انبار من', images[4], () => {
+                // navigation.navigate('WarehouseDetail');
+                  Toast.showWithGravity('این قسمت بعدا اضافه خواهد شد.', Toast.LONG, Toast.CENTER);
               })}
               {renderHomeItems('ماموریت‌های من', images[5], () => {
                 navigation.navigate('Mission');

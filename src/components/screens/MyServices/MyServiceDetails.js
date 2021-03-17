@@ -82,7 +82,6 @@ const MyServiceDetails = ({navigation}) => {
     RNFetchBlob.fs
       .readFile(`${dirs.DocumentDir}/${serviceID}/1.png`, 'base64')
       .then(data => {
-        console.warn("@@@@@@@@", data);
         if (!!data) {
           setFactorTabInfo({
             ...factorTabInfo,
