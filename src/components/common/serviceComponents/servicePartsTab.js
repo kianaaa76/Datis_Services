@@ -56,13 +56,11 @@ const ServicePartsTab = ({
     availableVersions: [],
   });
   const dropRef = useRef();
-  const new_dropRef = useRef();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isNewPartFormExpanded, setIsNewPartFormExpanded] = useState(false);
-  const [partsListName, setPartsListName] = useState(selector.objectsList);
+  const [partsListName] = useState(selector.objectsList);
   const [searchBarcodeLoading, setSearchBarcodeLoading] = useState(false);
   const [objectsList, setObjectsList] = useState(info);
-  const [selectedItemList, setSelectedItemList] = useState({});
   const [rerender, setRerender] = useState(false);
   const [qrScannerLoading, setQrScannerLoading] = useState(false);
 
@@ -97,7 +95,7 @@ const ServicePartsTab = ({
     return () => backHandler.remove();
   });
 
-  const onSuccess = async code => {
+  const onSuccess = async (code, item) => {
     try {
       let header = parseInt(code.toString().substr(0, 3));
       let numOfZeros = 0;
@@ -130,47 +128,47 @@ const ServicePartsTab = ({
         ).then(data => {
           if (data.errorCode === 0) {
             let selectedObjectt = partsListName.filter(item=>item.value.Id === data.result.ObjectId)
-            let selectedVersion = selectedObject[0].value.Versions.filter(
+            let selectedVersion = selectedObjectt[0].value.Versions.filter(
               item => item.Key === data.result.VersionId,
             );
-            if (!!selectedItemList.Id) {
+            if (!!item && !!item.index) {
               refactorObjectListItems(
                 'tempPart',
                 selectedObjectt[0],
-                selectedItemList.index,
+                item.index,
               );
               refactorObjectListItems(
                 'tempVersion',
                 selectedVersion[0],
-                selectedItemList.index,
+                item.index,
               );
               refactorObjectListItems(
                 'tempSerial',
-                `${selectedObject[0].value.SerialFormat.substr(
+                `${selectedObjectt[0].value.SerialFormat.substr(
                   0,
                   serialHeaderIndex,
                 )}${leftOfCode}`,
-                selectedItemList.index,
+                item.index,
               );
               refactorObjectListItems(
                 'availableVersions',
                 selectedObjectt[0].value.Versions,
-                selectedItemList.index,
+                item.index,
               );
-              setSelectedItemList({});
               setQrScannerLoading(false);
-            } else {
+            }
+            else {
               setFieldsObject({
                 ...fieldsObject,
-                partTypeSelected: selectedObject[0],
+                partTypeSelected: selectedObjectt[0],
                 partVersionSelected: selectedVersion[0],
-                serial: `${selectedObject[0].value.SerialFormat.substr(
+                serial: `${selectedObjectt[0].value.SerialFormat.substr(
                   0,
                   serialHeaderIndex,
                 )}${leftOfCode}`,
-                availableVersions: selectedObject[0].value.Versions,
+                availableVersions: selectedObjectt[0].value.Versions,
               });
-              new_dropRef.current.setList(selectedObject[0].value.Versions);
+              dropRef.current.setList(selectedObjectt[0].value.Versions);
               setQrScannerLoading(false);
             }
           } else {
@@ -216,7 +214,6 @@ const ServicePartsTab = ({
                   responseObject[0].value.Versions,
                   selectedItemList.index,
               );
-              setSelectedItemList({});
               setSearchBarcodeLoading(false);
             } else {
               setSearchBarcodeLoading(false);
@@ -271,7 +268,6 @@ const ServicePartsTab = ({
                           object.value.Versions,
                           selectedItemList.index,
                         );
-                        setSelectedItemList({});
                         setSearchBarcodeLoading(false);
                       } else {
                         setSearchBarcodeLoading(false);
@@ -304,8 +300,6 @@ const ServicePartsTab = ({
                       selectedVersion[0],
                       selectedItemList.index,
                     );
-                    setSelectedItemList({});
-
                     setSearchBarcodeLoading(false);
                   } else {
                     setSearchBarcodeLoading(false);
@@ -524,6 +518,10 @@ const ServicePartsTab = ({
           {
             marginBottom: 10,
             backgroundColor: !Item.isConfirmed ? 'rgba(66,00,00,0.4)' : null,
+            zIndex:-9999,
+            overflow: 'hidden',
+
+
           },
         ]}>
         <TouchableHighlight
@@ -621,7 +619,6 @@ const ServicePartsTab = ({
               ) : SearchIcon({
                 color:"#000",
                 onPress:async () => {
-                await setSelectedItemList(Item);
                 searchBarcode(Item);
               }
               })
@@ -631,9 +628,9 @@ const ServicePartsTab = ({
                 height:28,
                 strokeWidth:6,
                 fill:"#000",
-                onPress:() => {
+                onPress:async () => {
                 try {
-                RnZxing.showQrReader(data => onSuccess(data));
+                RnZxing.showQrReader(data => onSuccess(data, Item));
               } catch {
                 Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
               }
@@ -900,14 +897,15 @@ const ServicePartsTab = ({
       setHasNew(false);
       setObjectsList(list);
       setInfo(list);
-    } else {
+    }
+    else {
       setObjectsList(list);
       setInfo(list);
       let obj = {
         objectType: 'new',
         serial: '',
         partTypeSelected: fieldsObject.partTypeSelected,
-        partVersionSelected: fieldsObject.partVersionSelected,
+        partVersionSelected: '',
         availableVersions: fieldsObject.availableVersions,
         Price: '0',
         failureDescription: '',
@@ -942,9 +940,9 @@ const ServicePartsTab = ({
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag">
         {!!info && info.length > 0 && (
-          <View style={{flex: 1, marginBottom: 10}}>
+          <ScrollView style={{flex: 1, marginBottom: 10}}>
             {info.map(item => renderServicePartItem(item))}
-          </View>
+          </ScrollView>
         )}
         {hasNew && (
           <View style={Styles.newformContainerStyle}>
@@ -1099,7 +1097,7 @@ const ServicePartsTab = ({
                         partVersionSelected: {},
                         availableVersions: value.value.Versions,
                       });
-                      new_dropRef.current.setList(value.value.Versions);
+                      dropRef.current.setList(value.value.Versions);
                     }}
                     placeholder={
                       !!fieldsObject.partTypeSelected.label
@@ -1157,7 +1155,7 @@ const ServicePartsTab = ({
                 </View>
                 <View style={Styles.partTypeContainerStyle}>
                   <DropdownPicker
-                    ref={new_dropRef}
+                    ref={dropRef}
                     list={fieldsObject.availableVersions}
                     placeholder={
                       !!fieldsObject.partVersionSelected &&

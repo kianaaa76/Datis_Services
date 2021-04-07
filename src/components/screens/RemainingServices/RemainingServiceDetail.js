@@ -20,7 +20,7 @@ import {
 import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from '../../../actions/types';
 import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
-import ImagePicker from 'react-native-image-crop-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImageViewer from '../../common/ImageViwer';
 import {CameraIcon, DeleteIcon, UploadFileIcon} from "../../../assets/icons";
 
@@ -344,25 +344,29 @@ const RemainingServiceDetail = ({navigation}) => {
             <View style={Styles.imageIconContainerStyle}>
               {CameraIcon({
                 onPress:() =>
-                ImagePicker.openCamera({
-                width: pageWidth - 20,
-                height: pageHeight * 0.7,
-                includeBase64: true,
-                compressImageQuality: 0.7,
-              }).then(response => {
-                setFactorImage(response.data);
-              }),
+                    launchCamera(
+                        {
+                          mediaType: 'photo',
+                          includeBase64: true,
+                          quality:0.5
+                        },
+                        (response) => {
+                          setFactorImage(response.base64);
+                        },
+                    )
               })}
               {UploadFileIcon({
                 onPress:() =>
-                ImagePicker.openPicker({
-                width: pageWidth - 20,
-                height: pageHeight * 0.7,
-                includeBase64: true,
-                compressImageQuality: 0.7,
-              }).then(response => {
-                setFactorImage(response.data);
-              }),
+                    launchImageLibrary(
+                        {
+                          mediaType: 'photo',
+                          includeBase64: true,
+                          quality:0.5
+                        },
+                        (response) => {
+                          setFactorImage(response.base64);
+                        },
+                    ),
                 color:"#000",
                 height:30,
                 width:30

@@ -95,7 +95,7 @@ const Salary = ({navigation}) => {
 
     return (
         <View style={{flex: 1}}>
-            <Header headerText={"حقوق من"}/>
+            <Header headerText={"کارکرد من"}/>
             <View style={Styles.contentContainerStyle}>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-end"}}>
                     <Text style={Styles.serviceManNameStyle}>
@@ -111,7 +111,7 @@ const Salary = ({navigation}) => {
                 </View>
                 <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-end"}}>
                     <Text style={Styles.serviceManNameLabelStyle}>
-                        دوره های پرداخت:
+                        صورت حساب ها:
                     </Text>
                     {ArrowLeftIcon({
                         color: "#000",

@@ -14,7 +14,7 @@ import {
 import {normalize} from '../../utils/utilities';
 import CheckBox from 'react-native-check-box';
 import Input from "../../common/Input";
-import ImagePicker from "react-native-image-crop-picker";
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImageViewer from "../../common/ImageViwer";
 import {useSelector, useDispatch} from 'react-redux';
 import {getInventoryObjects} from "../../../actions/api";
@@ -297,7 +297,6 @@ const WarehouseHandling = ({navigation}) => {
 
     const getInventory = () => {
         getInventoryObjects(selector.token).then(data => {
-            console.warn("FFFFF", data.result[12].Versions);
             if (data.errorCode === 0) {
                 let tmp = [];
                 data.result.map(item => {
@@ -320,7 +319,6 @@ const WarehouseHandling = ({navigation}) => {
                 }
             }
             setInventoryLoading(false);
-            console.warn("DDDDD", data.result[12].Versions);
         })
     }
 
@@ -717,40 +715,60 @@ const WarehouseHandling = ({navigation}) => {
                                     style: {marginHorizontal: 10},
                                     color: "#000",
                                     onPress: () => {
-                                        ImagePicker.openCamera({
-                                            width: pageWidth - 20,
-                                            height: pageHeight * 0.7,
-                                            includeBase64: true,
-                                            compressImageQuality: 0.7,
-                                        }).then(response => {
-                                            setBarnameImage(response.data);
-                                        }).catch(err => {
-                                            ToastAndroid.showWithGravity(
-                                                'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                                                ToastAndroid.SHORT,
-                                                ToastAndroid.CENTER,
-                                            );
-                                        });
+                                        launchCamera(
+                                            {
+                                                mediaType: 'photo',
+                                                includeBase64: true,
+                                                quality:0.5
+                                            },
+                                            (response) => {
+                                                setBarnameImage(response.base64);
+                                            },
+                                        )
+                                        // ImagePicker.openCamera({
+                                        //     width: pageWidth - 20,
+                                        //     height: pageHeight * 0.7,
+                                        //     includeBase64: true,
+                                        //     compressImageQuality: 0.7,
+                                        // }).then(response => {
+                                        //     setBarnameImage(response.data);
+                                        // }).catch(err => {
+                                        //     ToastAndroid.showWithGravity(
+                                        //         'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                                        //         ToastAndroid.SHORT,
+                                        //         ToastAndroid.CENTER,
+                                        //     );
+                                        // });
                                     }
                                 })}
                                 {UploadFileIcon({
                                     style: {marginHorizontal: 10},
                                     color: '#000',
                                     onPress: () => {
-                                        ImagePicker.openPicker({
-                                            width: pageWidth - 20,
-                                            height: pageHeight * 0.7,
-                                            includeBase64: true,
-                                            compressImageQuality: 0.7,
-                                        }).then(response => {
-                                            setBarnameImage(response.data);
-                                        }).catch(err => {
-                                            ToastAndroid.showWithGravity(
-                                                'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
-                                                ToastAndroid.SHORT,
-                                                ToastAndroid.CENTER,
-                                            );
-                                        });
+                                        launchImageLibrary(
+                                            {
+                                                mediaType: 'photo',
+                                                includeBase64: true,
+                                                quality:0.5
+                                            },
+                                            (response) => {
+                                                setBarnameImage(response.base64);
+                                            },
+                                        )
+                                        // ImagePicker.openPicker({
+                                        //     width: pageWidth - 20,
+                                        //     height: pageHeight * 0.7,
+                                        //     includeBase64: true,
+                                        //     compressImageQuality: 0.7,
+                                        // }).then(response => {
+                                        //     setBarnameImage(response.data);
+                                        // }).catch(err => {
+                                        //     ToastAndroid.showWithGravity(
+                                        //         'مشکلی پیش آمد. لطفا دوباره تلاش کنید.',
+                                        //         ToastAndroid.SHORT,
+                                        //         ToastAndroid.CENTER,
+                                        //     );
+                                        // });
                                     }
                                 })}
                                 {!!barnameImage && DeleteIcon({

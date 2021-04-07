@@ -54,7 +54,7 @@ const SalaryDetail = ({navigation})=>{
         })
     }
 
-    const renderScene = () => {
+    const renderScene = (routes) => {
         switch (routes.key) {
             case 'first':
                 return (

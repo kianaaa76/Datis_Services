@@ -1,6 +1,7 @@
 import React,{useEffect, useState} from "react";
 import {View, StyleSheet, FlatList, TouchableOpacity, Text, TextInput, Dimensions, ActivityIndicator} from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import NumberFormat from 'react-number-format';
 
 const pageHeight = Dimensions.get("screen").height;
 const pageWidth = Dimensions.get("screen").width;
@@ -33,8 +34,7 @@ const ServicesTab = ({projectList})=>{
                 />
             </View>
             <FlatList data={services} renderItem={({item}) => (
-                <TouchableOpacity style={Styles.listItemContainerStyle} onPress={() => {
-                }}>
+                <View style={Styles.listItemContainerStyle}>
                     <View style={Styles.cardSingleRowStyle}>
                         <View style={Styles.cardSingleItemStyle}>
                             <Text style={Styles.cardTextStyle}>
@@ -55,23 +55,30 @@ const ServicesTab = ({projectList})=>{
                     </View>
                     <View style={Styles.cardSingleRowStyle}>
                         <View style={Styles.cardSingleItemStyle}>
-                            <Text style={Styles.cardTextStyle}>
-                                {item.InvoiceSum}
-                            </Text>
+                            <Text style={Styles.rialStyle}>ریال</Text>
+                            <NumberFormat thousandSeparator={true} renderText={value => (
+                                <Text style={Styles.cardTextStyle}>
+                                    {value}
+                                </Text>)} value={item.InvoiceSum} displayType={'text'}
+                              />
                             <Text style={Styles.cardLabelTextStyle}>
                                 جمع فاکتور:
                             </Text>
                         </View>
                         <View style={Styles.cardSingleItemStyle}>
-                            <Text style={Styles.cardTextStyle}>
-                                {item.AmountRecieved}
-                            </Text>
+                            <Text style={Styles.rialStyle}>ریال</Text>
+                            <NumberFormat thousandSeparator={true} renderText={value => (
+                                <Text style={Styles.cardTextStyle}>
+                                    {value}
+                                </Text>)} value={item.AmountRecieved} displayType={'text'}
+                            />
                             <Text style={Styles.cardLabelTextStyle}>
                                 مبلغ دریافتی:
                             </Text>
+
                         </View>
                     </View>
-                </TouchableOpacity>
+                </View>
             )}
                        ListEmptyComponent={() => (
                            <View style={{
@@ -140,10 +147,17 @@ const Styles = StyleSheet.create({
     },
     cardTextStyle:{
         fontFamily:"IRANSansMobile_Light",
+        fontSize: 12
+    },
+    rialStyle:{
+        fontFamily:"IRANSansMobile_Light",
+        fontSize: 12,
+        marginRight:5
     },
     cardLabelTextStyle:{
         fontFamily:"IRANSansMobile_Medium",
-        marginLeft:5
+        marginLeft:5,
+        fontSize: 13,
     }
 })
 

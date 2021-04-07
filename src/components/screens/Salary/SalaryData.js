@@ -1,10 +1,19 @@
 import React,{useEffect, useState} from "react";
-import {View, StyleSheet, Text, TouchableOpacity, Dimensions, ToastAndroid, ActivityIndicator} from "react-native";
+import {
+    View,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    Dimensions,
+    ToastAndroid,
+    ActivityIndicator,
+    TextInput
+} from "react-native";
 import Header from "../../common/Header";
 import {getSingleReciept} from "../../../actions/api";
 import {useSelector, useDispatch} from "react-redux";
 import {LOGOUT} from "../../../actions/types";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import NumberFormat from 'react-number-format';
 
 const pageHeight = Dimensions.get("screen").height;
 const pageWidth = Dimensions.get("screen").width;
@@ -45,40 +54,44 @@ const SalaryData = ({navigation})=>{
     }
 
 
-    const Separator = () => <View style={Styles.separator} />;
-
-    const renderDataItem = (title, value)=>{
+    const renderDataItem = (title, value, hasRial)=>{
         return(
-            <View style={{justifyContent: "center", alignItems:"center"}}>
             <View style={Styles.dataItemContainerStyle}>
-                <Text style={Styles.itemValueTextStyle}>
+                {hasRial &&(<Text style={Styles.rialStyle}>
+                    ریال
+                </Text>)}
+                {hasRial ? (
+                    <NumberFormat thousandSeparator={true} renderText={value => (
+                        <Text style={Styles.itemValueTextStyle}>
+                            {value}
+                        </Text>
+                    )} value={value} displayType={'text'}/>
+                ) : (<Text style={Styles.itemValueTextStyle}>
                     {value.toString().length > 0 ? value : '-'}
-                </Text>
+                </Text>)}
                 <Text style={Styles.itemTitleTextStyle}>
                     {title}
                 </Text>
             </View>
-                <Separator/>
-                </View>
         );
     };
 
     return(
         <View style={{flex:1}}>
-            <Header headerText={"اطلاعات پرداخت"}/>
+            <Header headerText={"صورت حساب"}/>
             {dataLoading ? (
                 <View style={{flex:1}}>
                     <ActivityIndicator size={"large"} color={"#660000"}/>
                 </View>
             ) :(<View style={Styles.contentContainerStyle}>
-                {renderDataItem("دوره پرداخت: ", reciept.Name)}
-                {renderDataItem(" دستمزد پرونده ها: ", paymentDetail.ProjectsWage)}
-                {renderDataItem(" دستمزد ماموریت ها: ", paymentDetail.MissionWage)}
-                {renderDataItem(" پاداش: ", paymentDetail.Reward)}
-                {renderDataItem(" مانده از قبل: ", paymentDetail.PreBalance)}
-                {renderDataItem(" دریافتی های مستقیم: ", paymentDetail.ReceivedAmount)}
-                {renderDataItem(" خالص پرداختی: ", paymentDetail.PureWage)}
-                {renderDataItem(" شماره حساب واریزی: ", paymentDetail.BankAccountNumber)}
+                {renderDataItem("دوره: ", reciept.Name, false)}
+                {renderDataItem(" دستمزد پرونده ها: ", paymentDetail.ProjectsWage, true)}
+                {renderDataItem(" دستمزد ماموریت ها: ", paymentDetail.MissionWage, true)}
+                {renderDataItem(" پاداش: ", paymentDetail.Reward, true)}
+                {renderDataItem(" مانده از قبل: ", paymentDetail.PreBalance, true)}
+                {renderDataItem(" دریافتی های مستقیم: ", paymentDetail.ReceivedAmount, true)}
+                {renderDataItem(paymentDetail.PureWage >= 0 ? " خالص پرداختی: " : "بدهی شما به شرکت: ", paymentDetail.PureWage, true)}
+                {renderDataItem(" شماره حساب واریزی: ", paymentDetail.BankAccountNumber, false)}
                 <TouchableOpacity style={Styles.detailButtonStyle} onPress={() => navigation.navigate("SalaryDetail", {recieptID:reciept.ID})}>
                     <Text style={Styles.buttonTextStyle}>
                         جزِئیات دستمزد
@@ -106,11 +119,9 @@ const Styles = StyleSheet.create({
     itemValueTextStyle:{
         fontFamily: "IRANSansMobile_Light"
     },
-    separator: {
-        marginVertical: 8,
-        borderBottomColor: "gray",
-        borderBottomWidth: 1,
-        width: '85%',
+    rialStyle:{
+        fontFamily: "IRANSansMobile_Light",
+        marginRight: 5
     },
     detailButtonStyle:{
         width: pageWidth *0.28,

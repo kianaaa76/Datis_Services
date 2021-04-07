@@ -48,7 +48,7 @@ const DropdownPicker = ({placeholder, list, onSelect, selectedValue, showList, s
                         position:"absolute",
                         top:50,
                         elevation:5,
-                        zIndex: 9999
+                        zIndex: 999999999
                     }}>
                         <FlatList
                             keyExtractor={item=>item.id.toString()}

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Toast from "react-native-simple-toast";
 import CheckBox from 'react-native-check-box';
-import ImagePicker from 'react-native-image-crop-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImageViewer from '../ImageViwer';
 import JalaliCalendarPicker from 'react-native-jalali-calendar-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -155,14 +155,16 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             {CameraIcon({
               onPress:() => {
               try {
-              ImagePicker.openCamera({
-              width: pageWidth - 20,
-              height: pageHeight * 0.7,
-              includeBase64: true,
-              compressImageQuality: 0.7,
-            }).then(response => {
-              setInfo({...info, image: response.data});
-            });
+                launchCamera(
+                    {
+                      mediaType: 'photo',
+                      includeBase64: true,
+                      quality:0.5
+                    },
+                    (response) => {
+                      setInfo({...info, image: response.base64});
+                    },
+                )
             } catch {
               Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
             }
@@ -174,14 +176,16 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             {UploadFileIcon({
               onPress:() => {
               try {
-              ImagePicker.openPicker({
-              width: pageWidth - 20,
-              height: pageHeight * 0.7,
-              includeBase64: true,
-              compressImageQuality: 0.7,
-            }).then(response => {
-              setInfo({...info, image: response.data});
-            });
+                launchImageLibrary(
+                    {
+                      mediaType: 'photo',
+                      includeBase64: true,
+                      quality:0.5
+                    },
+                    (response) => {
+                      setInfo({...info, image: response.base64});
+                    },
+                )
             } catch {
               Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
             }
@@ -190,6 +194,7 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
             })}
             {!!info.image && DeleteIcon(
                 {
+
                   color:"#000",
                   width:28,
                   height:28,

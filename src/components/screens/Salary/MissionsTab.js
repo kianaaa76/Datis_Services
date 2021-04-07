@@ -7,7 +7,6 @@ const pageWidth = Dimensions.get("screen").width;
 
 const MissionsTab = ({missionList})=>{
     const [missions, setMissions] = useState(missionList);
-
     const handleSearch = (searchValue)=>{
         if (!!searchValue) {
             let tmp = missionList.filter(item => item.ServiceID.toString().substr(0,searchValue.length) === searchValue);
@@ -15,6 +14,24 @@ const MissionsTab = ({missionList})=>{
         } else {
             setMissions(missionList);
         }
+    }
+
+    const handleDistanceFormat = (distance)=>{
+        let dotIndex = 0;
+        let finalString = "";
+        while(distance[dotIndex] !== '.' && dotIndex < distance.length){
+            dotIndex += 1;
+        }
+        if (dotIndex === distance.length){
+            finalString = distance.substr(0, distance.length - 3)
+            finalString = finalString.concat('.');
+            finalString = finalString.concat(distance.substr(distance.length-3, 3))
+        } else {
+            finalString = distance.substr(0, dotIndex-3);
+            finalString = finalString.concat('.');
+            finalString = finalString.concat(distance.substr(dotIndex-3,3));
+        }
+        return(finalString);
     }
 
     return(
@@ -33,7 +50,7 @@ const MissionsTab = ({missionList})=>{
                 />
             </View>
             <FlatList data={missions} renderItem={({item})=>(
-                <TouchableOpacity style={Styles.listItemContainerStyle} onPress={()=>{}}>
+                <View style={Styles.listItemContainerStyle}>
                     <View style={Styles.cardSingleRowStyle}>
                         <View style={Styles.cardSingleItemStyle}>
                             <Text style={Styles.cardTextStyle}>
@@ -48,17 +65,17 @@ const MissionsTab = ({missionList})=>{
                                 {item.ServiceID}
                             </Text>
                             <Text style={Styles.cardLabelTextStyle}>
-                                شماره پرونده:
+                                شماره ماموریت:
                             </Text>
                         </View>
                     </View>
                     <View style={Styles.cardSingleRowStyle}>
                         <View style={Styles.cardSingleItemStyle}>
                             <Text style={Styles.cardTextStyle}>
-                                {item.Distance}
+                                {`${handleDistanceFormat(item.Distance.toString())} کیلومتر`}
                             </Text>
                             <Text style={Styles.cardLabelTextStyle}>
-                                فاصله:
+                                مسافت:
                             </Text>
                         </View>
                         <View style={Styles.cardSingleItemStyle}>
@@ -70,14 +87,32 @@ const MissionsTab = ({missionList})=>{
                             </Text>
                         </View>
                     </View>
-                </TouchableOpacity>
+                    <View style={Styles.cardSingleRowStyle}>
+                        <View style={Styles.cardSingleItemStyle}>
+                            <Text style={Styles.cardTextStyle}>
+                                {!!item.EndCity ? item.EndCity : '-'}
+                            </Text>
+                            <Text style={Styles.cardLabelTextStyle}>
+                                شهر مقصد:
+                            </Text>
+                        </View>
+                        <View style={Styles.cardSingleItemStyle}>
+                            <Text style={Styles.cardTextStyle}>
+                                {!!item.StartCity ? item.StartCity : '-'}
+                            </Text>
+                            <Text style={Styles.cardLabelTextStyle}>
+                                شهر مبدا:
+                            </Text>
+                        </View>
+                    </View>
+                </View>
             )} ListEmptyComponent={()=>(
                 <View style={{flex:1, height: pageHeight*0.6, justifyContent:'center', alignItems:"center"}}>
                     <Text style={{fontFamily:'IRANSansMobile_Light'}}>
                         موردی یافت نشد.
                     </Text>
                 </View>
-            )} keyExtractor={item=>item.ServiceID}/>
+            )} keyExtractor={item=>item.ServiceID.toString()}/>
         </View>
     );
 };
@@ -92,7 +127,7 @@ const Styles = StyleSheet.create({
     cardSingleRowStyle:{
         flexDirection:"row",
         width:"100%",
-        alignItems:"center",
+        alignItems:"flex-start",
     },
     listItemContainerStyle:{
         width:"96%",
@@ -106,9 +141,12 @@ const Styles = StyleSheet.create({
     },
     cardTextStyle:{
         fontFamily:"IRANSansMobile_Light",
+        flexShrink:1,
+        fontSize: 12
     },
     cardLabelTextStyle:{
         fontFamily:"IRANSansMobile_Medium",
+        fontSize: 13,
         marginLeft:5
     },
     searchbarContainerStyle: {
@@ -135,7 +173,7 @@ const Styles = StyleSheet.create({
     cardSingleItemStyle:{
         flexDirection:"row",
         width:"50%",
-        alignItems:"center",
+        alignItems:"flex-start",
         justifyContent:"flex-end"
     },
 })

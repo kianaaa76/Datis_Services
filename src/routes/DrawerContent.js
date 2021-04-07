@@ -38,7 +38,7 @@ const DrawerContent = ({navigation}) => {
           onPress={()=> {
             navigation.navigate('Salary')
           }}>
-        <Text style={Styles.titleTextStyle}>حقوق من</Text>
+        <Text style={Styles.titleTextStyle}>کارکرد من</Text>
       </TouchableOpacity>
     </View>
   );

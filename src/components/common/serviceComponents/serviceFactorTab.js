@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Toast from "react-native-simple-toast";
 import NumberFormat from 'react-number-format';
-import ImagePicker from 'react-native-image-crop-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImageViewer from '../ImageViwer';
 import {normalize, getFontsName} from '../../utils/utilities';
 import {StarIcon, UploadFileIcon, CameraIcon, DeleteIcon} from "../../../assets/icons";
@@ -123,36 +123,36 @@ const ServiceFactorTab = ({
           <View style={Styles.getImageContainerViewStyle}>
             {CameraIcon({
               onPress:() => {
-              ImagePicker.openCamera({
-              width: pageWidth - 20,
-              height: pageHeight * 0.7,
-              includeBase64: true,
-              compressImageQuality: 0.7,
-            }).then(response => {
-              setInfo({
-              ...info,
-              factorImage: response.data,
-            });
-            }).catch(err=>{
-              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
-            });
+                launchCamera(
+                    {
+                      mediaType: 'photo',
+                      includeBase64: true,
+                      quality:0.5
+                    },
+                    (response) => {
+                      setInfo({
+                          ...info,
+                          factorImage: response.base64,
+                        });
+                    },
+                )
             }
             })}
             {UploadFileIcon({
               onPress:() => {
-              ImagePicker.openPicker({
-              width: pageWidth - 20,
-              height: pageHeight * 0.7,
-              includeBase64: true,
-              compressImageQuality: 0.7,
-            }).then(response => {
-              setInfo({
-              ...info,
-              factorImage: response.data,
-            });
-            }).catch(err=>{
-              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
-            });
+                launchImageLibrary(
+                    {
+                      mediaType: 'photo',
+                      includeBase64: true,
+                      quality:0.5
+                    },
+                    (response) => {
+                      setInfo({
+                          ...info,
+                          factorImage: response.base64,
+                        });
+                    },
+                )
             }
             })}
             {!isRejected && !!info.factorImage && DeleteIcon({
@@ -191,38 +191,38 @@ const ServiceFactorTab = ({
           <View style={Styles.getImageContainerViewStyle}>
             {CameraIcon({
               onPress:() => {
-              ImagePicker.openCamera({
-              width: pageWidth - 20,
-              height: pageHeight * 0.7,
-              includeBase64: true,
-              compressImageQuality: 0.7,
-            }).then(response => {
-              setInfo({
-              ...info,
-              billImage: response.data,
-            });
-            }).catch(err=>{
-              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
-            });
+                launchCamera(
+                    {
+                      mediaType: 'photo',
+                      includeBase64: true,
+                      quality:0.5
+                    },
+                    (response) => {
+                      setInfo({
+                          ...info,
+                          billImage: response.base64,
+                        });
+                    },
+                )
             }
             })}
             {UploadFileIcon({
               width:30,
               height:30,
               onPress:() => {
-              ImagePicker.openPicker({
-              width: pageWidth - 20,
-              height: pageHeight * 0.7,
-              includeBase64: true,
-              compressImageQuality: 0.7,
-            }).then(response => {
-              setInfo({
-              ...info,
-              billImage: response.data,
-            });
-            }).catch(err=>{
-              Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
-            });
+                launchImageLibrary(
+                    {
+                      mediaType: 'photo',
+                      includeBase64: true,
+                      quality:0.5
+                    },
+                    (response) => {
+                      setInfo({
+                          ...info,
+                          billImage: response.base64,
+                        });
+                    },
+                )
             }
             })}
             {!!info.billImage && DeleteIcon(

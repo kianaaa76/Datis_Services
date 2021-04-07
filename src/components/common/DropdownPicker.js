@@ -1,4 +1,4 @@
-import React, {useState, forwardRef, useImperativeHandle} from 'react';
+import React, {useState, useEffect, forwardRef, useImperativeHandle} from 'react';
 import {
   View,
   TextInput,
@@ -14,7 +14,7 @@ import {normalize} from '../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 
 const DropdownPicker = forwardRef(
-  ({placeholder, list, onSelect, listHeight}, ref) => {
+  ({placeholder, list, onSelect, listHeight, opensList, itemIndex}, ref) => {
     const [listIsShown, setListIsShown] = useState(false);
     const [showingList, setShowingList] = useState(list);
     const [searchText, setSearchText] = useState('');
@@ -22,7 +22,7 @@ const DropdownPicker = forwardRef(
     useImperativeHandle(ref, () => ({
       setList(LIST) {
         setShowingList(LIST);
-      },
+      }
     }));
 
     const renderListItem = item => {
@@ -101,7 +101,8 @@ const DropdownPicker = forwardRef(
             </Text>
           </TouchableOpacity>
           {listIsShown && (
-            <View style={[Styles.listContainerStyle, {height: listHeight}]}>
+            <View style={[Styles.listContainerStyle, {height: listHeight}]}
+            >
               <View style={Styles.searchbarContainerStyle}>
                 <TextInput
                   value={searchText}
