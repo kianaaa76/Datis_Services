@@ -67,27 +67,27 @@ const History = ({navigation}) => {
                 item.Versions.map((I, index) => {
                     if (index === item.Versions.length - 1) {
                         if (I.VersionId === currentVersion.VersionId) {
-                            serialList.push({Serial: I.Serial, isChecked: false})
+                            serialList.push({Serial: I.Serial})
                             tempVersions.push({
-                                ...currentVersion, serialList: serialList, isChecked: false
+                                ...currentVersion, serialList: serialList
                             });
                         } else {
                             tempVersions.push({
-                                ...currentVersion, serialList: serialList, isChecked: false
+                                ...currentVersion, serialList: serialList
                             })
                             tempVersions.push({
-                                ...I, serialList: [{Serial: I.Serial, isChecked: false}], isChecked: false
+                                ...I, serialList: [Serial]
                             });
                         }
                     } else {
                         if (I.VersionId !== currentVersion.VersionId) {
                             tempVersions.push({
-                                ...currentVersion, serialList: serialList, isChecked: false
+                                ...currentVersion, serialList: serialList
                             });
                             currentVersion = I;
-                            serialList = [{Serial: I.Serial, isChecked: false}];
+                            serialList = [{Serial: I.Serial}];
                         } else {
-                            serialList.push({Serial: I.Serial, isChecked: false});
+                            serialList.push({Serial: I.Serial});
                         }
                     }
                 });
@@ -95,8 +95,6 @@ const History = ({navigation}) => {
                     ...item,
                     ID: idx,
                     Versions: tempVersions,
-                    isExpanded: false,
-                    isChecked: false,
                     hasSerialFormat: true
                 });
             }
@@ -108,23 +106,22 @@ const History = ({navigation}) => {
                         if (I.VersionId === currentVersion.VersionId) {
                             tempVersions.push({
                                 ...currentVersion,
-                                isChecked: false,
                                 Count: totalCount + I.Count,
                                 selectedCount: 0
                             });
                         } else {
                             tempVersions.push({
-                                ...currentVersion, isChecked: false, Count: totalCount, selectedCount: 0
+                                ...currentVersion, Count: totalCount, selectedCount: 0
                             });
                             tempVersions.push({
-                                ...I, isChecked: false, selectedCount: 0
+                                ...I, selectedCount: 0
                             });
                         }
 
                     } else {
                         if (I.VersionId !== currentVersion.VersionId) {
                             tempVersions.push({
-                                ...currentVersion, isChecked: false, Count: totalCount, selectedCount: 0
+                                ...currentVersion, Count: totalCount, selectedCount: 0
                             });
                             currentVersion = I;
                             totalCount = I.Count;
@@ -136,8 +133,6 @@ const History = ({navigation}) => {
                 tmp.push({
                     ...item,
                     ID: idx,
-                    isExpanded: false,
-                    isChecked: false,
                     Versions: tempVersions,
                     hasSerialFormat: false
                 });
@@ -424,7 +419,7 @@ const History = ({navigation}) => {
     }
 
     const handleDeleteItem = ()=>{
-        console.log("ww2222", availableObjectsList.filter(item=>item.ObjectID === 29)[0].Versions)
+        console.log("ww2222", availableObjectsList.filter(item=>item.ObjectID === 29))
         const {verIndex, reqIndex, objIndex , objId, reqId, verId, broken, hasSerial} = deletingItem;
         let tempList = [...readyToSendList];
         if (verIndex !== undefined){
@@ -433,26 +428,30 @@ const History = ({navigation}) => {
             let tempVerList = [...tempObj.Versions];
             let tempAvailable = [...availableObjectsList];
             if (hasSerial){
-                let selectedObjIndex = null;
-                let selectedVerIndex = null;
+                let selectedObjIndex = undefined;
+                let selectedVerIndex = undefined;
+                console.log("********************")
                 tempAvailable.map((item, indx1)=>{
+                    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%", item)
                     if (item.ObjectID === objId && item.Broken === broken){
                         selectedObjIndex = indx1;
                         item.Versions.map((verItem,idx2)=>{
-                            if (verItem.VersionID === verId){
+                            if (verItem.VersionId === verId){
                                 selectedVerIndex = idx2;
                             }
-                        })
+                        });
                     }
                 });
-                if (!!selectedObjIndex && !!selectedVerIndex){
-                    tempVerList[verIndex].SerialList.map(serial=>{
-                        tempAvailable[selectedObjIndex].Versions[selectedVerIndex].SerialList.push(serial);
+                console.log("4443@@@@@@@@@@", selectedObjIndex, selectedVerIndex);
+                if (selectedObjIndex !== undefined && selectedVerIndex !== undefined){
+                    console.log("kianaaaaaaa", tempAvailable[selectedObjIndex].Versions[selectedVerIndex]);
+                    tempVerList[verIndex].serialList.map(serial=>{
+                        tempAvailable[selectedObjIndex].Versions[selectedVerIndex].serialList.push(serial);
                     });
-                } else if (!!selectedObjIndex){
+                } else if (selectedObjIndex !== undefined){
                     tempAvailable[selectedObjIndex].Versions.push({
                         Count:1,
-                        SerialList:tempVerList[verIndex].SerialList,
+                        serialList:tempVerList[verIndex].serialList,
                         Version_Id:tempVerList[verIndex].VersionId,
                         Version_Name:tempVerList[verIndex].Version_Name
                     });
@@ -468,21 +467,21 @@ const History = ({navigation}) => {
                 setAvailableObjectsList(tempAvailable);
             }
             else {
-                let selectedObjIndex = null;
-                let selectedVerIndex = null;
+                let selectedObjIndex = undefined;
+                let selectedVerIndex = undefined;
                 tempAvailable.map((item, indx1)=>{
                     if (item.ObjectID === objId){
                         selectedObjIndex = indx1;
                         item.Versions.map((verItem,idx2)=>{
-                            if (verItem.VersionID === verId){
+                            if (verItem.VersionId === verId){
                                 selectedVerIndex = idx2;
                             }
                         })
                     }
                 });
-                if (!!selectedObjIndex && !!selectedVerIndex){
+                if (selectedObjIndex !== undefined && selectedVerIndex !== undefined){
                     tempAvailable[selectedObjIndex].Versions[selectedVerIndex].Count += tempVerList[verIndex].Count;
-                } else if (!!selectedObjIndex){
+                } else if (selectedObjIndex !== undefined){
                     tempAvailable[selectedObjIndex].Versions.push({
                         Count: tempVerList[verIndex].Count,
                         Serial:"",
@@ -517,20 +516,20 @@ const History = ({navigation}) => {
             let tempObjList = [...tempReq.Objects];
             let tmpObj = tempObjList[objIndex];
             let tempAvailable = [...availableObjectsList];
-            let selectedObjIndex = null;
+            let selectedObjIndex = undefined;
             if (hasSerial){
                 tempAvailable.map((item, indx1)=>{
                     if (item.ObjectID === objId && item.Broken === broken){
                         selectedObjIndex = indx1;
                     }
                 });
-                if (!!selectedObjIndex){
+                if (selectedObjIndex !== undefined){
                     let flag = false;
                     tmpObj.Versions.map(version=>{
                         tempAvailable[selectedObjIndex].Versions.map((ver, verIdx)=>{
                             if (version.VersionID === ver.VersionID){
-                                version.SerialList.map(serial=>{
-                                    tempAvailable[selectedObjIndex].Versions[verIdx].SerialList.push(serial);
+                                version.serialList.map(serial=>{
+                                    tempAvailable[selectedObjIndex].Versions[verIdx].serialList.push(serial);
                                     flag = true;
                                 });
                             }
@@ -551,11 +550,11 @@ const History = ({navigation}) => {
                         selectedObjIndex = indx1;
                     }
                 });
-                if (!!selectedObjIndex){
+                if (selectedObjIndex !== undefined){
                     let flag = false;
                     tmpObj.Versions.map(version=>{
                         tempAvailable[selectedObjIndex].Versions.map((ver, verIdx)=>{
-                            if (version.VersionID === ver.VersionID){
+                            if (version.VersionId === ver.VersionID){
                                 tempAvailable[selectedObjIndex].Versions[verIdx].Count += version.Count;
                                 flag = true;
                             }
@@ -575,7 +574,7 @@ const History = ({navigation}) => {
             tempList[reqIndex] = tempReq;
             setReadyToSendList(tempList);
         }
-        console.log("www1111", availableObjectsList.filter(item=>item.ObjectID === 29)[0].Versions)
+        console.log("www1111", availableObjectsList.filter(item=>item.ObjectID === 29))
         setShowDeleteModal(false);
     }
 
