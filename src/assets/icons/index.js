@@ -502,12 +502,56 @@ export function BackIosIcon(props) {
     )
 }
 
-export function ArrowDownIcon() {
-    return <Down/>
+export function ArrowDownIcon(props) {
+    return (
+        <Svg
+            {...props}
+            id="Capa_1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            x="0px"
+            y="0px"
+            width={27}
+            height={27}
+            fill="#600"
+            color="#600"
+            viewBox="0 0 512 512"
+            style={{
+                enableBackground: "new 0 0 512 512",
+            }}
+            xmlSpace="preserve"
+        >
+
+            <Path
+                d="M466.216,227.115c-21.803-21.803-57.28-21.803-79.083,0l-77.803,77.803V53.333C309.331,23.936,285.395,0,255.997,0 s-53.333,23.936-53.333,53.333v251.584l-77.781-77.781c-21.803-21.803-57.28-21.803-79.083,0s-21.803,57.28,0,79.083 l202.667,202.667c2.069,2.069,4.8,3.115,7.531,3.115c2.731,0,5.461-1.045,7.552-3.115l202.667-202.667 C487.997,284.416,487.997,248.917,466.216,227.115z"/>
+
+        </Svg>
+    )
 }
 
-export function ArrowUpIcon() {
-    return <Up/>
+export function ArrowUpIcon(props) {
+    return (
+        <Svg
+            {...props}
+            id="Capa_1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            x="0px"
+            y="0px"
+            width={27}
+            height={27}
+            fill="#600"
+            color="#600"
+            viewBox="0 0 512.005 512.005"
+            style={{
+                enableBackground: "new 0 0 512.005 512.005",
+            }}
+            xmlSpace="preserve"
+        >
+            <Path
+                d="M466.22,205.787L263.553,3.12c-4.16-4.16-10.923-4.16-15.083,0L45.804,205.787c-21.803,21.803-21.803,57.28,0,79.083 s57.28,21.803,79.083,0l77.781-77.781v251.584c0,29.397,23.936,53.333,53.333,53.333s53.333-23.936,53.333-53.333V207.088 l77.781,77.781c21.803,21.803,57.28,21.803,79.083,0C488.001,263.088,488.001,227.589,466.22,205.787z"/>
+        </Svg>
+    )
 }
 
 

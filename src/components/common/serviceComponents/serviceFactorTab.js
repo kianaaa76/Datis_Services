@@ -129,6 +129,7 @@ const ServiceFactorTab = ({
                       includeBase64: true,
                       quality:0.5
                     },
+
                     (response) => {
                       setInfo({
                           ...info,

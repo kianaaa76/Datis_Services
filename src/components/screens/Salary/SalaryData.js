@@ -58,7 +58,7 @@ const SalaryData = ({navigation})=>{
         return(
             <View style={Styles.dataItemContainerStyle}>
                 {hasRial &&(<Text style={Styles.rialStyle}>
-                    ریال
+                    تومان
                 </Text>)}
                 {hasRial ? (
                     <NumberFormat thousandSeparator={true} renderText={value => (
@@ -94,7 +94,7 @@ const SalaryData = ({navigation})=>{
                 {renderDataItem(" شماره حساب واریزی: ", paymentDetail.BankAccountNumber, false)}
                 <TouchableOpacity style={Styles.detailButtonStyle} onPress={() => navigation.navigate("SalaryDetail", {recieptID:reciept.ID})}>
                     <Text style={Styles.buttonTextStyle}>
-                        جزِئیات دستمزد
+                        جزئیات دستمزد
                     </Text>
                 </TouchableOpacity>
             </View>)}

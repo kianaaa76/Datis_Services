@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableHighlight,
-  BackHandler,
+  BackHandler, Linking,
 } from 'react-native';
 import Toast from "react-native-simple-toast";
 import Header from '../../common/Header';
@@ -22,7 +22,7 @@ import {LOGOUT} from '../../../actions/types';
 import {toFaDigit, normalize, getFontsName} from '../../utils/utilities';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImageViewer from '../../common/ImageViwer';
-import {CameraIcon, DeleteIcon, UploadFileIcon} from "../../../assets/icons";
+import {CameraIcon, DeleteIcon, UploadFileIcon, PhoneIcon} from "../../../assets/icons";
 
 const pageWidth = Dimensions.get('screen').width;
 const pageHeight = Dimensions.get('screen').height;
@@ -55,6 +55,7 @@ const RemainingServiceDetail = ({navigation}) => {
 
   useEffect(() => {
     unsettledServiceDetail(SERVICE.projectID, selector.token).then(data => {
+      console.log("dataaaa", data)
       if (data.errorCode === 0) {
         setServiceDetail(data.result);
         setDetailLoading(false);
@@ -166,23 +167,33 @@ const RemainingServiceDetail = ({navigation}) => {
   const renderSingleItem = (title, titleColor, text) => {
     return (
       <View style={Styles.singleItemContainerstyle}>
-        <Text
-          style={{
-            fontFamily: getFontsName('IRANSansMobile_Light'),
-            fontSize: normalize(13),
-            flexShrink: 1,
-          }}>
-          {text}
-        </Text>
-        <Text
-          style={{
-            fontSize: normalize(12),
-            fontFamily: getFontsName('IRANSansMobile_Medium'),
-            marginLeft: 10,
-            color: titleColor,
-          }}>
-          {title}
-        </Text>
+        {title === 'تلفن صاحب پرونده:' && (
+            <View style={{width:"20%"}}>
+              {PhoneIcon({
+                onPress:() => Linking.openURL(`tel:${text}`),
+                style:{fontSize: normalize(26), marginLeft: 10},
+                color:"#000"
+              })}
+            </View>)}
+            <View style={{flexDirection:"row", width:title === 'تلفن صاحب پرونده:'? "80%" :"100%", justifyContent:"flex-end", padding:5}}>
+              <Text
+                style={{
+                  fontFamily: getFontsName('IRANSansMobile_Light'),
+                  fontSize: normalize(13),
+                  flexShrink: 1,
+                }}>
+                {text}
+              </Text>
+              <Text
+                style={{
+                  fontSize: normalize(12),
+                  fontFamily: getFontsName('IRANSansMobile_Medium'),
+                  marginLeft: 10,
+                  color: titleColor,
+                }}>
+                {title}
+              </Text>
+            </View>
       </View>
     );
   };
@@ -285,6 +296,16 @@ const RemainingServiceDetail = ({navigation}) => {
                       )}
                     </Text>
                   </View>
+                  {renderSingleItem(
+                      'مبلغ پیش پرداخت:',
+                      '#CB3434',
+                      toFaDigit(serviceDetail.DoneDetails.PrePaidAmount),
+                  )}
+                  {renderSingleItem(
+                      'مبلغ واریزی به حساب شرکت:',
+                      '#CB3434',
+                      toFaDigit(serviceDetail.DoneDetails.ToCompanySettlement),
+                  )}
                   {renderSingleItem(
                     'مبلغ دریافتی:',
                     '#CB3434',
@@ -495,7 +516,7 @@ const Styles = StyleSheet.create({
     marginVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   itemLabelStyle: {
     fontSize: normalize(14),

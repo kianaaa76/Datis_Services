@@ -127,6 +127,7 @@ const Home = ({navigation}) => {
       if (data.errorCode == 0) {
         const partsList = [];
         data.result.map(item =>
+
           partsList.push({label: item.Name, value: item}),
         );
         dispatch({
@@ -134,6 +135,7 @@ const Home = ({navigation}) => {
           objectsList: partsList,
         });
       } else if (data.errorCode === 3) {
+
         dispatch({
           type: LOGOUT,
         });
@@ -334,8 +336,8 @@ const Home = ({navigation}) => {
             </View>
             <View style={Styles.SingleRowStyle}>
               {renderHomeItems('انبار من', images[4], () => {
-                // navigation.navigate('WarehouseDetail');
-                  Toast.showWithGravity('این قسمت بعدا اضافه خواهد شد.', Toast.LONG, Toast.CENTER);
+                navigation.navigate('WarehouseDetail');
+                  // Toast.showWithGravity('این قسمت بعدا اضافه خواهد شد.', Toast.LONG, Toast.CENTER);
               })}
               {renderHomeItems('ماموریت‌های من', images[5], () => {
                 navigation.navigate('Mission');

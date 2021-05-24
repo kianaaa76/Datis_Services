@@ -426,3 +426,65 @@ export const requestsHistory = (token)=>{
 }
 
 
+export const sendUndoneObjects = (token, Objects)=>{
+  const msg = JSON.stringify({
+    Objects
+  });
+  return fetch(`${LOCAL_HOST}/UndoneSendObjects`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body:msg
+  }).then((response) => response.json());
+}
+
+export const acceptRequestGoods = (token, RequestId)=>{
+  return fetch(`${LOCAL_HOST}/AcceptPortage?Id=${RequestId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+
+export const rejectReguestGoods = (token, RequestId)=>{
+  return fetch(`${LOCAL_HOST}/RejectPortage?Id=${RequestId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+
+
+export const getReadyToSendList = (token)=>{
+  return fetch(`${LOCAL_HOST}/GetReadyToSendDocs`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+  }).then((response) => response.json());
+}
+
+
+export const  sendObjects = (token, ID ,Description, TrackingNumber, TrackingImage)=>{
+  const msg = JSON.stringify({
+    ID,
+    Description,
+    TrackingNumber,
+    TrackingImage
+  });
+  return fetch(`${LOCAL_HOST}/SendObjects`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `bearer ${token}`,
+    },
+    body: msg
+  }).then((response) => response.json());
+}

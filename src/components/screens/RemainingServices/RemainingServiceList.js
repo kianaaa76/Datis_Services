@@ -41,7 +41,7 @@ const RemainingServiceList = ({navigation}) => {
 
     const getServices = () => {
         setListLoading(true);
-        unsettledServiceList(selector.userId, selector.token).then((data) => {
+        unsettledServiceList(selector.userId, selector.token).then(data => {
             if (data.errorCode === 0) {
                 setServiceList(data.result);
             } else {

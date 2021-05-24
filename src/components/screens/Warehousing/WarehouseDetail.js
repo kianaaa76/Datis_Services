@@ -12,15 +12,15 @@ const pageHeight = Dimensions.get("screen").height;
 const WarehouseDetail = ()=>{
 const [index, setIndex] = React.useState(2);
   const [routes] = React.useState([
-      {key: 'third', title: 'تاریخچه'},
+      {key: 'third', title: 'ارسال / دریافت'},
     {key: 'second', title: 'درخواست کالا'},
     {key: 'first', title: 'انبارگردانی'}
   ]);
   const renderScene = ({route}) => {
     switch (route.key) {
-      case 'first':
+        case 'first':
         return (
-          <WarehouseHandling/>
+          <WarehouseHandling setTabIndex={index=>setIndex(index)}/>
         );
       case 'second':
         return (

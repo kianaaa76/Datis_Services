@@ -10,6 +10,11 @@ buildscript {
     repositories {
         google()
         jcenter()
+        mavenCentral()
+        maven {
+            url "https://jitpack.io"
+        }
+        maven {   url "https://maven.google.com"   }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.1")
@@ -32,6 +37,13 @@ allprojects {
 
         google()
         jcenter()
+        maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://maven.google.com" }
+        maven { url "http://dl.bintray.com/riteshakya037/maven" }
         maven { url 'https://www.jitpack.io' }
+        configurations.all {
+            resolutionStrategy.force 'com.android.support:support-v4:27.0.2'
+        }
     }
 }
+

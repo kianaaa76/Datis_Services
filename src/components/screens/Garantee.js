@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Header from '../common/Header';
 import Toast from "react-native-simple-toast";
-import RnZxing from 'react-native-rn-zxing';
+import RNRnZxing  from 'react-native-rn-zxing';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
 import {toFaDigit, normalize, getFontsName} from '../utils/utilities';
@@ -71,11 +71,12 @@ const Garantee = ({navigation}) => {
     );
   };
 
+
   return (
     <View style={{flex: 1}}>
       <>
-        <Header 
-        headerText={'استعلام گارانتی'} 
+        <Header
+        headerText={'استعلام گارانتی'}
         onBackPress={()=>navigation.goBack()}
         />
         <View style={{flex: 1, alignItems: 'center'}}>
@@ -87,7 +88,9 @@ const Garantee = ({navigation}) => {
               fill:"#000",
               onPress:() => {
               try {
-              RnZxing.showQrReader(data => setSerial(data));
+                RNRnZxing.showQrReader(data => {
+                setSerial(data.toString().substr(data.toString().length-7,7));
+              });
             } catch {
               Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
             }
@@ -174,6 +177,7 @@ const Styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#C0C0C0',
+
     elevation: 4,
     marginTop: 50,
   },

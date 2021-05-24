@@ -26,27 +26,48 @@ const RemainingServiceListItem = ({item, navigation}) => {
           padding: 10,
           marginVertical: 4,
           marginHorizontal: 3,
-          justifyContent: 'center',
+          justifyContent: 'space-between',
           alignItems: 'center',
           elevation: 3,
+          flexDirection:"row"
         }}>
-        <View style={Styles.secondRowContainerStyle}>
-          <View style={Styles.singleItemStyle}>
-            <Text style={{fontSize:normalize(13), fontFamily: getFontsName('IRANSansMobile_Light')}}>{toFaDigit(Item.projectID)}</Text>
-            <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium')}}>پرونده: </Text>
+          <View style={{ width:"57%"}}>
+              <View style={Styles.secondRowContainerStyle}>
+                  <View style={Styles.singleItemStyle}>
+                      <Text style={{fontSize:normalize(13), fontFamily: getFontsName('IRANSansMobile_Light')}}>{Item.Name}</Text>
+                      <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium')}}>نام صاحب پرونده: </Text>
+                  </View>
+              </View>
+              <View style={Styles.secondRowContainerStyle}>
+                  <View style={Styles.singleItemStyle}>
+                      <Text style={{color: '#000', fontSize:normalize(13), fontFamily: getFontsName('IRANSansMobile_Light')}}>
+                          {toFaDigit(Item.PhoneNumber)}
+                      </Text>
+                      <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium'), color: '#000'}}>
+                          تلفن صاحب پرونده:{' '}
+                      </Text>
+                  </View>
+              </View>
           </View>
-        </View>
-        <View style={Styles.secondRowContainerStyle}>
-          <View style={Styles.singleItemStyle}>
-            <Text style={{color: '#CB3434', fontSize:normalize(13), fontFamily: getFontsName('IRANSansMobile_Light')}}>
-              {Item.remaind == 0
-                ? `${toFaDigit(0)} ریال`
-                : ` ${toFaDigit(Item.remaind.toString().substr(1,Item.remaind.length))}-  ریال`}
-            </Text>
-            <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium'), color: '#CB3434'}}>
-              مانده:{' '}
-            </Text>
-          </View>
+        <View style={{width:'43%'}}>
+            <View style={Styles.secondRowContainerStyle}>
+              <View style={Styles.singleItemStyle}>
+                <Text style={{fontSize:normalize(13), fontFamily: getFontsName('IRANSansMobile_Light')}}>{toFaDigit(Item.projectID)}</Text>
+                <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium')}}>پرونده: </Text>
+              </View>
+            </View>
+            <View style={Styles.secondRowContainerStyle}>
+              <View style={Styles.singleItemStyle}>
+                <Text style={{color: '#CB3434', fontSize:normalize(13), fontFamily: getFontsName('IRANSansMobile_Light')}}>
+                  {Item.remaind === 0
+                    ? `${toFaDigit(0)} ریال` : Math.abs(Item.remaind) === Item.remaind ?
+                     ` ${toFaDigit(Item.remaind.toString())}  ریال` : ` ${toFaDigit(Item.remaind.toString().substr(1,Item.remaind.length))}-  ریال`}
+                </Text>
+                <Text style={{fontSize: normalize(13), fontFamily: getFontsName('IRANSansMobile_Medium'), color: '#CB3434'}}>
+                  مانده:{' '}
+                </Text>
+              </View>
+            </View>
         </View>
       </View>
     </TouchableWithoutFeedback>

@@ -96,6 +96,7 @@ const ServicePartsTab = ({
   });
 
   const onSuccess = async (code, item) => {
+    console.log("##########", code);
     try {
       let header = parseInt(code.toString().substr(0, 3));
       let numOfZeros = 0;
@@ -1319,7 +1320,7 @@ const ServicePartsTab = ({
                               fieldsObject.partTypeSelected.value.Id,
                               fieldsObject.partVersionSelected.Key,
                             ).then(data => {
-                              if (data.errorCode == 0) {
+                              if (data.errorCode === 0) {
                                 let INFO = !!objectsList ? objectsList : [];
                                 let SERIAL = !!fieldsObject.serial
                                   ? fieldsObject.serial
