@@ -13,9 +13,6 @@ import {
 } from 'react-native';
 import { getFontsName, normalize } from '../../utils/utilities';
 import CheckBox from 'react-native-check-box';
-import Input from "../../common/Input";
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import ImageViewer from "../../common/ImageViwer";
 import { useSelector, useDispatch } from 'react-redux';
 import { garanteeInquiry, getInventoryObjects, sendUndoneObjects } from "../../../actions/api";
 import { LOGOUT } from "../../../actions/types";
@@ -433,7 +430,7 @@ const WarehouseHandling = ({ navigation, setTabIndex }) => {
                             renderItem={({ item, index }) => screenMode === "all" || (screenMode === "new" && !!item.Broken) || (screenMode === "fail" && !item.Broken) ? (
                                 <View
                                     style={[Styles.cardHeaderStyle, {
-                                        backgroundColor: !!item.Broken ? "#90DA9F" : "#FF9999",
+                                        backgroundColor: !!item.Broken ? "#FF9999" : "#90DA9F",
                                     }]}>
                                     <TouchableOpacity style={{
                                         width: "100%",

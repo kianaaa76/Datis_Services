@@ -1140,7 +1140,7 @@ const History = ({ navigation }) => {
                                     } else if (screenMode === "CRejected") {
                                         let tmp = [...rejectedListByCompany];
                                         tmp[index] = { ...item, isExpanded: !item.isExpanded }
-                                        setConstRejectedListByCompany(tmp);
+                                        setRejectedListByCompany(tmp);
                                     } else if (screenMode === "MRejected") {
                                         let tmp = [...rejectedListByMe];
                                         tmp[index] = { ...item, isExpanded: !item.isExpanded }
