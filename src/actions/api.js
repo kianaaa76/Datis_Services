@@ -472,9 +472,10 @@ export const getReadyToSendList = (token)=>{
 }
 
 
-export const  sendObjects = (token, ID ,Description, TrackingNumber, TrackingImage)=>{
+export const  sendObjects = (token, Objects,ID ,Description, TrackingNumber, TrackingImage)=>{
   const msg = JSON.stringify({
     ID,
+    Objects,
     Description,
     TrackingNumber,
     TrackingImage

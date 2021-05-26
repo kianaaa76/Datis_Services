@@ -761,7 +761,7 @@ const History = ({ navigation }) => {
                         objectsList.push({
                             ObjectID: obj.ObjectID,
                             VersionID: vers.VersionId,
-                            Serial: serial.Serial,
+                            Serial: serial,
                             Count: 1,
                             Broken: obj.Broken
                         });
@@ -976,7 +976,6 @@ const History = ({ navigation }) => {
                                                         alignItems: "center",
                                                         marginRight: 5
                                                     }} onPress={() => {
-                                                        console.log("kiana22")
                                                         setDeletingItem({
                                                             reqIndex: index,
                                                             objIndex: objIndex,
@@ -1051,7 +1050,6 @@ const History = ({ navigation }) => {
                                                                 alignItems: "center",
                                                                 marginRight: 5
                                                             }} onPress={() => {
-                                                                console.log("kiana444")
                                                                 setDeletingItem({
                                                                     reqIndex: index,
                                                                     objIndex: objIndex,
@@ -1345,7 +1343,7 @@ const History = ({ navigation }) => {
                                         renderItem={(item) => (
                                             <TouchableOpacity
                                                 style={[Styles.objectlistItemsContainerStyle, {
-                                                    backgroundColor: !!item.item.Broken ? "#90DA9F" : "#FF9999"
+                                                    backgroundColor: !!item.item.Broken ? "#FF9999" : "#90DA9F"
                                                 }]}
                                                 onPress={() => {
                                                     handleSelectedNewObject(item.item);

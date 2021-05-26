@@ -350,7 +350,7 @@ const Home = ({navigation}) => {
             Styles.callIconContainerStyle,
             {bottom: isKeyboardVisible ? -pageHeight * 0.3 : pageHeight * 0.01},
           ]}
-          onPress={() => Linking.openURL(`tel:02188355621`)}>
+          onPress={() => Linking.openURL(`tel:02191073870`)}>
           <Image
             source={require('../../../assets/images/icon_call.png')}
             style={Styles.callIconStyle}
