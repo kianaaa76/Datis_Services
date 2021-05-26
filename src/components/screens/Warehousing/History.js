@@ -19,12 +19,14 @@ import {
     getInventoryObjects
 } from "../../../actions/api";
 import { useSelector, useDispatch } from "react-redux";
+import Input from "../../common/Input";
 import { LOGOUT } from "../../../actions/types";
-import { SearchIcon, ArrowDownIcon, ArrowUpIcon, PlusIcon, MinusIcon } from "../../../assets/icons/index";
-import { normalize, toEnglishDigit, toFaDigit } from "../../utils/utilities";
+import { SearchIcon, ArrowDownIcon, ArrowUpIcon, PlusIcon, MinusIcon, CameraIcon, UploadFileIcon, DeleteIcon } from "../../../assets/icons/index";
+import { normalize, toEnglishDigit, toFaDigit, getFontsName } from "../../utils/utilities";
 import DropdownPicker from "../../common/DropdownPicker";
 import { ScrollView } from "react-native-gesture-handler";
-
+import ImageViewer from "../../common/ImageViwer";
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const pageHeight = Dimensions.get("screen").height;
 const pageWidth = Dimensions.get("screen").width;
@@ -46,17 +48,24 @@ const History = ({ navigation }) => {
     const [searchText, setSearchText] = useState("");
     const [readyToSendListLoading, setReadyToSendListLoading] = useState(false);
     const [readyToSendList, setReadyToSendList] = useState([]);
+    const [constReadyToSendList, setConstReadyToSendList] = useState([]);
     const [availableObjectsList, setAvailableObjectsList] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deletingItem, setDeletingItem] = useState(null);
     const [showAddObjectModal, setShowAddObjectModal] = useState(false);
     const [newObject, setNewObject] = useState(null);
-    const [newObjectAvailableVersions, setNewObjectAvailableVersions] = useState([]);
+    const [finalSendLoading, setFinalSendLoading] = useState(false);
+    const [showFinalSendModal, setShowFinalSendModal] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [barnameNumber, setBarnameNumber] = useState("");
+    const [barnameImage, setBarnameImage] = useState("");
+    const [sendDescription, setSendDescription] = useState("");
     const versDropRef = useRef();
     const serDropRef = useRef();
 
     useEffect(() => {
         getReadyToSendRequests();
+        getHistory();
     }, [])
 
     const Separator = ({ color }) => <View style={[Styles.separator, { borderBottomColor: color }]} />;
@@ -234,6 +243,7 @@ const History = ({ navigation }) => {
 
                 });
                 setReadyToSendList(tempList);
+                setConstReadyToSendList(tempList);
                 setReadyToSendListLoading(false);
             } else if (data.errorCode === 3) {
                 dispatch({
@@ -364,12 +374,16 @@ const History = ({ navigation }) => {
             } else if (screenMode === "CRejected") {
                 let tmpList = constRejectedListByCompany.filter(item => item.ID.toString().includes(searchText));
                 setRejectedListByCompany(tmpList);
+            } else if (screenMode === "ReadyToSend") {
+                let tmpList = constReadyToSendList.filter(item => item.ID.toString().includes(searchText));
+                setReadyToSendList(tmpList);
             } else {
                 let tmpList = constRejectedListByMe.filter(item => item.ID.toString().includes(searchText));
                 setConstRejectedListByMe(tmpList);
             }
             setListLoading(false);
         } else {
+            setReadyToSendList(constReadyToSendList);
             getHistory();
         }
     }
@@ -496,16 +510,19 @@ const History = ({ navigation }) => {
                 }
             }
             setAvailableObjectsList(tempAvailable);
+            let removingCount = !!tempVerList[verIndex].Serial ? tempVerList[verIndex].SerialList.length : tempVerList[verIndex].Count;
             tempVerList.splice(verIndex, 1);
             if (tempVerList.length > 0) {
-                tempObj = { ...tempObj, Versions: tempVerList };
+                tempObj = { ...tempObj, Versions: tempVerList,  Total: tempObj.Total - removingCount};
                 tempReq.Objects[objIndex] = tempObj;
                 tempList[reqIndex] = tempReq;
                 setReadyToSendList(tempList);
+                setConstReadyToSendList(tempList);
             } else {
                 tempReq.Objects.splice(objIndex, 1);
                 tempList[reqIndex] = tempReq;
                 setReadyToSendList(tempList);
+                setConstReadyToSendList(tempList);
             }
         }
         else {
@@ -513,7 +530,6 @@ const History = ({ navigation }) => {
             let tempObjList = [...tempReq.Objects];
             let tmpObj = tempObjList[objIndex];
             let tempAvailable = [...availableObjectsList];
-
             let selectedObjIndex = undefined;
             if (hasSerial) {
                 tempAvailable.map((item, indx1) => {
@@ -571,12 +587,12 @@ const History = ({ navigation }) => {
             tempReq = { ...tempReq, Objects: tempObjList };
             tempList[reqIndex] = tempReq;
             setReadyToSendList(tempList);
+            setConstRejectedListByCompany(tempList);
         }
         setShowDeleteModal(false);
     }
 
     const handleAddItem = () => {
-        console.log("Kianaaaaa")
         const {
             obj,
             hasSerial,
@@ -584,13 +600,12 @@ const History = ({ navigation }) => {
             availableSerials,
             totalCount,
             selectedCount,
-            ver,
+            version,
             ser,
             broken,
             req
         } = newObject;
-        console.log("1111111",obj,  selectedCount, ver, ser, broken, req)
-        if (ser !== undefined && !selectedCount) {
+        if (ser === undefined && !selectedCount) {
             ToastAndroid.showWithGravity(
                 "درخواست شما مجاز نیست.",
                 ToastAndroid.SHORT,
@@ -602,14 +617,14 @@ const History = ({ navigation }) => {
             let selectedVersionIndex = undefined;
             if (hasSerial) {
                 let selectedSerialIndex = undefined;
-                tempAvailable.map((item, index)=>{
-                    if (item.Broken === broken && item.ObjectID === obj.ObjectID){
+                tempAvailable.map((item, index) => {
+                    if (item.Broken === broken && item.ObjectID === obj.ObjectID) {
                         selectedObjectIndex = index;
-                        item.Versions.map((vers, versIndex)=>{
-                            if (vers.VersionId === ver.VersionId){
+                        item.Versions.map((vers, versIndex) => {
+                            if (vers.VersionId === version.VersionId) {
                                 selectedVersionIndex = versIndex;
-                                vers.SerialList.map((serial, serialIndex)=>{
-                                    if (serial === ser){
+                                vers.serialList.map((serial, serialIndex) => {
+                                    if (serial === ser) {
                                         selectedSerialIndex = serialIndex;
                                     }
                                 })
@@ -617,20 +632,20 @@ const History = ({ navigation }) => {
                         })
                     }
                 });
-                tempAvailable[selectedObjectIndex].Versions[selectedVersionIndex].SerialList.splice(selectedSerialIndex,1);
+                tempAvailable[selectedObjectIndex].Versions[selectedVersionIndex].serialList.splice(selectedSerialIndex, 1);
                 setAvailableObjectsList(tempAvailable);
                 let tempReady = [...readyToSendList];
                 let selectedReqIndex = undefined;
                 let selectedObjIndexInReady = undefined;
                 let selectedVerIndexInReady = undefined;
-                tempReady.map((item, itemIndex)=>{
-                    if (item.ID === req.ID){
+                tempReady.map((item, itemIndex) => {
+                    if (item.ID === req.ID) {
                         selectedReqIndex = itemIndex;
-                        item.Objects.map((object, objIndex)=>{
-                            if (object.ObjectID === obj.ObjectID && object.Broken === broken){
+                        item.Objects.map((object, objIndex) => {
+                            if (object.ObjectID === obj.ObjectID && object.Broken === broken) {
                                 selectedObjIndexInReady = objIndex;
-                                object.Versions.map((verss, versIndex)=>{
-                                    if (verss.VersionId === ver.VersionId){
+                                object.Versions.map((verss, versIndex) => {
+                                    if (verss.VersionId === version.VersionId) {
                                         selectedVerIndexInReady = versIndex;
                                     }
                                 })
@@ -638,25 +653,27 @@ const History = ({ navigation }) => {
                         })
                     }
                 });
-                if (selectedVerIndexInReady !== undefined){
-                    tempReady[selectedReqIndex].Objects[selectedObjIndexInReady].Versions[selectedVerIndexInReady].serialList.push(ser);
-                } else if (selectedObjIndexInReady !== undefined){
+                if (selectedVerIndexInReady !== undefined) {
+                    tempReady[selectedReqIndex].Objects[selectedObjIndexInReady].Versions[selectedVerIndexInReady].SerialList.push(ser);
+                    tempReady[selectedReqIndex].Objects[selectedObjIndexInReady].Total += 1;
+                } else if (selectedObjIndexInReady !== undefined) {
                     tempReady[selectedReqIndex].Objects[selectedObjIndexInReady].Versions.push({
-                        ...ver, SerialList: [ser]
+                        ...version, SerialList: [ser]
                     });
                 } else {
                     tempReady[selectedReqIndex].Objects.push({
-                        ...obj, Versions:[{...ver, SerialList: [ser]}]
+                        ...obj, Total:1, Versions: [{ ...version, SerialList: [ser] }]
                     });
                 }
                 setReadyToSendList(tempReady);
+                setConstReadyToSendList(tempReady);
             }
             else {
-                tempAvailable.map((item, index)=>{
-                    if (item.Broken === broken && item.ObjectID === obj.ObjectID){
+                tempAvailable.map((item, index) => {
+                    if (item.Broken === broken && item.ObjectID === obj.ObjectID) {
                         selectedObjectIndex = index;
-                        item.Versions.map((vers, versIndex)=>{
-                            if (vers.VersionId === ver.VersionId){
+                        item.Versions.map((vers, versIndex) => {
+                            if (vers.VersionId === version.VersionId) {
                                 selectedVersionIndex = versIndex;
                             }
                         })
@@ -669,14 +686,14 @@ const History = ({ navigation }) => {
                 let selectedReqIndex = undefined;
                 let selectedObjIndexInReady = undefined;
                 let selectedVerIndexInReady = undefined;
-                tempReady.map((item, itemIndex)=>{
-                    if (item.ID === req.ID){
+                tempReady.map((item, itemIndex) => {
+                    if (item.ID === req.ID) {
                         selectedReqIndex = itemIndex;
-                        item.Objects.map((object, objIndex)=>{
-                            if (object.ObjectID === obj.ObjectID && object.Broken === broken){
+                        item.Objects.map((object, objIndex) => {
+                            if (object.ObjectID === obj.ObjectID && object.Broken === broken) {
                                 selectedObjIndexInReady = objIndex;
-                                object.Versions.map((verss, versIndex)=>{
-                                    if (verss.VersionId === ver.VersionId){
+                                object.Versions.map((verss, versIndex) => {
+                                    if (verss.VersionId === version.VersionId) {
                                         selectedVerIndexInReady = versIndex;
                                     }
                                 })
@@ -684,27 +701,29 @@ const History = ({ navigation }) => {
                         })
                     }
                 });
-                if (selectedVerIndexInReady !== undefined){
+                if (selectedVerIndexInReady !== undefined) {
                     tempReady[selectedReqIndex].Objects[selectedObjIndexInReady].Versions[selectedVerIndexInReady].Count += selectedCount;
-                } else if (selectedObjIndexInReady !== undefined){
+                } else if (selectedObjIndexInReady !== undefined) {
                     tempReady[selectedReqIndex].Objects[selectedObjIndexInReady].Versions.push({
-                        ...ver, Count: selectedCount
+                        ...version, Count: selectedCount
                     });
                 } else {
                     tempReady[selectedReqIndex].Objects.push({
-                        ...obj, Total: selectedCount, Versions:[{...ver, Count: selectedCount}]
+                        ...obj, Total: selectedCount, Versions: [{ ...version, Count: selectedCount }]
                     });
                 }
                 setReadyToSendList(tempReady);
+                setConstReadyToSendList(tempReady);
             }
         }
-
+        setShowAddObjectModal(false);
+        setNewObject(null);
     }
 
     const handleSelectedNewObject = (item) => {
         let tmp = { ...newObject };
         tmp = {
-            ...tmp,
+            req: tmp.req,
             obj: item,
             hasSerial: !!item.Versions[0].Serial,
             availableVersions: item.Versions,
@@ -716,7 +735,7 @@ const History = ({ navigation }) => {
 
     const handleSelectNewObjectVersion = (item) => {
         let tempNEw = { ...newObject };
-        tempNEw = { ...tempNEw, version: item };
+        tempNEw = { ...tempNEw, version: item, ser: undefined, selectedCount: undefined, availableSerials: [], totalCount: undefined };
         if (!!newObject.hasSerial) {
             tempNEw = { ...tempNEw, availableSerials: item.serialList };
             serDropRef.current.setList(item.serialList);
@@ -724,6 +743,71 @@ const History = ({ navigation }) => {
             tempNEw = { ...tempNEw, totalCount: item.Count, selectedCount: 0 };
         }
         setNewObject(tempNEw);
+    }
+
+    const handleFinalSend = () => {
+        setFinalSendLoading(true);
+        let objectsList = [];
+        let reqIndex = 0;
+        readyToSendList.map((req, reqidx) => {
+            if (req.ID === selectedRequest.ID) {
+                reqIndex = reqidx;
+            }
+        })
+        readyToSendList[reqIndex].Objects.map(obj => {
+            if (!!obj.Versions[0].Serial) {
+                obj.Versions.map(vers => {
+                    vers.SerialList.map(serial => {
+                        objectsList.push({
+                            ObjectID: obj.ObjectID,
+                            VersionID: vers.VersionId,
+                            Serial: serial.Serial,
+                            Count: 1,
+                            Broken: obj.Broken
+                        });
+                    })
+                })
+            } else {
+                obj.Versions.map(vers => {
+                    objectsList.push({
+                        ObjectID: obj.ObjectID,
+                        VersionID: vers.VersionId,
+                        Serial: null,
+                        Count: vers.Count,
+                        Broken: obj.Broken
+                    })
+                })
+            }
+        })
+        sendObjects(selector.token, objectsList, selectedRequest.ID, sendDescription, barnameNumber, barnameImage).then(data => {
+            if (data.errorCode === 0) {
+                setFinalSendLoading(false);
+                setShowFinalSendModal(false);
+                ToastAndroid.showWithGravity(
+                    data.message,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                );
+                setBarnameImage("");
+                setBarnameNumber("");
+                setSendDescription("");
+                setSelectedRequest(null);
+                getReadyToSendList();
+            } else if (data.errorCode === 3) {
+                dispatch({
+                    type: LOGOUT,
+                });
+                setFinalSendLoading(false);
+                navigation.navigate('SignedOut');
+            } else {
+                ToastAndroid.showWithGravity(
+                    data.message,
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER,
+                );
+                setFinalSendLoading(false);
+            }
+        })
     }
 
     return (
@@ -836,7 +920,7 @@ const History = ({ navigation }) => {
                 <View style={{ flex: 1, justifyContent: "center", alignItem: "center" }}>
                     <ActivityIndicator color={"#660000"} size={"large"} />
                 </View>
-            ) : (<FlatList style={{ flex: 1, paddingHorizontal: 10 }} data={
+            ) : (<FlatList style={{ flex: 1, paddingHorizontal: 10, }} data={
                 screenMode === "ReadyToSend" ? readyToSendList :
                     screenMode === "History" ? historyCardsList :
                         screenMode === "CRejected" ? rejectedListByCompany : rejectedListByMe}
@@ -892,6 +976,7 @@ const History = ({ navigation }) => {
                                                         alignItems: "center",
                                                         marginRight: 5
                                                     }} onPress={() => {
+                                                        console.log("kiana22")
                                                         setDeletingItem({
                                                             reqIndex: index,
                                                             objIndex: objIndex,
@@ -966,6 +1051,7 @@ const History = ({ navigation }) => {
                                                                 alignItems: "center",
                                                                 marginRight: 5
                                                             }} onPress={() => {
+                                                                console.log("kiana444")
                                                                 setDeletingItem({
                                                                     reqIndex: index,
                                                                     objIndex: objIndex,
@@ -997,13 +1083,30 @@ const History = ({ navigation }) => {
                                     <View style={{
                                         width: "100%",
                                         height: pageHeight * 0.08,
-                                        justifyContent: "center",
-                                        alignItems: "center"
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        flexDirection: "row",
+                                        paddingHorizontal: 20
                                     }}>
                                         <TouchableOpacity style={{
                                             height: pageHeight * 0.06,
-                                            width: pageHeight * 0.06,
-                                            borderRadius: pageHeight * 0.03,
+                                            width: pageHeight * 0.12,
+                                            borderRadius: 8,
+                                            backgroundColor: '#660000',
+                                            justifyContent: "center",
+                                            alignItems: "center"
+                                        }} onPress={() => {
+                                            setSelectedRequest(item);
+                                            setShowFinalSendModal(true);
+                                        }}>
+                                            <Text style={{ color: "#fff", fontFamily: "IRANSansMobile_Light" }}>
+                                                تایید نهایی
+                                            </Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{
+                                            height: pageHeight * 0.06,
+                                            width: pageHeight * 0.12,
+                                            borderRadius: 8,
                                             backgroundColor: '#660000',
                                             justifyContent: "center",
                                             alignItems: "center"
@@ -1013,9 +1116,9 @@ const History = ({ navigation }) => {
                                             });
                                             setShowAddObjectModal(true);
                                         }}>
-                                            {PlusIcon({
-                                                color: "#fff"
-                                            })}
+                                            <Text style={{ color: "#fff", fontFamily: "IRANSansMobile_Light" }}>
+                                                قطعه جدید
+                                            </Text>
                                         </TouchableOpacity>
                                     </View>
                                 </>
@@ -1182,8 +1285,15 @@ const History = ({ navigation }) => {
                                 </>
                             ) : null}
                         </View>
-                    )} />)}
-            {showDeleteModal || showAddObjectModal && (
+                    )}
+                ListEmptyComponent={() => (
+                    <View style={{height:pageHeight*0.4, flex: 1, justifyContent: "center", alignItems: "center" }}>
+                        <Text style={{ color: "#000", fontFamily: "IRANSansMobile_Light" }}>
+                            موردی یافت نشد.
+                            </Text>
+                    </View>
+                )} />)}
+            {(showDeleteModal || showAddObjectModal) && (
                 <View style={Styles.modalBackgroundStyle}>
                     {showDeleteModal ? (<View style={{
                         height: pageHeight * 0.35,
@@ -1245,6 +1355,7 @@ const History = ({ navigation }) => {
                                                 <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item.Object_Name}</Text>
                                             </TouchableOpacity>
                                         )}
+                                        hasSearchBox={false}
                                     />
                                 </View>
                                 <View style={{ marginVertical: 5 }}>
@@ -1267,6 +1378,8 @@ const History = ({ navigation }) => {
                                                 <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item.Version_Name}</Text>
                                             </TouchableOpacity>
                                         )}
+                                        hasSearchBox={false}
+
                                     />
                                 </View>
                                 {!!newObject && !!newObject.hasSerial ? (
@@ -1290,9 +1403,10 @@ const History = ({ navigation }) => {
                                                     <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item}</Text>
                                                 </TouchableOpacity>
                                             )}
+                                            hasSearchBox={false}asSearchBox={false}
                                         />
                                     </View>
-                                ) : !!newObject && !!newObject.obj && (
+                                ) : !!newObject && !!newObject.obj ? (
                                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                                         <TouchableOpacity style={Styles.plusButtonContainerStyle}
                                             onPress={() => {
@@ -1333,7 +1447,7 @@ const History = ({ navigation }) => {
                                         }}>
                                             تعداد :
                             </Text>
-                                    </View>)}
+                                    </View>) : null}
                                 <View style={[Styles.modalFooterContainerStyle, { marginTop: 15 }]}>
                                     <TouchableOpacity style={Styles.modalButtonStyle} onPress={() => {
                                         setNewObject(null);
@@ -1343,7 +1457,7 @@ const History = ({ navigation }) => {
                                             انصراف
                                         </Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={Styles.modalButtonStyle} onPress={()=>handleAddItem()}>
+                                    <TouchableOpacity style={Styles.modalButtonStyle} onPress={() => handleAddItem()}>
                                         <Text style={Styles.modalButtonTextStyle}>
                                             تایید
                                         </Text>
@@ -1352,6 +1466,111 @@ const History = ({ navigation }) => {
                             </ScrollView>
                         )}
                 </View>
+            )}
+            {showFinalSendModal && (
+                <View style={Styles.modalBackgroundStyle}>
+                    <ScrollView style={[Styles.modalContainerStyle, {
+                        height: !!barnameImage ? "70%" : "55%",
+                        top: !!barnameImage ? pageHeight * 0.04 : pageHeight * 0.08
+                    }]} contentContainerStyle={{ justifyContent: "center", alignSelf: "center", alignItems: 'center' }}>
+                        <View style={Styles.modalBodyContainerStyle2}>
+                            <Input label={"شماره بارنامه"} keyboardType={"numeric"}
+                                onChangeText={text => setBarnameNumber(text)} value={barnameNumber} />
+                            <View
+                                style={{
+                                    width: pageWidth * 0.8,
+                                    marginBottom: 10,
+                                    flexDirection: 'row',
+                                    justifyContent: 'flex-end',
+                                }}>
+                                <Text style={Styles.labelStyle}>توضیحات:</Text>
+                            </View>
+                            <TextInput
+                                style={Styles.descriptionInputStyle}
+                                onChangeText={text => {
+                                    setSendDescription(text)
+                                }}
+                                value={sendDescription}
+                                multiline
+                            />
+                            {!barnameImage &&
+                                <Text style={{ fontFamily: "IRANSansMobile_Light", marginTop: 5 }}>لطفا عکس بارنامه را بارگذاری
+                                کنید.</Text>}
+                            <View style={Styles.getImageContainerViewStyle}>
+                                {CameraIcon({
+                                    style: { marginHorizontal: 10 },
+                                    color: "#000",
+                                    onPress: () => {
+                                        launchCamera(
+                                            {
+                                                mediaType: 'photo',
+                                                includeBase64: true,
+                                                quality: 0.5
+                                            },
+                                            (response) => {
+                                                setBarnameImage(response.base64);
+                                            },
+                                        )
+                                    }
+                                })}
+                                {UploadFileIcon({
+                                    style: { marginHorizontal: 10 },
+                                    color: '#000',
+                                    onPress: () => {
+                                        launchImageLibrary(
+                                            {
+                                                mediaType: 'photo',
+                                                includeBase64: true,
+                                                quality: 0.5
+                                            },
+                                            (response) => {
+                                                setBarnameImage(response.base64);
+                                            },
+                                        )
+                                    }
+                                })}
+                                {!!barnameImage && DeleteIcon({
+                                    onPress: () => {
+                                        setBarnameImage("")
+                                    },
+                                    color: '#000',
+                                    style: { marginHorizontal: 10 }
+                                })}
+                            </View>
+                            {!!barnameImage && (
+                                <ImageViewer
+                                    width={pageWidth - 30}
+                                    height={pageHeight * 0.7}
+                                    imageUrl={`data:image/jpeg;base64,${barnameImage}`}
+                                />
+                            )}
+                        </View>
+                        {finalSendLoading ? (
+                            <View style={Styles.modalFooterContainerStyle}>
+                                <ActivityIndicator size={"small"} color={"#660000"} />
+                            </View>
+                        ) : (<View style={Styles.modalFooterContainerStyle}>
+                            <TouchableOpacity
+                                style={Styles.modalButtonStyle}
+                                onPress={() => {
+                                    setBarnameNumber("");
+                                    setBarnameImage("");
+                                    setSendDescription("");
+                                    setShowFinalSendModal(false)
+                                }}>
+                                <Text style={Styles.modalButtonTextStyle}>انصراف</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={Styles.modalButtonStyle}
+                                onPress={() => {
+                                    handleFinalSend()
+                                }}>
+                                <Text style={Styles.modalButtonTextStyle}>تایید</Text>
+                            </TouchableOpacity>
+                        </View>)}
+                    </ScrollView>
+                </View>
+
             )}
         </View>
     );
@@ -1548,6 +1767,26 @@ const Styles = StyleSheet.create({
         marginRight: 5,
         justifyContent: "center",
         alignItems: "center"
+    },
+    descriptionInputStyle: {
+        width: pageWidth * 0.8,
+        height: pageHeight * 0.15,
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 10,
+        textAlignVertical: 'top',
+        textAlign: 'right',
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        fontSize: normalize(13),
+        fontFamily: getFontsName('IRANSansMobile_Light'),
+    },
+    getImageContainerViewStyle: {
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        flexDirection: 'row',
+        alignSelf: "center",
+        marginVertical: 20
     },
 })
 

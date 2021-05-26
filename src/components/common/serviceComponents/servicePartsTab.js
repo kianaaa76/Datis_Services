@@ -605,6 +605,7 @@ const ServicePartsTab = ({
                     : 'قطعه مورد نظر خود را انتخاب کنید.'
                 }
                 listHeight={200}
+                hasSearchBox={true}
               />
               <Text
                 style={{
@@ -663,6 +664,7 @@ const ServicePartsTab = ({
                   refactorObjectListItems('tempVersion', item, Item.index)
                 }
                 listHeight={200}
+                hasSearchBox={true}
               />
               <Text style={Styles.labelStyle}>نسخه: </Text>
             </View>
@@ -1111,6 +1113,7 @@ const ServicePartsTab = ({
                         : 'قطعه مورد نظر خود را انتخاب کنید.'
                     }
                     listHeight={200}
+                    hasSearchBox={true}
                   />
                   <Text style={Styles.labelStyle}>نوع قطعه:</Text>
                 </View>
@@ -1171,6 +1174,7 @@ const ServicePartsTab = ({
                       })
                     }
                     listHeight={200}
+                    hasSearchBox={true}
                   />
                   <Text style={Styles.labelStyle}>نسخه: </Text>
                 </View>

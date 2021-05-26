@@ -14,7 +14,7 @@ import {normalize} from '../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 
 const DropdownPicker = forwardRef(
-  ({placeholder, list, onSelect, listHeight, opensList, itemIndex, renderItem}, ref) => {
+  ({placeholder, list, onSelect, listHeight, opensList, itemIndex, renderItem, hasSearchBox}, ref) => {
     const [listIsShown, setListIsShown] = useState(false);
     const [showingList, setShowingList] = useState(list);
     const [searchText, setSearchText] = useState('');
@@ -103,7 +103,7 @@ const DropdownPicker = forwardRef(
           {listIsShown && (
             <View style={[Styles.listContainerStyle, {height: listHeight}]}
             >
-              <View style={Styles.searchbarContainerStyle}>
+              {hasSearchBox && (<View style={Styles.searchbarContainerStyle}>
                 <TextInput
                   value={searchText}
                   placeholder={'جستجو کنید...'}
@@ -114,7 +114,7 @@ const DropdownPicker = forwardRef(
                   }}
                 />
                 {/* <FontAwesome name={"search"} style={Styles.searchIconStyle}/> */}
-              </View>
+              </View>)}
               <ScrollView
                 nestedScrollEnabled={true}
                 scrollEnabled={!!showingList.length}
