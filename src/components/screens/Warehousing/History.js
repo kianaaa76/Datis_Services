@@ -576,6 +576,7 @@ const History = ({ navigation }) => {
     }
 
     const handleAddItem = () => {
+        console.log("Kianaaaaa")
         const {
             obj,
             hasSerial,
@@ -583,11 +584,12 @@ const History = ({ navigation }) => {
             availableSerials,
             totalCount,
             selectedCount,
-            vverer,
+            ver,
             ser,
             broken,
             req
         } = newObject;
+        console.log("1111111",obj,  selectedCount, ver, ser, broken, req)
         if (ser !== undefined && !selectedCount) {
             ToastAndroid.showWithGravity(
                 "درخواست شما مجاز نیست.",
@@ -648,7 +650,8 @@ const History = ({ navigation }) => {
                     });
                 }
                 setReadyToSendList(tempReady);
-            } else {
+            }
+            else {
                 tempAvailable.map((item, index)=>{
                     if (item.Broken === broken && item.ObjectID === obj.ObjectID){
                         selectedObjectIndex = index;
@@ -712,8 +715,8 @@ const History = ({ navigation }) => {
     }
 
     const handleSelectNewObjectVersion = (item) => {
-        tempNEw = { ...newObject };
-        tempNEw = { ...tempNEw, vers: item };
+        let tempNEw = { ...newObject };
+        tempNEw = { ...tempNEw, version: item };
         if (!!newObject.hasSerial) {
             tempNEw = { ...tempNEw, availableSerials: item.serialList };
             serDropRef.current.setList(item.serialList);
@@ -1249,7 +1252,7 @@ const History = ({ navigation }) => {
                                         ref={versDropRef}
                                         list={!!newObject ? newObject.availableVersions : []}
                                         placeholder={
-                                            !!newObject && !!newObject.vers ? newObject.vers.Version_Name
+                                            !!newObject && !!newObject.version ? newObject.version.Version_Name
                                                 : 'نسخه مورد نظر خود را انتخاب کنید.'
                                         }
                                         listHeight={200}
@@ -1340,7 +1343,7 @@ const History = ({ navigation }) => {
                                             انصراف
                                         </Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={Styles.modalButtonStyle}>
+                                    <TouchableOpacity style={Styles.modalButtonStyle} onPress={()=>handleAddItem()}>
                                         <Text style={Styles.modalButtonTextStyle}>
                                             تایید
                                         </Text>
