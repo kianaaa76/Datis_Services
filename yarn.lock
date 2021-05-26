@@ -7166,10 +7166,10 @@ react-native-gesture-responder@^0.1.1:
   dependencies:
     react-timer-mixin "^0.13.3"
 
-react-native-image-picker@^3.3.2:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-3.3.2.tgz#dde494ce4fbb5c36a4ea56346b751b85223d6b25"
-  integrity sha512-7z902J7a7j2rUM6zzyLSGpBSDfXy/V9ssSDKV0QyoQpr7COZs3zsJye2PU1Z4TRqmuNtREIeG5m1NdwtpcXBkg==
+react-native-image-picker@^3.8.0:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-3.8.0.tgz#d6e9e46c060feae9e248843c0d22fd5f9ed78458"
+  integrity sha512-jlL8YdKBaN8OamKZZYWjjpgUEj4+VvMdnh69euUsUdKBu2iD9HTLQrC9NHVQ78p0fQ2YL3Gf4xNwMTDDFspNpA==
 
 react-native-iphone-x-helper@^1.2.1:
   version "1.2.1"

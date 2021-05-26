@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -11,14 +11,14 @@ import {
     ToastAndroid,
     ActivityIndicator
 } from 'react-native';
-import {getFontsName, normalize} from '../../utils/utilities';
+import { getFontsName, normalize } from '../../utils/utilities';
 import CheckBox from 'react-native-check-box';
 import Input from "../../common/Input";
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import ImageViewer from "../../common/ImageViwer";
-import {useSelector, useDispatch} from 'react-redux';
-import {garanteeInquiry, getInventoryObjects, sendUndoneObjects} from "../../../actions/api";
-import {LOGOUT} from "../../../actions/types";
+import { useSelector, useDispatch } from 'react-redux';
+import { garanteeInquiry, getInventoryObjects, sendUndoneObjects } from "../../../actions/api";
+import { LOGOUT } from "../../../actions/types";
 import {
     SearchIcon,
     PlusIcon,
@@ -33,7 +33,7 @@ import iterableToArray from "@babel/runtime/helpers/esm/iterableToArray";
 const pageHeight = Dimensions.get('screen').height;
 const pageWidth = Dimensions.get('screen').width;
 
-const WarehouseHandling = ({navigation, setTabIndex}) => {
+const WarehouseHandling = ({ navigation, setTabIndex }) => {
     const dispatch = useDispatch();
     const selector = useSelector(state => state);
     const [screenMode, setScreenMode] = useState("all");
@@ -49,7 +49,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
     // const [sendDescription, setSendDescription] = useState("");
     const [sendLoading, setSendLoading] = useState(false);
 
-    const Separator = () => <View style={Styles.separator}/>;
+    const Separator = () => <View style={Styles.separator} />;
 
     useEffect(() => {
         getInventory();
@@ -61,18 +61,18 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                 let tmp = [];
                 let idx = 0;
                 data.result.map(item => {
-                    let objct = selector.objectsList.filter(obj=> obj.value.Id === item.ObjectID);
+                    let objct = selector.objectsList.filter(obj => obj.value.Id === item.ObjectID);
                     let tempVersions = [];
-                    if (objct.length === 0){
+                    if (objct.length === 0) {
                         setInventoryLoading(false)
                     }
-                    if(!!objct[0].value.SerialFormat) {
+                    if (!!objct[0].value.SerialFormat) {
                         let currentVersion = item.Versions[0];
                         let serialList = [];
-                        item.Versions.map((I,index) => {
-                            if (index === item.Versions.length - 1){
-                                if (I.VersionId === currentVersion.VersionId){
-                                    serialList.push({Serial:I.Serial, isChecked: false})
+                        item.Versions.map((I, index) => {
+                            if (index === item.Versions.length - 1) {
+                                if (I.VersionId === currentVersion.VersionId) {
+                                    serialList.push({ Serial: I.Serial, isChecked: false })
                                     tempVersions.push({
                                         ...currentVersion, serialList: serialList, isChecked: false
                                     });
@@ -81,7 +81,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                                         ...currentVersion, serialList: serialList, isChecked: false
                                     })
                                     tempVersions.push({
-                                        ...I, serialList: [{Serial: I.Serial, isChecked: false}], isChecked: false
+                                        ...I, serialList: [{ Serial: I.Serial, isChecked: false }], isChecked: false
                                     });
                                 }
                             } else {
@@ -90,22 +90,22 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                                         ...currentVersion, serialList: serialList, isChecked: false
                                     });
                                     currentVersion = I;
-                                    serialList = [{Serial: I.Serial, isChecked: false}];
+                                    serialList = [{ Serial: I.Serial, isChecked: false }];
                                 } else {
-                                    serialList.push({Serial: I.Serial, isChecked: false});
+                                    serialList.push({ Serial: I.Serial, isChecked: false });
                                 }
                             }
                         });
-                        tmp.push({...item, ID: idx, Versions: tempVersions, isExpanded: false, isChecked: false, hasSerialFormat: true});
+                        tmp.push({ ...item, ID: idx, Versions: tempVersions, isExpanded: false, isChecked: false, hasSerialFormat: true });
                     }
                     else {
                         let currentVersion = item.Versions[0];
                         let totalCount = 0;
-                        item.Versions.map((I,index) => {
-                            if (index === item.Versions.length - 1){
-                                if (I.VersionId === currentVersion.VersionId){
+                        item.Versions.map((I, index) => {
+                            if (index === item.Versions.length - 1) {
+                                if (I.VersionId === currentVersion.VersionId) {
                                     tempVersions.push({
-                                        ...currentVersion, isChecked: false, Count: totalCount+I.Count, selectedCount: 0
+                                        ...currentVersion, isChecked: false, Count: totalCount + I.Count, selectedCount: 0
                                     });
                                 } else {
                                     tempVersions.push({
@@ -128,7 +128,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                                 }
                             }
                         });
-                        tmp.push({...item, ID: idx, isExpanded: false, isChecked: false, Versions: tempVersions, hasSerialFormat: false});
+                        tmp.push({ ...item, ID: idx, isExpanded: false, isChecked: false, Versions: tempVersions, hasSerialFormat: false });
                     }
                     idx += 1;
                 })
@@ -162,11 +162,11 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
         }
     };
 
-    const sendRequest = ()=>{
+    const sendRequest = () => {
         setSendLoading(true);
         let objectsList = [];
-        constList.map(obj=> {
-            if (obj.isChecked){
+        constList.map(obj => {
+            if (obj.isChecked) {
                 if (obj.hasSerialFormat) {
                     obj.Versions.map(vers => {
                         vers.serialList.map(serial => {
@@ -196,7 +196,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                 }
             }
         })
-        console.log("objectsList",objectsList);
+        console.log("objectsList", objectsList);
         sendUndoneObjects(selector.token, objectsList).then(data => {
             if (data.errorCode === 0) {
                 Toast.showWithGravity('درخواست شما با موفقیت ثبت شد.', Toast.LONG, Toast.CENTER);
@@ -231,7 +231,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                         if (screenMode !== "fail") {
                             let tmp = [...constList];
                             tmp.map((it, itIndex) => {
-                                tmp[itIndex] = {...it, isExpanded: false}
+                                tmp[itIndex] = { ...it, isExpanded: false }
                             })
                             setAllObjectsList(tmp);
                             setScreenMode("fail");
@@ -246,7 +246,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                         ناسالم
                     </Text>
                     <View
-                        style={screenMode === "fail" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle}/>
+                        style={screenMode === "fail" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle} />
                 </TouchableOpacity>
                 <TouchableOpacity
                     elevation={5}
@@ -259,7 +259,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                         if (screenMode !== "new") {
                             let tmp = [...constList];
                             tmp.map((it, itIndex) => {
-                                tmp[itIndex] = {...it, isExpanded: false}
+                                tmp[itIndex] = { ...it, isExpanded: false }
                             })
                             setAllObjectsList(tmp);
                             setScreenMode("new")
@@ -274,7 +274,7 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                         سالم
                     </Text>
                     <View
-                        style={screenMode === "new" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle}/>
+                        style={screenMode === "new" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle} />
                 </TouchableOpacity>
                 <TouchableOpacity
                     elevation={5}
@@ -285,13 +285,13 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                     }
                     onPress={() => {
                         if (screenMode !== "all") {
-                            if (!!searchText){
+                            if (!!searchText) {
                                 let tempList = constList.filter(item => item.Object_Name.toLowerCase().includes(searchText));
                                 setAllObjectsList(tempList);
                             } else {
                                 let tmp = [...constList];
                                 tmp.map((it, itIndex) => {
-                                    tmp[itIndex] = {...it, isExpanded: false}
+                                    tmp[itIndex] = { ...it, isExpanded: false }
                                 })
                                 setAllObjectsList(tmp);
                             }
@@ -307,10 +307,10 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                         همه
                     </Text>
                     <View
-                        style={screenMode === "all" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle}/>
+                        style={screenMode === "all" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle} />
                 </TouchableOpacity>
             </View>
-            {screenMode === "all" && (<View style={[Styles.searchbarContainerStyle, {elevation: renderConfirmModal ? 0 : 5}]}>
+            {screenMode === "all" && (<View style={[Styles.searchbarContainerStyle, { elevation: renderConfirmModal ? 0 : 5 }]}>
                 <TextInput
                     style={Styles.textinputStyle}
                     placeholder={"نام قطعه و نسخه را جستجو کنید..."}
@@ -332,15 +332,15 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                         ارسال
                     </Text>
                 </TouchableOpacity>
-                <View style={{flexDirection: "row"}}>
-                    <Text style={{fontFamily: 'IRANSansMobile_Light'}}>
+                <View style={{ flexDirection: "row" }}>
+                    <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>
                         انتخاب همه
                     </Text>
                     <CheckBox checkBoxColor={"#9C0000"} onClick={() => {
                         let currentList = [...allObjectsList];
                         let tempConstList = [...constList];
                         currentList.map((item, index) => {
-                            let index_in_constlist = constList.findIndex(x=> x.ID === item.ID);
+                            let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
                             if (screenMode === "all") {
                                 currentList[index] = {
                                     ...item, isChecked: allSelected !== "all"
@@ -421,258 +421,258 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
                         setAllObjectsList(currentList);
                         setConstList(tempConstList);
                         setHasToBeRefreshed(!hasToBeRefreshed);
-                    }} isChecked={allSelected === "all" ? true : allSelected === screenMode}/>
+                    }} isChecked={allSelected === "all" ? true : allSelected === screenMode} />
                 </View>
             </View>
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
                 {inventoryLoading ? (
-                    <ActivityIndicator color={"#660000"} size={"large"} style={{marginTop:pageHeight*0.2}}/>
+                    <ActivityIndicator color={"#660000"} size={"large"} style={{ marginTop: pageHeight * 0.2 }} />
                 ) : (
-                    <FlatList
-                        data={allObjectsList}
-                        renderItem={({item, index}) => screenMode === "all" || (screenMode === "new" && !!item.Broken) || (screenMode === "fail" && !item.Broken) ? (
-                            <View
-                                style={[Styles.cardHeaderStyle, {
-                                    backgroundColor: !!item.Broken ? "#90DA9F" : "#FF9999",
-                                }]}>
-                                <TouchableOpacity style={{
-                                    width: "100%",
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "space-around"
-                                }} onPress={() => {
-                                    let currentList = [...allObjectsList];
-                                    let tempConstList = [...constList];
-                                    let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
-                                    currentList[index] = {...item, isExpanded: !item.isExpanded};
-                                    tempConstList[index_in_constlist] = {...item, isExpanded: !item.isExpanded};
-                                    setAllObjectsList(currentList);
-                                    setConstList(tempConstList);
-                                    setHasToBeRefreshed(!hasToBeRefreshed);
-                                }
-                                }>
-                                    <Text style={[Styles.labelTextStyle,{fontSize:13}]}>
-                                        تعداد کل: {item.Total}
-                                    </Text>
-                                    <Text style={[Styles.labelTextStyle,{flexShrink:1, width:'55%', textAlign: "right", fontSize:13}]}>
-                                        نام
-                                        قطعه: {item.Object_Name}
-                                    </Text>
-                                    {((item.hasSerialFormat && item.Total > 0) || !item.hasSerialFormat) && (
-                                        <CheckBox checkBoxColor={'#9C0000'} isChecked={item.isChecked} onClick={() => {
-                                        let flag = false;
-                                        if (item.isChecked) {
-                                            flag = true;
-                                            if (allSelected === "all" && !!item.Broken) {
-                                                setAllSelected("fail");
-                                            } else if (allSelected === "all" && !item.Broken) {
-                                                setAllSelected("new");
-                                            } else {
-                                                setAllSelected('');
-                                            }
-                                        }
-                                        let currentList = [];
-                                        currentList = [...allObjectsList];
+                        <FlatList
+                            data={allObjectsList}
+                            renderItem={({ item, index }) => screenMode === "all" || (screenMode === "new" && !!item.Broken) || (screenMode === "fail" && !item.Broken) ? (
+                                <View
+                                    style={[Styles.cardHeaderStyle, {
+                                        backgroundColor: !!item.Broken ? "#90DA9F" : "#FF9999",
+                                    }]}>
+                                    <TouchableOpacity style={{
+                                        width: "100%",
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        justifyContent: "space-around"
+                                    }} onPress={() => {
+                                        let currentList = [...allObjectsList];
                                         let tempConstList = [...constList];
                                         let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
-                                        let ITEM_OBJECT_INVENTORY = currentList[index].Versions;
-                                        ITEM_OBJECT_INVENTORY.map((version, versionIndex) => {
-                                            if (currentList[index].hasSerialFormat) {
-                                                ITEM_OBJECT_INVENTORY[versionIndex].serialList.map((serial, serialIndex) => {
-                                                    ITEM_OBJECT_INVENTORY[versionIndex].serialList[serialIndex] = {
-                                                        ...serial,
-                                                        isChecked: !flag
-                                                    }
-                                                })
-                                            } else {
-                                                ITEM_OBJECT_INVENTORY[versionIndex].selectedCount = flag
-                                                    ? 0 : ITEM_OBJECT_INVENTORY[versionIndex].Count > 0
-                                                        ? ITEM_OBJECT_INVENTORY[versionIndex].Count :
-                                                        ITEM_OBJECT_INVENTORY[versionIndex].selectedCount;
-                                            }
-                                        })
-                                        currentList[index] = {
-                                            ...item, isChecked: !item.isChecked, Versions: ITEM_OBJECT_INVENTORY
-                                        };
-                                        tempConstList[index_in_constlist] = {
-                                            ...item, isChecked: !item.isChecked, Versions: ITEM_OBJECT_INVENTORY
-                                        };
+                                        currentList[index] = { ...item, isExpanded: !item.isExpanded };
+                                        tempConstList[index_in_constlist] = { ...item, isExpanded: !item.isExpanded };
                                         setAllObjectsList(currentList);
                                         setConstList(tempConstList);
                                         setHasToBeRefreshed(!hasToBeRefreshed);
-                                    }}/>)}
-                                </TouchableOpacity>
-                                {item.isExpanded && (
-                                    <>
-                                        <Separator/>
-                                        <View style={{width: '100%'}}>
-                                            {item.Versions.map((I, IIndex) => (
-                                                <View
-                                                    style={{
-                                                        flexDirection: 'row',
-                                                        alignItems: 'flex-start',
-                                                        marginBottom: 15,
-                                                        justifyContent: 'space-around',
-                                                    }}>
-                                                    {item.hasSerialFormat ? (
-                                                        <View>
-                                                            {I.serialList.map((serial, serialIndex) => (
-                                                                <View style={{
-                                                                    flexDirection: "row",
-                                                                    alignItems: "center"
-                                                                }}>
-                                                                    {item.Total > 0 && (<CheckBox checkBoxColor={'#9C0000'}
-                                                                               isChecked={serial.isChecked}
-                                                                               onClick={() => {
-                                                                                   let flag = false;
-                                                                                   if (serial.isChecked) {
-                                                                                       if (allSelected === "all" && !!item.Broken) {
-                                                                                           setAllSelected("fail");
-                                                                                       } else if (allSelected === "all" && !item.Broken) {
-                                                                                           setAllSelected("new");
-                                                                                       } else if (allSelected === "new" && !!item.Broken) {
-                                                                                           setAllSelected("");
-                                                                                       } else if (allSelected === "fail" && !item.Broken) {
-                                                                                           setAllSelected("");
-                                                                                       }
-                                                                                   } else {
-                                                                                       flag = true;
-                                                                                   }
-                                                                                   let currentList = [...I.serialList];
-                                                                                   currentList[serialIndex] = {
-                                                                                       ...serial,
-                                                                                       isChecked: !serial.isChecked
-                                                                                   }
-                                                                                   let LIST = [...allObjectsList];
-                                                                                   let tempConstList = [...constList];
-                                                                                   let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
-                                                                                   let tempObjectInventory = [...item.Versions];
-                                                                                   tempObjectInventory[IIndex] = {
-                                                                                       ...I, serialList: currentList
-                                                                                   };
-                                                                                   LIST[index].Versions.map((v, vIndex) => {
-                                                                                       v.serialList.map((s, sIndex) => {
-                                                                                           if (s.isChecked && (sIndex !== serialIndex || vIndex !== IIndex)) {
-                                                                                               flag = true;
-                                                                                           }
-                                                                                       })
-                                                                                   })
-                                                                                   LIST[index] = {
-                                                                                       ...item,
-                                                                                       Versions: tempObjectInventory,
-                                                                                       isChecked: flag
-                                                                                   };
-                                                                                   tempConstList[index_in_constlist] = {
-                                                                                       ...item,
-                                                                                       Versions: tempObjectInventory,
-                                                                                       isChecked: flag
-                                                                                   }
-                                                                                   setAllObjectsList(LIST);
-                                                                                   setConstList(tempConstList);
-                                                                                   setHasToBeRefreshed(!hasToBeRefreshed);
-                                                                               }}/>)}
-                                                                    <Text
-                                                                        style={Styles.labelTextStyle}>{serial.Serial}</Text>
+                                    }
+                                    }>
+                                        <Text style={[Styles.labelTextStyle, { fontSize: 13 }]}>
+                                            تعداد کل: {item.Total}
+                                        </Text>
+                                        <Text style={[Styles.labelTextStyle, { flexShrink: 1, width: '55%', textAlign: "right", fontSize: 13 }]}>
+                                            نام
+                                        قطعه: {item.Object_Name}
+                                        </Text>
+                                        {((item.hasSerialFormat && item.Total > 0) || !item.hasSerialFormat) && (
+                                            <CheckBox checkBoxColor={'#9C0000'} isChecked={item.isChecked} onClick={() => {
+                                                let flag = false;
+                                                if (item.isChecked) {
+                                                    flag = true;
+                                                    if (allSelected === "all" && !!item.Broken) {
+                                                        setAllSelected("fail");
+                                                    } else if (allSelected === "all" && !item.Broken) {
+                                                        setAllSelected("new");
+                                                    } else {
+                                                        setAllSelected('');
+                                                    }
+                                                }
+                                                let currentList = [];
+                                                currentList = [...allObjectsList];
+                                                let tempConstList = [...constList];
+                                                let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
+                                                let ITEM_OBJECT_INVENTORY = currentList[index].Versions;
+                                                ITEM_OBJECT_INVENTORY.map((version, versionIndex) => {
+                                                    if (currentList[index].hasSerialFormat) {
+                                                        ITEM_OBJECT_INVENTORY[versionIndex].serialList.map((serial, serialIndex) => {
+                                                            ITEM_OBJECT_INVENTORY[versionIndex].serialList[serialIndex] = {
+                                                                ...serial,
+                                                                isChecked: !flag
+                                                            }
+                                                        })
+                                                    } else {
+                                                        ITEM_OBJECT_INVENTORY[versionIndex].selectedCount = flag
+                                                            ? 0 : ITEM_OBJECT_INVENTORY[versionIndex].Count > 0
+                                                                ? ITEM_OBJECT_INVENTORY[versionIndex].Count :
+                                                                ITEM_OBJECT_INVENTORY[versionIndex].selectedCount;
+                                                    }
+                                                })
+                                                currentList[index] = {
+                                                    ...item, isChecked: !item.isChecked, Versions: ITEM_OBJECT_INVENTORY
+                                                };
+                                                tempConstList[index_in_constlist] = {
+                                                    ...item, isChecked: !item.isChecked, Versions: ITEM_OBJECT_INVENTORY
+                                                };
+                                                setAllObjectsList(currentList);
+                                                setConstList(tempConstList);
+                                                setHasToBeRefreshed(!hasToBeRefreshed);
+                                            }} />)}
+                                    </TouchableOpacity>
+                                    {item.isExpanded && (
+                                        <>
+                                            <Separator />
+                                            <View style={{ width: '100%' }}>
+                                                {item.Versions.map((I, IIndex) => (
+                                                    <View
+                                                        style={{
+                                                            flexDirection: 'row',
+                                                            alignItems: 'flex-start',
+                                                            marginBottom: 15,
+                                                            justifyContent: 'space-around',
+                                                        }}>
+                                                        {item.hasSerialFormat ? (
+                                                            <View>
+                                                                {I.serialList.map((serial, serialIndex) => (
+                                                                    <View style={{
+                                                                        flexDirection: "row",
+                                                                        alignItems: "center"
+                                                                    }}>
+                                                                        {item.Total > 0 && (<CheckBox checkBoxColor={'#9C0000'}
+                                                                            isChecked={serial.isChecked}
+                                                                            onClick={() => {
+                                                                                let flag = false;
+                                                                                if (serial.isChecked) {
+                                                                                    if (allSelected === "all" && !!item.Broken) {
+                                                                                        setAllSelected("fail");
+                                                                                    } else if (allSelected === "all" && !item.Broken) {
+                                                                                        setAllSelected("new");
+                                                                                    } else if (allSelected === "new" && !!item.Broken) {
+                                                                                        setAllSelected("");
+                                                                                    } else if (allSelected === "fail" && !item.Broken) {
+                                                                                        setAllSelected("");
+                                                                                    }
+                                                                                } else {
+                                                                                    flag = true;
+                                                                                }
+                                                                                let currentList = [...I.serialList];
+                                                                                currentList[serialIndex] = {
+                                                                                    ...serial,
+                                                                                    isChecked: !serial.isChecked
+                                                                                }
+                                                                                let LIST = [...allObjectsList];
+                                                                                let tempConstList = [...constList];
+                                                                                let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
+                                                                                let tempObjectInventory = [...item.Versions];
+                                                                                tempObjectInventory[IIndex] = {
+                                                                                    ...I, serialList: currentList
+                                                                                };
+                                                                                LIST[index].Versions.map((v, vIndex) => {
+                                                                                    v.serialList.map((s, sIndex) => {
+                                                                                        if (s.isChecked && (sIndex !== serialIndex || vIndex !== IIndex)) {
+                                                                                            flag = true;
+                                                                                        }
+                                                                                    })
+                                                                                })
+                                                                                LIST[index] = {
+                                                                                    ...item,
+                                                                                    Versions: tempObjectInventory,
+                                                                                    isChecked: flag
+                                                                                };
+                                                                                tempConstList[index_in_constlist] = {
+                                                                                    ...item,
+                                                                                    Versions: tempObjectInventory,
+                                                                                    isChecked: flag
+                                                                                }
+                                                                                setAllObjectsList(LIST);
+                                                                                setConstList(tempConstList);
+                                                                                setHasToBeRefreshed(!hasToBeRefreshed);
+                                                                            }} />)}
+                                                                        <Text
+                                                                            style={Styles.labelTextStyle}>{serial.Serial}</Text>
+                                                                    </View>
+                                                                ))}
+                                                            </View>
+                                                        ) : (
+                                                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                                    <TouchableOpacity style={Styles.plusButtonContainerStyle}
+                                                                        onPress={() => {
+                                                                            if (I.selectedCount < I.Count) {
+                                                                                let tempList = [...allObjectsList];
+                                                                                let tempConstList = [...constList];
+                                                                                let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
+                                                                                tempList[index].Versions[IIndex] = {
+                                                                                    ...I,
+                                                                                    selectedCount: I.Count
+                                                                                }
+                                                                                tempConstList[index_in_constlist].Versions[IIndex] = {
+                                                                                    ...I,
+                                                                                    selectedCount: I.selectedCount + 1
+                                                                                }
+                                                                                tempList[index] = { ...tempList[index], isChecked: true };
+                                                                                tempConstList[index_in_constlist] = { ...tempConstList[index_in_constlist], isChecked: true };
+                                                                                setAllObjectsList(tempList);
+                                                                                setConstList(tempConstList)
+                                                                                setHasToBeRefreshed(!hasToBeRefreshed);
+                                                                            }
+                                                                        }}>
+                                                                        {PlusIcon({
+                                                                            color: "#fff"
+                                                                        })}
+                                                                    </TouchableOpacity>
+                                                                    <Text style={{
+                                                                        textAlign: "center",
+                                                                        fontFamily: "IRANSansMobile_Medium"
+                                                                    }}>
+                                                                        از {I.Count}
+                                                                    </Text>
+                                                                    <Text style={{ marginHorizontal: 5 }}>
+                                                                        {I.selectedCount}
+                                                                    </Text>
+                                                                    <TouchableOpacity style={Styles.plusButtonContainerStyle}
+                                                                        onPress={() => {
+                                                                            if (I.selectedCount > 0) {
+                                                                                if (allSelected === "all") {
+                                                                                    if (!!item.type) {
+                                                                                        setAllSelected("fail");
+                                                                                    } else {
+                                                                                        setAllSelected("new");
+                                                                                    }
+                                                                                } else if (!!allSelected) {
+                                                                                    setAllSelected("");
+                                                                                }
+                                                                                let tempList = [...allObjectsList];
+                                                                                let tempConstList = [...constList];
+                                                                                let index_in_constlist = constList.findIndex(x => x.ID === item.ID);
+                                                                                tempList[index].isChecked = false;
+                                                                                tempConstList[index_in_constlist].isChecked = false;
+                                                                                ; tempList[index].Versions[IIndex] = {
+                                                                                    ...I,
+                                                                                    selectedCount: I.selectedCount - 1
+                                                                                }
+                                                                                tempConstList[index_in_constlist].Versions[IIndex] = {
+                                                                                    ...I,
+                                                                                    selectedCount: I.selectedCount - 1
+                                                                                };
+                                                                                let check_flag = false;
+                                                                                tempList[index].Versions.map(v => {
+                                                                                    if (v.selectedCount > 0) {
+                                                                                        check_flag = true;
+                                                                                    }
+                                                                                })
+                                                                                tempList[index] = { ...tempList[index], isChecked: check_flag };
+                                                                                tempConstList[index_in_constlist] = { ...tempConstList[index_in_constlist], isChecked: check_flag };
+                                                                                setConstList(tempConstList);
+                                                                                setAllObjectsList(tempList);
+                                                                                setHasToBeRefreshed(!hasToBeRefreshed);
+                                                                            }
+                                                                        }}>
+                                                                        {MinusIcon({
+                                                                            color: "#fff"
+                                                                        })}
+                                                                    </TouchableOpacity>
+                                                                    <Text style={{
+                                                                        textAlign: "center",
+                                                                        fontFamily: "IRANSansMobile_Medium"
+                                                                    }}>
+                                                                        تعداد :
+                                                            </Text>
                                                                 </View>
-                                                            ))}
-                                                        </View>
-                                                    ) : (
-                                                        <View style={{flexDirection: "row", alignItems: "center"}}>
-                                                            <TouchableOpacity style={Styles.plusButtonContainerStyle}
-                                                                              onPress={() => {
-                                                                                  if (I.selectedCount < I.Count){
-                                                                                      let tempList = [...allObjectsList];
-                                                                                      let tempConstList = [...constList];
-                                                                                      let index_in_constlist = constList.findIndex(x=>x.ID === item.ID);
-                                                                                      tempList[index].Versions[IIndex] = {
-                                                                                          ...I,
-                                                                                          selectedCount: I.Count
-                                                                                      }
-                                                                                      tempConstList[index_in_constlist].Versions[IIndex] = {
-                                                                                          ...I,
-                                                                                          selectedCount: I.selectedCount + 1
-                                                                                      }
-                                                                                      tempList[index]={...tempList[index], isChecked: true};
-                                                                                      tempConstList[index_in_constlist]={...tempConstList[index_in_constlist], isChecked: true};
-                                                                                      setAllObjectsList(tempList);
-                                                                                      setConstList(tempConstList)
-                                                                                      setHasToBeRefreshed(!hasToBeRefreshed);
-                                                                                  }
-                                                                              }}>
-                                                                {PlusIcon({
-                                                                    color: "#fff"
-                                                                })}
-                                                            </TouchableOpacity>
-                                                            <Text style={{
-                                                                textAlign: "center",
-                                                                fontFamily: "IRANSansMobile_Medium"
-                                                            }}>
-                                                                از {I.Count}
-                                                            </Text>
-                                                            <Text style={{marginHorizontal: 5}}>
-                                                                {I.selectedCount}
-                                                            </Text>
-                                                            <TouchableOpacity style={Styles.plusButtonContainerStyle}
-                                                                              onPress={() => {
-                                                                                  if (I.selectedCount > 0) {
-                                                                                      if (allSelected === "all") {
-                                                                                          if (!!item.type) {
-                                                                                              setAllSelected("fail");
-                                                                                          } else {
-                                                                                              setAllSelected("new");
-                                                                                          }
-                                                                                      } else if (!!allSelected) {
-                                                                                          setAllSelected("");
-                                                                                      }
-                                                                                      let tempList = [...allObjectsList];
-                                                                                      let tempConstList = [...constList];
-                                                                                      let index_in_constlist = constList.findIndex(x=> x.ID === item.ID);
-                                                                                      tempList[index].isChecked = false;
-                                                                                      tempConstList[index_in_constlist].isChecked = false;
-;                                                                                      tempList[index].Versions[IIndex] = {
-                                                                                          ...I,
-                                                                                          selectedCount: I.selectedCount - 1
-                                                                                      }
-                                                                                      tempConstList[index_in_constlist].Versions[IIndex] = {
-                                                                                          ...I,
-                                                                                          selectedCount: I.selectedCount - 1
-                                                                                      };
-                                                                                        let check_flag = false;
-                                                                                      tempList[index].Versions.map(v=>{
-                                                                                          if (v.selectedCount>0){
-                                                                                              check_flag = true;
-                                                                                          }
-                                                                                      })
-                                                                                      tempList[index] = {...tempList[index], isChecked: check_flag};
-                                                                                      tempConstList[index_in_constlist] = {...tempConstList[index_in_constlist], isChecked: check_flag};
-                                                                                      setConstList(tempConstList);
-                                                                                      setAllObjectsList(tempList);
-                                                                                      setHasToBeRefreshed(!hasToBeRefreshed);
-                                                                                  }
-                                                                              }}>
-                                                                {MinusIcon({
-                                                                    color: "#fff"
-                                                                })}
-                                                            </TouchableOpacity>
-                                                            <Text style={{
-                                                                textAlign: "center",
-                                                                fontFamily: "IRANSansMobile_Medium"
-                                                            }}>
-                                                                تعداد :
-                                                            </Text>
-                                                        </View>
-                                                    )}
-                                                    <Text style={[Styles.labelTextStyle,{flexShrink:1, width:"40%"}]}>نام
+                                                            )}
+                                                        <Text style={[Styles.labelTextStyle, { flexShrink: 1, width: "40%" }]}>نام
                                                         نسخه: {I.Version_Name}</Text>
-                                                </View>
-                                            ))}
-                                        </View>
-                                    </>
-                                )}
-                            </View>
-                        ) : null}
-                    />
-                )}
+                                                    </View>
+                                                ))}
+                                            </View>
+                                        </>
+                                    )}
+                                </View>
+                            ) : null}
+                        />
+                    )}
             </View>
             {renderConfirmModal && (
                 // <View style={Styles.modalBackgroundStyle}>
@@ -783,22 +783,22 @@ const WarehouseHandling = ({navigation, setTabIndex}) => {
 
                 <View style={Styles.modalBackgroundStyle}>
                     <View style={{
-                        height: pageHeight*0.35,
-                        width: pageWidth*0.8,
-                        justifyContent:"space-around",
-                        alignItems:"center",
-                        backgroundColor:"#fff",
-                        position:"absolute",
-                        top:pageHeight*0.2,
-                        borderRadius:10,
+                        height: pageHeight * 0.35,
+                        width: pageWidth * 0.8,
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        backgroundColor: "#fff",
+                        position: "absolute",
+                        top: pageHeight * 0.2,
+                        borderRadius: 10,
                         paddingVertical: "10%"
                     }}>
-                        <Text style={{fontFamily:"IRANSansMobile_Medium"}}>آیا از ارسال درخواست خود اطمینان دارید؟</Text>
+                        <Text style={{ fontFamily: "IRANSansMobile_Medium" }}>آیا از ارسال درخواست خود اطمینان دارید؟</Text>
                         {sendLoading ? (
                             <View style={Styles.modalFooterContainerStyle}>
-                                <ActivityIndicator size={"small"} color={"#660000"}/>
+                                <ActivityIndicator size={"small"} color={"#660000"} />
                             </View>
-                        ) :(<View style={Styles.modalFooterContainerStyle}>
+                        ) : (<View style={Styles.modalFooterContainerStyle}>
                             <TouchableOpacity
                                 style={Styles.modalButtonStyle}
                                 onPress={() => {
@@ -999,13 +999,13 @@ const Styles = StyleSheet.create({
         marginVertical: 20
     },
     descriptionInputStyle: {
-        width: pageWidth*0.8,
+        width: pageWidth * 0.8,
         height: pageHeight * 0.15,
         borderWidth: 1,
         borderColor: '#000',
         borderRadius: 10,
         textAlignVertical: 'top',
-        textAlign:'right',
+        textAlign: 'right',
         paddingHorizontal: 15,
         paddingVertical: 5,
         fontSize: normalize(13),

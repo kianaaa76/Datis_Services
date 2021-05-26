@@ -14,7 +14,7 @@ import {normalize} from '../utils/utilities';
 const pageWidth = Dimensions.get('screen').width;
 
 const DropdownPicker = forwardRef(
-  ({placeholder, list, onSelect, listHeight, opensList, itemIndex}, ref) => {
+  ({placeholder, list, onSelect, listHeight, opensList, itemIndex, renderItem}, ref) => {
     const [listIsShown, setListIsShown] = useState(false);
     const [showingList, setShowingList] = useState(list);
     const [searchText, setSearchText] = useState('');
@@ -96,7 +96,7 @@ const DropdownPicker = forwardRef(
                 }
               setListIsShown(!listIsShown);
             }}>
-            <Text style={{color: '#000'}}>
+            <Text style={{color: '#000', fontFamily:'IRANSansMobile_Light'}}>
               {placeholder}
             </Text>
           </TouchableOpacity>
@@ -122,7 +122,7 @@ const DropdownPicker = forwardRef(
                 keyboardDismissMode="on-drag">
                 <FlatList
                   data={showingList}
-                  renderItem={item => renderListItem(item)}
+                  renderItem={item => !!renderItem ? renderItem(item) : renderListItem(item)}
                   ListEmptyComponent={() => (
                     <View
                       style={{
@@ -130,7 +130,7 @@ const DropdownPicker = forwardRef(
                         alignItems: 'center',
                         height: '100%',
                       }}>
-                      <Text>موردی یافت نشد.</Text>
+                      <Text style={{fontFamily:'IRANSansMobile_Light'}}>موردی یافت نشد.</Text>
                     </View>
                   )}
                 />
@@ -157,7 +157,8 @@ const Styles = StyleSheet.create({
     width: '100%',
     height: 50,
     textAlign:"right",
-    paddingHorizontal:10
+    paddingHorizontal:10,
+    fontFamily:'IRANSansMobile_Light'
   },
   listItemsContainerStyle: {
     flexDirection: 'row',
