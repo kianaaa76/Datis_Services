@@ -159,6 +159,8 @@ const RequestObject = ({navigation}) => {
                         </TouchableOpacity>
                         <Text
                             style={{
+                                width:"30%",
+                                flexShrink:1,
                                 color: '#660000',
                                 fontSize: normalize(12),
                                 textAlign: 'center',
@@ -168,6 +170,8 @@ const RequestObject = ({navigation}) => {
                         </Text>
                         <Text
                             style={{
+                                width:"40%",
+                                flexShrink:1,
                                 color: '#660000',
                                 fontSize: normalize(12),
                                 textAlign: 'center',
@@ -182,6 +186,7 @@ const RequestObject = ({navigation}) => {
                     <View style={Styles.bothOptionsContainerStyle}>
                         <View style={Styles.partTypeContainerStyle}>
                             <DropdownPicker
+                                hasSearchBox={true}
                                 list={partsListName}
                                 onSelect={value => {
                                     refactorObjectListItems('tempPart', value, Item.index);
@@ -212,6 +217,7 @@ const RequestObject = ({navigation}) => {
                         </View>
                         <View style={Styles.partTypeContainerStyle}>
                             <DropdownPicker
+                                hasSearchBox={true}
                                 ref={dropRef}
                                 list={Item.availableVersions}
                                 placeholder={
@@ -347,10 +353,11 @@ const RequestObject = ({navigation}) => {
                 setRequestDescription("");
                 setObjectsList([]);
                 ToastAndroid.showWithGravity(
-                    "درخواست شما با موفقیت ثبت شد.",
+                    `درخواست شما با موفقیت ثبت شد. شماره پیگیری: ${data.result}`,
                     ToastAndroid.SHORT,
                     ToastAndroid.CENTER,
                 );
+                setRequestLoading(true);
             } else if (data.errorCode === 3){
                 dispatch({
                     type: LOGOUT,
@@ -392,6 +399,7 @@ const RequestObject = ({navigation}) => {
                                             availableVersions: value.value.Versions,
                                         });
                                         new_dropRef.current.setList(value.value.Versions);
+
                                     }}
                                     placeholder={
                                         !!fieldsObject.partTypeSelected.label
@@ -404,11 +412,13 @@ const RequestObject = ({navigation}) => {
                                             : 'قطعه مورد نظر خود را انتخاب کنید.'
                                     }
                                     listHeight={200}
+                                    hasSearchBox={true}
                                 />
                                 <Text style={Styles.labelStyle}>نوع قطعه:</Text>
                             </View>
                             <View style={Styles.partTypeContainerStyle}>
                                 <DropdownPicker
+                                    hasSearchBox={true}
                                     ref={new_dropRef}
                                     list={fieldsObject.availableVersions}
                                     placeholder={

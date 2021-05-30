@@ -27,7 +27,7 @@ import DropdownPicker from "../../common/DropdownPicker";
 import { ScrollView } from "react-native-gesture-handler";
 import ImageViewer from "../../common/ImageViwer";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-
+let hamedType = [];
 const pageHeight = Dimensions.get("screen").height;
 const pageWidth = Dimensions.get("screen").width;
 const History = ({ navigation }) => {
@@ -63,10 +63,14 @@ const History = ({ navigation }) => {
     const versDropRef = useRef();
     const serDropRef = useRef();
 
+    const getInitialData = async ()=>{
+        await getReadyToSendRequests()
+        // await getHistory();
+    }
+
     useEffect(() => {
-        getReadyToSendRequests();
-        getHistory();
-    }, [])
+        getInitialData();
+    }, []);
 
     const Separator = ({ color }) => <View style={[Styles.separator, { borderBottomColor: color }]} />;
 
@@ -243,8 +247,10 @@ const History = ({ navigation }) => {
 
                 });
                 setReadyToSendList(tempList);
+                hamedType = tempList;
                 setConstReadyToSendList(tempList);
                 setReadyToSendListLoading(false);
+                console.log("kianaaaa1111");
             } else if (data.errorCode === 3) {
                 dispatch({
                     type: LOGOUT,
@@ -259,15 +265,21 @@ const History = ({ navigation }) => {
                 );
                 setReadyToSendListLoading(false);
             }
+        }).then(()=>{
+            getHistory()
         })
     }
 
     const getHistory = () => {
+        let list1 = []
+        let list2 = []
+        let list3 = []
+        console.log("kianaaaa22222")
         setListLoading(true);
-        requestsHistory(selector.token).then(data => {
+        requestsHistory(selector.token).then(async data => {
             if (data.errorCode === 0) {
                 let tempList = [];
-                data.result.map((req, reqIndex) => {
+               await data.result.map((req, reqIndex) => {
                     let objectList = [];
                     req.Objects.map(obj => {
                         let serialList = [];
@@ -304,11 +316,11 @@ const History = ({ navigation }) => {
                     });
                     tempList.push({ ...req, Objects: objectList, isExpanded: false });
                 });
-                let list1 = []
-                let list2 = []
-                let list3 = []
-                tempList.map(item => {
+
+             await  tempList.map(item => {
+                 console.log(item.Type, item.State)
                     if (item.Type === 0 && item.State === 110) {
+                        console.log('sheytooon')
                         list1.push(item);
                     } else if (item.Type === 1 && item.State === 120) {
                         list2.push(item);
@@ -325,11 +337,6 @@ const History = ({ navigation }) => {
                 setHistoryList(tempList);
                 setConstHistoryList(tempList);
                 setListLoading(false);
-                if (list1.length === 0 && list2.length === 0) {
-                    setScreenMode("History");
-                } else if (list1.length === 0) {
-                    setScreenMode("MRejected");
-                }
             } else if (data.errorCode === 3) {
                 dispatch({
                     type: LOGOUT,
@@ -343,6 +350,18 @@ const History = ({ navigation }) => {
                     ToastAndroid.CENTER,
                 );
                 setListLoading(false);
+            }
+        }).then(()=>{
+            console.log(readyToSendList, '0')
+            if (list1.length === 0 && list2.length === 0 && hamedType.length === 0) {
+                console.log("1111111")
+                setScreenMode("History");
+            } else if (list1.length === 0 && hamedType.length === 0) {
+                console.log("222222")
+                setScreenMode("MRejected");
+            } else if (hamedType.length === 0){
+                console.log("333333")
+                setScreenMode("CRejected");
             }
         })
     };
@@ -874,7 +893,7 @@ const History = ({ navigation }) => {
                                 ? Styles.activeHeaderButtonTextStyle
                                 : Styles.deactiveHeaderButtonTextStyle
                         }>
-                        ناتمام
+                        بازگشت از شرکت
                     </Text>
                     <View
                         style={screenMode === "CRejected" ? Styles.activeRadioButtonStyle : Styles.deactiveRadioButtonStyle} />
@@ -1636,14 +1655,16 @@ const Styles = StyleSheet.create({
         width: '100%',
     },
     activeHeaderButtonStyle: {
-        width: '25%',
+        width: '18%',
+        flexShrink:1,
         height: '80%',
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: "row"
     },
     deactiveHeaderButtonStyle: {
-        width: '25%',
+        width: '18%',
+        flexShrink:1,
         height: '80%',
         justifyContent: 'center',
         alignItems: 'center',
@@ -1653,13 +1674,17 @@ const Styles = StyleSheet.create({
         fontFamily: 'IRANSansMobile',
         fontSize: normalize(15),
         color: '#9C0000',
-        textAlign: "center"
+        textAlign: "center",
+        // width:"20%",
+        // flexShrink:1
     },
     deactiveHeaderButtonTextStyle: {
         fontFamily: 'IRANSansMobile',
         fontSize: normalize(15),
         color: 'gray',
-        textAlign: "center"
+        textAlign: "center",
+        // width:"20%",
+        // flexShrink:1
     },
     activeRadioButtonStyle: {
         width: pageWidth * 0.05,
