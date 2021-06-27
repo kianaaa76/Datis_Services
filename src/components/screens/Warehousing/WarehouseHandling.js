@@ -456,7 +456,8 @@ const WarehouseHandling = ({ navigation, setTabIndex }) => {
                                         قطعه: {item.Object_Name}
                                         </Text>
                                         {((item.hasSerialFormat && item.Total > 0) || !item.hasSerialFormat) && (
-                                            <CheckBox checkBoxColor={'#9C0000'} isChecked={item.isChecked} onClick={() => {
+                                            <CheckBox checkBoxColor={'#9C0000'} isChecked={item.isChecked} style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }] }}
+                                                      onClick={() => {
                                                 let flag = false;
                                                 if (item.isChecked) {
                                                     flag = true;

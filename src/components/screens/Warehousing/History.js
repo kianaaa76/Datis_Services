@@ -23,10 +23,13 @@ import Input from "../../common/Input";
 import { LOGOUT } from "../../../actions/types";
 import { SearchIcon, ArrowDownIcon, ArrowUpIcon, PlusIcon, MinusIcon, CameraIcon, UploadFileIcon, DeleteIcon } from "../../../assets/icons/index";
 import { normalize, toEnglishDigit, toFaDigit, getFontsName } from "../../utils/utilities";
-import DropdownPicker from "../../common/DropdownPicker";
+// import DropdownPicker from "../../common/DropdownPicker";
+import DropDownPicker from "react-native-dropdown-picker";
 import { ScrollView } from "react-native-gesture-handler";
 import ImageViewer from "../../common/ImageViwer";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import Modal from 'react-native-modalbox';
+
 let hamedType = [];
 const pageHeight = Dimensions.get("screen").height;
 const pageWidth = Dimensions.get("screen").width;
@@ -60,12 +63,49 @@ const History = ({ navigation }) => {
     const [barnameNumber, setBarnameNumber] = useState("");
     const [barnameImage, setBarnameImage] = useState("");
     const [sendDescription, setSendDescription] = useState("");
-    const versDropRef = useRef();
-    const serDropRef = useRef();
+    const [openObjectDropDown, setOpenObjectDropDown] = useState(false);
+    const [openVersionDropDown, setOpenVersionDropDown] = useState(false);
+    const [openSerialDropDown, setOpenSerialDropDown] = useState(false);
+    const [newSelectedObject, setNewSelectedObject] = useState(null);
+    const [newSelectedVersion, setNewSelectedVersion] = useState(null);
+    const [newSelectedSerial, setNewSelectedSerial] = useState(null);
+    const [availableObjectVersion, setAvailableObjectVersion] = useState([])
+    const [availableVersionSerial, setAvailableVersionSerial] = useState([]);
+    const [newSelectedCount, setNewSelectedCount] = useState(0);
+    const [newTotalCount, setNewTotalCount] = useState(0);
+
+    useEffect(()=>{
+        if (!!newSelectedObject) {
+            let tempVersionList = [];
+            newSelectedObject.Versions.map(item => {
+                tempVersionList.push({
+                    label: String(item.VersionId) + ' / ' + item.Version_Name,
+                    value: item
+                });
+            });
+            setAvailableObjectVersion(tempVersionList);
+        }
+    },[newSelectedObject])
+
+    useEffect(()=>{
+        if (!!newSelectedObject && !!newSelectedVersion) {
+            if (newSelectedObject.hasSerialFormat) {
+                let tempSerialList = [];
+                newSelectedVersion.serialList.map(item => {
+                    tempSerialList.push({
+                        label: item,
+                        value: item
+                    });
+                });
+                setAvailableVersionSerial(tempSerialList);
+            } else {
+                setNewTotalCount(newSelectedVersion.Count);
+            }
+        }
+    },[newSelectedVersion, newSelectedObject]);
 
     const getInitialData = async ()=>{
         await getReadyToSendRequests()
-        // await getHistory();
     }
 
     useEffect(() => {
@@ -133,7 +173,6 @@ const History = ({ navigation }) => {
                             });
                             tempVersions.push(I);
                         }
-
                     } else {
                         if (I.VersionId !== currentVersion.VersionId) {
                             tempVersions.push({
@@ -155,7 +194,14 @@ const History = ({ navigation }) => {
             }
             idx += 1;
         });
-        return (tmp);
+        let finalTmp = [];
+        tmp.map(item=>{
+            finalTmp.push({
+                label: String(item.ObjectID) + ' / ' + item.Object_Name,
+                value: item
+            });
+        });
+        return (finalTmp);
     }
 
     const getReadyToSendRequests = () => {
@@ -465,9 +511,9 @@ const History = ({ navigation }) => {
                 let selectedObjIndex = undefined;
                 let selectedVerIndex = undefined;
                 tempAvailable.map((item, indx1) => {
-                    if (item.ObjectID === objId && item.Broken === broken) {
+                    if (item.value.ObjectID === objId && item.value.Broken === broken) {
                         selectedObjIndex = indx1;
-                        item.Versions.map((verItem, idx2) => {
+                        item.value.Versions.map((verItem, idx2) => {
                             if (verItem.VersionId === verId) {
                                 selectedVerIndex = idx2;
                             }
@@ -475,23 +521,26 @@ const History = ({ navigation }) => {
                     }
                 });
                 if (selectedObjIndex !== undefined && selectedVerIndex !== undefined) {
-                    tempVerList[verIndex].SerialList.map(serial => {
-                        tempAvailable[selectedObjIndex].Versions[selectedVerIndex].serialList.push(serial);
+                    tempVerList[verIndex].value.SerialList.map(serial => {
+                        tempAvailable[selectedObjIndex].value.Versions[selectedVerIndex].serialList.push(serial);
                     });
                 } else if (selectedObjIndex !== undefined) {
-                    tempAvailable[selectedObjIndex].Versions.push({
+                    tempAvailable[selectedObjIndex].value.Versions.push({
                         Count: 1,
-                        serialList: tempVerList[verIndex].serialList,
-                        Version_Id: tempVerList[verIndex].VersionId,
-                        Version_Name: tempVerList[verIndex].Version_Name
+                        serialList: tempVerList[verIndex].value.serialList,
+                        Version_Id: tempVerList[verIndex].value.VersionId,
+                        Version_Name: tempVerList[verIndex].value.Version_Name
                     });
                 } else {
                     tempAvailable.push({
-                        Broken: broken,
-                        ObjectID: tempObj.ObjectID,
-                        Object_Name: tempObj.Object_Name,
-                        Total: 1,
-                        Versions: tempObj.Versions
+                        label: String(tempObj.ObjectID) + ' / ' + tempObj.Object_Name,
+                        value: {
+                            Broken: broken,
+                            ObjectID: tempObj.ObjectID,
+                            Object_Name: tempObj.Object_Name,
+                            Total: 1,
+                            Versions: tempObj.Versions
+                        }
                     });
                 }
                 setAvailableObjectsList(tempAvailable);
@@ -500,9 +549,9 @@ const History = ({ navigation }) => {
                 let selectedObjIndex = undefined;
                 let selectedVerIndex = undefined;
                 tempAvailable.map((item, indx1) => {
-                    if (item.ObjectID === objId) {
+                    if (item.value.ObjectID === objId) {
                         selectedObjIndex = indx1;
-                        item.Versions.map((verItem, idx2) => {
+                        item.value.Versions.map((verItem, idx2) => {
                             if (verItem.VersionId === verId) {
                                 selectedVerIndex = idx2;
                             }
@@ -510,9 +559,9 @@ const History = ({ navigation }) => {
                     }
                 });
                 if (selectedObjIndex !== undefined && selectedVerIndex !== undefined) {
-                    tempAvailable[selectedObjIndex].Versions[selectedVerIndex].Count += tempVerList[verIndex].Count;
+                    tempAvailable[selectedObjIndex].value.Versions[selectedVerIndex].Count += tempVerList[verIndex].Count;
                 } else if (selectedObjIndex !== undefined) {
-                    tempAvailable[selectedObjIndex].Versions.push({
+                    tempAvailable[selectedObjIndex].value.Versions.push({
                         Count: tempVerList[verIndex].Count,
                         Serial: "",
                         Version_Id: tempVerList[verIndex].VersionId,
@@ -520,11 +569,14 @@ const History = ({ navigation }) => {
                     });
                 } else {
                     tempAvailable.push({
-                        Broken: broken,
-                        ObjectID: tempObj.ObjectID,
-                        Object_Name: tempObj.Object_Name,
-                        Total: 1,
-                        Versions: tempObj.Versions
+                        label:  String(tempObj.ObjectID) + ' / ' + tempObj.Object_Name,
+                        value: {
+                            Broken: broken,
+                            ObjectID: tempObj.ObjectID,
+                            Object_Name: tempObj.Object_Name,
+                            Total: 1,
+                            Versions: tempObj.Versions
+                        }
                     });
                 }
             }
@@ -547,58 +599,63 @@ const History = ({ navigation }) => {
         else {
             let tempReq = { ...readyToSendList[reqIndex] };
             let tempObjList = [...tempReq.Objects];
-            let tmpObj = tempObjList[objIndex];
+            let tmpObj = tempObjList[objIndex].value;
             let tempAvailable = [...availableObjectsList];
             let selectedObjIndex = undefined;
             if (hasSerial) {
                 tempAvailable.map((item, indx1) => {
-                    if (item.ObjectID === objId && item.Broken === broken) {
+                    if (item.value.ObjectID === objId && item.value.Broken === broken) {
                         selectedObjIndex = indx1;
                     }
                 });
                 if (selectedObjIndex !== undefined) {
                     let flag = false;
                     tmpObj.Versions.map(version => {
-                        tempAvailable[selectedObjIndex].Versions.map((ver, verIdx) => {
+                        tempAvailable[selectedObjIndex].value.Versions.map((ver, verIdx) => {
                             if (version.VersionId === ver.VersionId) {
                                 version.SerialList.map(serial => {
-                                    tempAvailable[selectedObjIndex].Versions[verIdx].serialList.push(serial);
+                                    tempAvailable[selectedObjIndex].value.Versions[verIdx].serialList.push(serial);
                                     flag = true;
                                 });
                             }
                         });
                         if (!flag) {
-                            tempAvailable[selectedObjIndex].Versions.push(version);
+                            tempAvailable[selectedObjIndex].value.Versions.push(version);
                         }
                     })
                     setAvailableObjectsList(tempAvailable);
                 } else {
-                    tempAvailable.push(tmpObj);
+                    tempAvailable.push({
+                        label: String(tmpObj.ObjectID) + ' / ' + tmpObj.Object_Name,
+                        value: tmpObj
+                    });
                     setAvailableObjectsList(tempAvailable);
                 }
             }
             else {
                 tempAvailable.map((item, indx1) => {
-                    if (item.ObjectID === objId && item.Broken === broken) {
+                    if (item.value.ObjectID === objId && item.value.Broken === broken) {
                         selectedObjIndex = indx1;
                     }
                 });
                 if (selectedObjIndex !== undefined) {
                     let flag = false;
                     tmpObj.Versions.map(version => {
-                        tempAvailable[selectedObjIndex].Versions.map((ver, verIdx) => {
+                        tempAvailable[selectedObjIndex].value.Versions.map((ver, verIdx) => {
                             if (version.VersionId === ver.VersionId) {
-                                tempAvailable[selectedObjIndex].Versions[verIdx].Count += version.Count;
+                                tempAvailable[selectedObjIndex].value.Versions[verIdx].Count += version.Count;
                                 flag = true;
                             }
                         });
                         if (!flag) {
-                            availableObjectsList[selectedObjIndex].Versions.push(version);
+                            availableObjectsList[selectedObjIndex].value.Versions.push(version);
                         }
                     })
                     setAvailableObjectsList(tempAvailable);
                 } else {
-                    tempAvailable.push(tmpObj);
+                    tempAvailable.push({
+                        label: String(tmpObj.ObjectID) + ' / ' + tmpObj.Object_Name,
+                        value: tmpObj});
                     setAvailableObjectsList(tempAvailable);
                 }
             }
@@ -637,9 +694,9 @@ const History = ({ navigation }) => {
             if (hasSerial) {
                 let selectedSerialIndex = undefined;
                 tempAvailable.map((item, index) => {
-                    if (item.Broken === broken && item.ObjectID === obj.ObjectID) {
+                    if (item.value.Broken === broken && item.value.ObjectID === obj.ObjectID) {
                         selectedObjectIndex = index;
-                        item.Versions.map((vers, versIndex) => {
+                        item.value.Versions.map((vers, versIndex) => {
                             if (vers.VersionId === version.VersionId) {
                                 selectedVersionIndex = versIndex;
                                 vers.serialList.map((serial, serialIndex) => {
@@ -651,7 +708,7 @@ const History = ({ navigation }) => {
                         })
                     }
                 });
-                tempAvailable[selectedObjectIndex].Versions[selectedVersionIndex].serialList.splice(selectedSerialIndex, 1);
+                tempAvailable[selectedObjectIndex].value.Versions[selectedVersionIndex].serialList.splice(selectedSerialIndex, 1);
                 setAvailableObjectsList(tempAvailable);
                 let tempReady = [...readyToSendList];
                 let selectedReqIndex = undefined;
@@ -689,17 +746,17 @@ const History = ({ navigation }) => {
             }
             else {
                 tempAvailable.map((item, index) => {
-                    if (item.Broken === broken && item.ObjectID === obj.ObjectID) {
+                    if (item.value.Broken === broken && item.value.ObjectID === obj.ObjectID) {
                         selectedObjectIndex = index;
-                        item.Versions.map((vers, versIndex) => {
+                        item.value.Versions.map((vers, versIndex) => {
                             if (vers.VersionId === version.VersionId) {
                                 selectedVersionIndex = versIndex;
                             }
                         })
                     }
                 });
-                let remained = tempAvailable[selectedObjectIndex].Versions[selectedVersionIndex].Count - selectedCount;
-                tempAvailable[selectedObjectIndex].Versions[selectedVersionIndex].Count = remained;
+                let remained = tempAvailable[selectedObjectIndex].value.Versions[selectedVersionIndex].Count - selectedCount;
+                tempAvailable[selectedObjectIndex].value.Versions[selectedVersionIndex].Count = remained;
                 setAvailableObjectsList(tempAvailable);
                 let tempReady = [...readyToSendList];
                 let selectedReqIndex = undefined;
@@ -737,31 +794,6 @@ const History = ({ navigation }) => {
         }
         setShowAddObjectModal(false);
         setNewObject(null);
-    }
-
-    const handleSelectedNewObject = (item) => {
-        let tmp = { ...newObject };
-        tmp = {
-            req: tmp.req,
-            obj: item,
-            hasSerial: !!item.Versions[0].Serial,
-            availableVersions: item.Versions,
-            broken: item.Broken
-        };
-        setNewObject(tmp);
-        versDropRef.current.setList(item.Versions);
-    }
-
-    const handleSelectNewObjectVersion = (item) => {
-        let tempNEw = { ...newObject };
-        tempNEw = { ...tempNEw, version: item, ser: undefined, selectedCount: undefined, availableSerials: [], totalCount: undefined };
-        if (!!newObject.hasSerial) {
-            tempNEw = { ...tempNEw, availableSerials: item.serialList };
-            serDropRef.current.setList(item.serialList);
-        } else {
-            tempNEw = { ...tempNEw, totalCount: item.Count, selectedCount: 0 };
-        }
-        setNewObject(tempNEw);
     }
 
     const handleFinalSend = () => {
@@ -1310,9 +1342,9 @@ const History = ({ navigation }) => {
                             </Text>
                     </View>
                 )} />)}
-            {(showDeleteModal || showAddObjectModal) && (
+            {showDeleteModal && (
                 <View style={Styles.modalBackgroundStyle}>
-                    {showDeleteModal ? (<View style={{
+                    <View style={{
                         height: pageHeight * 0.35,
                         width: pageWidth * 0.8,
                         justifyContent: "space-around",
@@ -1339,236 +1371,359 @@ const History = ({ navigation }) => {
                                 <Text style={Styles.modalButtonTextStyle}>تایید</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>) : (
-                            <ScrollView style={{
-                                width: pageWidth * 0.8,
-                                backgroundColor: "#fff",
-                                maxHeight: pageHeight * 0.6,
-                                position: "absolute",
-                                borderRadius: 10,
-                                top: pageHeight * 0.1,
-                                paddingTop: 10,
-                                paddingBottom: 30,
-                                flex: 1
-                            }} contentContainerStyle={{ alignItems: "center", justifyContent: "flex-start" }}>
-                                <View style={{ marginVertical: 5 }}>
-                                    <DropdownPicker
-                                        list={availableObjectsList}
-                                        placeholder={
-                                            !!newObject && !!newObject.obj ? newObject.obj.Object_Name
-                                                : 'قطعه مورد نظر خود را انتخاب کنید.'
-                                        }
-                                        listHeight={200}
-                                        renderItem={(item) => (
-                                            <TouchableOpacity
-                                                style={[Styles.objectlistItemsContainerStyle, {
-                                                    backgroundColor: !!item.item.Broken ? "#FF9999" : "#90DA9F"
-                                                }]}
-                                                onPress={() => {
-                                                    handleSelectedNewObject(item.item);
-                                                }}>
-                                                <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item.ObjectID}</Text>
-                                                <Text style={{ fontFamily: 'IRANSansMobile_Light' }}> / </Text>
-                                                <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item.Object_Name}</Text>
-                                            </TouchableOpacity>
-                                        )}
-                                        hasSearchBox={false}
-                                    />
-                                </View>
-                                <View style={{ marginVertical: 5 }}>
-                                    <DropdownPicker
-                                        ref={versDropRef}
-                                        list={!!newObject ? newObject.availableVersions : []}
-                                        placeholder={
-                                            !!newObject && !!newObject.version ? newObject.version.Version_Name
-                                                : 'نسخه مورد نظر خود را انتخاب کنید.'
-                                        }
-                                        listHeight={200}
-                                        renderItem={(item) => (
-                                            <TouchableOpacity
-                                                style={Styles.listItemsContainerStyle}
-                                                onPress={() => {
-                                                    handleSelectNewObjectVersion(item.item);
-                                                }}>
-                                                <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item.VersionId}</Text>
-                                                <Text style={{ fontFamily: 'IRANSansMobile_Light' }}> / </Text>
-                                                <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item.Version_Name}</Text>
-                                            </TouchableOpacity>
-                                        )}
-                                        hasSearchBox={false}
-
-                                    />
-                                </View>
-                                {!!newObject && !!newObject.hasSerial ? (
-                                    <View style={{ marginVertical: 5 }}>
-                                        <DropdownPicker
-                                            ref={serDropRef}
-                                            list={!!newObject ? newObject.availableSerials : []}
-                                            placeholder={
-                                                !!newObject && !!newObject.ser ? newObject.ser
-                                                    : 'سریال مورد نظر خود را انتخاب کنید.'
-                                            }
-                                            listHeight={200}
-                                            renderItem={(item) => (
-                                                <TouchableOpacity
-                                                    style={Styles.listItemsContainerStyle}
-                                                    onPress={() => {
-                                                        let tmp = { ...newObject };
-                                                        tmp = { ...tmp, ser: item.item }
-                                                        setNewObject(tmp);
-                                                    }}>
-                                                    <Text style={{ fontFamily: 'IRANSansMobile_Light' }}>{item.item}</Text>
-                                                </TouchableOpacity>
-                                            )}
-                                            hasSearchBox={false}asSearchBox={false}
-                                        />
-                                    </View>
-                                ) : !!newObject && !!newObject.obj ? (
-                                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                        <TouchableOpacity style={Styles.plusButtonContainerStyle}
-                                            onPress={() => {
-                                                if (newObject.selectedCount < newObject.totalCount) {
-                                                    let tmp = { ...newObject };
-                                                    tmp = { ...tmp, selectedCount: newObject.selectedCount + 1 }
-                                                    setNewObject(tmp);
-                                                }
-                                            }}>
-                                            {PlusIcon({
-                                                color: "#fff"
-                                            })}
-                                        </TouchableOpacity>
-                                        <Text style={{
-                                            textAlign: "center",
-                                            fontFamily: "IRANSansMobile_Light"
-                                        }}>
-                                            از {!!newObject.totalCount ? newObject.totalCount : null}
-                                        </Text>
-                                        <Text style={{ marginHorizontal: 5, fontFamily: "IRANSansMobile_Light" }}>
-                                            {newObject.selectedCount !== undefined ? newObject.selectedCount : null}
-                                        </Text>
-                                        <TouchableOpacity style={Styles.plusButtonContainerStyle}
-                                            onPress={() => {
-                                                if (newObject.selectedCount > 0) {
-                                                    let tmp = { ...newObject };
-                                                    tmp = { ...tmp, selectedCount: newObject.selectedCount - 1 }
-                                                    setNewObject(tmp);
-                                                }
-                                            }}>
-                                            {MinusIcon({
-                                                color: "#fff"
-                                            })}
-                                        </TouchableOpacity>
-                                        <Text style={{
-                                            textAlign: "center",
-                                            fontFamily: "IRANSansMobile_Light"
-                                        }}>
-                                            تعداد :
-                            </Text>
-                                    </View>) : null}
-                                <View style={[Styles.modalFooterContainerStyle, { marginTop: 15 }]}>
-                                    <TouchableOpacity style={Styles.modalButtonStyle} onPress={() => {
-                                        setNewObject(null);
-                                        setShowAddObjectModal(false);
-                                    }}>
-                                        <Text style={Styles.modalButtonTextStyle}>
-                                            انصراف
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={Styles.modalButtonStyle} onPress={() => handleAddItem()}>
-                                        <Text style={Styles.modalButtonTextStyle}>
-                                            تایید
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </ScrollView>
-                        )}
-                </View>
-            )}
-            {showFinalSendModal && (
-                <View style={Styles.modalBackgroundStyle}>
-                    <ScrollView style={[Styles.modalContainerStyle, {
-                        height: !!barnameImage ? "70%" : "55%",
-                        top: !!barnameImage ? pageHeight * 0.04 : pageHeight * 0.08
-                    }]} contentContainerStyle={{ justifyContent: "center", alignSelf: "center", alignItems: 'center' }}>
-                        <View style={Styles.modalBodyContainerStyle2}>
-                            <Input label={"شماره بارنامه"} keyboardType={"numeric"}
-                                onChangeText={text => setBarnameNumber(text)} value={barnameNumber} />
-                            <View
-                                style={{
-                                    width: pageWidth * 0.8,
-                                    marginBottom: 10,
-                                    flexDirection: 'row',
-                                    justifyContent: 'flex-end',
-                                }}>
-                                <Text style={Styles.labelStyle}>توضیحات:</Text>
-                            </View>
-                            <TextInput
-                                style={Styles.descriptionInputStyle}
-                                onChangeText={text => {
-                                    setSendDescription(text)
+                    </View>
+                </View>)}
+                <Modal
+                    style={Styles.modal}
+                    isOpen={showAddObjectModal}
+                    swipeToClose={()=>{
+                        setNewObject(null);
+                        setShowAddObjectModal(false);
+                    }}
+                    onClosed={()=>{
+                        setNewObject(null);
+                        setShowAddObjectModal(false);
+                    }}
+                    onOpened={()=>setShowAddObjectModal(true)}
+                    onClosingState={()=>{}}>
+                        <View style={{ marginVertical: 15, width:"90%" }}>
+                            <DropDownPicker
+                                dropDownDirection="BOTTOM"
+                                dropDownMaxHeight={200}
+                                dropDownStyle={{
+                                    height: 200,
                                 }}
-                                value={sendDescription}
-                                multiline
+                                dropDownContainerStyle={{
+                                    zIndex: 9999,
+                                    elevation:5
+                                }}
+                                style={{
+                                    borderWidth: 2,
+                                    borderColor: '#000',
+                                    borderRadius: 10,
+                                    backgroundColor: '#fff',
+                                    elevation:5,
+                                    zIndex: 9999
+                                }}
+                                showATickIcon={false}
+                                listMode="FLATLIST"
+                                placeholder="قطعه مورد نظر خود را انتخاب کنید."
+                                placeholderStyle={{
+                                    color: "grey",
+                                    textAlign: "right",
+                                    fontFamily: 'IRANSansMobile_Light'
+                                }}
+                                open={openObjectDropDown}
+                                value={newSelectedObject}
+                                items={availableObjectsList}
+                                setOpen={() => {
+                                    setOpenObjectDropDown(!openObjectDropDown);
+                                    setOpenVersionDropDown(false);
+                                    setOpenSerialDropDown(false);
+                                }}
+                                setValue={setNewSelectedObject}
+                                setItems={setAvailableObjectsList}
+                                itemSeparator={true}
+                                searchable={true}
+                                searchPlaceholder="جستجو کنید..."
+                                searchContainerStyle={{
+                                    height: 40,
+                                    padding: 0
+                                }}
+                                searchTextInputStyle={{
+                                    borderWidth: 0
+                                }}
+                                ListEmptyComponent={() => (
+                                    <View style={{
+                                        height: 40,
+                                        justifyContent: "center",
+                                        alignItems: "center"
+                                    }}>
+                                        <Text style={{
+                                            fontFamily: 'IRANSansMobile_Light'
+                                        }}>
+                                            {"موردی یافت نشد."}
+                                        </Text>
+                                    </View>
+                                )}
                             />
-                            {!barnameImage &&
-                                <Text style={{ fontFamily: "IRANSansMobile_Light", marginTop: 5 }}>لطفا عکس بارنامه را بارگذاری
-                                کنید.</Text>}
-                            <View style={Styles.getImageContainerViewStyle}>
-                                {CameraIcon({
-                                    style: { marginHorizontal: 10 },
-                                    color: "#000",
-                                    onPress: () => {
-                                        launchCamera(
-                                            {
-                                                mediaType: 'photo',
-                                                includeBase64: true,
-                                                quality: 0.5
-                                            },
-                                            (response) => {
-                                                setBarnameImage(response.base64);
-                                            },
-                                        )
-                                    }
-                                })}
-                                {UploadFileIcon({
-                                    style: { marginHorizontal: 10 },
-                                    color: '#000',
-                                    onPress: () => {
-                                        launchImageLibrary(
-                                            {
-                                                mediaType: 'photo',
-                                                includeBase64: true,
-                                                quality: 0.5
-                                            },
-                                            (response) => {
-                                                setBarnameImage(response.base64);
-                                            },
-                                        )
-                                    }
-                                })}
-                                {!!barnameImage && DeleteIcon({
-                                    onPress: () => {
-                                        setBarnameImage("")
-                                    },
-                                    color: '#000',
-                                    style: { marginHorizontal: 10 }
-                                })}
-                            </View>
-                            {!!barnameImage && (
-                                <ImageViewer
-                                    width={pageWidth - 30}
-                                    height={pageHeight * 0.7}
-                                    imageUrl={`data:image/jpeg;base64,${barnameImage}`}
-                                />
-                            )}
                         </View>
+                        <View style={{ marginVertical: 15, width:"90%" }}>
+                            <DropDownPicker
+                                dropDownDirection="BOTTOM"
+                                dropDownMaxHeight={200}
+                                dropDownStyle={{
+                                    height: 200,
+                                }}
+                                dropDownContainerStyle={{
+                                    zIndex: 9999,
+                                    elevation:5
+                                }}
+                                style={{
+                                    borderWidth: 2,
+                                    borderColor: '#000',
+                                    borderRadius: 10,
+                                    backgroundColor: '#fff',
+                                }}
+                                showATickIcon={false}
+                                listMode="FLATLIST"
+                                placeholder="نسخه مورد نظر خود را انتخاب کنید."
+                                placeholderStyle={{
+                                    color: "grey",
+                                    textAlign: "right",
+                                    fontFamily: 'IRANSansMobile_Light'
+                                }}
+                                open={openVersionDropDown}
+                                value={newSelectedVersion}
+                                items={availableObjectVersion}
+                                setOpen={() => {
+                                    setOpenVersionDropDown(!openVersionDropDown);
+                                    setOpenObjectDropDown(false);
+                                    setOpenSerialDropDown(false);
+                                }}
+                                setValue={setNewSelectedVersion}
+                                setItems={setAvailableObjectVersion}
+                                itemSeparator={true}
+                                searchable={true}
+                                searchPlaceholder="جستجو کنید..."
+                                searchContainerStyle={{
+                                    height: 40,
+                                    padding: 0
+                                }}
+                                searchTextInputStyle={{
+                                    borderWidth: 0
+                                }}
+                                ListEmptyComponent={() => (
+                                    <View style={{
+                                        height: 40,
+                                        justifyContent: "center",
+                                        alignItems: "center"
+                                    }}>
+                                        <Text style={{
+                                            fontFamily: 'IRANSansMobile_Light'
+                                        }}>
+                                            {"موردی یافت نشد."}
+                                        </Text>
+                                    </View>
+                                )}
+                            />
+                        </View>
+                        {!!newSelectedObject && !!newSelectedObject.hasSerialFormat ? (
+                            <View style={{ marginVertical:15, width:"90%" }}>
+                                <DropDownPicker
+                                    dropDownDirection="BOTTOM"
+                                    dropDownMaxHeight={200}
+                                    dropDownStyle={{
+                                        height: 200
+                                    }}
+                                    dropDownContainerStyle={{
+                                        zIndex: 9999,
+                                        elevation:5
+                                    }}
+                                    style={{
+                                        borderWidth: 2,
+                                        borderColor: '#000',
+                                        borderRadius: 10,
+                                        backgroundColor: '#fff',
+                                    }}
+                                    showATickIcon={false}
+                                    listMode="FLATLIST"
+                                    placeholder="سریال مورد نظر خود را انتخاب کنید."
+                                    placeholderStyle={{
+                                        color: "grey",
+                                        textAlign: "right",
+                                        fontFamily: 'IRANSansMobile_Light'
+                                    }}
+                                    open={openSerialDropDown}
+                                    value={newSelectedSerial}
+                                    items={availableVersionSerial}
+                                    setOpen={() => {
+                                        setOpenSerialDropDown(!openSerialDropDown)
+                                        setOpenObjectDropDown(false);
+                                        setOpenVersionDropDown(false);
+                                    }}
+                                    setValue={setNewSelectedSerial}
+                                    setItems={setAvailableVersionSerial}
+                                    itemSeparator={true}
+                                    searchable={true}
+                                    searchPlaceholder="جستجو کنید..."
+                                    searchContainerStyle={{
+                                        height: 40,
+                                        padding: 0
+                                    }}
+                                    searchTextInputStyle={{
+                                        borderWidth: 0
+                                    }}
+                                    ListEmptyComponent={() => (
+                                        <View style={{
+                                            height: 40,
+                                            justifyContent: "center",
+                                            alignItems: "center"
+                                        }}>
+                                            <Text style={{
+                                                fontFamily: 'IRANSansMobile_Light'
+                                            }}>
+                                                {"موردی یافت نشد."}
+                                            </Text>
+                                        </View>
+                                    )}
+                                />
+                            </View>
+                        ) : !!newSelectedObject ? (
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <TouchableOpacity style={Styles.plusButtonContainerStyle}
+                                    onPress={() => {
+                                        if (newSelectedCount < newTotalCount) {
+                                            let count = newSelectedCount + 1;
+                                            setNewSelectedCount(count);
+                                        }
+                                    }}>
+                                    {PlusIcon({
+                                        color: "#fff"
+                                    })}
+                                </TouchableOpacity>
+                                <Text style={{
+                                    textAlign: "center",
+                                    fontFamily: "IRANSansMobile_Light"
+                                }}>
+                                    از {!!newTotalCount ? newTotalCount : 0}
+                                </Text>
+                                <Text style={{ marginHorizontal: 5, fontFamily: "IRANSansMobile_Light" }}>
+                                    {!!newSelectedCount ? newSelectedCount : 0}
+                                </Text>
+                                <TouchableOpacity style={Styles.plusButtonContainerStyle}
+                                    onPress={() => {
+                                        if (newSelectedCount > 0) {
+                                            let count = newSelectedCount - 1;
+                                            setNewSelectedCount(count);
+                                        }
+                                    }}>
+                                    {MinusIcon({
+                                        color: "#fff"
+                                    })}
+                                </TouchableOpacity>
+                                <Text style={{
+                                    textAlign: "center",
+                                    fontFamily: "IRANSansMobile_Light"
+                                }}>
+                                    تعداد :
+                    </Text>
+                            </View>) : null}
+                        <View style={[Styles.modalFooterContainerStyle, { marginTop: 15 }]}>
+                            <TouchableOpacity style={Styles.modalButtonStyle} onPress={() => {
+                                setNewObject(null);
+                                setShowAddObjectModal(false);
+                            }}>
+                                <Text style={Styles.modalButtonTextStyle}>
+                                    انصراف
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={Styles.modalButtonStyle} onPress={() => handleAddItem()}>
+                                <Text style={Styles.modalButtonTextStyle}>
+                                    تایید
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                </Modal>
+                <Modal
+                    style={Styles.modal}
+                    isOpen={showFinalSendModal}
+                    swipeToClose={()=>{
+                        setBarnameNumber("");
+                        setBarnameImage("");
+                        setSendDescription("");
+                        setShowFinalSendModal(false)
+                    }}
+                    onClosed={()=>{
+                        setBarnameNumber("");
+                        setBarnameImage("");
+                        setSendDescription("");
+                        setShowFinalSendModal(false)
+                    }}
+                    onOpened={()=>setShowFinalSendModal(true)}
+                    onClosingState={()=>{}}>
+                    <ScrollView style={Styles.modalBodyContainerStyle2}>
+                        <View style={{ alignItems: 'center',
+                            justifyContent: 'center', width: '100%'}}>
+                        <Input label={"شماره بارنامه"} keyboardType={"numeric"}
+                               onChangeText={text => setBarnameNumber(text)} value={barnameNumber} />
+                        <View
+                            style={{
+                                width: pageWidth * 0.8,
+                                marginBottom: 10,
+                                flexDirection: 'row',
+                                justifyContent: 'flex-end',
+                            }}>
+                            <Text style={Styles.labelStyle}>توضیحات:</Text>
+                        </View>
+                        <TextInput
+                            style={Styles.descriptionInputStyle}
+                            onChangeText={text => {
+                                setSendDescription(text)
+                            }}
+                            value={sendDescription}
+                            multiline
+                        />
+                        {!barnameImage &&
+                        <Text style={{ fontFamily: "IRANSansMobile_Light", marginTop: 5 }}>لطفا عکس بارنامه را بارگذاری
+                            کنید.</Text>}
+                        <View style={Styles.getImageContainerViewStyle}>
+                            {CameraIcon({
+                                style: { marginHorizontal: 10 },
+                                color: "#000",
+                                onPress: () => {
+                                    launchCamera(
+                                        {
+                                            mediaType: 'photo',
+                                            includeBase64: true,
+                                            quality: 0.5
+                                        },
+                                        (response) => {
+                                            setBarnameImage(response.base64);
+                                        },
+                                    )
+                                }
+                            })}
+                            {UploadFileIcon({
+                                style: { marginHorizontal: 10 },
+                                color: '#000',
+                                onPress: () => {
+                                    launchImageLibrary(
+                                        {
+                                            mediaType: 'photo',
+                                            includeBase64: true,
+                                            quality: 0.5
+                                        },
+                                        (response) => {
+                                            setBarnameImage(response.base64);
+                                        },
+                                    )
+                                }
+                            })}
+                            {!!barnameImage && DeleteIcon({
+                                onPress: () => {
+                                    setBarnameImage("")
+                                },
+                                color: '#000',
+                                style: { marginHorizontal: 10 }
+                            })}
+                        </View>
+                        {!!barnameImage && (
+                            <ImageViewer
+                                width={pageWidth - 30}
+                                height={pageHeight * 0.7}
+                                imageUrl={`data:image/jpeg;base64,${barnameImage}`}
+                            />
+                        )}
                         {finalSendLoading ? (
                             <View style={Styles.modalFooterContainerStyle}>
                                 <ActivityIndicator size={"small"} color={"#660000"} />
                             </View>
                         ) : (<View style={Styles.modalFooterContainerStyle}>
                             <TouchableOpacity
-                                style={Styles.modalButtonStyle}
+                                style={[Styles.modalButtonStyle,{
+                                    elevation: !!openVersionDropDown || !!openObjectDropDown ? 0 : 5
+                                }]}
                                 onPress={() => {
                                     setBarnameNumber("");
                                     setBarnameImage("");
@@ -1578,17 +1733,19 @@ const History = ({ navigation }) => {
                                 <Text style={Styles.modalButtonTextStyle}>انصراف</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={Styles.modalButtonStyle}
+                                style={[Styles.modalButtonStyle,{
+                                    elevation: !!openVersionDropDown || !!openObjectDropDown ? 0 : 5
+                                }]}
                                 onPress={() => {
                                     handleFinalSend()
                                 }}>
                                 <Text style={Styles.modalButtonTextStyle}>تایید</Text>
                             </TouchableOpacity>
                         </View>)}
+                        </View>
                     </ScrollView>
-                </View>
 
-            )}
+                </Modal>
         </View>
     );
 }
@@ -1672,19 +1829,15 @@ const Styles = StyleSheet.create({
     },
     activeHeaderButtonTextStyle: {
         fontFamily: 'IRANSansMobile',
-        fontSize: normalize(15),
+        fontSize: normalize(12),
         color: '#9C0000',
         textAlign: "center",
-        // width:"20%",
-        // flexShrink:1
     },
     deactiveHeaderButtonTextStyle: {
         fontFamily: 'IRANSansMobile',
-        fontSize: normalize(15),
+        fontSize: normalize(12),
         color: 'gray',
         textAlign: "center",
-        // width:"20%",
-        // flexShrink:1
     },
     activeRadioButtonStyle: {
         width: pageWidth * 0.05,
@@ -1736,8 +1889,6 @@ const Styles = StyleSheet.create({
     },
     modalBodyContainerStyle2: {
         width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     modalButtonTextStyle: {
         color: 'white',
@@ -1751,13 +1902,14 @@ const Styles = StyleSheet.create({
         borderRadius: 7,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 5,
         marginHorizontal: 20
     },
     modalFooterContainerStyle: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 15
+        marginBottom: 15,
+        justifyContent:"space-around",
+        width:"60%"
     },
     listItemsContainerStyle: {
         flexDirection: 'row',
@@ -1810,6 +1962,14 @@ const Styles = StyleSheet.create({
         flexDirection: 'row',
         alignSelf: "center",
         marginVertical: 20
+    },
+    modal: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height:pageHeight*0.6,
+        marginTop:pageHeight*0.085,
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15
     },
 })
 

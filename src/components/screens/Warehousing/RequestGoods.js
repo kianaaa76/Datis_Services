@@ -11,8 +11,10 @@ import {
     TouchableHighlight,
     Alert,
     Keyboard,
-    ActivityIndicator
+    ActivityIndicator,
+    Button
 } from 'react-native';
+import Modal from 'react-native-modalbox';
 import {requestObject} from "../../../actions/api";
 import DropdownPicker from '../../common/DropdownPicker';
 import {useSelector} from 'react-redux';
@@ -33,6 +35,7 @@ const RequestObject = ({navigation}) => {
     });
     const dropRef = useRef();
     const new_dropRef = useRef();
+    const modalRef = useRef();
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
     const [partsListName] = useState(selector.objectsList);
     const [objectsList, setObjectsList] = useState([]);
@@ -41,6 +44,9 @@ const RequestObject = ({navigation}) => {
     const [openSendModal,setOpenSendModal] = useState(false);
     const [requestDescription, setRequestDescription] = useState("");
     const [requestLoading, setRequestLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [swipeToClose, setSwipeToClose] = useState(true);
+    const [sliderValue, setSliderValue] = useState(0.3);
 
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener(
@@ -116,6 +122,18 @@ const RequestObject = ({navigation}) => {
         setObjectsList(currentList);
         setRerender(!rerender);
     };
+
+    const onClose =()=> {
+        console.log('Modal just closed');
+    }
+
+    const onOpen = () => {
+        console.log('Modal just opened');
+    }
+
+    // const onClosingState = (state) => {
+    //     console.log('the open/close of the swipeToClose just changed');
+    // }
 
     const renderServicePartItem = item => {
         let Item = item;
@@ -536,56 +554,42 @@ const RequestObject = ({navigation}) => {
                 </TouchableOpacity>)}
             </View>)}
             {openSendModal && (
-                <TouchableHighlight
-                    style={Styles.modalBackgroundStyle}
-                    onPress={() => {
-                        if(!isKeyboardVisible) {
-                            setRequestDescription("");
-                            setOpenSendModal(false);
-                        }
-                    }}
-                    underlayColor="none">
-                    <View style={{
-                        top:isKeyboardVisible ? 0 : pageHeight*0.15,
-                        position: 'absolute',
-                        width: pageWidth * 0.8,
-                        height: pageHeight*0.5,
-                        backgroundColor: '#E8E8E8',
-                        borderRadius: 15,
-                        padding:10,
-                        overflow: 'hidden',
-                        alignItems: 'center'
-                    }}>
-                        <View style={Styles.modalBodyContainerStyle}>
-                            <Text style={Styles.modalBodyTextStyle}>
-                                آیا از درخواست خود اطمینان دارید؟
-                            </Text>
-                        </View>
-                        <View style={{width:"100%", paddingRight:10}}>
-                            <Text style={Styles.labelStyle}>توضیحات:</Text>
-                        </View>
-                        <TextInput value={requestDescription} onChangeText={txt=>setRequestDescription(txt)} style={Styles.descriptionTextInputStyle}/>
-                        {requestLoading ? (
-                            <View style={Styles.modalFooterContainerStyle}>
-                                <ActivityIndicator size={"small"} color={"#660000"}/>
-                            </View>
-                        ) : (<View style={Styles.modalFooterContainerStyle}>
-                            <TouchableOpacity
-                                style={Styles.modalButtonStyle}
-                                onPress={() => {
-                                    setOpenSendModal(false);
-                                    setRequestDescription("");
-                                }}>
-                                <Text style={Styles.modalButtonTextStyle}>انصراف</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={Styles.modalButtonStyle}
-                                onPress={handleSubmitRequest}>
-                                <Text style={Styles.modalButtonTextStyle}>تایید</Text>
-                            </TouchableOpacity>
-                        </View>)}
+                <Modal
+                    style={Styles.modal}
+                    isOpen={openSendModal}
+                    swipeToClose={()=>setOpenSendModal(false)}
+                    onClosed={()=>setOpenSendModal(false)}
+                    onOpened={()=>setOpenSendModal(true)}
+                    onClosingState={()=>{}}>
+                    <View style={Styles.modalBodyContainerStyle}>
+                        <Text style={Styles.modalBodyTextStyle}>
+                            آیا از درخواست خود اطمینان دارید؟
+                        </Text>
                     </View>
-                </TouchableHighlight>
+                    <View style={{width:"100%", paddingRight:10}}>
+                        <Text style={Styles.labelStyle}>توضیحات:</Text>
+                    </View>
+                    <TextInput value={requestDescription} onChangeText={txt=>setRequestDescription(txt)} style={Styles.descriptionTextInputStyle}/>
+                    {requestLoading ? (
+                        <View style={Styles.modalFooterContainerStyle}>
+                            <ActivityIndicator size={"small"} color={"#660000"}/>
+                        </View>
+                    ) : (<View style={Styles.modalFooterContainerStyle}>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={() => {
+                                setOpenSendModal(false);
+                                setRequestDescription("");
+                            }}>
+                            <Text style={Styles.modalButtonTextStyle}>انصراف</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={Styles.modalButtonStyle}
+                            onPress={handleSubmitRequest}>
+                            <Text style={Styles.modalButtonTextStyle}>تایید</Text>
+                        </TouchableOpacity>
+                    </View>)}
+                </Modal>
             )}
         </>
     );
@@ -679,7 +683,7 @@ const Styles = StyleSheet.create({
         justifyContent:"space-between"
     },
     descriptionTextInputStyle: {
-        width:"100%",
+        width:"90%",
         height:pageHeight*0.15,
         borderWidth:1,
         marginTop:10,
@@ -761,6 +765,14 @@ const Styles = StyleSheet.create({
         color: '#fff',
         fontSize: normalize(14),
         fontFamily: 'IRANSansMobile_Medium',
+    },
+    modal: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height:pageHeight*0.6,
+        marginTop:pageHeight*0.1,
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15
     },
 });
 
