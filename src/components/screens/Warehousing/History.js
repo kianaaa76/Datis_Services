@@ -990,7 +990,7 @@ const History = ({ navigation }) => {
                             setReadyToSendList(currentList);
                         }}>
                             <Text style={[Styles.labelTextStyle, { fontSize: 13 }]}>
-                                تاریخ: {toFaDigit(item.Date)}
+                                تاریخ: {toFaDigit(item.Date.split(' ')[1].concat(' ').concat(item.Date.split(' ')[0]))}
                             </Text>
                             <Text style={[Styles.labelTextStyle, {
                                 flexShrink: 1,
@@ -1087,9 +1087,9 @@ const History = ({ navigation }) => {
                                                                 return (<Text>{serial}</Text>)
                                                             })}
                                                         </View>
-                                                        <View style={{ flexDirection: "row" }}>
+                                                        <View style={{ flexDirection: "row", justifyContent:"flex-end" }}>
                                                             <Text
-                                                                style={[Styles.labelTextStyle, { marginRight: 10 }]}>
+                                                                style={[Styles.labelTextStyle, { marginRight: 10 , width:"65%", flexShrink:1}]}>
                                                                 نام
                                                                            نسخه: {version.Version_Name}</Text>
                                                             <TouchableOpacity style={{
@@ -1218,7 +1218,7 @@ const History = ({ navigation }) => {
                                         alignItems: "center"
                                     }}>
                                         <Text style={Styles.labelTextStyle}>
-                                            تاریخ: {item.Date}
+                                            تاریخ: {toFaDigit(item.Date.split(' ')[1].concat(' ').concat(item.Date.split(' ')[0]))}
                                         </Text>
                                     </View>
                                 </View>
