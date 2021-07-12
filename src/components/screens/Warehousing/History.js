@@ -1992,7 +1992,7 @@ const History = ({navigation}) => {
                                             quality: 0.5
                                         },
                                         (response) => {
-                                            setBarnameImage(response.base64);
+                                            setBarnameImage(response.assets[0].base64);
                                         },
                                     )
                                 }

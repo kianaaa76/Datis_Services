@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   BackHandler,
+  PermissionsAndroid,
 } from 'react-native';
 import Toast from "react-native-simple-toast";
 import CheckBox from 'react-native-check-box';
@@ -161,9 +162,26 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                       includeBase64: true,
                       quality:0.5
                     },
-                    (response) => {
-                      setInfo({...info, image: response.base64});
-                    },
+                    async (response) => {
+                      try {
+                        const granted = await PermissionsAndroid.request(
+                            PermissionsAndroid.PERMISSIONS.CAMERA,
+                            {
+                              title: "App Camera Permission",
+                              message:"App needs access to your camera ",
+                              buttonNeutral: "Ask Me Later",
+                              buttonNegative: "Cancel",
+                              buttonPositive: "OK"
+                            }
+                        );
+                        if (granted === PermissionsAndroid.RESULTS.GRANTED && !response.didCancel) {
+                          setInfo({...info, image: response.assets[0].base64});
+                        }
+                      } catch (err) {
+                        Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+                      }
+
+                    }
                 )
             } catch {
               Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
@@ -182,9 +200,8 @@ const ServiceServicesTab = ({setInfo, info, renderSaveModal}) => {
                       includeBase64: true,
                       quality:0.5
                     },
-                    (response) => {
-                      setInfo({...info, image: response.base64});
-                    },
+                    (response) => !response.didCancel ?
+                      setInfo({...info, image: response.base64}): null
                 )
             } catch {
               Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);

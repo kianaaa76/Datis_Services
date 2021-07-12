@@ -45,13 +45,13 @@ const ServiceMissionTab = ({
   const [searchText, setSearchText] = useState("");
   const [searchLoading,setSearchLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [distance, setDistance] = useState(
+  const [distance, setDistance] = useState(!!info.distance ?
     (parseFloat(info.distance) / 1000)
       .toString()
       .substr(
         0,
         (parseFloat(info.distance) / 1000).toString().indexOf('.') + 4,
-      ),
+      ) : 0
   );
 
   useEffect(() => {
@@ -186,18 +186,49 @@ const ServiceMissionTab = ({
         )
           .then(response => response.json())
           .then(data => {
-            let dist = (
-              parseFloat(data.routes[0].legs[0].distance) / 1000
-            ).toString();
-            setDistance(dist.substr(0, dist.indexOf('.') + 3));
+            try {
+              if (!!data && !!data.routes[0].legs[0].distance) {
+                let dist = (
+                    parseFloat(data.routes[0].legs[0].distance) / 1000
+                ).toString();
+                setDistance(dist.substr(0, dist.indexOf('.') + 3));
+                setInfo({
+                  ...info,
+                  distance: data.routes[0].legs[0].distance,
+                  endCity: EndObject,
+                  endLatitude: feature.geometry.coordinates[1],
+                  endLongitude: feature.geometry.coordinates[0],
+                });
+              }else {
+                setDistance(0);
+                setInfo({
+                  ...info,
+                  distance: 0,
+                  endCity: EndObject,
+                  endLatitude: feature.geometry.coordinates[1],
+                  endLongitude: feature.geometry.coordinates[0],
+                });
+              }
+            }catch{
+              setDistance(0);
+              setInfo({
+                ...info,
+                distance: 0,
+                endCity: EndObject,
+                endLatitude: feature.geometry.coordinates[1],
+                endLongitude: feature.geometry.coordinates[0],
+              });
+            }
+          }).catch(()=>{
+            setDistance(0);
             setInfo({
               ...info,
-              distance: data.routes[0].legs[0].distance,
+              distance: 0,
               endCity: EndObject,
               endLatitude: feature.geometry.coordinates[1],
               endLongitude: feature.geometry.coordinates[0],
             });
-          });
+        });
         setInfo({
           ...info,
           startCity: startCity,
@@ -432,7 +463,7 @@ const ServiceMissionTab = ({
                 onPress:async () => {
                 LocationServicesDialogBox.checkLocationServicesIsEnabled({
                 message:
-                "<h2 style='color: #0af13e'>Use Location ?</h2>This app wants to change your device settings:<br/><br/>Use GPS, Wi-Fi, and cell network for location<br/><br/><a href='#'>Learn more</a>",
+                "<h2 style='color: #0af13e'>آیا میخواهید از امکانات لوکیشن استفاده کنید؟</h2><br/>",
                 ok: 'YES',
                 cancel: 'NO',
                 enableHighAccuracy: true, // true => GPS AND NETWORK PROVIDER, false => GPS OR NETWORK PROVIDER

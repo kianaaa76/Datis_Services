@@ -282,7 +282,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                       {!!factorImage && (
                         <ImageViewer
                           width={pageWidth * 0.9 - 20}
-                          height={pageHeight * 0.7}
+                          height={pageHeight*0.7*(pageWidth*0.9-20)/(pageWidth-20)}
                           imageUrl={`data:image/jpeg;base64,${factorImage}`}
                         />
                       )}
@@ -293,7 +293,7 @@ const ServiceArchiveDetail = ({navigation}) => {
                           </View>
                           <ImageViewer
                             width={pageWidth * 0.9 - 20}
-                            height={pageHeight * 0.7}
+                            height={pageHeight*0.7*(pageWidth*0.9-20)/(pageWidth-20)}
                             imageUrl={`data:image/jpeg;base64,${image}`}
                           />
                         </>

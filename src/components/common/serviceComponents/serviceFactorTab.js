@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   BackHandler,
+    PermissionsAndroid
 } from 'react-native';
 import Toast from "react-native-simple-toast";
 import NumberFormat from 'react-number-format';
@@ -129,12 +130,27 @@ const ServiceFactorTab = ({
                       includeBase64: true,
                       quality:0.5
                     },
-
-                    (response) => {
-                      setInfo({
-                          ...info,
-                          factorImage: response.base64,
-                        });
+                    async (response) => {
+                      try {
+                        const granted = await PermissionsAndroid.request(
+                            PermissionsAndroid.PERMISSIONS.CAMERA,
+                            {
+                              title: "App Camera Permission",
+                              message:"App needs access to your camera ",
+                              buttonNeutral: "Ask Me Later",
+                              buttonNegative: "Cancel",
+                              buttonPositive: "OK"
+                            }
+                        );
+                        if (granted === PermissionsAndroid.RESULTS.GRANTED && !response.didCancel) {
+                          setInfo({
+                            ...info,
+                            factorImage: response.assets[0].base64,
+                          });
+                        }
+                      } catch (err) {
+                        Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+                      }
                     },
                 )
             }
@@ -147,12 +163,12 @@ const ServiceFactorTab = ({
                       includeBase64: true,
                       quality:0.5
                     },
-                    (response) => {
-                      setInfo({
+                    (response) => !response.didCancel ?
+                        setInfo({
                           ...info,
                           factorImage: response.base64,
-                        });
-                    },
+                        })
+                     : null,
                 )
             }
             })}
@@ -198,11 +214,27 @@ const ServiceFactorTab = ({
                       includeBase64: true,
                       quality:0.5
                     },
-                    (response) => {
-                      setInfo({
-                          ...info,
-                          billImage: response.base64,
-                        });
+                    async (response) => {
+                      try {
+                        const granted = await PermissionsAndroid.request(
+                            PermissionsAndroid.PERMISSIONS.CAMERA,
+                            {
+                              title: "App Camera Permission",
+                              message:"App needs access to your camera ",
+                              buttonNeutral: "Ask Me Later",
+                              buttonNegative: "Cancel",
+                              buttonPositive: "OK"
+                            }
+                        );
+                        if (granted === PermissionsAndroid.RESULTS.GRANTED && !response.didCancel) {
+                          setInfo({
+                            ...info,
+                            billImage: response.assets[0].base64,
+                          });
+                        }
+                      } catch (err) {
+                        Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
+                      }
                     },
                 )
             }
@@ -217,12 +249,11 @@ const ServiceFactorTab = ({
                       includeBase64: true,
                       quality:0.5
                     },
-                    (response) => {
+                    (response) => !response.didCancel ?
                       setInfo({
                           ...info,
                           billImage: response.base64,
-                        });
-                    },
+                        }) : null
                 )
             }
             })}

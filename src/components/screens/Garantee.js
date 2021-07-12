@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Header from '../common/Header';
 import Toast from "react-native-simple-toast";
-import RNRnZxing  from 'react-native-rn-zxing';
+import {RNCamera} from 'react-native-camera';
 import {useSelector, useDispatch} from 'react-redux';
 import {garanteeInquiry} from '../../actions/api';
 import {toFaDigit, normalize, getFontsName} from '../utils/utilities';
@@ -25,6 +25,7 @@ const Garantee = ({navigation}) => {
   const dispatch = useDispatch();
   const [serial, setSerial] = useState('');
   const [loader, setLoader] = useState(false);
+  const [barCode, setBarCode] = useState(false);
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
@@ -74,6 +75,31 @@ const Garantee = ({navigation}) => {
 
   return (
     <View style={{flex: 1}}>
+      {
+        barCode &&
+        <RNCamera
+            style={Styles.preview}
+            onBarCodeRead={(e) => setSerial(e.data.toString().substr(data.toString().length-7,7))}
+            type={RNCamera.Constants.Type.back}
+            flashMode={RNCamera.Constants.FlashMode.on}
+            androidCameraPermissionOptions={{
+              title: 'Permission to use camera',
+              message: 'We need your permission to use your camera',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+            androidRecordAudioPermissionOptions={{
+              title: 'Permission to use audio recording',
+              message: 'We need your permission to use your audio',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+        >
+          {/*{({ camera, status, recordAudioPermissionStatus }) => {*/}
+          {/*  // if (status !== 'READY') return <PendingView />;*/}
+          {/*}}*/}
+        </RNCamera>
+      }
       <>
         <Header
         headerText={'استعلام گارانتی'}
@@ -88,9 +114,10 @@ const Garantee = ({navigation}) => {
               fill:"#000",
               onPress:() => {
               try {
-                RNRnZxing.showQrReader(data => {
-                setSerial(data.toString().substr(data.toString().length-7,7));
-              });
+              //   RNRnZxing.showQrReader(data => {
+              //   setSerial(data.toString().substr(data.toString().length-7,7));
+              // });
+                setBarCode(true)
             } catch {
               Toast.showWithGravity('مشکلی پیش آمد. لطفا دوباره تلاش کنید.', Toast.LONG, Toast.CENTER);
             }

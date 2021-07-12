@@ -76,7 +76,8 @@ const MyServiceDetails = ({navigation}) => {
   const [hasServiceNewPart, setHasServiceNewPart] = useState(false);
 
   const setRenderSaveModalInTabs = () => {
-    setRenderSaveModal(true);
+    // setRenderSaveModal(true);
+    onSavePress();
   };
 
   useEffect(() => {
@@ -621,42 +622,42 @@ const MyServiceDetails = ({navigation}) => {
           </View>
         </TouchableHighlight>
       )}
-      {renderSaveModal && (
-        <TouchableHighlight
-          style={Styles.modalBackgroundStyle}
-          onPress={() => setRenderSaveModal(false)}
-          underlayColor="none">
-          <View style={Styles.modalContainerStyle}>
-            <View style={Styles.modalBodyContainerStyle2}>
-              <Text
-                style={{
-                  fontSize: normalize(14),
-                  fontFamily: getFontsName('IRANSansMobile_Medium'),
-                  textAlign: 'center',
-                }}>
-                آیا مایل به ذخیره اطلاعات وارد شده هستید؟
-              </Text>
-            </View>
-            <View style={Styles.modalFooterContainerStyle}>
-              <TouchableOpacity
-                style={Styles.modalButtonStyle}
-                onPress={() => {
-                  setRenderSaveModal(false);
-                  navigation.replace('RejectedServices');
-                }}>
-                <Text style={Styles.modalButtonTextStyle}>خیر</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={Styles.modalButtonStyle}
-                onPress={() => {
-                  onSavePress();
-                }}>
-                <Text style={Styles.modalButtonTextStyle}>بله</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableHighlight>
-      )}
+      {/*{renderSaveModal && (*/}
+      {/*  <TouchableHighlight*/}
+      {/*    style={Styles.modalBackgroundStyle}*/}
+      {/*    onPress={() => setRenderSaveModal(false)}*/}
+      {/*    underlayColor="none">*/}
+      {/*    <View style={Styles.modalContainerStyle}>*/}
+      {/*      <View style={Styles.modalBodyContainerStyle2}>*/}
+      {/*        <Text*/}
+      {/*          style={{*/}
+      {/*            fontSize: normalize(14),*/}
+      {/*            fontFamily: getFontsName('IRANSansMobile_Medium'),*/}
+      {/*            textAlign: 'center',*/}
+      {/*          }}>*/}
+      {/*          آیا مایل به ذخیره اطلاعات وارد شده هستید؟*/}
+      {/*        </Text>*/}
+      {/*      </View>*/}
+      {/*      <View style={Styles.modalFooterContainerStyle}>*/}
+      {/*        <TouchableOpacity*/}
+      {/*          style={Styles.modalButtonStyle}*/}
+      {/*          onPress={() => {*/}
+      {/*            setRenderSaveModal(false);*/}
+      {/*            navigation.replace('RejectedServices');*/}
+      {/*          }}>*/}
+      {/*          <Text style={Styles.modalButtonTextStyle}>خیر</Text>*/}
+      {/*        </TouchableOpacity>*/}
+      {/*        <TouchableOpacity*/}
+      {/*          style={Styles.modalButtonStyle}*/}
+      {/*          onPress={() => {*/}
+      {/*            onSavePress();*/}
+      {/*          }}>*/}
+      {/*          <Text style={Styles.modalButtonTextStyle}>بله</Text>*/}
+      {/*        </TouchableOpacity>*/}
+      {/*      </View>*/}
+      {/*    </View>*/}
+      {/*  </TouchableHighlight>*/}
+      {/*)}*/}
       {renderNetworkModal && (
         <TouchableHighlight
           style={Styles.modalBackgroundStyle}

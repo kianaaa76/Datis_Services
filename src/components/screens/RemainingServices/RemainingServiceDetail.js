@@ -171,7 +171,7 @@ const RemainingServiceDetail = ({navigation}) => {
             <View style={{width:"20%"}}>
               {PhoneIcon({
                 onPress:() => Linking.openURL(`tel:${text}`),
-                style:{fontSize: normalize(26), marginLeft: 10},
+                style:{marginLeft: 10},
                 color:"#000"
               })}
             </View>)}
@@ -372,7 +372,7 @@ const RemainingServiceDetail = ({navigation}) => {
                           quality:0.5
                         },
                         (response) => {
-                          setFactorImage(response.base64);
+                          setFactorImage(response.assets[0].base64);
                         },
                     )
               })}
